@@ -1,0 +1,142 @@
+2018-12-16 23:40:28,165 ERROR: Exception on /chargepage [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+TypeError: chargepage() missing 1 required positional argument: 'id'
+2018-12-16 23:43:31,629 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:43:48,933 ERROR: Exception on /chargepage [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 46, in chargepage
+    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, \
+NameError: name 'Charge' is not defined
+2018-12-16 23:45:14,710 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:45:28,060 ERROR: Exception on /chargepage [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 46, in chargepage
+    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, \
+NameError: name 'Chargetype' is not defined
+2018-12-16 23:45:50,743 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:46:00,926 ERROR: Exception on /chargepage [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 47, in chargepage
+    Charge.chargedesc, Charge.chargestartdate, Charge.chargetotal, charge.chargedetails, \
+AttributeError: type object 'Charge' has no attribute 'chargedesc'
+2018-12-16 23:49:08,336 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:49:19,355 ERROR: Exception on /chargepage [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 47, in chargepage
+    Chargetype.chargedesc, Charge.chargestartdate, Charge.chargetotal, charge.chargedetails, \
+AttributeError: type object 'Charge' has no attribute 'chargestartdate'
+2018-12-16 23:50:40,601 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:50:51,851 ERROR: Exception on /chargepage [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 47, in chargepage
+    Chargetype.chargedesc, Charge.startdate, Charge.chargetotal, charge.chargedetails, \
+NameError: name 'charge' is not defined
+2018-12-16 23:51:31,814 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-16 23:51:44,993 ERROR: Exception on /editcharge/27 [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 105, in editcharge
+    Charge.chargedesc, Charge.chargestartdate, Charge.chargetotal, charge.chargedetails, \
+AttributeError: type object 'Charge' has no attribute 'chargedesc'
+2018-12-16 23:53:17,551 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 00:57:06,235 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 01:02:47,056 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 01:04:36,015 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 14:24:35,934 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]

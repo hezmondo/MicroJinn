@@ -1,0 +1,152 @@
+2018-12-18 21:58:18,783 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 116, in newrent
+    return render_template('nextrent.html', title='New rent')
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 45, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 8, in block "content"
+    <input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 430, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'rent' is undefined
+2018-12-18 22:01:16,315 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:01:21,924 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 117, in newrent
+    return render_template('nextrent.html', title='New rent')
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 45, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 8, in block "content"
+    <input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 430, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'rent' is undefined
+2018-12-18 22:07:15,036 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:07:25,756 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 117, in newrent
+    return render_template('nextrent.html', title='New rent')
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 45, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 106, in block "content"
+    <a href="/chargepage/{{ rent.id }}"" class="btn btn-primary" role="button">Charges</a>
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 430, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'rent' is undefined
+2018-12-18 22:12:09,387 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:26:52,880 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:32:59,440 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:35:05,179 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:39:11,069 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:45:15,710 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:50:16,272 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 22:56:07,679 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 23:02:28,401 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 23:02:37,141 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 120, in newrent
+    return render_template('nextrent.html', title='New rent', landls=landls, malts=malts, tens=tens)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 45, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 29, in block "content"
+    <option value="{{freqs[0]}}" selected>{{freqs[0]}}</option>
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 411, in getitem
+    return obj[argument]
+jinja2.exceptions.UndefinedError: 'freqs' is undefined
+2018-12-18 23:03:09,460 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]

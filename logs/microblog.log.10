@@ -1,0 +1,133 @@
+2018-12-12 22:25:26,407 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:27:49,849 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:29:23,592 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:31:46,217 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:37:50,724 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:40:38,063 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:42:36,938 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 22:49:00,130 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:05:26,341 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:05:42,851 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 48, in editrent
+    return redirect(url_for('editrent'), id)
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 356, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2061, in handle_url_build_error
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 345, in url_for
+    force_external=external)
+  File "c:\mjp\micro\env\lib\site-packages\werkzeug\routing.py", line 1776, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'editrent'. Did you forget to specify values ['id']?
+2018-12-12 23:07:57,794 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:08:13,746 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 48, in editrent
+    return redirect(url_for('editrent'), '{}'.format(id))
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 356, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2061, in handle_url_build_error
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 345, in url_for
+    force_external=external)
+  File "c:\mjp\micro\env\lib\site-packages\werkzeug\routing.py", line 1776, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'editrent'. Did you forget to specify values ['id']?
+2018-12-12 23:08:55,791 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:09:04,824 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 48, in editrent
+    return redirect(url_for('editrent'), id='{}'.format(id))
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 356, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2061, in handle_url_build_error
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 345, in url_for
+    force_external=external)
+  File "c:\mjp\micro\env\lib\site-packages\werkzeug\routing.py", line 1776, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'editrent'. Did you forget to specify values ['id']?
+2018-12-12 23:09:57,844 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:10:37,804 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:11:03,943 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:11:17,198 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 48, in editrent
+    return redirect(url_for('editrent'), id=id)
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 356, in url_for
+    return appctx.app.handle_url_build_error(error, endpoint, values)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2061, in handle_url_build_error
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\helpers.py", line 345, in url_for
+    force_external=external)
+  File "c:\mjp\micro\env\lib\site-packages\werkzeug\routing.py", line 1776, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.BuildError: Could not build url for endpoint 'editrent'. Did you forget to specify values ['id']?
+2018-12-12 23:23:51,704 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-12 23:24:22,162 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-13 00:06:11,175 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]

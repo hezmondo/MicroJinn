@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+    <form method="POST" id="target">
+		<div class="form-row">
+			<div class="form-group col-md-2">
+				<label for="rentcode">Rent code:</label>
+				<input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ "" }}">
+			</div>
+			<div class="form-group col-md-10">
+				<label for="propaddr">Property address:</label>
+				<input type="text" class="form-control" id="propaddr" name="propaddr" value="{{ "" }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-4">
+				<label for="landlord">Landlord:</label>
+				<select class="form-control" name="landlord" method="GET" action="/">
+				  <option value="{{landlords[0]}}" selected>{{landlords[0]}}</option>
+				  {% for landlord in landlords[0:] %}
+					<option value="{{landlord}}">{{landlord}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-8">
+				<label for="tenantname">Tenant name:</label>
+				<input type="text" class="form-control" id="tenantname" name="tenantname" value="{{ "" }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-8">
+				<label for="note">Notes:</label>
+				<input type="text" class="form-control" id="note" name="note" value="{{ "" }}">
+			</div>
+            <div class="form-group col-md-4">
+				<label for="email">Email:</label>
+				<input type="text" class="form-control" id="email" name="email" value="{{ "" }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-4">
+				<label for="mailto">Mail to:</label>
+				<select class="form-control" name="mailto" method="GET" action="/">
+				  <option value="{{mailtodets[0]}}" selected>{{mailtodets[0]}}</option>
+				  {% for mailtodet in mailtodets[0:] %}
+					<option value="{{mailtodet}}">{{mailtodet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-8">
+				<label for="agent">Agent:</label>
+				<input type="text" class="form-control" id="agent" name="agent" value="{{ "" }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-2">
+				<label for="rentpa">Rent pa:</label>
+				<input type="text" class="form-control" id="rentpa" name="rentpa" value="{{ "0.00" }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="arrears">Rent arrears:</label>
+				<input type="text" class="form-control" id="arrears" name="arrears" value="{{ "0.00" }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="totcharges">Total charges:</label>
+				<input type="text" class="form-control" id="totcharges" name="totcharges" value="{{ "0.00" }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="lastrentdate">Last rent date:</label>
+				<input type ="date" name="lastrentdate" value="{{ today }}" class="form-control">	  
+			</div>
+            <div class="form-group col-md-2">
+				<label for="frequency">Frequency:</label>
+				<select class="form-control" name="frequency" method="GET" action="/">
+				  <option value="{{freqdets[0]}}" selected>{{freqdets[0]}}</option>
+				  {% for freqdet in freqdets[0:] %}
+					<option value="{{freqdet}}">{{freqdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="advarr">Advance/Arrears:</label>
+				<select class="form-control" name="advarr" method="GET" action="/">
+				  <option value="{{advarrdets[0]}}" selected>{{advarrdets[0]}}</option>
+				  {% for advarrdet in advarrdets[0:] %}
+					<option value="{{advarrdet}}">{{advarrdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-2">
+				<label for="tenure">Tenure:</label>
+				<select class="form-control" name="tenure" method="GET" action="/">
+				  <option value="{{tenuredets[0]}}" selected>{{tenuredets[0]}}</option>
+				  {% for tenuredet in tenuredets[0:] %}
+					<option value="{{tenuredet}}">{{tenuredet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="source">Source:</label>
+				<input type="text" class="form-control" id="source" name="source" value="{{ "" }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="deedtype">Deed type:</label>
+				<select class="form-control" name="deedtype" method="GET" action="/">
+				  <option value="{{deedcodes[0]}}" selected>{{deedcodes[0]}}</option>
+				  {% for deedcode in deedcodes[0:] %}
+					<option value="{{deedcode}}">{{deedcode}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="salegrade">Sale grade:</label>
+				<select class="form-control" name="salegrade" method="GET" action="/">
+				  <option value="{{salegradedets[0]}}" selected>{{salegradedets[0]}}</option>
+				  {% for salegradedet in salegradedets[0:] %}
+					<option value="{{salegradedet}}">{{salegradedet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="price">Price:</label>
+				<input type="text" class="form-control" id="price" name="price" value="{{ "99999.99" }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="status">Status:</label>
+				<select class="form-control" name="status" method="GET" action="/">
+				  <option value="{{statusdets[0]}}" selected>{{statusdets[0]}}</option>
+				  {% for statusdet in statusdets[0:] %}
+					<option value="{{statusdet}}">{{statusdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-4">
+				<button type="submit" class="btn btn-block btn-primary">Save changes</button>
+			</div>
+		</div>
+    </form>
+{% endblock %}

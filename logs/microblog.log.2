@@ -1,0 +1,124 @@
+2018-12-19 19:36:13,841 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 20:35:04,441 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 21:25:19,936 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 22:24:16,917 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 22:24:21,756 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 117, in newrent
+    landlords = Landlord.query.with_entities(name).all()
+NameError: name 'name' is not defined
+2018-12-19 22:25:24,767 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 22:25:30,298 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 123, in newrent
+    return render_template('nextrent.html', title='New rent', landlords=landlords, freqs=freqs, mailtos=mailtos, tenures=tenures, advars=advars)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 45, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 29, in block "content"
+    <option value="{{tens[0]}}" selected>{{tens[0]}}</option>
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 411, in getitem
+    return obj[argument]
+jinja2.exceptions.UndefinedError: 'tens' is undefined
+2018-12-19 22:26:46,423 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 22:30:15,119 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 22:32:22,561 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 23:34:27,246 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 23:43:22,576 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-19 23:44:42,403 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 21:46:30,444 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 21:47:56,276 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 22:11:59,178 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 22:12:35,645 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 22:14:14,891 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 22:14:30,197 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:00:36,651 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:00:44,105 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:06:51,839 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:06:59,982 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:27:46,962 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:27:53,109 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:38:16,786 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:41:45,502 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:47:10,844 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:50:07,232 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:52:01,654 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:53:20,395 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:55:38,135 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:55:52,218 ERROR: Exception on /externalrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 51, in externalrent
+    return render_template('externalrent.html', title='externalrent', rents=rents)
+UnboundLocalError: local variable 'rents' referenced before assignment
+2018-12-20 23:57:51,064 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-20 23:59:38,237 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-21 00:03:28,672 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-21 00:08:42,242 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-21 00:13:54,685 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:37:03,341 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:38:28,326 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:38:38,911 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:38:48,924 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:39:00,765 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 16:58:12,419 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:02:54,231 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:04:26,876 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:06:19,310 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:06:43,591 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:17:05,845 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:17:13,564 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:19:08,246 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:19:19,840 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:42:05,201 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:43:18,478 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:45:16,267 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-23 17:48:13,576 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]

@@ -1,0 +1,118 @@
+2018-12-24 19:21:45,399 ERROR: Exception on /editrent/1427 [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 132, in editrent
+    return render_template('editrent.html', rent=rentdet)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\editrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 47, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\editrent.html", line 91, in block "content"
+    <input type="text" class="form-control" id="titlegrade" name="titlegrade" value="{{ rent.salegrade.det }}">
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 430, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'sqlalchemy.util._collections.result object' has no attribute 'salegrade'
+2018-12-24 19:23:13,565 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-24 20:51:24,119 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-24 20:51:35,015 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 196, in newrent
+    freqs=freqs, mailtos=mailtos, salegrades= salegrades, statuses=statuses, tenures=tenures)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\nextrent.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 47, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\nextrent.html", line 100, in block "content"
+    <option value="{{advars[0]}}" selected>{{advars[0]}}</option>
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 411, in getitem
+    return obj[argument]
+jinja2.exceptions.UndefinedError: 'advars' is undefined
+2018-12-24 20:52:56,358 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-25 11:19:53,686 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-25 11:41:54,050 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-25 11:44:46,566 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-25 11:53:19,604 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-27 18:42:05,566 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2019-01-21 15:34:05,534 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2019-01-21 15:37:35,841 ERROR: Exception on /rentpage [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 228, in rentpage
+    return render_template('rentpage.html', rents=rentdet)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 135, in render_template
+    context, ctx.app)
+  File "c:\mjp\micro\env\lib\site-packages\flask\templating.py", line 117, in _render
+    rv = template.render(context)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 1008, in render
+    return self.environment.handle_exception(exc_info, True)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 780, in handle_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\_compat.py", line 37, in reraise
+    raise value.with_traceback(tb)
+  File "C:\MJP\micro\app\templates\rentpage.html", line 1, in top-level template code
+    {% extends 'base.html' %}
+  File "C:\MJP\micro\app\templates\base.html", line 47, in top-level template code
+    {% block content %}
+  File "C:\MJP\micro\app\templates\rentpage.html", line 8, in block "content"
+    <input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
+  File "c:\mjp\micro\env\lib\site-packages\jinja2\environment.py", line 430, in getattr
+    return getattr(obj, attribute)
+jinja2.exceptions.UndefinedError: 'rent' is undefined

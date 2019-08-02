@@ -1,0 +1,130 @@
+2018-12-17 14:25:00,125 ERROR: Exception on /index [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 32, in index
+    Rent.tenantname.ilike ('%{}%'.format(ten)), \
+NameError: name 'ten' is not defined
+2018-12-17 14:26:05,979 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 14:27:27,265 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 69, in editrent
+    thisagent.agdetails = request.form["agdetails"]
+AttributeError: 'NoneType' object has no attribute 'agdetails'
+2018-12-17 14:46:10,917 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 14:46:25,377 ERROR: Exception on /editrent/99 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 69, in editrent
+    thisagent.agdetails = request.form["agent"]
+AttributeError: 'NoneType' object has no attribute 'agdetails'
+2018-12-17 14:51:12,221 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 14:51:27,161 ERROR: Exception on /editrent/99 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 70, in editrent
+    thisagent.agdetails = request.form["agent"]
+AttributeError: 'NoneType' object has no attribute 'agdetails'
+2018-12-17 22:22:58,863 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 22:23:19,971 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 22:23:43,756 ERROR: Exception on /editrent/1481 [POST] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "c:\mjp\micro\env\lib\site-packages\flask_login\utils.py", line 261, in decorated_view
+    return func(*args, **kwargs)
+  File "C:\MJP\micro\app\routes.py", line 70, in editrent
+    thisagent.agdetails = request.form["agent"]
+AttributeError: 'NoneType' object has no attribute 'agdetails'
+2018-12-17 22:34:56,751 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 23:08:43,937 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 23:45:23,558 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 23:46:22,399 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-17 23:54:32,775 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 00:07:11,613 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 00:15:19,248 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:42:04,862 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:48:11,606 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:52:50,332 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:53:17,652 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:57:28,186 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]
+2018-12-18 21:57:35,285 ERROR: Exception on /newrent [GET] [in c:\mjp\micro\env\lib\site-packages\flask\app.py:1761]
+Traceback (most recent call last):
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 2292, in wsgi_app
+    response = self.full_dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1815, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1718, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "c:\mjp\micro\env\lib\site-packages\flask\_compat.py", line 35, in reraise
+    raise value
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1813, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "c:\mjp\micro\env\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "C:\MJP\micro\app\routes.py", line 116, in newrent
+    if form.validate_on_submit():
+NameError: name 'form' is not defined
+2018-12-18 21:58:13,043 INFO: MicroJinn startup [in C:\MJP\micro\app\__init__.py:47]

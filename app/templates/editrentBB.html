@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+    <form method="POST" id="target">
+		<div class="form-row">
+			<div class="form-group col-md-2">
+				<label for="rentcode">Rent code:</label>
+				<input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
+			</div>
+			<div class="form-group col-md-10">
+				<label for="propaddr">Property address:</label>
+				<input type="text" class="form-control" id="propaddr" name="propaddr" value="{{ rent.propaddr }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-4">
+				<label for="landlord">Landlord:</label>
+				<select class="form-control" name="landlord" method="GET" action="/">
+				  <option value="{{rent.name}}" selected>{{rent.name}}</option>
+				  {% for landlord in landlords[0:] %}
+					<option value="{{landlord}}">{{landlord}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-8">
+				<label for="tenantname">Tenant name:</label>
+				<input type="text" class="form-control" id="tenantname" name="tenantname" value="{{ rent.tenantname }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-8">
+				<label for="note">Notes:</label>
+				<input type="text" class="form-control" id="note" name="note" value="{{ rent.note }}">
+			</div>
+            <div class="form-group col-md-4">
+				<label for="email">Email:</label>
+				<input type="text" class="form-control" id="email" name="email" value="{{ rent.email }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-4">
+				<label for="mailto">Mail to:</label>
+				<select class="form-control" name="mailto" method="GET" action="/">
+				  <option value="{{rent.mailtodet}}" selected>{{rent.mailtodet}}</option>
+				  {% for mailto in mailtos[0:] %}
+					<option value="{{mailto}}">{{mailto}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-8">
+				<label for="agent">Agent:</label>
+				<input type="text" class="form-control" id="agent" name="agent" value="{{ rent.agdetails }}">
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-2">
+				<label for="rentpa">Rent pa:</label>
+				<input type="text" class="form-control" id="rentpa" name="rentpa" value="{{ rent.rentpa }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="arrears">Rent arrears:</label>
+				<input type="text" class="form-control" id="arrears" name="arrears" value="{{ rent.arrears }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="totcharges">Total charges:</label>
+				<input type="text" class="form-control" id="totcharges" name="totcharges" value="{{ rent.arrears }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="lastrentdate">Last rent date:</label>
+				<input type="date" class="form-control" id="lastrentdate" name="lastrentdate" value="{{ rent.lastrentdate }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="frequency">Frequency:</label>
+				<select class="form-control" name="frequency" method="GET" action="/">
+				  <option value="{{rent.freqdet}}" selected>{{rent.freqdet}}</option>
+				  {% for freqdet in freqdets[0:] %}
+					<option value="{{freqdet}}">{{freqdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="advarr">Advance/Arrears:</label>
+				<select class="form-control" name="advarr" method="GET" action="/">
+				  <option value="{{rent.advarrdet}}" selected>{{rent.advarrdet}}</option>
+				  {% for advarrdet in advarrdets[0:] %}
+					<option value="{{advarrdet}}">{{advarrdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+		</div>
+		<div class="form-row">
+            <div class="form-group col-md-2">
+				<label for="tenure">Tenure:</label>
+				<select class="form-control" name="tenure" method="GET" action="/">
+				  <option value="{{rent.tenuredet}}" selected>{{rent.tenuredet}}</option>
+				  {% for tenuredet in tenuredets[0:] %}
+					<option value="{{tenuredet}}">{{tenuredet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="source">Source:</label>
+				<input type="text" class="form-control" id="source" name="source" value="{{ rent.source }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="deedtype">Deed type:</label>
+				<select class="form-control" name="deedtype" method="GET" action="/">
+				  <option value="{{rent.deedcode}}" selected>{{rent.deedcode}}</option>
+				  {% for deedcode in deedcodes[0:] %}
+					<option value="{{deedcode}}">{{deedcode}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="salegrade">Sale grade:</label>
+				<select class="form-control" name="salegrade" method="GET" action="/">
+				  <option value="{{rent.salegradedet}}" selected>{{rent.salegradedet}}</option>
+				  {% for salegradedet in salegradedets[0:] %}
+					<option value="{{salegradedet}}">{{salegradedet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+            <div class="form-group col-md-2">
+				<label for="price">Price:</label>
+				<input type="text" class="form-control" id="price" name="price" value="{{ rent.price }}">
+			</div>
+            <div class="form-group col-md-2">
+				<label for="status">Status:</label>
+				<select class="form-control" name="status" method="GET" action="/">
+				  <option value="{{rent.statusdet}}" selected>{{rent.statusdet}}</option>
+				  {% for statusdet in statusdets[0:] %}
+					<option value="{{statusdet}}">{{statusdet}}</option>
+				  {% endfor %}
+				</select>			
+			</div>
+		</div>
+		<div class="form-row">
+			<br />
+            <div class="form-group col-md-2">
+			<a href="/chargepage/{{ rent.id }}"" class="btn btn-primary" role="button">Charges</a>
+			</div>
+            <div class="form-group col-md-2">
+			<a href="/newrent" class="btn btn-primary" role="button">Add new rent</a>
+			</div>
+            <div class="form-group col-md-2">
+			<a href="/prpage" class="btn btn-primary" role="button">Payreq</a>
+			</div>
+            <div class="form-group col-md-6">
+			<button type="submit" class="btn btn-block btn-primary">Save changes</button>
+			</div>
+		</div>
+    </form>
+{% endblock %}
+

@@ -1,0 +1,20 @@
+INSERT INTO  micro.agent
+select 0, substring_index(AgentDetails, ',', 1), SUBSTR(AgentDetails FROM (INSTR(AgentDetails, ', ') +1)), r.RentCode FROM yoda.agents a
+LEFT JOIN yoda.link l 
+ON a.AgentCode = l.AgentCode
+LEFT JOIN yoda.rents r ON l.RentCode = r.RentCode
+WHERE r.RentCode IN 
+(SELECT rentcode from micro.rent)
+;
+
+
+
+UPDATE micro.agent m INNER JOIN yoda.link l
+ON m.RentCode = l.AgentCode
+SET m.note = SUBSTRING(c.Notes, 1, 60), m.email = c.Email;
+
+UPDATE micro.rent r RIGHT JOIN micro.agent a
+ON a.rentcode = r.rentcode
+SET r.agent_id = a.id;
+
+, "note": request.form['note'], "email": request.form['email']
