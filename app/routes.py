@@ -66,7 +66,7 @@ def clonerent(id):
     else:
         rentdet = Property.query.join(Rent).join(Landlord).outerjoin(Agent).join(Typeactype).join(Typeadvarr).join(Typedeed).\
                   join(Typemailto).join(Typesalegrade).join(Typestatus).join(Typetenure).with_entities(Rent.id, \
-                   Rent.rentcode, Rent.tenantname, Rent.rentpa, Rent.arrears, Rent.lastrentdate, Rent.frequency, \
+                   Rent.rentcode, Rent.tenantname, Rent.rentpa, Rent.arrears, Rent.lastrentdate, Rent.freq_id, \
                    Rent.datecode, Rent.source, Rent.price, Rent.note, Rent.email, Property.propaddr, Landlord.name, \
                    Agent.agdetails, Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typemailto.mailtodet, \
                    Typesalegrade.salegradedet, Typestatus.statusdet, Typetenure.tenuredet).filter(Rent.id==('{}'.format(id))).first()
