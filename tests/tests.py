@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from datetime import datetime, timedelta
 import unittest
 from app import app, db
@@ -7,8 +6,7 @@ from app.models import User
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://hezmo:Hez815918H@localhost/micro'
-	db.create_all()
+        db.create_all()
 
     def tearDown(self):
         db.session.remove()
