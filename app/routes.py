@@ -126,7 +126,7 @@ def editcharge(id):
     return render_template('editcharge.html', chargedescs=chargedescs, charge=chargedet)
 
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
+@app.route('/signin/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm(current_user.username)
@@ -291,7 +291,7 @@ def login():
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template('/signin/login.html', title='Sign In', form=form)
 
 
 @app.route('/logout')
@@ -303,26 +303,49 @@ def logout():
 @app.route('/newrent', methods=['GET', 'POST'])
 def newrent():
     if request.method == "POST":
-        rentcode = request.form["tenantname"]
+        rentcode = request.form["rentcode"]
+
+        # get property details and we will write code later to deal with it!:
+        propaddr = request.form["propaddr"]
+        # if propaddr is not None:
+
+        landlord = request.form["landlord"]
+        landlord_id = \
+            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).first()[0]
         tenantname = request.form["tenantname"]
-        rentpa = request.form["rentpa"]
-        source = request.form["source"]
         note = request.form["note"]
+
         email = request.form["email"]
-        lastrentdate = request.form["lastrentdate"]
         mailto = request.form["mailto"]
         mailto_id = \
             Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).first()[0]
+
+        # get agent details and we will write code later to deal with it!:
+        agent = request.form["agent"]
+        agent_id = 0
+        # if agent is not None:
+
+        rentpa = request.form["rentpa"]
         arrears = request.form["arrears"]
+
+        lastrentdate = request.form["lastrentdate"]
         frequency = request.form["frequency"]
         freq_id = \
             Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).first()[0]
+        actype = request.form["actype"]
+        actype_id = \
+            Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
         advarr = request.form["advarr"]
         advarr_id = \
             Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).first()[0]
+
+        # get datecode details but we will write code later to generate it!:
+        datecode = request.form["datecode"]
+
         tenure = request.form["tenure"]
         tenure_id = \
             Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
+        source = request.form["source"]
         deedtype = request.form["deedtype"]
         deed_id = \
             Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).first()[0]
@@ -330,24 +353,16 @@ def newrent():
         salegrade_id = \
             Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).first()[
                 0]
+        price = request.form["price"]
         status = request.form["status"]
         status_id = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).first()[0]
+
         newrent = Rent(0, rentcode, tenantname, rentpa, arrears, lastrentdate, datecode,
-                       source, price, email, note, landlord_id, agent_id, actype, advarr_id, deed_id,
-                       freq_id, mailto_id, salegrade_id, status_id, tenure_id)
-        propaddr = request.form["propaddr"]
-        agent = request.form["agent"]
-        if propaddr is not None and propaddr != "" and propaddr != "None":
-            newprop = Fitstory(storydet=thisstory)
-            newfit.story_fit.append(newstory)
-            db.session.add(newfit)
-            db.session.commit()
-        return redirect('/index')
-        if agent is not None:
-            thisagent.agdetails = request.form["agent"]
-        newfit.users.append(user)
+                       source, price, email, note, landlord_id, agent_id, actype_id, advarr_id, deed_id,
+                       mailto_id, salegrade_id, status_id, tenure_id, freq_id)
+        db.session.add(newrent)
         db.session.commit()
-        return redirect('/editrent/{}'.format(id))
+        return redirect('/index')
     else:
         actypedets = Typeactype.query.with_entities(Typeactype.actypedet).all()
         actypedets = [value for (value,) in actypedets]
@@ -384,7 +399,7 @@ def register():
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('signin/register.html', title='Register', form=form)
 
 
 @app.route('/rentpage')
@@ -425,7 +440,7 @@ def reset_password_request():
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
         return redirect(url_for('login'))
-    return render_template('reset_password_request.html', title='Reset Password', form=form)
+    return render_template('/signin/reset_password_request.html', title='Reset Password', form=form)
 
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
@@ -441,7 +456,7 @@ def reset_password(token):
         db.session.commit()
         flash('Your password has been reset.')
         return redirect(url_for('login'))
-    return render_template('reset_password.html', form=form)
+    return render_template('/signin/reset_password.html', form=form)
 
 
 @app.route('/user/<username>')
@@ -449,4 +464,4 @@ def reset_password(token):
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    return render_template('user.html', user=user)
+    return render_template('/signin/user.html', user=user)
