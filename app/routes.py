@@ -55,114 +55,46 @@ def chargepage(id):
 @login_required
 def clonerent(id):
     if request.method == "POST":
-        rent = Rent()
-
-        # we need to test for unique rentcode not already used
+        rent, property, agent = savechanges(id, "clone")
         rent.rentcode = request.form["rentcode"]
-
-        actype = request.form["actype"]
-        rent.actype_id = \
-            Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
-        advarr = request.form["advarr"]
-        rent.advarr_id = \
-            Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).first()[0]
-        rent.arrears = request.form["arrears"]
-
-        # we will write code later to generate datecode from lastrentdate!:
-        rent.datecode = request.form["datecode"]
-
-        deedtype = request.form["deedtype"]
-        rent.deed_id = \
-            Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).first()[0]
-        rent.email = request.form["email"]
-        frequency = request.form["frequency"]
-        rent.freq_id = \
-            Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).first()[0]
-        landlord = request.form["landlord"]
-        rent.landlord_id = \
-            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).first()[0]
-        rent.lastrentdate = request.form["lastrentdate"]
-        mailto = request.form["mailto"]
-        rent.mailto_id = \
-            Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).first()[0]
-        rent.note = request.form["note"]
-        rent.price = request.form["price"]
-        rent.rentpa = request.form["rentpa"]
-        salegrade = request.form["salegrade"]
-        rent.salegrade_id = \
-            Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).first()[
-                0]
-        rent.source = request.form["source"]
-        status = request.form["status"]
-        rent.status_id = \
-            Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).first()[0]
-        rent.tenantname = request.form["tenantname"]
-        tenure = request.form["tenure"]
-        rent.tenure_id = \
-            Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
-        # agent = Agent.query.filter(Agent.id == rent.agent_id).first()
-        # if agent is not None:
-        #     agent.agdetails = request.form["agent"]
-        property = Property()
-        property.propaddr = request.form["propaddr"]
-        proptype = request.form["proptype"]
-        property.typeprop_id = \
-            Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).first()[0]
         rent.prop_rent.append(property)
+
+        # lots of challenges: this should deal with a new agent, but not to connect to an existing agent
+        if agent and agent.agdetails != "None":
+            agent.rent_agent.append(rent)
+            db.session.add(agent)
+
         db.session.add(rent)
         db.session.commit()
-        return redirect(url_for('login'))
-    else:
-        rentdet = \
+        new_id = \
             Property.query \
                 .join(Rent) \
-                .join(Landlord) \
-                .outerjoin(Agent) \
-                .join(Typeactype) \
-                .join(Typeadvarr) \
-                .join(Typedeed) \
-                .join(Typefreq) \
-                .join(Typemailto) \
-                .join(Typeproperty) \
-                .join(Typesalegrade) \
-                .join(Typestatus) \
-                .join(Typetenure) \
-                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
-                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                               Typetenure.tenuredet) \
-                .filter(Rent.id == ('{}'.format(id))) \
-                .first()
-        actypedets = Typeactype.query.with_entities(Typeactype.actypedet).all()
-        actypedets = [value for (value,) in actypedets]
-        advarrdets = Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()
-        advarrdets = [value for (value,) in advarrdets]
-        deedcodes = Typedeed.query.with_entities(Typedeed.deedcode).all()
-        deedcodes = [value for (value,) in deedcodes]
-        freqdets = Typefreq.query.with_entities(Typefreq.freqdet).all()
-        freqdets = [value for (value,) in freqdets]
-        landlords = Landlord.query.with_entities(Landlord.name).all()
-        landlords = [value for (value,) in landlords]
-        mailtodets = Typemailto.query.with_entities(Typemailto.mailtodet).all()
-        mailtodets = [value for (value,) in mailtodets]
-        proptypedets = Typeproperty.query.with_entities(Typeproperty.proptypedet).all()
-        proptypedets = [value for (value,) in proptypedets]
-        salegradedets = Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()
-        salegradedets = [value for (value,) in salegradedets]
-        statusdets = Typestatus.query.with_entities(Typestatus.statusdet).all()
-        statusdets = [value for (value,) in statusdets]
-        tenuredets = Typetenure.query.with_entities(Typetenure.tenuredet).all()
-        tenuredets = [value for (value,) in tenuredets]
-        if rentdet is None:
-            flash('Invalid rent code')
-            return redirect(url_for('login'))
+            .with_entities(Rent.id).filter(Property.propaddr == property.propaddr).first()[0]
 
-    return render_template('editrent.html', rent=rentdet, actypedets=actypedets, advarrdets=advarrdets,
-                           deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                           proptypedets=proptypedets, salegradedets=salegradedets, statusdets=statusdets,
-                           tenuredets=tenuredets)
+        return redirect('/editrent/{}'.format(new_id))
+    else:
+        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getvalues(id, "clone")
+
+    return render_template('editrent.html', title='Clone rent', rent=rentdet, actypedets=actypedets,
+                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
+                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
+                           statusdets=statusdets, tenuredets=tenuredets)
+
+
+@app.route('/signin/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+
+    return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
 @app.route('/editcharge/<int:id>', methods=["POST", "GET"])
@@ -197,138 +129,23 @@ def editcharge(id):
     return render_template('editcharge.html', chargedescs=chargedescs, charge=chargedet)
 
 
-@app.route('/signin/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm(current_user.username)
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
-
-
-@app.route('/deleterentprop/<int:id>')
-def deleteitem(id):
-    delete_rent = Rent.query.get(id)
-    delete_property = Property.query.filter(Property.rent_id == ('{}'.format(id))).first()
-    if delete_property is not None:
-        db.session.delete(delete_property)
-    db.session.delete(delete_rent)
-    db.session.commit()
-
-    return redirect(url_for('index'))
-
-
 @app.route('/editrent/<int:id>', methods=["POST", "GET"])
 @login_required
 def editrent(id):
     if request.method == "POST":
-        rent = Rent.query.get(id)
-        actype = request.form["actype"]
-        rent.actype_id = \
-            Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
-        advarr = request.form["advarr"]
-        rent.advarr_id = \
-            Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).first()[0]
-        rent.arrears = request.form["arrears"]
+        rent, property, agent = savechanges(id, "edit")
+        # lots of challenges: I have allowed for editing an existing agent, but not switching to another or new agent
 
-        # we will write code later to generate datecode from lastrentdate!:
-        rent.datecode = request.form["datecode"]
-
-        deedtype = request.form["deedtype"]
-        rent.deed_id = \
-            Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).first()[0]
-        rent.email = request.form["email"]
-        frequency = request.form["frequency"]
-        rent.freq_id = \
-            Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).first()[0]
-        landlord = request.form["landlord"]
-        rent.landlord_id = \
-            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).first()[0]
-        rent.lastrentdate = request.form["lastrentdate"]
-        mailto = request.form["mailto"]
-        rent.mailto_id = \
-            Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).first()[0]
-        rent.note = request.form["note"]
-        rent.price = request.form["price"]
-        rent.rentpa = request.form["rentpa"]
-        salegrade = request.form["salegrade"]
-        rent.salegrade_id = \
-            Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).first()[0]
-        rent.source = request.form["source"]
-        status = request.form["status"]
-        rent.status_id = \
-            Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).first()[0]
-        rent.tenantname = request.form["tenantname"]
-        tenure = request.form["tenure"]
-        rent.tenure_id = \
-            Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
-        agent = Agent.query.filter(Agent.id == rent.agent_id).first()
-        if agent is not None:
-            agent.agdetails = request.form["agent"]
-        property = Property.query.filter(Property.rent_id == id).first()
-        property.propaddr = request.form["propaddr"]
-        proptype = request.form["proptype"]
-        property.typeprop_id = \
-            Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).first()[0]
         db.session.commit()
         return redirect('/editrent/{}'.format(id))
     else:
-        rentdet = \
-            Property.query \
-                .join(Rent) \
-                .join(Landlord) \
-                .outerjoin(Agent) \
-                .join(Typeactype) \
-                .join(Typeadvarr) \
-                .join(Typedeed) \
-                .join(Typefreq) \
-                .join(Typemailto) \
-                .join(Typeproperty) \
-                .join(Typesalegrade) \
-                .join(Typestatus) \
-                .join(Typetenure) \
-                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
-                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                               Typetenure.tenuredet) \
-                .filter(Rent.id == ('{}'.format(id))) \
-                .first()
-        actypedets = Typeactype.query.with_entities(Typeactype.actypedet).all()
-        actypedets = [value for (value,) in actypedets]
-        advarrdets = Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()
-        advarrdets = [value for (value,) in advarrdets]
-        deedcodes = Typedeed.query.with_entities(Typedeed.deedcode).all()
-        deedcodes = [value for (value,) in deedcodes]
-        freqdets = Typefreq.query.with_entities(Typefreq.freqdet).all()
-        freqdets = [value for (value,) in freqdets]
-        landlords = Landlord.query.with_entities(Landlord.name).all()
-        landlords = [value for (value,) in landlords]
-        mailtodets = Typemailto.query.with_entities(Typemailto.mailtodet).all()
-        mailtodets = [value for (value,) in mailtodets]
-        proptypedets = Typeproperty.query.with_entities(Typeproperty.proptypedet).all()
-        proptypedets = [value for (value,) in proptypedets]
-        salegradedets = Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()
-        salegradedets = [value for (value,) in salegradedets]
-        statusdets = Typestatus.query.with_entities(Typestatus.statusdet).all()
-        statusdets = [value for (value,) in statusdets]
-        tenuredets = Typetenure.query.with_entities(Typetenure.tenuredet).all()
-        tenuredets = [value for (value,) in tenuredets]
-        if rentdet is None:
-            flash('Invalid rent code')
-            return redirect(url_for('login'))
+        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getvalues(id, "edit")
 
-    return render_template('editrent.html', rent=rentdet, actypedets=actypedets, advarrdets=advarrdets,
-                               deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                               proptypedets=proptypedets, salegradedets=salegradedets, statusdets=statusdets,
-                               tenuredets=tenuredets)
+    return render_template('editrent.html', title='Edit rent', rent=rentdet, actypedets=actypedets,
+                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
+                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
+                           statusdets=statusdets, tenuredets=tenuredets)
 
 
 @app.route('/externalrent', methods=['GET', 'POST'])
@@ -351,6 +168,18 @@ def externalrent():
                     Extrent.propaddr.ilike('%{}%'.format(pop))) \
             .all()
     return render_template('externalrent.html', title='ExternalRents', rents=rents)
+
+
+@app.route('/deleterentprop/<int:id>')
+def deleteitem(id):
+    delete_rent = Rent.query.get(id)
+    delete_property = Property.query.filter(Property.rent_id == ('{}'.format(id))).first()
+    if delete_property is not None:
+        db.session.delete(delete_property)
+    db.session.delete(delete_rent)
+    db.session.commit()
+
+    return redirect(url_for('index'))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -400,68 +229,21 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
 @app.route('/newrent', methods=['GET', 'POST'])
 def newrent():
+    id = 0
     if request.method == "POST":
-        rent = Rent()
+        rent, property, agent = savechanges(id, "new")
         rent.rentcode = request.form["rentcode"]
-        actype = request.form["actype"]
-        rent.actype_id = \
-            Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
-        advarr = request.form["advarr"]
-        rent.advarr_id = \
-            Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).first()[0]
-        rent.arrears = request.form["arrears"]
-
-        # we will write code later to generate datecode from lastrentdate!:
-        rent.datecode = request.form["datecode"]
-
-        deedtype = request.form["deedtype"]
-        rent.deed_id = \
-            Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).first()[0]
-        rent.email = request.form["email"]
-        frequency = request.form["frequency"]
-        rent.freq_id = \
-            Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).first()[0]
-        landlord = request.form["landlord"]
-        rent.landlord_id = \
-            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).first()[0]
-        rent.lastrentdate = request.form["lastrentdate"]
-        mailto = request.form["mailto"]
-        rent.mailto_id = \
-            Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).first()[0]
-        rent.note = request.form["note"]
-        rent.price = request.form["price"]
-        rent.rentpa = request.form["rentpa"]
-        salegrade = request.form["salegrade"]
-        rent.salegrade_id = \
-            Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).first()[0]
-        rent.source = request.form["source"]
-        status = request.form["status"]
-        rent.status_id = \
-            Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).first()[0]
-        rent.tenantname = request.form["tenantname"]
-        tenure = request.form["tenure"]
-        rent.tenure_id = \
-            Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
-
-        # Agent - we will write code later to deal with agentdetails and agentcode:
-        # agent = request.form["agent"]
-        agent_id = 1
-        # if agent is not None:
-
-        # Property - will need enhancing to deal with multiple properties (less than 0.1 per cent problem):
-        property = Property()
-        property.propaddr = request.form["propaddr"]
-        proptype = request.form["proptype"]
-        property.typeprop_id = \
-            Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).first()[0]
-
         rent.prop_rent.append(property)
+
+        # lots of challenges: this should deal with a new agent, but not to connect to an existing agent
+        if agent and agent.agdetails != "None":
+            agent.rent_agent.append(rent)
+            db.session.add(agent)
+
         db.session.add(rent)
         db.session.commit()
-
         new_id = \
             Property.query \
                 .join(Rent) \
@@ -469,30 +251,13 @@ def newrent():
 
         return redirect('/editrent/{}'.format(new_id))
     else:
-        actypedets = Typeactype.query.with_entities(Typeactype.actypedet).all()
-        actypedets = [value for (value,) in actypedets]
-        advarrdets = Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()
-        advarrdets = [value for (value,) in advarrdets]
-        deedcodes = Typedeed.query.with_entities(Typedeed.deedcode).all()
-        deedcodes = [value for (value,) in deedcodes]
-        freqdets = Typefreq.query.with_entities(Typefreq.freqdet).all()
-        freqdets = [value for (value,) in freqdets]
-        landlords = Landlord.query.with_entities(Landlord.name).all()
-        landlords = [value for (value,) in landlords]
-        mailtodets = Typemailto.query.with_entities(Typemailto.mailtodet).all()
-        mailtodets = [value for (value,) in mailtodets]
-        proptypedets = Typeproperty.query.with_entities(Typeproperty.proptypedet).all()
-        proptypedets = [value for (value,) in proptypedets]
-        salegradedets = Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()
-        salegradedets = [value for (value,) in salegradedets]
-        statusdets = Typestatus.query.with_entities(Typestatus.statusdet).all()
-        statusdets = [value for (value,) in statusdets]
-        tenuredets = Typetenure.query.with_entities(Typetenure.tenuredet).all()
-        tenuredets = [value for (value,) in tenuredets]
-        return render_template('newrent.html', title='New rent', actypedets=actypedets, advarrdets=advarrdets,
-                               deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                               proptypedets=proptypedets, salegradedets=salegradedets, statusdets=statusdets,
-                               tenuredets=tenuredets)
+        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getvalues(id, "new")
+
+    return render_template('newrent.html', title='New rent', actypedets=actypedets, advarrdets=advarrdets,
+                           deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
+                           proptypedets=proptypedets, salegradedets=salegradedets, statusdets=statusdets,
+                           tenuredets=tenuredets)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -529,6 +294,115 @@ def rentpage():
         flash('Invalid rent code')
         return redirect(url_for('login'))
     return render_template('rentpage.html', rents=rentdet)
+
+def savechanges(id, type):
+    if type == "edit":
+        rent = Rent.query.get(id)
+        property = Property.query.filter(Property.rent_id == id).first()
+        agent = Agent.query.filter(Agent.id == rent.agent_id).first()
+    else:
+        rent = Rent()
+        property = Property()
+        agent = Agent()
+    actype = request.form["actype"]
+    rent.actype_id = \
+        Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
+    advarr = request.form["advarr"]
+    rent.advarr_id = \
+        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).first()[0]
+    rent.arrears = request.form["arrears"]
+
+    # we will write code later to generate datecode from lastrentdate!:
+    rent.datecode = request.form["datecode"]
+
+    deedtype = request.form["deedtype"]
+    rent.deed_id = \
+        Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).first()[0]
+    rent.email = request.form["email"]
+    frequency = request.form["frequency"]
+    rent.freq_id = \
+        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).first()[0]
+    landlord = request.form["landlord"]
+    rent.landlord_id = \
+        Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).first()[0]
+    rent.lastrentdate = request.form["lastrentdate"]
+    mailto = request.form["mailto"]
+    rent.mailto_id = \
+        Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).first()[0]
+    rent.note = request.form["note"]
+    rent.price = request.form["price"]
+    rent.rentpa = request.form["rentpa"]
+    salegrade = request.form["salegrade"]
+    rent.salegrade_id = \
+        Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).first()[
+            0]
+    rent.source = request.form["source"]
+    status = request.form["status"]
+    rent.status_id = \
+        Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).first()[0]
+    rent.tenantname = request.form["tenantname"]
+    tenure = request.form["tenure"]
+    rent.tenure_id = \
+        Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
+    agent.agdetails = request.form["agent"]
+    property.propaddr = request.form["propaddr"]
+    proptype = request.form["proptype"]
+    property.typeprop_id = \
+        Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).first()[0]
+    return rent, property, agent
+
+
+def getvalues(id, type):
+    if type == "clone" or type == "edit":
+        rentdet = \
+            Property.query \
+                .join(Rent) \
+                .join(Landlord) \
+                .outerjoin(Agent) \
+                .join(Typeactype) \
+                .join(Typeadvarr) \
+                .join(Typedeed) \
+                .join(Typefreq) \
+                .join(Typemailto) \
+                .join(Typeproperty) \
+                .join(Typesalegrade) \
+                .join(Typestatus) \
+                .join(Typetenure) \
+                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
+                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
+                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
+                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                               Typetenure.tenuredet) \
+                .filter(Rent.id == ('{}'.format(id))) \
+                .first()
+        if rentdet is None:
+            flash('Invalid rent code')
+            return redirect(url_for('login'))
+    else:
+        rentdet = None
+    actypedets = Typeactype.query.with_entities(Typeactype.actypedet).all()
+    actypedets = [value for (value,) in actypedets]
+    advarrdets = Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()
+    advarrdets = [value for (value,) in advarrdets]
+    deedcodes = Typedeed.query.with_entities(Typedeed.deedcode).all()
+    deedcodes = [value for (value,) in deedcodes]
+    freqdets = Typefreq.query.with_entities(Typefreq.freqdet).all()
+    freqdets = [value for (value,) in freqdets]
+    landlords = Landlord.query.with_entities(Landlord.name).all()
+    landlords = [value for (value,) in landlords]
+    mailtodets = Typemailto.query.with_entities(Typemailto.mailtodet).all()
+    mailtodets = [value for (value,) in mailtodets]
+    proptypedets = Typeproperty.query.with_entities(Typeproperty.proptypedet).all()
+    proptypedets = [value for (value,) in proptypedets]
+    salegradedets = Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()
+    salegradedets = [value for (value,) in salegradedets]
+    statusdets = Typestatus.query.with_entities(Typestatus.statusdet).all()
+    statusdets = [value for (value,) in statusdets]
+    tenuredets = Typetenure.query.with_entities(Typetenure.tenuredet).all()
+    tenuredets = [value for (value,) in tenuredets]
+    return rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, \
+            salegradedets, statusdets, tenuredets
 
 
 def replace_users(dictum, key_to_find, definition):

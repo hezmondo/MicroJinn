@@ -181,6 +181,7 @@ class Rent(db.Model):
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
     prop_rent = db.relationship('Property', backref = 'rent', lazy = 'dynamic')
     charge_rent = db.relationship('Charge', backref = 'rent', lazy = 'dynamic')
+    # agent_rent = db.relationship('Agent', backref = 'rent', lazy = 'dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
