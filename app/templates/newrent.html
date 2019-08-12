@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% import 'macros.html' as macros %}
+{% import 'widgets.html' as widgets %}
 
 {% block app_content %}
     <form method="POST" id="target">
@@ -15,13 +15,13 @@
 			</div>
             <div class="col-md-2">
 				<label for="proptype">Proptype:</label>
-                {{ macros.combobox_single(name="proptype", items=proptypedets, items_selected=proptypedets[0]) }}
+                {{ widgets.combobox_single(name="proptype", items=proptypedets, items_selected=proptypedets[3]) }}
 			</div>
 		</div>
 		<div class="form-group row">
             <div class="col-md-4">
 				<label for="landlord">Landlord:</label>
-                {{ macros.combobox_single(name="landlord", items=landlords, items_selected=landlords[0]) }}
+                {{ widgets.combobox_single(name="landlord", items=landlords, items_selected=landlords[2]) }}
 			</div>
             <div class="col-md-8">
 				<label for="tenantname">Tenant name:</label>
@@ -41,8 +41,7 @@
 		<div class="form-group row">
             <div class="col-md-4">
 				<label for="mailto">Mail to:</label>
-                {{ macros.combobox_single(name="mailto", items=mailtodets, items_selected=mailtodets[0]) }}
-				</select>
+                {{ widgets.combobox_single(name="mailto", items=mailtodets, items_selected=mailtodets[2]) }}
 			</div>
             <div class="col-md-8">
 				<label for="agent">Agent:</label>
@@ -62,29 +61,29 @@
 		<div class="form-group row">
             <div class="col-md-2">
 				<label for="lastrentdate">Last rent date:</label>
-				<input type="date" class="form-control" id="lastrentdate" name="lastrentdate" value="">
+				<input type="date" class="form-control" id="lastrentdate" name="lastrentdate" value="2019-05-01">
 			</div>
             <div class="col-md-2">
 				<label for="frequency">Frequency:</label>
-                {{ macros.combobox_single(name="frequency", items=freqdets, items_selected=freqdets[0]) }}
+                {{ widgets.combobox_single(name="frequency", items=freqdets, items_selected=freqdets[0]) }}
 			</div>
             <div class="form-group col-md-2">
 				<label for="actype">Actype:</label>
-                {{ macros.combobox_single(name="actype", items=actypedets, items_selected=actypedets[0]) }}
+                {{ widgets.combobox_single(name="actype", items=actypedets, items_selected=actypedets[1]) }}
 			</div>
             <div class="col-md-3">
 				<label for="advarr">Advance/Arrears:</label>
-                {{ macros.combobox_single(name="advarr", items=advarrdets, items_selected=advarrdets[0]) }}
+                {{ widgets.combobox_single(name="advarr", items=advarrdets, items_selected=advarrdets[0]) }}
 			</div>
             <div class="form-group col-md-3">
 				<label for="datecode">DateCode:</label>
-				<input type="text" class="form-control" id="datecode" name="datecode" value="{{ "" }}">
+				<input type="text" class="form-control" id="datecode" name="datecode" value="F1May01A">
 			</div>
 		</div>
 		<div class="form-group row">
             <div class="col-md-2">
 				<label for="tenure">Tenure:</label>
-                {{ macros.combobox_single(name="tenure", items=tenuredets, items_selected=tenuredets[0]) }}
+                {{ widgets.combobox_single(name="tenure", items=tenuredets, items_selected=tenuredets[0]) }}
 			</div>
             <div class="col-md-2">
 				<label for="source">Source:</label>
@@ -92,11 +91,11 @@
 			</div>
             <div class="col-md-2">
 				<label for="deedtype">Deed type:</label>
-                {{ macros.combobox_single(name="deedtype", items=deedcodes, items_selected=deedcodes[0]) }}
+                {{ widgets.combobox_single(name="deedtype", items=deedcodes, items_selected="UNENF") }}
 			</div>
             <div class="col-md-2">
 				<label for="salegrade">Sale grade:</label>
-                {{ macros.combobox_single(name="salegrade", items=salegradedets, items_selected=salegradedets[0]) }}
+                {{ widgets.combobox_single(name="salegrade", items=salegradedets, items_selected=salegradedets[1]) }}
 			</div>
             <div class="col-md-2">
 				<label for="price">Price:</label>
@@ -104,7 +103,7 @@
 			</div>
             <div class="col-md-2">
 				<label for="status">Status:</label>
-                {{ macros.combobox_single(name="status", items=statusdets, items_selected=statusdets[0]) }}
+                {{ widgets.combobox_single(name="status", items=statusdets, items_selected=statusdets[0]) }}
 			</div>
 		</div>
 		<div class="form-row">
