@@ -1,62 +1,60 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-    <form method="POST" id="target"> 
-        <div class="form-group">
-            <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
+<form method="POST" id="target">
+    <div class="form-group">
+        <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
+    </div>
+    <div class="form-group">
+        <input type="text" class="form-control" name="propaddr" placeholder="Property address">
+    </div>
+    <br/>
+    <div class="form-row">
+        <br/>
+        <div class="col-sm-4">
+            <button type="submit" class="btn btn-block btn-primary">Search</button>
         </div>
-        <div class="form-group">
-            <input type="text" class="form-control" name="propaddr" placeholder="Property address">
+    </div>
+</form>
+<div class="container">
+    <div class="row voffset2">
+        <div class="col-lg-12">
+            <h4 class="text-center">Filtered to show:</h4>
         </div>
-			<br />
-		<div class="form-row">
-			<br />
-			<div class="col-sm-4">
-			<button type="submit" class="btn btn-block btn-primary">Search</button>
-			</div>
-        </div>
-    </form>
-	<div class="container">
-	  <div class="row voffset2">
-		<div class="col-lg-12">
-		  <p>
-			<h4 class="text-center">Filtered to show:</h6>
-		  </p>
-		</div>
-	  </div>
-	</div>
-	<div class="table-fixed">
-		<table class="table" id="rents">
-			<thead>
-				<tr>
-					<th style="width: 6.00%">rentcode</th>
-					<th style="width: 29.00%">propaddr</th>
-					<th style="width: 29.00%">tenantname</th>
-					<th style="width: 6.00%">rentpa</th>
-					<th style="width: 6.00%">arrears</th>
-					<th style="width: 6.00%">lastrentdate</th>
-					<th style="width: 6.00%">status</th>
-					<th style="width: 6.00%">landlord</th>
-					<th style="width: 6.00%">extmanager</th>
-				</tr>
-			</thead>
-			<tbody>
-			{% for rent in rents %}
-				<tr id={{ rent.id }}>
-					<td style="width: 6.00%">{{ rent.rentcode }}</th>
-					<td style="width: 29.00%">{{ rent.propaddr }}</th>
-					<td style="width: 29.00%"> {{ rent.tenantname }} </td>
-					<td style="width: 6.00%"> {{ rent.rentpa }} </td>
-					<td style="width: 6.00%"> {{ rent.arrears }} </td>
-					<td style="width: 6.00%"> {{ rent.lastrentdate }} </td>
-					<td style="width: 6.00%"> {{ rent.status }} </td>
-					<td style="width: 6.00%"> {{ rent.owner }} </td>
-					<td style="width: 6.00%"> {{ rent.codename }} </td>
-					<td style="width: 5.00%"> <a href="/editrent/{{ rent.id }}">Edit</a> </td>
-					<td style="width: 5.00%"> <a href="/clonerent/{{ rent.id }}">Clone</a> </td>
-				</tr>
-			{% endfor %}
-			</tbody>
-		</table>
-	</div>
+    </div>
+</div>
+<div class="table-fixed">
+    <table class="table" id="rents">
+        <thead>
+        <tr>
+            <th style="width: 6.00%">rentcode</th>
+            <th style="width: 29.00%">propaddr</th>
+            <th style="width: 29.00%">tenantname</th>
+            <th style="width: 6.00%">rentpa</th>
+            <th style="width: 6.00%">arrears</th>
+            <th style="width: 6.00%">lastrentdate</th>
+            <th style="width: 6.00%">status</th>
+            <th style="width: 6.00%">landlord</th>
+            <th style="width: 6.00%">extmanager</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for rent in rents %}
+        <tr id="{{ rent.id }}">
+            <td style="width: 6.00%">{{ rent.rentcode }}</td>
+            <td style="width: 29.00%">{{ rent.propaddr }}</td>
+            <td style="width: 29.00%"> {{ rent.tenantname }}</td>
+            <td style="width: 6.00%"> {{ rent.rentpa }}</td>
+            <td style="width: 6.00%"> {{ rent.arrears }}</td>
+            <td style="width: 6.00%"> {{ rent.lastrentdate }}</td>
+            <td style="width: 6.00%"> {{ rent.status }}</td>
+            <td style="width: 6.00%"> {{ rent.owner }}</td>
+            <td style="width: 6.00%"> {{ rent.codename }}</td>
+            <td style="width: 5.00%"><a href="/editrent/{{ rent.id }}">Edit</a></td>
+            <td style="width: 5.00%"><a href="/clonerent/{{ rent.id }}">Clone</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}	

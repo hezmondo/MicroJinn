@@ -1,120 +1,121 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <form method="POST" id="target">
-		<div class="form-row">
-			<div class="col-sm-2">
-				<label for="rentcode">Rent code:</label>
-				<input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
-			</div>
-			<div class="col">
-				<label for="propaddr">Property address:</label>
-				<input type="text" class="form-control" id="propaddr" name="propaddr" value="{{ rent.propaddr }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<div class="col-xs-2">
-				<label for="landlord">Landlord:</label>
-				<input type="text" class="form-control" id="landlord" name="landlord" value="{{ rent.name }}">
-			</div>
-			<div class="col">
-				<label for="tenantname">Tenant name:</label>
-				<input type="text" class="form-control" id="tenantname" name="tenantname" value="{{ rent.tenantname }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<div class="col">
-				<label for="note">Notes:</label>
-				<input type="text" class="form-control" id="note" name="note" value="{{ rent.note }}">
-			</div>
-			<div class="col">
-				<label for="email">Email:</label>
-				<input type="text" class="form-control" id="email" name="email" value="{{ rent.email }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<div class="col-sm-2">
-				<label for="mailto">Mail to:</label>
-				<input type="text" class="form-control" id="mailto" name="mailto" value="{{ rent.mailto }}">
-			</div>
-			<div class="col">
-				<label for="agent">Agent:</label>
-				<input type="text" class="form-control" id="agent" name="agent" value="{{ rent.agdetails }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<div class="col-sm-2">
-				<label for="rentpa">Rent pa:</label>
-				<input type="text" class="form-control" id="rentpa" name="rentpa" value="{{ rent.rentpa }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="arrears">Rent arrears:</label>
-				<input type="text" class="form-control" id="arrears" name="arrears" value="{{ rent.arrears }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="totcharges">Total charges:</label>
-				<input type="text" class="form-control" id="totcharges" name="totcharges" value="{{ rent.arrears }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="lastrentdate">Last rent date:</label>
-				<input type="text" class="form-control" id="lastrentdate" name="lastrentdate" value="{{ rent.lastrentdate }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="frequency">Frequency:</label>
-				<input type="text" class="form-control" id="frequency" name="frequency" value="{{ rent.frequency }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="advarr">Advance/Arrears:</label>
-				<input type="text" class="form-control" id="advarr" name="advarr" value="{{ rent.advarr }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<div class="col-sm-2">
-				<label for="tenure">Tenure:</label>
-				<input type="text" class="form-control" id="tenure" name="tenure" value="{{ rent.tenure }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="source">Source:</label>
-				<input type="text" class="form-control" id="source" name="source" value="{{ rent.source }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="deedtype">Deed type:</label>
-				<input type="text" class="form-control" id="deedtype" name="deedtype" value="{{ rent.deedtype }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="titlegrade">Title grade:</label>
-				<input type="text" class="form-control" id="titlegrade" name="titlegrade" value="{{ rent.titlegrade }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="price">Price:</label>
-				<input type="text" class="form-control" id="price" name="price" value="{{ rent.price }}">
-			</div>
-			<div class="col-sm-2">
-				<label for="status">Status:</label>
-				<input type="text" class="form-control" id="status" name="status" value="{{ rent.status }}">
-			</div>
-		</div>
-		<br />
-		<div class="form-row">
-			<br />
-			<div class="col-sm-2">
-			<a href="/chargepage/{{ rent.id }}"" class="btn btn-primary" role="button">Charges</a>
-			</div>
-			<div class="col-sm-2">
-			<a href="/newrent" class="btn btn-primary" role="button">Add new rent</a>
-			</div>
-			<div class="col-sm-2">
-			<a href="/prpage" class="btn btn-primary" role="button">Payreq</a>
-			</div>
-			<div class="col-sm-2">
-			<button type="submit" class="btn btn-block btn-primary">Submit</button>
-			</div>
-		</div>
-    </form>
+<form method="POST" id="target">
+    <div class="form-row">
+        <div class="col-sm-2">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
+        </div>
+        <div class="col">
+            <label for="propaddr">Property address:</label>
+            <input type="text" class="form-control" id="propaddr" name="propaddr" value="{{ rent.propaddr }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <div class="col-xs-2">
+            <label for="landlord">Landlord:</label>
+            <input type="text" class="form-control" id="landlord" name="landlord" value="{{ rent.name }}">
+        </div>
+        <div class="col">
+            <label for="tenantname">Tenant name:</label>
+            <input type="text" class="form-control" id="tenantname" name="tenantname" value="{{ rent.tenantname }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <div class="col">
+            <label for="note">Notes:</label>
+            <input type="text" class="form-control" id="note" name="note" value="{{ rent.note }}">
+        </div>
+        <div class="col">
+            <label for="email">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" value="{{ rent.email }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <div class="col-sm-2">
+            <label for="mailto">Mail to:</label>
+            <input type="text" class="form-control" id="mailto" name="mailto" value="{{ rent.mailto }}">
+        </div>
+        <div class="col">
+            <label for="agent">Agent:</label>
+            <input type="text" class="form-control" id="agent" name="agent" value="{{ rent.agdetails }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <div class="col-sm-2">
+            <label for="rentpa">Rent pa:</label>
+            <input type="text" class="form-control" id="rentpa" name="rentpa" value="{{ rent.rentpa }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="arrears">Rent arrears:</label>
+            <input type="text" class="form-control" id="arrears" name="arrears" value="{{ rent.arrears }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="totcharges">Total charges:</label>
+            <input type="text" class="form-control" id="totcharges" name="totcharges" value="{{ rent.arrears }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="lastrentdate">Last rent date:</label>
+            <input type="text" class="form-control" id="lastrentdate" name="lastrentdate"
+                   value="{{ rent.lastrentdate }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="frequency">Frequency:</label>
+            <input type="text" class="form-control" id="frequency" name="frequency" value="{{ rent.frequency }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="advarr">Advance/Arrears:</label>
+            <input type="text" class="form-control" id="advarr" name="advarr" value="{{ rent.advarr }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <div class="col-sm-2">
+            <label for="tenure">Tenure:</label>
+            <input type="text" class="form-control" id="tenure" name="tenure" value="{{ rent.tenure }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="source">Source:</label>
+            <input type="text" class="form-control" id="source" name="source" value="{{ rent.source }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="deedtype">Deed type:</label>
+            <input type="text" class="form-control" id="deedtype" name="deedtype" value="{{ rent.deedtype }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="titlegrade">Title grade:</label>
+            <input type="text" class="form-control" id="titlegrade" name="titlegrade" value="{{ rent.titlegrade }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="price">Price:</label>
+            <input type="text" class="form-control" id="price" name="price" value="{{ rent.price }}">
+        </div>
+        <div class="col-sm-2">
+            <label for="status">Status:</label>
+            <input type="text" class="form-control" id="status" name="status" value="{{ rent.status }}">
+        </div>
+    </div>
+    <br/>
+    <div class="form-row">
+        <br/>
+        <div class="col-sm-2">
+            <a href="/chargepage/{{ rent.id }}" class="btn btn-primary" role="button">Charges</a>
+        </div>
+        <div class="col-sm-2">
+            <a href="/newrent" class="btn btn-primary" role="button">Add new rent</a>
+        </div>
+        <div class="col-sm-2">
+            <a href="/prpage" class="btn btn-primary" role="button">Payreq</a>
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-block btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
 {% endblock %}
 

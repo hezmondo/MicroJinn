@@ -66,10 +66,8 @@ def clonerent(id):
 
         db.session.add(rent)
         db.session.commit()
-        new_id = \
-            Property.query \
-                .join(Rent) \
-            .with_entities(Rent.id).filter(Property.propaddr == property.propaddr).first()[0]
+        # `rent.id` gets updated to hold the INSERTed id
+        new_id = rent.id
 
         return redirect('/editrent/{}'.format(new_id))
     else:
@@ -229,6 +227,7 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
 @app.route('/newrent', methods=['GET', 'POST'])
 def newrent():
     id = 0
@@ -244,10 +243,8 @@ def newrent():
 
         db.session.add(rent)
         db.session.commit()
-        new_id = \
-            Property.query \
-                .join(Rent) \
-            .with_entities(Rent.id).filter(Property.propaddr == property.propaddr).first()[0]
+        # `rent.id` gets updated to hold the INSERTed id
+        new_id = rent.id
 
         return redirect('/editrent/{}'.format(new_id))
     else:
@@ -295,6 +292,7 @@ def rentpage():
         return redirect(url_for('login'))
     return render_template('rentpage.html', rents=rentdet)
 
+
 def savechanges(id, type):
     if type == "edit":
         rent = Rent.query.get(id)
@@ -304,6 +302,7 @@ def savechanges(id, type):
         rent = Rent()
         property = Property()
         agent = Agent()
+
     actype = request.form["actype"]
     rent.actype_id = \
         Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).first()[0]
@@ -344,11 +343,14 @@ def savechanges(id, type):
     tenure = request.form["tenure"]
     rent.tenure_id = \
         Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).first()[0]
+
     agent.agdetails = request.form["agent"]
+
     property.propaddr = request.form["propaddr"]
     proptype = request.form["proptype"]
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).first()[0]
+
     return rent, property, agent
 
 

@@ -3,113 +3,113 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-    <form method="POST" id="target">
-		<div class="form-group row">
-			<div class="col-md-2">
-				<label for="rentcode">Rent code:</label>
-				<input type="text" class="form-control" name="rentcode" value="">
-			</div>
-			<div class="col-md-8">
-				<label for="propaddr">Property address:</label>
-				<input type="text" class="form-control" name="propaddr" value="">
-			</div>
-            <div class="col-md-2">
-				<label for="proptype">Proptype:</label>
-                {{ widgets.combobox_single(name="proptype", items=proptypedets, items_selected=proptypedets[3]) }}
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-4">
-				<label for="landlord">Landlord:</label>
-                {{ widgets.combobox_single(name="landlord", items=landlords, items_selected=landlords[2]) }}
-			</div>
-            <div class="col-md-8">
-				<label for="tenantname">Tenant name:</label>
-				<input type="text" class="form-control" name="tenantname" value="">
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-8">
-				<label for="note">Notes:</label>
-				<input type="text" class="form-control" id="note" name="note" value="">
-			</div>
-            <div class="col-md-4">
-				<label for="email">Email:</label>
-				<input type="text" class="form-control" id="email" name="email" value="">
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-4">
-				<label for="mailto">Mail to:</label>
-                {{ widgets.combobox_single(name="mailto", items=mailtodets, items_selected=mailtodets[2]) }}
-			</div>
-            <div class="col-md-8">
-				<label for="agent">Agent:</label>
-				<input type="text" class="form-control" id="agent" name="agent" value="">
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-4">
-				<label for="rentpa">Rent pa:</label>
-				<input type="text" class="form-control" id="rentpa" name="rentpa" value="0.00">
-			</div>
-            <div class="col-md-4">
-				<label for="arrears">Rent arrears:</label>
-				<input type="text" class="form-control" id="arrears" name="arrears" value="0.00">
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-2">
-				<label for="lastrentdate">Last rent date:</label>
-				<input type="date" class="form-control" id="lastrentdate" name="lastrentdate" value="2019-05-01">
-			</div>
-            <div class="col-md-2">
-				<label for="frequency">Frequency:</label>
-                {{ widgets.combobox_single(name="frequency", items=freqdets, items_selected=freqdets[0]) }}
-			</div>
-            <div class="form-group col-md-2">
-				<label for="actype">Actype:</label>
-                {{ widgets.combobox_single(name="actype", items=actypedets, items_selected=actypedets[1]) }}
-			</div>
-            <div class="col-md-3">
-				<label for="advarr">Advance/Arrears:</label>
-                {{ widgets.combobox_single(name="advarr", items=advarrdets, items_selected=advarrdets[0]) }}
-			</div>
-            <div class="form-group col-md-3">
-				<label for="datecode">DateCode:</label>
-				<input type="text" class="form-control" id="datecode" name="datecode" value="F1May01A">
-			</div>
-		</div>
-		<div class="form-group row">
-            <div class="col-md-2">
-				<label for="tenure">Tenure:</label>
-                {{ widgets.combobox_single(name="tenure", items=tenuredets, items_selected=tenuredets[0]) }}
-			</div>
-            <div class="col-md-2">
-				<label for="source">Source:</label>
-				<input type="text" class="form-control" id="source" name="source" value="">
-			</div>
-            <div class="col-md-2">
-				<label for="deedtype">Deed type:</label>
-                {{ widgets.combobox_single(name="deedtype", items=deedcodes, items_selected="UNENF") }}
-			</div>
-            <div class="col-md-2">
-				<label for="salegrade">Sale grade:</label>
-                {{ widgets.combobox_single(name="salegrade", items=salegradedets, items_selected=salegradedets[1]) }}
-			</div>
-            <div class="col-md-2">
-				<label for="price">Price:</label>
-				<input type="text" class="form-control" id="price" name="price" value="9999.99">
-			</div>
-            <div class="col-md-2">
-				<label for="status">Status:</label>
-                {{ widgets.combobox_single(name="status", items=statusdets, items_selected=statusdets[0]) }}
-			</div>
-		</div>
-		<div class="form-row">
-            <div class="form-group col-md-4">
-				<button type="submit" class="btn btn-block btn-primary">Save changes</button>
-			</div>
-		</div>
-    </form>
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="">
+        </div>
+        <div class="col-md-8">
+            <label for="propaddr">Property address:</label>
+            <input type="text" class="form-control" name="propaddr" value="">
+        </div>
+        <div class="col-md-2">
+            <label for="proptype">Proptype:</label>
+            {{ widgets.combobox_single(name="proptype", items=proptypedets, items_selected=proptypedets[3]) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="landlord">Landlord:</label>
+            {{ widgets.combobox_single(name="landlord", items=landlords, items_selected=landlords[2]) }}
+        </div>
+        <div class="col-md-8">
+            <label for="tenantname">Tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" value="">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-8">
+            <label for="note">Notes:</label>
+            <input type="text" class="form-control" id="note" name="note" value="">
+        </div>
+        <div class="col-md-4">
+            <label for="email">Email:</label>
+            <input type="text" class="form-control" id="email" name="email" value="">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="mailto">Mail to:</label>
+            {{ widgets.combobox_single(name="mailto", items=mailtodets, items_selected=mailtodets[2]) }}
+        </div>
+        <div class="col-md-8">
+            <label for="agent">Agent:</label>
+            <input type="text" class="form-control" id="agent" name="agent" value="">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="rentpa">Rent pa:</label>
+            <input type="text" class="form-control" id="rentpa" name="rentpa" value="0.00">
+        </div>
+        <div class="col-md-4">
+            <label for="arrears">Rent arrears:</label>
+            <input type="text" class="form-control" id="arrears" name="arrears" value="0.00">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="lastrentdate">Last rent date:</label>
+            <input type="date" class="form-control" id="lastrentdate" name="lastrentdate" value="2019-05-01">
+        </div>
+        <div class="col-md-2">
+            <label for="frequency">Frequency:</label>
+            {{ widgets.combobox_single(name="frequency", items=freqdets, items_selected=freqdets[0]) }}
+        </div>
+        <div class="form-group col-md-2">
+            <label for="actype">Actype:</label>
+            {{ widgets.combobox_single(name="actype", items=actypedets, items_selected=actypedets[1]) }}
+        </div>
+        <div class="col-md-3">
+            <label for="advarr">Advance/Arrears:</label>
+            {{ widgets.combobox_single(name="advarr", items=advarrdets, items_selected=advarrdets[0]) }}
+        </div>
+        <div class="form-group col-md-3">
+            <label for="datecode">DateCode:</label>
+            <input type="text" class="form-control" id="datecode" name="datecode" value="F1May01A">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="tenure">Tenure:</label>
+            {{ widgets.combobox_single(name="tenure", items=tenuredets, items_selected=tenuredets[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="source">Source:</label>
+            <input type="text" class="form-control" id="source" name="source" value="">
+        </div>
+        <div class="col-md-2">
+            <label for="deedtype">Deed type:</label>
+            {{ widgets.combobox_single(name="deedtype", items=deedcodes, items_selected="UNENF") }}
+        </div>
+        <div class="col-md-2">
+            <label for="salegrade">Sale grade:</label>
+            {{ widgets.combobox_single(name="salegrade", items=salegradedets, items_selected=salegradedets[1]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="price">Price:</label>
+            <input type="text" class="form-control" id="price" name="price" value="9999.99">
+        </div>
+        <div class="col-md-2">
+            <label for="status">Status:</label>
+            {{ widgets.combobox_single(name="status", items=statusdets, items_selected=statusdets[0]) }}
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <button type="submit" class="btn btn-block btn-primary">Save changes</button>
+        </div>
+    </div>
+</form>
 {% endblock %}
