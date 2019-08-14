@@ -74,7 +74,7 @@ def clonerent(id):
         rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
         statusdets, tenuredets = getvalues(id, "clone")
 
-    return render_template('editrent.html', title='Clone rent', rent=rentdet, actypedets=actypedets,
+    return render_template('editrent.html', action="clone", title='Clone rent', rent=rentdet, actypedets=actypedets,
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)
@@ -139,7 +139,7 @@ def editrent(id):
         rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
         statusdets, tenuredets = getvalues(id, "edit")
 
-    return render_template('editrent.html', title='Edit rent', rent=rentdet, actypedets=actypedets,
+    return render_template('editrent.html', action="edit", title='Edit rent', rent=rentdet, actypedets=actypedets,
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)
@@ -379,8 +379,11 @@ def getvalues(id, action):
         if rentdet is None:
             flash('Invalid rent code')
             return redirect(url_for('login'))
-    else:
+    elif action == "new":
         rentdet = None
+    else:
+        raise ValueError("getvalues(): Unrecognised value for 'action' (\"{}\")".format(action))
+
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
@@ -391,6 +394,7 @@ def getvalues(id, action):
     salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+
     return rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, \
            salegradedets, statusdets, tenuredets
 
