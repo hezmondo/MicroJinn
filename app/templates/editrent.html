@@ -15,13 +15,13 @@
         </div>
         <div class="col-md-2">
             <label for="proptype">Proptype:</label>
-            {{ widgets.combobox_single(name="proptype", items=proptypedets, items_selected=rent.proptypedet) }}
+            {{ widgets.combobox(name="proptype", items=proptypedets, item_selected=rent.proptypedet) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">Landlord:</label>
-            {{ widgets.combobox_single(name="landlord", items=landlords, items_selected=rent.name) }}
+            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rent.name) }}
         </div>
         <div class="col-md-8">
             <label for="tenantname">Tenant name:</label>
@@ -41,7 +41,7 @@
     <div class="form-group row">
         <div class="col-md-4">
             <label for="mailto">Mail to:</label>
-            {{ widgets.combobox_single(name="mailto", items=mailtodets, items_selected=rent.mailtodet) }}
+            {{ widgets.combobox(name="mailto", items=mailtodets, item_selected=rent.mailtodet) }}
         </div>
         <div class="col-md-8">
             <label for="agent">Agent:</label>
@@ -70,15 +70,15 @@
         </div>
         <div class="col-md-2">
             <label for="frequency">Frequency:</label>
-            {{ widgets.combobox_single(name="frequency", items=freqdets, items_selected=rent.freqdet) }}
+            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rent.freqdet) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">Actype:</label>
-            {{ widgets.combobox_single(name="actype", items=actypedets, items_selected=rent.actypedet) }}
+            {{ widgets.combobox(name="actype", items=actypedets, item_selected=rent.actypedet) }}
         </div>
         <div class="col-md-3">
             <label for="advarr">Advance/Arrears:</label>
-            {{ widgets.combobox_single(name="advarr", items=advarrdets, items_selected=rent.advarrdet) }}
+            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rent.advarrdet) }}
         </div>
         <div class="form-group col-md-3">
             <label for="datecode">DateCode:</label>
@@ -88,7 +88,7 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="tenure">Tenure:</label>
-            {{ widgets.combobox_single(name="tenure", items=tenuredets, items_selected=rent.tenuredet) }}
+            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=rent.tenuredet) }}
         </div>
         <div class="col-md-2">
             <label for="source">Source:</label>
@@ -96,11 +96,11 @@
         </div>
         <div class="col-md-2">
             <label for="deedtype">Deed type:</label>
-            {{ widgets.combobox_single(name="deedtype", items=deedcodes, items_selected=rent.deedcode) }}
+            {{ widgets.combobox(name="deedtype", items=deedcodes, item_selected=rent.deedcode) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">Sale grade:</label>
-            {{ widgets.combobox_single(name="salegrade", items=salegradedets, items_selected=rent.salegradedet) }}
+            {{ widgets.combobox(name="salegrade", items=salegradedets, item_selected=rent.salegradedet) }}
         </div>
         <div class="col-md-2">
             <label for="price">Price:</label>
@@ -108,7 +108,7 @@
         </div>
         <div class="col-md-2">
             <label for="status">Status:</label>
-            {{ widgets.combobox_single(name="status", items=statusdets, items_selected=rent.statusdet) }}
+            {{ widgets.combobox(name="status", items=statusdets, item_selected=rent.statusdet) }}
         </div>
     </div>
     <div class="form-group row">
