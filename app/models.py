@@ -55,6 +55,29 @@ class Datef4(db.Model):
     date4 = db.Column(db.Date)
 
 
+class Emailaccount(db.Model):
+    __tablename__ = 'emailaccount'
+
+    id = db.Column(db.Integer, primary_key=True)
+    smtp_server = db.Column(db.String(60))
+    smtp_port = db.Column(db.Integer)
+    smtp_timeout = db.Column(db.Integer)
+    smtp_debug = db.Column(db.Integer)
+    smtp_tls = db.Column(db.Integer)
+    smtp_user = db.Column(db.String(60))
+    smtp_password = db.Column(db.String(60))
+    smtp_sendfrom = db.Column(db.String(60))
+    imap_server = db.Column(db.String(60))
+    imap_port = db.Column(db.Integer)
+    imap_tls = db.Column(db.Integer)
+    imap_user = db.Column(db.String(60))
+    imap_password = db.Column(db.String(60))
+    imap_sentfolder = db.Column(db.String(60))
+    imap_draftfolder = db.Column(db.String(60))
+
+    # landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
+
+
 class Extmanager(db.Model):
     __tablename__ = 'extmanager'
 
@@ -119,10 +142,13 @@ class Landlord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(90))
     addr = db.Column(db.String(180))
-    manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
+    details = db.Column(db.String(90))
     taxdate = db.Column(db.Date)
+    # manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
+    # bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    # emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
-    rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
+    # rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
@@ -159,7 +185,7 @@ class Manager(db.Model):
     addr1 = db.Column(db.String(180))
     addr2 = db.Column(db.String(180))
 
-    landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
+    # landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
 
     def __repr__(self):
         return '<Manager {}>'.format(self.name)
@@ -208,6 +234,10 @@ class Rent(db.Model):
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
+
+    # @classmethod
+    # def totcharges(self):
+    #     return sum of charges for this rent - is this possible?
 
 
 class Typeactype(db.Model):

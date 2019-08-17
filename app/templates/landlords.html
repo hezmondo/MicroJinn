@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="name" placeholder="Landlord name">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="address" placeholder="Landlord address">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="manager" placeholder="Manager">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-primary">Search</button>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <a href="/newrent" class="btn btn-block btn-primary" role="button">Add Landlord</a>
+        </div>
+    </div>
+</form>
+</div><div class="container">
+    <div class="row voffset2">
+        <div class="col-lg-12">
+            <h4 class="text-center">Filtered to show:</h4>
+        </div>
+    </div>
+</div>
+<div class="table-fixed">
+    <table class="table" id="landlords">
+        <thead>
+        <tr>
+            <th style="width: 25.00%">name</th>
+            <th style="width: 25.00%">address</th>
+            <th style="width: 10.00%">taxdate</th>
+            <th style="width: 10.00%">manager</th>
+            <th style="width: 10.00%">spare</th>
+            <th style="width: 10.00%">spare</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for landlord in landlords %}
+        <tr id="{{ landlord.id }}">
+            <td style="width: 25.00%">{{ landlord.name }}</td>
+            <td style="width: 25.00%"> {{ landlord.addr }}</td>
+            <td style="width: 10.00%"> {{ landlord.taxdate }}</td>
+            <td style="width: 10.00%"> {{ landlord.manager }}</td>
+            <td style="width: 10.00%">spare</td>
+            <td style="width: 5.00%"><a href="/landlordpage/{{ landlord.id }}">Goto Landlord</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}	

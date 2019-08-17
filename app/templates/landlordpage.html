@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="name">Landlord name:</label>
+            <input type="text" class="form-control" name="name" value="{{ landlord.name }}">
+        </div>
+        <div class="col-md-6">
+            <label for="addr">Landlord address:</label>
+            <input type="text" class="form-control" name="addr" value="{{ landlord.addr }}">
+        </div>
+        <div class="col-md-3">
+            <label for="taxdate">Landlord tax year end date:</label>
+            <input type="text" class="form-control" id="note" name="note" value="{{ Landlord.taxdate }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="details">Details:</label>
+            <input type="text" class="form-control" id="details" name="details" value="{{ landlord.details }}">
+        </div>
+    </div>
+        <div class="col-md-3">
+            <label for="emailacc">Email account:</label>
+            {{ widgets.combobox(name="emailacc", items=emailaccs, item_selected=landlord.emailacc) }}
+        </div>
+        <div class="col-md-3">
+            <label for="bankacc">bank account:</label>
+            {{ widgets.combobox(name="bankacc", items=bankaccs, item_selected=landlord.bankacc) }}
+        </div>
+        <div class="col-md-3">
+            <label for="manager">bank account:</label>
+            {{ widgets.combobox(name="manager", items=managers, item_selected=landlord.manager) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/deletelandlord/{{ rent.id }}"
+               onclick="return confirm('Are you sure you want to delete this landlord?');"
+               class="btn btn-block btn-warning" role="button">Delete landlord</a>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save changes</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
