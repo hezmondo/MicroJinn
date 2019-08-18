@@ -1,0 +1,3 @@
+Once we have conditional formatting in editrent.html (currently shared by clonerent & editrent), we need to suppress
+three buttons when invoked by def clonetrent, as all we need is two buttons - cancel and save.
+

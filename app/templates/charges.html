@@ -6,6 +6,12 @@
         <div class="col-md-2">
             <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
         </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="chargedetails" placeholder="Charge details">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-primary">Search</button>
+        </div>
     </div>
 </form>
 <div class="container">
@@ -16,7 +22,7 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="rents">
+    <table class="table" id="charges">
         <thead>
         <tr>
             <th style="width: 10.00%">rentcode</th>
@@ -25,7 +31,6 @@
             <th style="width: 10.00%">chargetotal</th>
             <th style="width: 25.00%">chargedetails</th>
             <th style="width: 10.00%">chargebalance</th>
-            <th style="width: 10.00%">spare</th>
         </tr>
         </thead>
         <tbody>
@@ -37,8 +42,7 @@
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
             <td style="width: 25.00%"> {{ charge.chargedetails }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
-            <td style="width: 5.00%">spare</td>
-            <td style="width: 5.00%"><a href="/editcharge/{{ charge.id }}">Edit</a></td>
+            <td style="width: 5.00%"><a href="/editcharge/{{ charge.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

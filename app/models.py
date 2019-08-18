@@ -143,7 +143,6 @@ class Landlord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(90))
     addr = db.Column(db.String(180))
-    details = db.Column(db.String(90))
     taxdate = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
     bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))

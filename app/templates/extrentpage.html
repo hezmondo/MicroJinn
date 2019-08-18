@@ -1,0 +1,56 @@
+<!-- /templates/utilities.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="{{ rent.rentcode }}">
+        </div>
+        <div class="col-md-6">
+            <label for="propaddr">Property address:</label>
+            <input type="text" class="form-control" name="propaddr" value="{{ rent.propaddr }}">
+        </div>
+        <div class="col-md-4">
+            <label for="tenantname">Tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="manager">External manager:</label>
+            <input type="text" class="form-control" name="manager" value="{{ rent.codename }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentpa">Rent pa:</label>
+            <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
+        </div>
+        <div class="col-md-2">
+            <label for="arrears">Rent arrears:</label>
+            <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
+        </div>
+        <div class="col-md-2">
+            <label for="lastrentdate">lastrentdate:</label>
+            <input type="text" class="form-control" name="lastrentdate" value="{{ rent.lastrentdate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="source">Source:</label>
+            <input type="text" class="form-control" name="source" value="{{ rent.source }}">
+        </div>
+        <div class="col-md-2">
+            <label for="status">Status:</label>
+            <input type="text" class="form-control" name="status" value="{{ rent.status }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="agentdetails">Agent details:</label>
+            <input type="text" class="form-control" name="agentdetails" value="{{ rent.agentdetails }}">
+        </div>
+        <div class="col-md-4">
+            <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

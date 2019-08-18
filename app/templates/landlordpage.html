@@ -14,8 +14,8 @@
             <input type="text" class="form-control" name="addr" value="{{ landlord.addr }}">
         </div>
         <div class="col-md-3">
-            <label for="details">Details:</label>
-            <input type="text" class="form-control" name="details" value="{{ landlord.details }}">
+            <label for="manager">Manager:</label>
+            {{ widgets.combobox(name="manager", items=managers, item_selected=landlord.manager) }}
         </div>
     </div>
     <div class="form-group row">
@@ -24,16 +24,12 @@
             <input type="text" class="form-control" name="taxdate" value="{{ landlord.taxdate }}">
         </div>
         <div class="col-md-3">
-            <label for="manager">Manager:</label>
-            {{ widgets.combobox(name="manager", items=managers, item_selected=landlord.manager) }}
-        </div>
-        <div class="col-md-3">
             <label for="emailacc">Email account:</label>
-            <input type="text" class="form-control" name="emailacc" value="{{ landlord.emailacc }}">
+            {{ widgets.combobox(name="emailacc", items=emailaccs, item_selected=landlord.smtp_server) }}
         </div>
         <div class="col-md-3">
             <label for="bankacc">Bank account:</label>
-            <input type="text" class="form-control" name="bankacc" value="{{ landlord.bankacc }}">
+            {{ widgets.combobox(name="bankacc", items=bankaccs, item_selected=landlord.accnum) }}
         </div>
     </div>
     <div class="form-group row">

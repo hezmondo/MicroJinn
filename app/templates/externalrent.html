@@ -25,33 +25,29 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="rents">
+    <table class="table" id="rent">
         <thead>
         <tr>
             <th style="width: 6.00%">rentcode</th>
             <th style="width: 29.00%">propaddr</th>
             <th style="width: 29.00%">tenantname</th>
             <th style="width: 6.00%">rentpa</th>
-            <th style="width: 6.00%">arrears</th>
-            <th style="width: 6.00%">lastrentdate</th>
             <th style="width: 6.00%">status</th>
             <th style="width: 6.00%">landlord</th>
             <th style="width: 6.00%">extmanager</th>
         </tr>
         </thead>
         <tbody>
-        {% for rent in rents %}
+        {% for rent in rent %}
         <tr id="{{ rent.id }}">
             <td style="width: 6.00%">{{ rent.rentcode }}</td>
             <td style="width: 29.00%">{{ rent.propaddr }}</td>
             <td style="width: 29.00%"> {{ rent.tenantname }}</td>
             <td style="width: 6.00%"> {{ rent.rentpa }}</td>
-            <td style="width: 6.00%"> {{ rent.arrears }}</td>
-            <td style="width: 6.00%"> {{ rent.lastrentdate }}</td>
             <td style="width: 6.00%"> {{ rent.status }}</td>
-            <td style="width: 6.00%"> {{ rent.status }}</td>
-            <td style="width: 6.00%"> {{ rent.landlord }}</td>
-            <td style="width: 5.00%"><a href="/externalrent/{{ rent.id }}">View</a></td>
+            <td style="width: 6.00%"> {{ rent.owner }}</td>
+            <td style="width: 6.00%"> {{ rent.codename }}</td>
+            <td style="width: 5.00%"><a href="/extrentpage/{{ rent.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

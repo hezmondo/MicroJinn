@@ -22,6 +22,17 @@ def before_request():
         current_user.last_seen = datetime.datetime.utcnow()
         db.session.commit()
 
+@app.route('/charges', methods=['GET', 'POST'])
+def charges():
+    if request.method == "POST":
+        rcd = request.form["rentcode"]
+        cdt = request.form["chargedetails"]
+    else:
+        rcd = ""
+        cdt = ""
+    charges = getcharges(rcd, cdt)
+
+    return render_template('charges.html', title='Charges page', charges=charges)
 
 @app.route('/chargepage/<int:id>', methods=["POST", "GET"])
 @login_required
@@ -29,15 +40,6 @@ def chargepage(id):
     if request.method == "POST":
         rcd = request.form["rentcode"]
         cdt = request.form["chargedetails"]
-        charges = \
-            Charge.query \
-                .join(Rent) \
-                .join(Chargetype) \
-                .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
-                               Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-                .filter(Rent.rentcode.startswith([rcd]),
-                        Charge.chargedetails.ilike('%{}%'.format(cdt))) \
-                .all()
     else:
         idr = id
         charges = \
@@ -49,7 +51,7 @@ def chargepage(id):
                 .filter(Rent.id == idr) \
                 .all()
 
-    return render_template('chargepage.html', title='Charges', charges=charges)
+    return render_template('charges.html', title='Charges', charges=charges)
 
 
 @app.route('/clonerent/<int:id>', methods=["POST", "GET"])
@@ -168,21 +170,59 @@ def editrent(id):
 def externalrent():
     if request.method == "POST":
         rcd = request.form["rentcode"]
+        ten = request.form["tenantname"]
         pop = request.form["propaddr"]
-        rents = []
     else:
         rcd = "lus"
+        ten = ""
         pop = ""
-        rents = []
-    rents = \
+    rent = \
         Extrent.query \
             .join(Extmanager) \
-            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.owner, Extrent.tenantname,
-                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extmanager.codename) \
+            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
+                           Extmanager.codename, Extrent.agentdetails) \
             .filter(Extrent.rentcode.startswith([rcd]),
+                    Extrent.tenantname.ilike('%{}%'.format(ten)),
                     Extrent.propaddr.ilike('%{}%'.format(pop))) \
             .all()
-    return render_template('externalrent.html', title='ExternalRents', rents=rents)
+    return render_template('externalrent.html', title='External Rents', rent=rent)
+
+
+@app.route('/extrentpage/<int:id>', methods=["GET"])
+@login_required
+def extrentpage(id):
+    # if request.method == "POST":
+    #
+    #     return redirect(url_for('index'))
+    # else:
+    rent = \
+        Extrent.query \
+            .join(Extmanager) \
+            .with_entities(Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source,
+                           Extmanager.codename, Extrent.agentdetails) \
+            .filter(Extrent.id == id) \
+                .one_or_none()
+    if rent is None:
+        flash('N')
+        return redirect(url_for('index'))
+
+    return render_template('extrentpage.html', title ='External Rent', rent=rent)
+
+
+def getcharges(rcd, cdt):
+    charges = \
+        Charge.query \
+            .join(Rent) \
+            .join(Chargetype) \
+            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
+                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+            .filter(Rent.rentcode.startswith([rcd]),
+                    Charge.chargedetails.ilike('%{}%'.format(cdt))) \
+            .all()
+
+    return charges
 
 
 def getrents(rcd, ten, pop):
@@ -277,14 +317,18 @@ def landlordpage(id):
         return
     else:
         idl = id
+        managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
+        emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
+        bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accnum).all()]
         landlord = \
-            Landlord.query.join(Manager) \
-                .with_entities(Landlord.name, Landlord.addr, Landlord.details, Landlord.taxdate, Manager.name,
-                               Landlord.emailacc_id, Landlord.bankacc_id) \
+            Landlord.query.join(Manager).join(Emailaccount).join(Typebankacc) \
+                .with_entities(Landlord.name, Landlord.addr, Landlord.taxdate, Manager.name.label("manager"),
+                               Emailaccount.smtp_server, Typebankacc.accnum) \
                 .filter(Landlord.id == idl) \
                 .one_or_none()
 
-    return render_template('landlordpage.html', title='Landlord', landlord=landlord)
+    return render_template('landlordpage.html', title='Landlord', landlord=landlord, bankaccs=bankaccs,
+                           managers=managers, emailaccs=emailaccs)
 
 
 @app.route('/landlords', methods=['GET', 'POST'])
