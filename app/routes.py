@@ -269,14 +269,18 @@ def landlordpage(id):
     if request.method == "POST":
         name = request.form["name"]
         addr = request.form["address"]
+        details = request.form["details"]
         taxdate = request.form["taxdate"]
+        emailacc = request.form["emailacc"]
+        bankacc = request.form["bankacc"]
         manager = request.form["manager"]
         return
     else:
         idl = id
         landlord = \
             Landlord.query.join(Manager) \
-                .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate, Manager.name) \
+                .with_entities(Landlord.name, Landlord.addr, Landlord.details, Landlord.taxdate, Manager.name,
+                               Landlord.emailacc_id, Landlord.bankacc_id) \
                 .filter(Landlord.id == idl) \
                 .one_or_none()
 

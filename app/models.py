@@ -15,7 +15,7 @@ class Agent(db.Model):
 
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
-        
+
 class Charge(db.Model):
     __tablename__ = 'charge'
 
@@ -75,7 +75,7 @@ class Emailaccount(db.Model):
     imap_sentfolder = db.Column(db.String(60))
     imap_draftfolder = db.Column(db.String(60))
 
-    # landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
+    landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
 
 
 class Extmanager(db.Model):
@@ -144,11 +144,11 @@ class Landlord(db.Model):
     addr = db.Column(db.String(180))
     details = db.Column(db.String(90))
     taxdate = db.Column(db.Date)
-    # manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
-    # bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
-    # emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
+    manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
-    # rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
+    rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
@@ -185,7 +185,7 @@ class Manager(db.Model):
     addr1 = db.Column(db.String(180))
     addr2 = db.Column(db.String(180))
 
-    # landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
+    landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
 
     def __repr__(self):
         return '<Manager {}>'.format(self.name)
@@ -230,7 +230,6 @@ class Rent(db.Model):
 
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
-    # agent_rent = db.relationship('Agent', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
@@ -269,6 +268,7 @@ class Typebankacc(db.Model):
     accnum = db.Column(db.String(15))
 
     income_typebankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
+    landlord_typebankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')
 
 
 class Typedeed(db.Model):

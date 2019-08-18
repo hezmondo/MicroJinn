@@ -35,21 +35,21 @@
         <tr>
             <th style="width: 25.00%">name</th>
             <th style="width: 25.00%">address</th>
+            <th style="width: 25.00%">details</th>
             <th style="width: 10.00%">taxdate</th>
             <th style="width: 10.00%">manager</th>
-            <th style="width: 10.00%">spare</th>
             <th style="width: 10.00%">spare</th>
         </tr>
         </thead>
         <tbody>
-        {% for landlord in landlords %}
-        <tr id="{{ landlord.id }}">
-            <td style="width: 25.00%">{{ landlord.name }}</td>
-            <td style="width: 25.00%"> {{ landlord.addr }}</td>
-            <td style="width: 10.00%"> {{ landlord.taxdate }}</td>
-            <td style="width: 10.00%"> {{ landlord.manager }}</td>
-            <td style="width: 10.00%">spare</td>
-            <td style="width: 5.00%"><a href="/landlordpage/{{ landlord.id }}">Goto Landlord</a></td>
+        {% for item in landlords %}
+        <tr id="{{ item.id }}">
+            <td style="width: 25.00%">{{ item.name }}</td>
+            <td style="width: 25.00%"> {{ item.addr }}</td>
+            <td style="width: 25.00%"> {{ item.addr }}</td>
+            <td style="width: 10.00%"> {{ item.details }}</td>
+            <td style="width: 10.00%"> {{ item.manager }}</td>
+            <td style="width: 5.00%"><a href="/landlordpage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
