@@ -98,6 +98,7 @@ class Extrent(db.Model):
     rentcode = db.Column(db.String(20), index=True)
     tenantname = db.Column(db.String(30))
     propaddr = db.Column(db.String(180))
+    agentdetails = db.Column(db.String(45))
     rentpa = db.Column(db.Numeric(8,2))
     arrears = db.Column(db.Numeric(8,2))
     lastrentdate = db.Column(db.Date)
