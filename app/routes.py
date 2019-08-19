@@ -8,12 +8,26 @@ from werkzeug.urls import url_parse
 
 from app import app, db
 from app.email import send_password_reset_email
-from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm, \
-    JinnForm, RentForm
+from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
-from app.tables import Results
+
+
+@app.route('/agents', methods=['GET', 'POST'])
+@login_required
+def agents():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('agents'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+
+        return render_template('agents.html', title='Agents')
 
 
 @app.before_request
@@ -21,6 +35,23 @@ def before_request():
     if current_user.is_authenticated:
         current_user.last_seen = datetime.datetime.utcnow()
         db.session.commit()
+
+
+@app.route('/chargepage/<int:id>', methods=["GET"])
+@login_required
+def chargepage(id):
+    idr = id
+    charges = \
+        Charge.query \
+            .join(Rent) \
+            .join(Chargetype) \
+            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
+                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+            .filter(Rent.id == idr) \
+            .all()
+
+    return render_template('charges.html', title='Charges', charges=charges)
+
 
 @app.route('/charges', methods=['GET', 'POST'])
 def charges():
@@ -30,35 +61,16 @@ def charges():
     else:
         rcd = ""
         cdt = ""
-    charges = getcharges(rcd, cdt)
+    charges = filtercharges(rcd, cdt)
 
     return render_template('charges.html', title='Charges page', charges=charges)
 
-@app.route('/chargepage/<int:id>', methods=["POST", "GET"])
+
+@app.route('/clonerentprop/<int:id>', methods=["POST", "GET"])
 @login_required
-def chargepage(id):
+def clonerentprop(id):
     if request.method == "POST":
-        rcd = request.form["rentcode"]
-        cdt = request.form["chargedetails"]
-    else:
-        idr = id
-        charges = \
-            Charge.query \
-                .join(Rent) \
-                .join(Chargetype) \
-                .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
-                               Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-                .filter(Rent.id == idr) \
-                .all()
-
-    return render_template('charges.html', title='Charges', charges=charges)
-
-
-@app.route('/clonerent/<int:id>', methods=["POST", "GET"])
-@login_required
-def clonerent(id):
-    if request.method == "POST":
-        rent, property, agent = savechanges(id, "clone")
+        rent, property, agent = postrentprop(id, "clone")
         rent.rentcode = request.form["rentcode"]
         rent.prop_rent.append(property)
 
@@ -72,42 +84,36 @@ def clonerent(id):
         # `rent.id` gets updated to hold the INSERTed id
         new_id = rent.id
 
-        return redirect('/editrent/{}'.format(new_id))
+        return redirect('/editrentprop/{}'.format(new_id))
     else:
-        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getvalues(id, "clone")
+        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getrentpropvalues(id, action="clone")
 
-    return render_template('rentpage.html', action="clone", title='Clone rent', rent=rentdet, actypedets=actypedets,
+    return render_template('rentproppage.html', action="clone", title='Clone rent', rentprop=rentprop, actypedets=actypedets,
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)
+
+
+@app.route('/deleteemailacc/<int:id>')
+def deleteemailacc(id):
+    emailacc = Emailaccount.query.get(id)
+    db.session.delete(emailacc)
+    db.session.commit()
+
+    return redirect(url_for('emailaccs'))
 
 
 @app.route('/deleterentprop/<int:id>')
 def deleterentprop(id):
     delete_rent = Rent.query.get(id)
     delete_property = Property.query.filter(Property.rent_id == id).first()
-    if delete_property is not None:
+    if delete_property:
         db.session.delete(delete_property)
     db.session.delete(delete_rent)
     db.session.commit()
 
     return redirect(url_for('index'))
-
-
-@app.route('/signin/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    form = EditProfileForm(current_user.username)
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
 @app.route('/editcharge/<int:id>', methods=["POST", "GET"])
@@ -123,6 +129,7 @@ def editcharge(id):
         charge.chargedetails = request.form["chargedetails"]
         charge.chargebalance = request.form["chargebalance"]
         db.session.commit()
+
         return redirect('/editcharge/{}'.format(id))
     else:
         chargedet = \
@@ -141,28 +148,79 @@ def editcharge(id):
     return render_template('editcharge.html', chargedescs=chargedescs, charge=chargedet)
 
 
-@app.route('/editrent/<int:id>', methods=["POST", "GET"])
+@app.route('/signin/edit_profile', methods=['GET', 'POST'])
 @login_required
-def editrent(id):
-    if request.method == "POST":
-        rent, property, agent = savechanges(id, "edit")
-
-        # lots of challenges: I have allowed for editing an existing agent, but not switching to another or new agent
-
+def edit_profile():
+    form = EditProfileForm(current_user.username)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
         db.session.commit()
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
 
-        return redirect('/editrent/{}'.format(id))
+    return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+
+@app.route('/editrentprop/<int:id>', methods=["POST", "GET"])
+@login_required
+def editrentprop(id):
+    if request.method == "POST":
+        postrentprop(id, "edit")
+
+        return redirect('/editrentprop/{}'.format(id))
     else:
-        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getvalues(id, "edit")
+        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getrentpropvalues(id, action="edit")
         # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
         #     filter(Rent.id == id) \
         #         .one_or_none()
 
-    return render_template('rentpage.html', action="edit", title='Edit rent', rent=rentdet, actypedets=actypedets,
+    return render_template('rentproppage.html', action="edit", title='Edit rent', rentprop=rentprop, actypedets=actypedets,
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)
+
+
+@app.route('/emailaccpage/<int:id>', methods=["POST", "GET"])
+@login_required
+def emailaccpage(id):
+    if request.method == "POST":
+        emailacc = postemailacc(id, action="edit")
+        db.session.add(emailacc)
+        db.session.commit()
+
+        return redirect('/emailaccpage/{}'.format(id))
+
+    else:
+        ide = id
+        managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
+        emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
+        bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accnum).all()]
+        emailacc = \
+            Emailaccount.query \
+                .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_port,
+                               Emailaccount.smtp_timeout, Emailaccount.smtp_debug, Emailaccount.smtp_tls,
+                               Emailaccount.smtp_user, Emailaccount.smtp_password, Emailaccount.smtp_sendfrom,
+                               Emailaccount.imap_server, Emailaccount.imap_port, Emailaccount.imap_tls,
+                               Emailaccount.imap_user, Emailaccount.imap_password, Emailaccount.imap_sentfolder,
+                               Emailaccount.imap_draftfolder) \
+                .filter(Emailaccount.id == ide) \
+                .one_or_none()
+
+    return render_template('emailaccpage.html', title='Email account', emailacc=emailacc)
+
+
+@app.route('/emailaccs', methods=['GET'])
+def emailaccs():
+    emailaccs = \
+        Emailaccount.query \
+            .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_user,
+                           Emailaccount.smtp_sendfrom, Emailaccount.imap_sentfolder, Emailaccount.imap_draftfolder) \
+            .all()
+
+    return render_template('emailaccs.html', title='Email accounts', emailaccs=emailaccs)
 
 
 @app.route('/externalrent', methods=['GET', 'POST'])
@@ -211,7 +269,7 @@ def extrentpage(id):
     return render_template('extrentpage.html', title ='External Rent', rent=rent)
 
 
-def getcharges(rcd, cdt):
+def filtercharges(rcd, cdt):
     charges = \
         Charge.query \
             .join(Rent) \
@@ -225,8 +283,8 @@ def getcharges(rcd, cdt):
     return charges
 
 
-def getrents(rcd, ten, pop):
-    rents = \
+def filterrentprops(rcd, ten, pop):
+    rentprops = \
         Property.query \
             .join(Rent) \
             .join(Landlord) \
@@ -238,12 +296,12 @@ def getrents(rcd, ten, pop):
                     Property.propaddr.ilike('%{}%'.format(pop))) \
             .all()
 
-    return rents
+    return rentprops
 
 
-def getvalues(id, action):
+def getrentpropvalues(id, action):
     if action == "clone" or action == "edit":
-        rentdet = \
+        rentprop = \
             Property.query \
                 .join(Rent) \
                 .join(Landlord) \
@@ -257,20 +315,19 @@ def getvalues(id, action):
                 .join(Typesalegrade) \
                 .join(Typestatus) \
                 .join(Typetenure) \
-                .join(Charge) \
                 .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                                Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
                                Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
                                Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
                                Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                               Typetenure.tenuredet,func.sum(Charge.chargebalance).label("totcharges")) \
-                .filter(Rent.id == id) \
+                               Typetenure.tenuredet) \
+                .filter(Rent.id == ('{}'.format(id))) \
                 .one_or_none()
-        if rentdet is None:
+        if rentprop is None:
             flash('Invalid rent code')
             return redirect(url_for('login'))
     elif action == "new":
-        rentdet = None
+        rentprop = None
     else:
         raise ValueError("getvalues(): Unrecognised value for 'action' (\"{}\")".format(action))
 
@@ -285,9 +342,39 @@ def getvalues(id, action):
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
 
-    return rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, \
+    return rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, \
            salegradedets, statusdets, tenuredets
 
+
+@app.route('/headrents', methods=['GET', 'POST'])
+@login_required
+def headrents():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('headrents'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+
+        return render_template('headrents.html', title='Headrents')
+
+
+@app.route('/income', methods=['GET', 'POST'])
+@login_required
+def income():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('income'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+        return render_template('income.html', title='Income')
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -296,11 +383,11 @@ def index():
         rcd = request.form["rentcode"]
         ten = request.form["tenantname"]
         pop = request.form["propaddr"]
-        rents = getrents(rcd, ten, pop)
+        rentprops = filterrentprops(rcd, ten, pop)
     else:
-        rcd = "ZCAS"
-        rents = getrents(rcd, "", "")
-    return render_template('index.html', title='Rent and property search page', rents=rents)
+        rcd = "ZWEF"
+        rentprops = filterrentprops(rcd, "", "")
+    return render_template('index.html', title='Rent and property search page', rentprops=rentprops)
 
 
 @app.route('/landlordpage/<int:id>', methods=["POST", "GET"])
@@ -371,11 +458,44 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/newrent', methods=['GET', 'POST'])
-def newrent():
+@app.route('/money', methods=['GET', 'POST'])
+@login_required
+def money():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('money'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+
+        return render_template('money.html', title='Money')
+
+
+@app.route('/newemailacc', methods=['GET', 'POST'])
+def newemailacc():
     id = 0
     if request.method == "POST":
-        rent, property, agent = savechanges(id, "new")
+        emailacc = postemailacc(id, action="new")
+        db.session.add(emailacc)
+        db.session.commit()
+        new_id = emailacc.id
+
+        return redirect('/emailaccpage/{}'.format(new_id))
+
+    else:
+        emailacc = []
+
+        return render_template('emailaccpage.html', title='New rent', emailacc=emailacc)
+
+
+@app.route('/newrentprop', methods=['GET', 'POST'])
+def newrentprop():
+    id = 0
+    if request.method == "POST":
+        rent, property, agent = postrentprop(id, "new")
         rent.rentcode = request.form["rentcode"]
         rent.prop_rent.append(property)
 
@@ -389,10 +509,10 @@ def newrent():
         # `rent.id` gets updated to hold the INSERTed id
         new_id = rent.id
 
-        return redirect('/editrent/{}'.format(new_id))
+        return redirect('/editrentprop/{}'.format(new_id))
     else:
-        rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getvalues(id, "new")
+        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getrentpropvalues(id, action="new")
 
     return render_template('newrent.html', title='New rent', actypedets=actypedets, advarrdets=advarrdets,
                            deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
@@ -400,45 +520,53 @@ def newrent():
                            tenuredets=tenuredets)
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Congratulations, you are now a registered user!')
-        return redirect(url_for('login'))
-    return render_template('signin/register.html', title='Register', form=form)
-
-
-@app.route('/rentpage/<int:id>', methods=["GET"])
+@app.route('/payrequests', methods=['GET', 'POST'])
 @login_required
-def rentpage(id):
-    rentdet, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-    statusdets, tenuredets = getvalues(id, "edit")
-    # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-    #     filter(Rent.id == id) \
-    #         .one_or_none()
+def payrequests():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('payrequests'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
 
-    return render_template('rentpage.html', action="view", title='View rent', rent=rentdet, actypedets=actypedets,
-                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
-                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets)
+        return render_template('payrequests.html', title='Payrequests')
 
 
-def savechanges(id, action):
+def postemailacc(id, action):
+    if action == "edit":
+        emailacc = Emailaccount.query.get(id)
+    else:
+        emailacc = Emailaccount()
+    emailacc.smtp_server = request.form["smtp_server"]
+    emailacc.smtp_port = request.form["smtp_port"]
+    emailacc.smtp_timeout = request.form["smtp_timeout"]
+    emailacc.smtp_debug = request.form["smtp_debug"]
+    emailacc.smtp_tls = request.form["smtp_tls"]
+    emailacc.smtp_user = request.form["smtp_user"]
+    emailacc.smtp_password = request.form["smtp_password"]
+    emailacc.smtp_sendfrom = request.form["smtp_sendfrom"]
+    emailacc.imap_port = request.form["imap_port"]
+    emailacc.imap_tls = request.form["imap_tls"]
+    emailacc.imap_user = request.form["imap_user"]
+    emailacc.imap_password = request.form["imap_password"]
+    emailacc.imap_sentfolder = request.form["imap_sentfolder"]
+    emailacc.imap_draftfolder = request.form["imap_draftfolder"]
+
+    return emailacc
+
+
+def postrentprop(id, action):
     if action == "edit":
         rent = Rent.query.get(id)
         property = Property.query.filter(Property.rent_id == id).first()
-        agent = Agent.query.filter(Agent.id == rent.agent_id).first()
+        agent = Agent.query.filter(Agent.id == rent.agent_id).one_or_none()
     else:
         rent = Rent()
         property = Property()
-        agent = Agent()
 
     actype = request.form["actype"]
     rent.actype_id = \
@@ -480,14 +608,70 @@ def savechanges(id, action):
     rent.tenure_id = \
         Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).one()[0]
 
-    agent.agdetails = request.form["agent"]
-
+    agdetails = request.form["agent"]
+    if agdetails and agdetails != "None":
+        if not agent:
+            agent = Agent()
+            agent.agdetails = agdetails
+            agent.rent_agent.append(rent)
+            db.session.add(agent)
+        else:
+            agent.agdetails = agdetails
     property.propaddr = request.form["propaddr"]
     proptype = request.form["proptype"]
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).one()[0]
 
-    return rent, property, agent
+    # lots of challenges: I have allowed for editing an existing agent, but not switching to another or new agent
+    # I have not dealt with case where someone simply deletes all existing agentdetails
+    db.session.commit()
+
+
+@app.route('/properties', methods=['GET', 'POST'])
+@login_required
+def properties():
+    if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+        return redirect(url_for('properties'))
+    else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+
+        return render_template('properties.html', title='Properties')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('signin/register.html', title='Register', form=form)
+
+
+@app.route('/rentproppage/<int:id>', methods=["GET"])
+@login_required
+def rentproppage(id):
+    rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+    statusdets, tenuredets = getrentpropvalues(id, action="edit")
+    # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
+    #     filter(Rent.id == id) \
+    #         .one_or_none()
+
+    return render_template('rentproppage.html', action="view", title='View rent', rentprop=rentprop, actypedets=actypedets,
+                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
+                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
+                           statusdets=statusdets, tenuredets=tenuredets)
+
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -528,100 +712,6 @@ def user(username):
     return render_template('/signin/user.html', user=user)
 
 
-@app.route('/agents', methods=['GET', 'POST'])
-@login_required
-def agents():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('agents'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('agents.html', title='Agents')
-
-
-@app.route('/headrents', methods=['GET', 'POST'])
-@login_required
-def headrents():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('headrents'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('headrents.html', title='Headrents')
-
-
-@app.route('/income', methods=['GET', 'POST'])
-@login_required
-def income():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('income'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-        return render_template('income.html', title='Income')
-
-@app.route('/money', methods=['GET', 'POST'])
-@login_required
-def money():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('money'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('money.html', title='Money')
-
-
-@app.route('/payrequests', methods=['GET', 'POST'])
-@login_required
-def payrequests():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('payrequests'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('payrequests.html', title='Payrequests')
-
-
-@app.route('/properties', methods=['GET', 'POST'])
-@login_required
-def properties():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('properties'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('properties.html', title='Properties')
-
-
 @app.route('/utilities', methods=['GET', 'POST'])
 @login_required
 def utilities():
@@ -636,4 +726,3 @@ def utilities():
     #     rents = getrents(rcd, "", "")
 
         return render_template('utilities.html', title='utilities')
-

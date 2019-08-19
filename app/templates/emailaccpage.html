@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="smtp_server">smtp_server:</label>
+            <input type="text" class="form-control" name="smtp_server" value="{{ emailacc.smtp_server }}">
+        </div>
+        <div class="col-md-2">
+            <label for="smtp_port">smtp_port:</label>
+            <input type="text" class="form-control" name="smtp_port" value="{{ emailacc.smtp_port }}">
+        </div>
+        <div class="col-md-2">
+            <label for="smtp_timeout">smtp_timeout:</label>
+            <input type="text" class="form-control" name="smtp_timeout  " value="{{ emailacc.smtp_timeout }}">
+        </div>
+        <div class="col-md-2">
+            <label for="smtp_debug">smtp_debug:</label>
+            <input type="text" class="form-control" name="smtp_debug" value="{{ emailacc.smtp_debug }}">
+        </div>
+        <div class="col-md-2">
+            <label for="smtp_tls">smtp_tls:</label>
+            <input type="text" class="form-control" name="smtp_tls" value="{{ emailacc.smtp_tls }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="smtp_user">smtp_user:</label>
+            <input type="text" class="form-control" name="smtp_user" value="{{ emailacc.smtp_user }}">
+        </div>
+        <div class="col-md-3">
+            <label for="smtp_password">smtp_password:</label>
+            <input type="text" class="form-control" name="smtp_password" value="{{ emailacc.smtp_password }}">
+        </div>
+        <div class="col-md-3">
+            <label for="smtp_sendfrom">smtp_sendfrom:</label>
+            <input type="text" class="form-control" name="smtp_sendfrom" value="{{ emailacc.smtp_sendfrom }}">
+        </div>
+        <div class="col-md-3">
+            <label for="imap_server">imap_server:</label>
+            <input type="text" class="form-control" name="imap_server" value="{{ emailacc.imap_server }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="imap_port">imap_port:</label>
+            <input type="text" class="form-control" name="imap_port" value="{{ emailacc.imap_port }}">
+        </div>
+        <div class="col-md-2">
+            <label for="imap_tls">imap_tls:</label>
+            <input type="text" class="form-control" name="imap_tls" value="{{ emailacc.imap_tls }}">
+        </div>
+        <div class="col-md-4">
+            <label for="imap_user">imap_user:</label>
+            <input type="text" class="form-control" name="imap_user" value="{{ emailacc.imap_user }}">
+        </div>
+        <div class="col-md-4">
+            <label for="imap_password">imap_password:</label>
+            <input type="text" class="form-control" name="imap_password" value="{{ emailacc.imap_password }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-6">
+            <label for="imap_sentfolder">imap_sentfolder:</label>
+            <input type="text" class="form-control" name="imap_sentfolder" value="{{ emailacc.imap_sentfolder }}">
+        </div>
+        <div class="col-md-6">
+            <label for="imap_draftfolder">imap_draftfolder:</label>
+            <input type="text" class="form-control" name="imap_draftfolder" value="{{ emailacc.imap_draftfolder }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <a href="/emailaccs" class="btn btn-block btn-danger" role="button">Cancel</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/newemailacc" class="btn btn-block btn-success" role="button">New email account</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/deleteemailacc/{{ emailacc.id }}"
+               onclick="return confirm('Are you sure you want to delete this email account?');"
+               class="btn btn-block btn-warning" role="button">Delete email account</a>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save changes</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+

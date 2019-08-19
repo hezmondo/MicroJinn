@@ -7,114 +7,114 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rent code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ rent.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" value="{{ rentprop.rentcode }}">
         </div>
         <div class="col-md-8">
             <label for="propaddr">Property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rent.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" value="{{ rentprop.propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="proptype">Proptype:</label>
-            {{ widgets.combobox(name="proptype", items=proptypedets, item_selected=rent.proptypedet) }}
+            {{ widgets.combobox(name="proptype", items=proptypedets, item_selected=rentprop.proptypedet) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">Landlord:</label>
-            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rent.name) }}
+            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rentprop.name) }}
         </div>
         <div class="col-md-8">
             <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+            <input type="text" class="form-control" name="tenantname" value="{{ rentprop.tenantname }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-8">
             <label for="note">Notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ rent.note }}">
+            <input type="text" class="form-control" name="note" value="{{ rentprop.note }}">
         </div>
         <div class="col-md-4">
             <label for="email">Email:</label>
-            <input type="text" class="form-control" name="email" value="{{ rent.email }}">
+            <input type="text" class="form-control" name="email" value="{{ rentprop.email }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="mailto">Mail to:</label>
-            {{ widgets.combobox(name="mailto", items=mailtodets, item_selected=rent.mailtodet) }}
+            {{ widgets.combobox(name="mailto", items=mailtodets, item_selected=rentprop.mailtodet) }}
         </div>
         <div class="col-md-8">
             <label for="agent">Agent:</label>
-            <input type="text" class="form-control" name="agent" value="{{ rent.agdetails }}">
+            <input type="text" class="form-control" name="agent" value="{{ rentprop.agdetails }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="rentpa">Rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
+            <input type="text" class="form-control" name="rentpa" value="{{ rentprop.rentpa }}">
         </div>
         <div class="col-md-4">
             <label for="arrears">Rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
+            <input type="text" class="form-control" name="arrears" value="{{ rentprop.arrears }}">
         </div>
         <div class="col-md-4">
             <label for="totcharges">Total charges:</label>
-            <input type="text" class="form-control" name="totcharges" value="{{ rent.totcharges }}">
+            <input type="text" class="form-control" name="totcharges" value="{{ rentprop.totcharges }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="lastrentdate">Last rent date:</label>
             <input type="date" class="form-control" name="lastrentdate"
-                   value="{{ rent.lastrentdate }}">
+                   value="{{ rentprop.lastrentdate }}">
         </div>
         <div class="col-md-2">
             <label for="frequency">Frequency:</label>
-            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rent.freqdet) }}
+            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rentprop.freqdet) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">Actype:</label>
-            {{ widgets.combobox(name="actype", items=actypedets, item_selected=rent.actypedet) }}
+            {{ widgets.combobox(name="actype", items=actypedets, item_selected=rentprop.actypedet) }}
         </div>
         <div class="col-md-3">
             <label for="advarr">Advance/Arrears:</label>
-            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rent.advarrdet) }}
+            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rentprop.advarrdet) }}
         </div>
         <div class="form-group col-md-3">
             <label for="datecode">DateCode:</label>
-            <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
+            <input type="text" class="form-control" name="datecode" value="{{ rentprop.datecode }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="tenure">Tenure:</label>
-            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=rent.tenuredet) }}
+            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=rentprop.tenuredet) }}
         </div>
         <div class="col-md-2">
             <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" value="{{ rent.source }}">
+            <input type="text" class="form-control" name="source" value="{{ rentprop.source }}">
         </div>
         <div class="col-md-2">
             <label for="deedtype">Deed type:</label>
-            {{ widgets.combobox(name="deedtype", items=deedcodes, item_selected=rent.deedcode) }}
+            {{ widgets.combobox(name="deedtype", items=deedcodes, item_selected=rentprop.deedcode) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">Sale grade:</label>
-            {{ widgets.combobox(name="salegrade", items=salegradedets, item_selected=rent.salegradedet) }}
+            {{ widgets.combobox(name="salegrade", items=salegradedets, item_selected=rentprop.salegradedet) }}
         </div>
         <div class="col-md-2">
             <label for="price">Price:</label>
-            <input type="text" class="form-control" name="price" value="{{ rent.price }}">
+            <input type="text" class="form-control" name="price" value="{{ rentprop.price }}">
         </div>
         <div class="col-md-2">
             <label for="status">Status:</label>
-            {{ widgets.combobox(name="status", items=statusdets, item_selected=rent.statusdet) }}
+            {{ widgets.combobox(name="status", items=statusdets, item_selected=rentprop.statusdet) }}
         </div>
     </div>
     <div class="form-group row">
 		    {% if action == "view" %}
                 <div class="col-md-3">
-                    <a href="/editrent/{{ rent.id }}" class="btn btn-block btn-primary" role="button">Edit this rent & property</a>
+                    <a href="/editrentprop/{{ rentprop.id }}" class="btn btn-block btn-primary" role="button">Edit this rent & property</a>
                 </div>
     		{% endif %}
 		    {% if action == "edit" %}
@@ -122,12 +122,12 @@
                     <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
                 </div>
                 <div class="col-md-3">
-                    <a href="/deleterentprop/{{ rent.id }}"
+                    <a href="/deleterentprop/{{ rentprop.id }}"
                        onclick="return confirm('Are you sure you want to delete this rent and property?');"
                        class="btn btn-block btn-warning" role="button">Delete rent and property</a>
                 </div>
                 <div class="col-md-3">
-                    <a href="/chargepage/{{ rent.id }}" class="btn btn-block btn-info" role="button">Charges</a>
+                    <a href="/chargepage/{{ rentprop.id }}" class="btn btn-block btn-info" role="button">Charges</a>
                 </div>
                 <div class="col-md-3">
                     <button type="submit" class="btn btn-block btn-success">Save changes</button>

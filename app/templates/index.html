@@ -45,14 +45,14 @@
         </tr>
         </thead>
         <tbody>
-        {% for rent in rents %}
-        <tr id="{{ rent.id }}">
-            <td style="width: 10.00%">{{ rent.rentcode }}</td>
-            <td style="width: 25.00%">{{ rent.propaddr }}</td>
-            <td style="width: 25.00%"> {{ rent.tenantname }}</td>
-            <td style="width: 10.00%"> {{ rent.rentpa }}</td>
-            <td style="width: 10.00%"> {{ rent.arrears }}</td>
-            <td style="width: 5.00%"><a href="/rentpage/{{ rent.id }}">View</a></td>
+        {% for item in rentprops %}
+        <tr id="{{ item.id }}">
+            <td style="width: 10.00%">{{ item.rentcode }}</td>
+            <td style="width: 25.00%">{{ item.propaddr }}</td>
+            <td style="width: 25.00%"> {{ item.tenantname }}</td>
+            <td style="width: 10.00%"> {{ item.rentpa }}</td>
+            <td style="width: 10.00%"> {{ item.arrears }}</td>
+            <td style="width: 5.00%"><a href="/rentproppage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
