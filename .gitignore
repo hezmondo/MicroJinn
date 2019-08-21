@@ -71,4 +71,4 @@ MicroDump*.sql
 myconfig.py
 logs/
 
-
+sqldumps/
