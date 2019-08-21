@@ -29,20 +29,30 @@ def agents():
     return render_template('agents.html', title='Agent search page', agents=agents)
 
 
-@app.route('/agentpage/<int:id>', methods=["GET"])
+@app.route('/agentpage/<int:id>', methods=["GET", "POST"])
 @login_required
 def agentpage(id):
-    ida = id
-    agent = \
-        Agent.query \
-            .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-            .filter(Agent.id == ida) \
-            .one_or_none()
-    if agent is None:
-        flash('Invalid agent code')
+    if request.method == "POST":
+        agent = Agent.query.get(id)
+        agent.agdetails = request.form["address"]
+        agent.agemail = request.form["email"]
+        agent.agnotes = request.form["notes"]
+        db.session.commit()
+
         return redirect(url_for('agents'))
 
-    return render_template('agentpage.html', title='Agent', agent=agent)
+    else:
+        ida = id
+        agent = \
+            Agent.query \
+                .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
+                .filter(Agent.id == ida) \
+                .one_or_none()
+        if agent is None:
+            flash('Invalid agent code')
+            return redirect(url_for('agents'))
+
+        return render_template('agentpage.html', title='Agent', agent=agent)
 
 
 @app.route('/chargepage/<int:id>', methods=["GET"])
@@ -101,6 +111,15 @@ def clonerentprop(id):
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)
+
+
+@app.route('/deleteagent/<int:id>')
+def deleteagent(id):
+    agent = Agent.query.get(id)
+    db.session.delete(agent)
+    db.session.commit()
+
+    return redirect(url_for('agents'))
 
 
 @app.route('/deleteemailacc/<int:id>')
@@ -281,8 +300,8 @@ def filteragents(agd, age, agn):
     agents = \
         Agent.query \
             .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-            .filter(Agent.agdetails.ilike('%{}%'.format(agd)),
-                    Agent.agemail.ilike('%{}%'.format(age)),
+            .filter(Agent.agdetails.ilike('%{}%'.format(agd)), \
+                    Agent.agemail.ilike('%{}%'.format(age)), \
                     Agent.agnotes.ilike('%{}%'.format(agn))) \
             .all()
 
@@ -414,14 +433,26 @@ def index():
 @login_required
 def landlordpage(id):
     if request.method == "POST":
-        name = request.form["name"]
-        addr = request.form["address"]
-        details = request.form["details"]
-        taxdate = request.form["taxdate"]
+        landlord = Landlord.query.get(id)
+        landlord.name = request.form["name"]
+        landlord.addr = request.form["address"]
+        landlord.taxdate = request.form["taxdate"]
         emailacc = request.form["emailacc"]
+        landlord.emailacc_id = \
+            Emailaccount.query.with_entities(Emailaccount.id).filter \
+                (Emailaccount.smtp_server == emailacc).one()[0]
         bankacc = request.form["bankacc"]
+        landlord.bankacc_id = \
+                Typebankacc.query.with_entities(Typebankacc.id).filter \
+                    (Typebankacc.accnum == bankacc).one()[0]
         manager = request.form["manager"]
-        return
+        landlord.manager_id = \
+            Manager.query.with_entities(Manager.id).filter \
+                (Manager.name == manager).one()[0]
+        db.session.commit()
+
+        return redirect(url_for('landlords'))
+
     else:
         idl = id
         managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
@@ -515,7 +546,7 @@ def newemailacc():
 def newrentprop():
     id = 0
     if request.method == "POST":
-        rent, property, agent = postrentprop(id, "new")
+        rent, property, agent = postrentprop(id, action="new")
         rent.rentcode = request.form["rentcode"]
         rent.prop_rent.append(property)
 
