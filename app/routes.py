@@ -18,23 +18,31 @@ from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Ex
 @login_required
 def agents():
     if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('agents'))
+        agd = request.form["address"]
+        age = request.form["email"]
+        agn = request.form["notes"]
+        agents = filteragents(agd, age, agn)
     else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
+        agd = "Jones"
+        agents = filteragents(agd, "", "")
 
-        return render_template('agents.html', title='Agents')
+    return render_template('agents.html', title='Agent search page', agents=agents)
 
 
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.datetime.utcnow()
-        db.session.commit()
+@app.route('/agentpage/<int:id>', methods=["GET"])
+@login_required
+def agentpage(id):
+    ida = id
+    agent = \
+        Agent.query \
+            .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
+            .filter(Agent.id == ida) \
+            .one_or_none()
+    if agent is None:
+        flash('Invalid agent code')
+        return redirect(url_for('agents'))
+
+    return render_template('agentpage.html', title='Agent', agent=agent)
 
 
 @app.route('/chargepage/<int:id>', methods=["GET"])
@@ -269,6 +277,18 @@ def extrentpage(id):
     return render_template('extrentpage.html', title ='External Rent', rent=rent)
 
 
+def filteragents(agd, age, agn):
+    agents = \
+        Agent.query \
+            .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
+            .filter(Agent.agdetails.ilike('%{}%'.format(agd)),
+                    Agent.agemail.ilike('%{}%'.format(age)),
+                    Agent.agnotes.ilike('%{}%'.format(agn))) \
+            .all()
+
+    return agents
+
+
 def filtercharges(rcd, cdt):
     charges = \
         Charge.query \
@@ -321,7 +341,7 @@ def getrentpropvalues(id, action):
                                Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
                                Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                Typetenure.tenuredet) \
-                .filter(Rent.id == ('{}'.format(id))) \
+                .filter(Rent.id == id) \
                 .one_or_none()
         if rentprop is None:
             flash('Invalid rent code')

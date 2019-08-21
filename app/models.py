@@ -11,7 +11,9 @@ class Agent(db.Model):
     __tablename__ = 'agent'
 
     id = db.Column(db.Integer, primary_key=True)
-    agdetails = db.Column(db.String(180))    
+    agdetails = db.Column(db.String(180))
+    agemail = db.Column(db.String(60))
+    agnotes = db.Column(db.String(60))
 
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
