@@ -84,35 +84,6 @@ def charges():
     return render_template('charges.html', title='Charges page', charges=charges)
 
 
-@app.route('/clonerentprop/<int:id>', methods=["POST", "GET"])
-@login_required
-def clonerentprop(id):
-    if request.method == "POST":
-        rent, property, agent = postrentprop(id, "clone")
-        rent.rentcode = request.form["rentcode"]
-        rent.prop_rent.append(property)
-
-        # lots of challenges: this should deal with a new agent, but not to connect to an existing agent
-        if agent and agent.agdetails != "None":
-            agent.rent_agent.append(rent)
-            db.session.add(agent)
-
-        db.session.add(rent)
-        db.session.commit()
-        # `rent.id` gets updated to hold the INSERTed id
-        new_id = rent.id
-
-        return redirect('/editrentprop/{}'.format(new_id))
-    else:
-        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getrentpropvalues(id, action="clone")
-
-    return render_template('rentproppage.html', action="clone", title='Clone rent', rentprop=rentprop, actypedets=actypedets,
-                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
-                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets)
-
-
 @app.route('/deleteagent/<int:id>')
 def deleteagent(id):
     agent = Agent.query.get(id)
@@ -188,26 +159,6 @@ def edit_profile():
         form.username.data = current_user.username
 
     return render_template('edit_profile.html', title='Edit Profile', form=form)
-
-
-@app.route('/editrentprop/<int:id>', methods=["POST", "GET"])
-@login_required
-def editrentprop(id):
-    if request.method == "POST":
-        postrentprop(id, "edit")
-
-        return redirect('/editrentprop/{}'.format(id))
-    else:
-        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getrentpropvalues(id, action="edit")
-        # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-        #     filter(Rent.id == id) \
-        #         .one_or_none()
-
-    return render_template('rentproppage.html', action="edit", title='Edit rent', rentprop=rentprop, actypedets=actypedets,
-                           advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
-                           mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets)
 
 
 @app.route('/emailaccpage/<int:id>', methods=["POST", "GET"])
@@ -338,37 +289,32 @@ def filterrentprops(rcd, ten, pop):
     return rentprops
 
 
-def getrentpropvalues(id, action):
-    if action == "clone" or action == "edit":
-        rentprop = \
-            Property.query \
-                .join(Rent) \
-                .join(Landlord) \
-                .outerjoin(Agent) \
-                .join(Typeactype) \
-                .join(Typeadvarr) \
-                .join(Typedeed) \
-                .join(Typefreq) \
-                .join(Typemailto) \
-                .join(Typeproperty) \
-                .join(Typesalegrade) \
-                .join(Typestatus) \
-                .join(Typetenure) \
-                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
-                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                               Typetenure.tenuredet) \
-                .filter(Rent.id == id) \
-                .one_or_none()
-        if rentprop is None:
-            flash('Invalid rent code')
-            return redirect(url_for('login'))
-    elif action == "new":
-        rentprop = None
-    else:
-        raise ValueError("getvalues(): Unrecognised value for 'action' (\"{}\")".format(action))
+def getrentpropvalues(id):
+    rentprop = \
+        Property.query \
+            .join(Rent) \
+            .join(Landlord) \
+            .outerjoin(Agent) \
+            .join(Typeactype) \
+            .join(Typeadvarr) \
+            .join(Typedeed) \
+            .join(Typefreq) \
+            .join(Typemailto) \
+            .join(Typeproperty) \
+            .join(Typesalegrade) \
+            .join(Typestatus) \
+            .join(Typetenure) \
+            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                           Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
+                           Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
+                           Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
+                           Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                           Typetenure.tenuredet) \
+            .filter(Rent.id == id) \
+            .one_or_none()
+    if rentprop is None:
+        flash('Invalid rent code')
+        return redirect(url_for('login'))
 
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
@@ -542,35 +488,6 @@ def newemailacc():
         return render_template('emailaccpage.html', title='New rent', emailacc=emailacc)
 
 
-@app.route('/newrentprop', methods=['GET', 'POST'])
-def newrentprop():
-    id = 0
-    if request.method == "POST":
-        rent, property, agent = postrentprop(id, action="new")
-        rent.rentcode = request.form["rentcode"]
-        rent.prop_rent.append(property)
-
-        # lots of challenges: this should deal with a new agent, but not to connect to an existing agent
-        if agent and agent.agdetails != "None":
-            agent.rent_agent.append(rent)
-            db.session.add(agent)
-
-        db.session.add(rent)
-        db.session.commit()
-        # `rent.id` gets updated to hold the INSERTed id
-        new_id = rent.id
-
-        return redirect('/editrentprop/{}'.format(new_id))
-    else:
-        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-        statusdets, tenuredets = getrentpropvalues(id, action="new")
-
-    return render_template('newrent.html', title='New rent', actypedets=actypedets, advarrdets=advarrdets,
-                           deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                           proptypedets=proptypedets, salegradedets=salegradedets, statusdets=statusdets,
-                           tenuredets=tenuredets)
-
-
 @app.route('/payrequests', methods=['GET', 'POST'])
 @login_required
 def payrequests():
@@ -672,7 +589,10 @@ def postrentprop(id, action):
     proptype = request.form["proptype"]
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).one()[0]
-
+    if not action == "edit":
+        rent.rentcode = request.form["rentcode"]
+        rent.prop_rent.append(property)
+        db.session.add(rent)
     # lots of challenges: I have allowed for editing an existing agent, but not switching to another or new agent
     # I have not dealt with case where someone simply deletes all existing agentdetails
     db.session.commit()
@@ -709,16 +629,23 @@ def register():
     return render_template('signin/register.html', title='Register', form=form)
 
 
-@app.route('/rentproppage/<int:id>', methods=["GET"])
+@app.route('/rentproppage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def rentproppage(id):
-    rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
-    statusdets, tenuredets = getrentpropvalues(id, action="edit")
-    # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-    #     filter(Rent.id == id) \
-    #         .one_or_none()
+    action = request.args.get('action')
+    if request.method == "POST":
+        postrentprop(id, action)
 
-    return render_template('rentproppage.html', action="view", title='View rent', rentprop=rentprop, actypedets=actypedets,
+        return redirect('/rentproppage/{}?action=edit'.format(id))
+
+    else:
+        rentprop, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, salegradedets, \
+        statusdets, tenuredets = getrentpropvalues(id)
+        # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
+        #     filter(Rent.id == id) \
+        #         .one_or_none()
+
+        return render_template('rentproppage.html', action=action, title=action, rentprop=rentprop, actypedets=actypedets,
                            advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets, landlords=landlords,
                            mailtodets=mailtodets, proptypedets=proptypedets, salegradedets=salegradedets,
                            statusdets=statusdets, tenuredets=tenuredets)

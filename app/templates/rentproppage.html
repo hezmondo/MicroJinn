@@ -113,27 +113,25 @@
     </div>
     <div class="form-group row">
 		    {% if action == "view" %}
-                <div class="col-md-3">
-                    <a href="/editrentprop/{{ rentprop.id }}" class="btn btn-block btn-primary" role="button">Edit this rent & property</a>
-                </div>
-    		{% endif %}
-		    {% if action == "edit" %}
-                <div class="col-md-3">
-                    <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
-                </div>
-                <div class="col-md-3">
-                    <a href="/deleterentprop/{{ rentprop.id }}"
-                       onclick="return confirm('Are you sure you want to delete this rent and property?');"
-                       class="btn btn-block btn-warning" role="button">Delete rent and property</a>
-                </div>
-                <div class="col-md-3">
-                    <a href="/chargepage/{{ rentprop.id }}" class="btn btn-block btn-info" role="button">Charges</a>
-                </div>
-                <div class="col-md-3">
-                    <button type="submit" class="btn btn-block btn-success">Save changes</button>
-                </div>
+            <div class="col-md-3">
+                <a href="/rentproppage/{{ rentprop.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rent & property</a>
+            </div>
+            {% else %}
+            <div class="col-md-3">
+                <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/deleterentprop/{{ rentprop.id }}"
+                   onclick="return confirm('Are you sure you want to delete this rent and property?');"
+                   class="btn btn-block btn-warning" role="button">Delete rent and property</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/chargepage/{{ rentprop.id }}" class="btn btn-block btn-info" role="button">Charges</a>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-block btn-success">Save changes</button>
+            </div>
     		{% endif %}
     </div>
 </form>
 {% endblock %}
-
