@@ -251,8 +251,8 @@ def filteragents(agd, age, agn):
     agents = \
         Agent.query \
             .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-            .filter(Agent.agdetails.ilike('%{}%'.format(agd)), \
-                    Agent.agemail.ilike('%{}%'.format(age)), \
+            .filter(Agent.agdetails.ilike('%{}%'.format(agd)),
+                    Agent.agemail.ilike('%{}%'.format(age)),
                     Agent.agnotes.ilike('%{}%'.format(agn))) \
             .all()
 
@@ -290,31 +290,50 @@ def filterrentprops(rcd, ten, pop):
 
 
 def getrentpropvalues(id):
-    rentprop = \
-        Property.query \
-            .join(Rent) \
-            .join(Landlord) \
-            .outerjoin(Agent) \
-            .join(Typeactype) \
-            .join(Typeadvarr) \
-            .join(Typedeed) \
-            .join(Typefreq) \
-            .join(Typemailto) \
-            .join(Typeproperty) \
-            .join(Typesalegrade) \
-            .join(Typestatus) \
-            .join(Typetenure) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                           Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
-                           Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                           Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                           Typetenure.tenuredet) \
-            .filter(Rent.id == id) \
-            .one_or_none()
-    if rentprop is None:
-        flash('Invalid rent code')
-        return redirect(url_for('login'))
+    # This method returns a "rentprop" object
+    # information about a rent, plus its related property/agent/landlord stuff
+    # plus all the list values to offer for various comboboxes
+    # all of this is to be shown in rentproppage.html
+    # that allows either editing etc. of an existing rent (whose `id` is specified)
+    # (in which case we fetch the rent info to edit)
+    # or it allows creation of a new rent (signified by id==0)
+    # (in which case for the rent info we have to "invent" an object
+    # with the same attributes as would have been fetched from the database
+    # but with "blanks", or default values, as desired for creating a new rent
+    # --- seems like Flask is happy for it not even to have the fields which will be referenced
+    # so just put in any defaults desired)
+    if id > 0:
+        # existing rent
+        rentprop = \
+            Property.query \
+                .join(Rent) \
+                .join(Landlord) \
+                .outerjoin(Agent) \
+                .join(Typeactype) \
+                .join(Typeadvarr) \
+                .join(Typedeed) \
+                .join(Typefreq) \
+                .join(Typemailto) \
+                .join(Typeproperty) \
+                .join(Typesalegrade) \
+                .join(Typestatus) \
+                .join(Typetenure) \
+                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
+                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
+                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
+                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                               Typetenure.tenuredet) \
+                .filter(Rent.id == id) \
+                .one_or_none()
+        if rentprop is None:
+            flash('Invalid rent code')
+            return redirect(url_for('login'))
+    else:
+        # new rent
+        rentprop = {
+            'id': 0
+        }
 
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
@@ -535,6 +554,7 @@ def postrentprop(id, action):
     else:
         rent = Rent()
         property = Property()
+        agent = Agent()
 
     actype = request.form["actype"]
     rent.actype_id = \
@@ -632,7 +652,7 @@ def register():
 @app.route('/rentproppage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def rentproppage(id):
-    action = request.args.get('action')
+    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         postrentprop(id, action)
 
