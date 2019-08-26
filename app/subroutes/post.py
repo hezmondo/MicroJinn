@@ -27,8 +27,8 @@ def postcharge(id):
     return
 
 
-def postemailacc(id, action):
-    if action == "edit":
+def postemailacc(id):
+    if id > 0:
         emailacc = Emailaccount.query.get(id)
     else:
         emailacc = Emailaccount()
@@ -46,14 +46,16 @@ def postemailacc(id, action):
     emailacc.imap_password = request.form["imap_password"]
     emailacc.imap_sentfolder = request.form["imap_sentfolder"]
     emailacc.imap_draftfolder = request.form["imap_draftfolder"]
-    emailacc = postemailacc(id, action="edit")
-    db.session.add(emailacc)
+    if id < 1:
+        db.session.add(emailacc)
+        db.session.commit()
+        id = emailacc.id
     db.session.commit()
     return
 
 
-def postlandlord(id, action):
-    if action == "edit":
+def postlandlord(id):
+    if id > 0:
         landlord = Landlord.query.get(id)
     else:
         landlord = Landlord()
@@ -72,12 +74,16 @@ def postlandlord(id, action):
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
             (Manager.name == manager).one()[0]
+    if id < 1:
+        db.session.add(landlord)
+        db.session.commit()
+        id = landlord.id
     db.session.commit()
     return
 
 
-def postrentobj(id, action):
-    if action == "edit":
+def postrentobj(id):
+    if id > 0:
         rent = Rent.query.get(id)
         property = Property.query.filter(Property.rent_id == id).first()
         agent = Agent.query.filter(Agent.id == rent.agent_id).one_or_none()
@@ -139,7 +145,7 @@ def postrentobj(id, action):
     proptype = request.form["proptype"]
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).one()[0]
-    if not action == "edit":
+    if id < 1:
         rent.rentcode = request.form["rentcode"]
         rent.prop_rent.append(property)
         db.session.add(rent)

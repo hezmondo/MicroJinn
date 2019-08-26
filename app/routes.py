@@ -12,8 +12,8 @@ from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswor
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
-from app.subroutes.sub import subagents, subagentp, subcharges, subchargep, subemailaccp, subindex, \
-    sublandlordp, subrentobjp
+from app.subroutes.sub import subagents, subagentp, subcharges, subchargep, subdeleteitem, subemailaccp, \
+    subindex, sublandlordp, subrentobjp
 
 
 @app.route('/agents', methods=['GET', 'POST'])
@@ -47,43 +47,11 @@ def chargepage(id):
     return render_template('chargepage.html', charge=charge, chargedescs=chargedescs)
 
 
-@app.route('/deleteagent/<int:id>')
-def deleteagent(id):
-    agent = Agent.query.get(id)
-    db.session.delete(agent)
-    db.session.commit()
+@app.route('/deleteitem/<int:id>')
+def deleteitem(id):
+    subdeleteitem(id)
 
-    return redirect(url_for('agents'))
-
-
-@app.route('/deleteemailacc/<int:id>')
-def deleteemailacc(id):
-    emailacc = Emailaccount.query.get(id)
-    db.session.delete(emailacc)
-    db.session.commit()
-
-    return redirect(url_for('emailaccs'))
-
-
-@app.route('/deletelandlord/<int:id>')
-def deletelandlord(id):
-    landlord = Landlord.query.get(id)
-    db.session.delete(landlord)
-    db.session.commit()
-
-    return redirect(url_for('landlords'))
-
-
-@app.route('/deleterentprop/<int:id>')
-def deleterentprop(id):
-    delete_rent = Rent.query.get(id)
-    delete_property = Property.query.filter(Property.rent_id == id).first()
-    if delete_property:
-        db.session.delete(delete_property)
-    db.session.delete(delete_rent)
-    db.session.commit()
-
-    return redirect(url_for('index'))
+    # return redirect(url_for('index'))
 
 
 @app.route('/signin/edit_profile', methods=['GET', 'POST'])

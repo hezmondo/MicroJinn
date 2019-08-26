@@ -89,31 +89,38 @@ def getcharge(id):
 
 
 def getemailacc(id):
-    emailacc = \
-        Emailaccount.query \
-            .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_port,
-                           Emailaccount.smtp_timeout, Emailaccount.smtp_debug, Emailaccount.smtp_tls,
-                           Emailaccount.smtp_user, Emailaccount.smtp_password, Emailaccount.smtp_sendfrom,
-                           Emailaccount.imap_server, Emailaccount.imap_port, Emailaccount.imap_tls,
-                           Emailaccount.imap_user, Emailaccount.imap_password, Emailaccount.imap_sentfolder,
-                           Emailaccount.imap_draftfolder) \
-            .filter(Emailaccount.id == id) \
-            .one_or_none()
+    if id > 0:
+        # existing emailacc
+        emailacc = \
+            Emailaccount.query \
+                .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_port,
+                               Emailaccount.smtp_timeout, Emailaccount.smtp_debug, Emailaccount.smtp_tls,
+                               Emailaccount.smtp_user, Emailaccount.smtp_password, Emailaccount.smtp_sendfrom,
+                               Emailaccount.imap_server, Emailaccount.imap_port, Emailaccount.imap_tls,
+                               Emailaccount.imap_user, Emailaccount.imap_password, Emailaccount.imap_sentfolder,
+                               Emailaccount.imap_draftfolder) \
+                .filter(Emailaccount.id == id) \
+                .one_or_none()
+    else:
+        # new emailacc
+        emailacc = {
+            'id': 0
+        }
     return emailacc
 
 
 def getlandlord(id):
     if id > 0:
-        # existing rent
+        # existing landlord
         landlord = \
             Landlord.query.join(Manager).join(Emailaccount).join(Typebankacc) \
-                .with_entities(Landlord.name, Landlord.addr, Landlord.taxdate, Manager.name.label("manager"),
-                               Emailaccount.smtp_server, Typebankacc.accnum) \
+                .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
+                               Manager.name.label("manager"), Emailaccount.smtp_server, Typebankacc.accnum) \
                 .filter(Landlord.id == id) \
                 .one_or_none()
         if landlord is None:
             flash('Invalid landlord id')
-            return redirect(url_for('landlords'))
+            return redirect('/landlords')
     else:
         # new landlord
         landlord = {

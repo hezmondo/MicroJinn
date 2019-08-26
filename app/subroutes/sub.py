@@ -54,14 +54,47 @@ def subchargep(id):
     return charge, chargedescs
 
 
+def subdeleteitem(id):
+    item = request.args.get('item', "view", type=str)
+    if item == "agent":
+        agent = Agent.query.get(id)
+        db.session.delete(agent)
+        db.session.commit()
+        return redirect(url_for('agents'))
+    elif item == "charge":
+        charge = Charge.query.get(id)
+        db.session.delete(charge)
+        db.session.commit()
+        return redirect(url_for('charges'))
+    elif item == "emailacc":
+        emailacc = Emailacc.query.get(id)
+        db.session.delete(emailacc)
+        db.session.commit()
+        return redirect('/emailaccs')
+    elif item == "landlord":
+        landlord = Landlord.query.get(id)
+        if landlord:
+            db.session.delete(landlord)
+            db.session.commit()
+        return redirect(url_for ('index'))
+    elif item == "rentprop":
+        delete_rent = Rent.query.get(id)
+        delete_property = Property.query.filter(Property.rent_id == id).first()
+        if delete_property:
+            db.session.delete(delete_property)
+        db.session.delete(delete_rent)
+        db.session.commit()
+    return redirect(url_for('index'))
+
+
 def subemailaccp(id):
     if request.method == "POST":
-        postemailacc(id, action="edit")
+        postemailacc(id)
+        return redirect('/emailaccs')
     else:
         pass
     emailacc = getemailacc(id)
-
-    return render_template('emailaccpage.html', title='Email account', emailacc=emailacc)
+    return emailacc
 
 
 def subindex():
@@ -76,19 +109,19 @@ def subindex():
 
 
 def sublandlordp(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postlandlord(id, action)
+        postlandlord(id)
+        # return redirect('/landlords')
     else:
         pass
-    landlord, managers, emailaccs, bankaccs= getlandlord(id)
+    landlord, managers, emailaccs, bankaccs = getlandlord(id)
     return landlord, managers, emailaccs, bankaccs
 
 
 def subrentobjp(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postrentobj(id, action)
+        postrentobj(id)
     else:
         pass
     rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, \
