@@ -1,14 +1,4 @@
-# from datetime import datetime
-import datetime
-from dateutil.relativedelta import relativedelta
-from flask import render_template, flash, redirect, url_for, request
-from flask_login import login_user, logout_user, current_user, login_required
-from sqlalchemy import asc, desc, extract, func, literal, and_, or_
-from werkzeug.urls import url_parse
-
-from app import app, db
-from app.email import send_password_reset_email
-from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from flask import flash, redirect, url_for, request
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -87,7 +77,7 @@ def filterincome():
         # ten = request.form["tenantname"]
         # pop = request.form["propaddr"]
         # rents = getrents(rcd, ten, pop)
-    #     return redirect(url_for('income'))
+    #     return redirect(url_for('main.income'))
     # else:
     #     rcd = "ZCAS"
     #     rents = getrents(rcd, "", "")
@@ -128,7 +118,7 @@ def getagent(id):
             .one_or_none()
     if agent is None:
         flash('Invalid agent code')
-        return redirect(url_for('agents'))
+        return redirect(url_for('main.agents'))
     return agent
 
 
@@ -161,22 +151,7 @@ def getemailacc(id):
     else:
         # new emailacc
         emailacc = {
-            'id': 0,
-            'smtp_server': 'smtp.gmail.com',
-            'smtp_port': 587,
-            'smtp_timeout': 20,
-            'smtp_debug': 0,
-            'smtp_tls': 0,
-            'smtp_user': 'hesmaloney@gmail.com',
-            'smtp_password': 'abcdefgh',
-            'smtp_sendfrom': 'hesmaloney@gmail.com',
-            'imap_server': 'imap.gmail.com',
-            'imap_port': 993,
-            'imap_tls': 0,
-            'imap_user': '',
-            'imap_password': 'abcdefgh',
-            'imap_sentfolder': 'Sent',
-            'imap_draftfolder': 'Draft'
+            'id': 0
         }
     return emailacc
 
@@ -184,20 +159,20 @@ def getemailacc(id):
 def getextrent(id):
     # if request.method == "POST":
     #
-    #     return redirect(url_for('index'))
+    #     return redirect(url_for('main.index'))
     # else:
     # pass
     extrent = \
         Extrent.query \
             .join(Extmanager) \
             .with_entities(Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
-                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
                            Extmanager.codename, Extrent.agentdetails) \
             .filter(Extrent.id == id) \
                 .one_or_none()
     if extrent is None:
         flash('N')
-        return redirect(url_for('index'))
+        return redirect(url_for('main.index'))
     return extrent
 
 
@@ -264,7 +239,7 @@ def getrentobj(id):
                 .one_or_none()
         if rentobj is None:
             flash('Invalid rent code')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
     else:
         # new rent
         rentobj = {

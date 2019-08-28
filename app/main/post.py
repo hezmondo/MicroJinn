@@ -1,14 +1,6 @@
-# from datetime import datetime
-import datetime
-from dateutil.relativedelta import relativedelta
-from flask import render_template, flash, redirect, url_for, request
-from flask_login import login_user, logout_user, current_user, login_required
-from sqlalchemy import asc, desc, extract, func, literal, and_, or_
-from werkzeug.urls import url_parse
+from flask import request
 
-from app import app, db
-from app.email import send_password_reset_email
-from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
+from app import db
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -27,8 +19,8 @@ def postcharge(id):
     return
 
 
-def postemailacc(id):
-    if id > 0:
+def postemailacc(id, action):
+    if action == "edit":
         emailacc = Emailaccount.query.get(id)
     else:
         emailacc = Emailaccount()
@@ -47,14 +39,14 @@ def postemailacc(id):
     emailacc.imap_password = request.form["imap_password"]
     emailacc.imap_sentfolder = request.form["imap_sentfolder"]
     emailacc.imap_draftfolder = request.form["imap_draftfolder"]
-    if id == 0:
+    if not action == "edit":
         db.session.add(emailacc)
         db.session.commit()
         id = emailacc.id
-        return
     else:
         db.session.commit()
-        return
+
+    return redirect('/emailaccpage/{}'.format(id))
 
 
 def postlandlord(id):
@@ -82,7 +74,8 @@ def postlandlord(id):
         db.session.commit()
         id = landlord.id
     db.session.commit()
-    return
+
+    return redirect('/landlordpage/{}'.format(id))
 
 
 def postrentobj(id):
