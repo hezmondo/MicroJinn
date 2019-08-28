@@ -71,9 +71,10 @@ def subdeleteitem(id):
         db.session.delete(charge)
         db.session.commit()
     elif item == "emailacc":
-        emailacc = Emailacc.query.get(id)
+        emailacc = Emailaccount.query.get(id)
         db.session.delete(emailacc)
         db.session.commit()
+        # return redirect('/emailaccs')
     elif item == "landlord":
         landlord = Landlord.query.get(id)
         if landlord:

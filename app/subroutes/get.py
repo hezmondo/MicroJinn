@@ -161,7 +161,22 @@ def getemailacc(id):
     else:
         # new emailacc
         emailacc = {
-            'id': 0
+            'id': 0,
+            'smtp_server': 'smtp.gmail.com',
+            'smtp_port': 587,
+            'smtp_timeout': 20,
+            'smtp_debug': 0,
+            'smtp_tls': 0,
+            'smtp_user': 'hesmaloney@gmail.com',
+            'smtp_password': 'abcdefgh',
+            'smtp_sendfrom': 'hesmaloney@gmail.com',
+            'imap_server': 'imap.gmail.com',
+            'imap_port': 993,
+            'imap_tls': 0,
+            'imap_user': '',
+            'imap_password': 'abcdefgh',
+            'imap_sentfolder': 'Sent',
+            'imap_draftfolder': 'Draft'
         }
     return emailacc
 
