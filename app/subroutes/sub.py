@@ -9,16 +9,22 @@ from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswor
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
-from app.subroutes.get import filteragents, filtercharges, filterrentobjs, getagent, getcharge, getemailacc, \
-    getlandlord, getrentobj
+from app.subroutes.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
+    filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
+    getextrent, getlandlord, getrentobj
 from app.subroutes.post import postagent, postcharge, postemailacc, postlandlord, postrentobj
 
 
 def subagents():
     if request.method == "POST":
-        agents = filteragents("post")
+        agd = request.form["address"]
+        age = request.form["email"]
+        agn = request.form["notes"]
     else:
-        agents = filteragents("get")
+        agd = "Jones"
+        age = ""
+        agn = ""
+    agents = filteragents(agd, age, agn)
     return agents
 
 
@@ -60,41 +66,61 @@ def subdeleteitem(id):
         agent = Agent.query.get(id)
         db.session.delete(agent)
         db.session.commit()
-        return redirect(url_for('agents'))
     elif item == "charge":
         charge = Charge.query.get(id)
         db.session.delete(charge)
         db.session.commit()
-        return redirect(url_for('charges'))
     elif item == "emailacc":
         emailacc = Emailacc.query.get(id)
         db.session.delete(emailacc)
         db.session.commit()
-        return redirect('/emailaccs')
     elif item == "landlord":
         landlord = Landlord.query.get(id)
         if landlord:
             db.session.delete(landlord)
             db.session.commit()
-        return redirect(url_for ('index'))
     elif item == "rentprop":
         delete_rent = Rent.query.get(id)
         delete_property = Property.query.filter(Property.rent_id == id).first()
         if delete_property:
             db.session.delete(delete_property)
-        db.session.delete(delete_rent)
-        db.session.commit()
-    return redirect(url_for('index'))
+            db.session.delete(delete_rent)
+            db.session.commit()
+    return
 
 
 def subemailaccp(id):
     if request.method == "POST":
         postemailacc(id)
-        return redirect('/emailaccs')
     else:
         pass
     emailacc = getemailacc(id)
     return emailacc
+
+
+def subemailaccs():
+    emailaccs = filteremailaccs()
+    return emailaccs
+
+
+def subextrentp(id):
+    extrent = getextrent(id)
+    return extrent
+
+
+def subextrents():
+    extrents = filterextrents()
+    return extrents
+
+
+def subheadrents():
+    headrents = filterheadrents()
+    return headrents
+
+
+def subincome():
+    income = filterincome()
+    return income
 
 
 def subindex():
@@ -107,15 +133,34 @@ def subindex():
         rentobjs = filterrentobjs("ZWEF", "", "")
     return rentobjs
 
+def sublandlords():
+    landlords = filterlandlords()
+    return landlords
+
+
 
 def sublandlordp(id):
     if request.method == "POST":
         postlandlord(id)
-        # return redirect('/landlords')
     else:
         pass
     landlord, managers, emailaccs, bankaccs = getlandlord(id)
     return landlord, managers, emailaccs, bankaccs
+
+
+def submoney():
+    money = None
+    return money
+
+
+def subpayrequests():
+    payrequests = None
+    return payrequests
+
+
+def subproperties():
+    properties = None
+    return properties
 
 
 def subrentobjp(id):

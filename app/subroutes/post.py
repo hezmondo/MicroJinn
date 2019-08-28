@@ -40,18 +40,21 @@ def postemailacc(id):
     emailacc.smtp_user = request.form["smtp_user"]
     emailacc.smtp_password = request.form["smtp_password"]
     emailacc.smtp_sendfrom = request.form["smtp_sendfrom"]
+    emailacc.imap_server = request.form["imap_server"]
     emailacc.imap_port = request.form["imap_port"]
     emailacc.imap_tls = request.form["imap_tls"]
     emailacc.imap_user = request.form["imap_user"]
     emailacc.imap_password = request.form["imap_password"]
     emailacc.imap_sentfolder = request.form["imap_sentfolder"]
     emailacc.imap_draftfolder = request.form["imap_draftfolder"]
-    if id < 1:
+    if id == 0:
         db.session.add(emailacc)
         db.session.commit()
         id = emailacc.id
-    db.session.commit()
-    return
+        return
+    else:
+        db.session.commit()
+        return
 
 
 def postlandlord(id):

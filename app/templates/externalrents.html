@@ -25,29 +25,29 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="rent">
+    <table class="table" id="external">
         <thead>
         <tr>
-            <th style="width: 6.00%">rentcode</th>
-            <th style="width: 29.00%">propaddr</th>
-            <th style="width: 29.00%">tenantname</th>
-            <th style="width: 6.00%">rentpa</th>
-            <th style="width: 6.00%">status</th>
-            <th style="width: 6.00%">landlord</th>
-            <th style="width: 6.00%">extmanager</th>
+            <th style="width: 6.00%">Rent code</th>
+            <th style="width: 29.00%">Prop addr</th>
+            <th style="width: 29.00%">Tenant name</th>
+            <th style="width: 6.00%">Rent pa</th>
+            <th style="width: 6.00%">Status</th>
+            <th style="width: 6.00%">Landlord</th>
+            <th style="width: 6.00%">External manager</th>
         </tr>
         </thead>
         <tbody>
-        {% for rent in rent %}
-        <tr id="{{ rent.id }}">
-            <td style="width: 6.00%">{{ rent.rentcode }}</td>
-            <td style="width: 29.00%">{{ rent.propaddr }}</td>
-            <td style="width: 29.00%"> {{ rent.tenantname }}</td>
-            <td style="width: 6.00%"> {{ rent.rentpa }}</td>
-            <td style="width: 6.00%"> {{ rent.status }}</td>
-            <td style="width: 6.00%"> {{ rent.owner }}</td>
-            <td style="width: 6.00%"> {{ rent.codename }}</td>
-            <td style="width: 5.00%"><a href="/extrentpage/{{ rent.id }}">View</a></td>
+        {% for item in extrents %}
+        <tr id="{{ item.id }}">
+            <td style="width: 6.00%">{{ item.rentcode }}</td>
+            <td style="width: 29.00%">{{ item.propaddr }}</td>
+            <td style="width: 29.00%"> {{ item.tenantname }}</td>
+            <td style="width: 6.00%"> {{ item.rentpa }}</td>
+            <td style="width: 6.00%"> {{ item.status }}</td>
+            <td style="width: 6.00%"> {{ item.owner }}</td>
+            <td style="width: 6.00%"> {{ item.codename }}</td>
+            <td style="width: 5.00%"><a href="/extrentpage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

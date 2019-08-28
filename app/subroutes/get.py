@@ -14,15 +14,7 @@ from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Ex
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
-def filteragents(action):
-    if action == "post":
-        agd = request.form["address"]
-        age = request.form["email"]
-        agn = request.form["notes"]
-    else:
-        agd = "Jones"
-        age = ""
-        agn = ""
+def filteragents(agd, age, agn):
     agents = \
         Agent.query \
             .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
@@ -45,6 +37,71 @@ def filtercharges(rcd, cdt):
             .all()
 
     return charges
+
+
+def filteremailaccs():
+    emailaccs = \
+        Emailaccount.query \
+            .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_user,
+                           Emailaccount.smtp_sendfrom, Emailaccount.imap_sentfolder, Emailaccount.imap_draftfolder) \
+            .all()
+    return emailaccs
+
+
+def filterextrents():
+    if request.method == "POST":
+        rcd = request.form["rentcode"]
+        ten = request.form["tenantname"]
+        pop = request.form["propaddr"]
+    else:
+        rcd = "lus"
+        ten = ""
+        pop = ""
+    extrents = \
+        Extrent.query \
+            .join(Extmanager) \
+            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
+                           Extmanager.codename, Extrent.agentdetails) \
+            .filter(Extrent.rentcode.startswith([rcd]),
+                    Extrent.tenantname.ilike('%{}%'.format(ten)),
+                    Extrent.propaddr.ilike('%{}%'.format(pop))) \
+            .all()
+
+    return extrents
+
+def filterheadrents():
+#     if request.method == "POST":
+        # hrcd = request.form["headrentcode"]
+        # agd = request.form["agentdetails"]
+        # pop = request.form["propaddr"]
+    # else:
+        # headrents = getheadrents("", "COMP", "")
+    headrents = None
+    return headrents
+
+
+def filterincome():
+    # if request.method == "POST":
+        # rcd = request.form["rentcode"]
+        # ten = request.form["tenantname"]
+        # pop = request.form["propaddr"]
+        # rents = getrents(rcd, ten, pop)
+    #     return redirect(url_for('income'))
+    # else:
+    #     rcd = "ZCAS"
+    #     rents = getrents(rcd, "", "")
+    income = None
+    return income
+
+
+def filterlandlords():
+    landlords = \
+        Landlord.query.join(Manager) \
+            .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
+                           Manager.name.label("manager")) \
+            .all()
+    return landlords
 
 
 def filterrentobjs(rcd, ten, pop):
@@ -107,6 +164,26 @@ def getemailacc(id):
             'id': 0
         }
     return emailacc
+
+
+def getextrent(id):
+    # if request.method == "POST":
+    #
+    #     return redirect(url_for('index'))
+    # else:
+    # pass
+    extrent = \
+        Extrent.query \
+            .join(Extmanager) \
+            .with_entities(Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source,
+                           Extmanager.codename, Extrent.agentdetails) \
+            .filter(Extrent.id == id) \
+                .one_or_none()
+    if extrent is None:
+        flash('N')
+        return redirect(url_for('index'))
+    return extrent
 
 
 def getlandlord(id):

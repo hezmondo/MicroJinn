@@ -1,26 +1,19 @@
-# from datetime import datetime
-import datetime
-from dateutil.relativedelta import relativedelta
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
-from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from werkzeug.urls import url_parse
 
 from app import app, db
 from app.email import send_password_reset_email
 from app.forms import EditProfileForm, LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
-    Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+from app.models import User
 from app.subroutes.sub import subagents, subagentp, subcharges, subchargep, subdeleteitem, subemailaccp, \
-    subindex, sublandlordp, subrentobjp
+    subemailaccs, subextrentp, subextrents, subheadrents, subincome, subindex, sublandlordp, \
+    sublandlords, submoney, subpayrequests, subproperties, subrentobjp
 
 
 @app.route('/agents', methods=['GET', 'POST'])
-@login_required
 def agents():
     agents = subagents()
-
     return render_template('agents.html', title='Agent search page', agents=agents)
 
 
@@ -28,14 +21,12 @@ def agents():
 @login_required
 def agentpage(id):
     agent = subagentp(id)
-
     return render_template('agentpage.html', title='Agent', agent=agent)
 
 
 @app.route('/charges', methods=['GET', 'POST'])
-def charges(rentcode=None):
+def charges():
     charges = subcharges()
-
     return render_template('charges.html', title='Charges page', charges=charges)
 
 
@@ -43,15 +34,14 @@ def charges(rentcode=None):
 @login_required
 def chargepage(id):
     charge, chargedescs = subchargep(id)
-
     return render_template('chargepage.html', charge=charge, chargedescs=chargedescs)
 
 
 @app.route('/deleteitem/<int:id>')
+@login_required
 def deleteitem(id):
     subdeleteitem(id)
-
-    # return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 
 @app.route('/signin/edit_profile', methods=['GET', 'POST'])
@@ -73,103 +63,44 @@ def edit_profile():
 @login_required
 def emailaccpage(id):
     emailacc = subemailaccp(id)
-
     return render_template('emailaccpage.html', title='Email account', emailacc=emailacc)
 
 
 @app.route('/emailaccs', methods=['GET'])
 def emailaccs():
-    emailaccs = \
-        Emailaccount.query \
-            .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_user,
-                           Emailaccount.smtp_sendfrom, Emailaccount.imap_sentfolder, Emailaccount.imap_draftfolder) \
-            .all()
-
+    emailaccs = subemailaccs()
     return render_template('emailaccs.html', title='Email accounts', emailaccs=emailaccs)
 
 
-@app.route('/externalrent', methods=['GET', 'POST'])
-@login_required
-def externalrent():
-    if request.method == "POST":
-        rcd = request.form["rentcode"]
-        ten = request.form["tenantname"]
-        pop = request.form["propaddr"]
-    else:
-        rcd = "lus"
-        ten = ""
-        pop = ""
-    rent = \
-        Extrent.query \
-            .join(Extmanager) \
-            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
-                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
-                           Extmanager.codename, Extrent.agentdetails) \
-            .filter(Extrent.rentcode.startswith([rcd]),
-                    Extrent.tenantname.ilike('%{}%'.format(ten)),
-                    Extrent.propaddr.ilike('%{}%'.format(pop))) \
-            .all()
-    return render_template('externalrent.html', title='External Rents', rent=rent)
+@app.route('/externalrents', methods=['GET', 'POST'])
+def externalrents():
+    extrents = subextrents()
+    return render_template('externalrents.html', title='External rents', extrents=extrents)
 
 
 @app.route('/extrentpage/<int:id>', methods=["GET"])
 @login_required
 def extrentpage(id):
-    # if request.method == "POST":
-    #
-    #     return redirect(url_for('index'))
-    # else:
-    rent = \
-        Extrent.query \
-            .join(Extmanager) \
-            .with_entities(Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
-                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source,
-                           Extmanager.codename, Extrent.agentdetails) \
-            .filter(Extrent.id == id) \
-                .one_or_none()
-    if rent is None:
-        flash('N')
-        return redirect(url_for('index'))
-
-    return render_template('extrentpage.html', title ='External Rent', rent=rent)
+    extrent = subextrentp(id)
+    return render_template('extrentpage.html', title ='External Rent', extrent=extrent)
 
 
 @app.route('/headrents', methods=['GET', 'POST'])
-@login_required
 def headrents():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('headrents'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('headrents.html', title='Headrents')
+    headrents = subheadrents()
+    return render_template('headrents.html', title='Headrents', headrents=headrents)
 
 
 @app.route('/income', methods=['GET', 'POST'])
-@login_required
 def income():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('income'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-        return render_template('income.html', title='Income')
+    income = subincome()
+    return render_template('income.html', title='Income', income=income)
 
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     rentobjs = subindex()
-
     return render_template('index.html', title='Rent and property search page', rentobjs=rentobjs)
 
 
@@ -177,24 +108,13 @@ def index():
 @login_required
 def landlordpage(id):
     landlord, managers, emailaccs, bankaccs = sublandlordp(id)
-
     return render_template('landlordpage.html', title='Landlord', landlord=landlord, bankaccs=bankaccs,
-                           managers=managers, emailaccs=emailaccs)
+                               managers=managers, emailaccs=emailaccs)
 
 
-@app.route('/landlords', methods=['GET', 'POST'])
-@login_required
+@app.route('/landlords', methods=['GET'])
 def landlords():
-    if request.method == "POST":
-        return
-
-    else:
-        landlords = \
-            Landlord.query.join(Manager) \
-                .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                               Manager.name.label("manager")) \
-                .all()
-
+    landlords = sublandlords()
     return render_template('landlords.html', title='Landlords', landlords=landlords)
 
 
@@ -223,68 +143,23 @@ def logout():
 
 
 @app.route('/money', methods=['GET', 'POST'])
-@login_required
 def money():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('money'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('money.html', title='Money')
-
-
-@app.route('/newemailacc', methods=['GET', 'POST'])
-def newemailacc():
-    id = 0
-    if request.method == "POST":
-        emailacc = postemailacc(id, action="new")
-        db.session.add(emailacc)
-        db.session.commit()
-        new_id = emailacc.id
-
-        return redirect('/emailaccpage/{}'.format(new_id))
-
-    else:
-        emailacc = []
-
-        return render_template('emailaccpage.html', title='New rent', emailacc=emailacc)
+    money = submoney()
+    return render_template('money.html', title='Money', money=money)
 
 
 @app.route('/payrequests', methods=['GET', 'POST'])
 @login_required
 def payrequests():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('payrequests'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('payrequests.html', title='Payrequests')
+    payrequests = subpayrequests()
+    return render_template('payrequests.html', title='Payrequests', payrequests=payrequests)
 
 
 @app.route('/properties', methods=['GET', 'POST'])
 @login_required
 def properties():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('properties'))
-    else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('properties.html', title='Properties')
+    properties = subproperties()
+    return render_template('properties.html', title='Properties', properties=properties)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -353,17 +228,6 @@ def user(username):
     return render_template('/signin/user.html', user=user)
 
 
-@app.route('/utilities', methods=['GET', 'POST'])
-@login_required
+@app.route('/utilities', methods=['GET'])
 def utilities():
-    if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-        return redirect(url_for('utilities'))
-    else:
-    # rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-
-        return render_template('utilities.html', title='utilities')
+    return render_template('utilities.html', title='utilities')

@@ -6,50 +6,50 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rent code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ rent.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" value="{{ extrent.rentcode }}">
         </div>
         <div class="col-md-6">
             <label for="propaddr">Property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rent.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" value="{{ extrent.propaddr }}">
         </div>
         <div class="col-md-4">
             <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+            <input type="text" class="form-control" name="tenantname" value="{{ extrent.tenantname }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="manager">External manager:</label>
-            <input type="text" class="form-control" name="manager" value="{{ rent.codename }}">
+            <input type="text" class="form-control" name="manager" value="{{ extrent.codename }}">
         </div>
         <div class="col-md-2">
             <label for="rentpa">Rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
+            <input type="text" class="form-control" name="rentpa" value="{{ extrent.rentpa }}">
         </div>
         <div class="col-md-2">
             <label for="arrears">Rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
+            <input type="text" class="form-control" name="arrears" value="{{ extrent.arrears }}">
         </div>
         <div class="col-md-2">
             <label for="lastrentdate">lastrentdate:</label>
-            <input type="text" class="form-control" name="lastrentdate" value="{{ rent.lastrentdate }}">
+            <input type="text" class="form-control" name="lastrentdate" value="{{ extrent.lastrentdate }}">
         </div>
         <div class="col-md-2">
             <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" value="{{ rent.source }}">
+            <input type="text" class="form-control" name="source" value="{{ extrent.source }}">
         </div>
         <div class="col-md-2">
             <label for="status">Status:</label>
-            <input type="text" class="form-control" name="status" value="{{ rent.status }}">
+            <input type="text" class="form-control" name="status" value="{{ extrent.status }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="agentdetails">Agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" value="{{ rent.agentdetails }}">
+            <input type="text" class="form-control" name="agentdetails" value="{{ extrent.agentdetails }}">
         </div>
         <div class="col-md-4">
-            <a href="/index" class="btn btn-block btn-danger" role="button">Cancel</a>
+            <a href="/externalrents" class="btn btn-block btn-danger" role="button">Cancel</a>
         </div>
     </div>
 </form>
