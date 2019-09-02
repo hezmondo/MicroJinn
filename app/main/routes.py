@@ -4,8 +4,8 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getlandlord, getrentobj
-from app.main.post import postagent, postcharge, postemailacc, postlandlord, postrentobj
+    getextrent, getincome, getlandlord, getrentobj
+from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, postrentobj
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -41,11 +41,12 @@ def charges():
     if request.method == "POST":
         rcd = request.form["rentcode"]
         cdt = request.form["chargedetails"]
-    elif not rentcode == "view":
-        rcd = rentcode
     else:
-        rcd = ""
-    cdt = ""
+        if not rentcode == "view":
+            rcd = rentcode
+        else:
+            rcd = ""
+        cdt = ""
     charges = filtercharges(rcd, cdt)
 
     return render_template('charges.html', title='Charges page', charges=charges)
@@ -140,9 +141,29 @@ def headrents():
 
 @bp.route('/income', methods=['GET', 'POST'])
 def income():
-    income = filterincome()
+    if request.method == "POST":
+        rcd = request.form["rentcode"]
+        pay = request.form["payer"]
+        typ = request.form["type"]
+        income = filterincome(rcd, pay, typ)
+    else:
+        income = filterincome("", "", "")
 
     return render_template('income.html', title='Income', income=income)
+
+
+@bp.route('/incomepage/<int:id>', methods=["POST", "GET"])
+@login_required
+def incomepage(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        postincome(id, action)
+    else:
+        pass
+    income, bankaccs = getincome(id)
+
+    return render_template('incomepage.html', title='Income', action=action, income=income,
+                           bankaccs=bankaccs, )
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -162,14 +183,15 @@ def index():
 @bp.route('/landlordpage/<int:id>', methods=["POST", "GET"])
 @login_required
 def landlordpage(id):
+    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postlandlord(id)
+        postlandlord(id, action)
     else:
         pass
     landlord, managers, emailaccs, bankaccs = getlandlord(id)
 
-    return render_template('landlordpage.html', title='Landlord', landlord=landlord, bankaccs=bankaccs,
-                               managers=managers, emailaccs=emailaccs)
+    return render_template('landlordpage.html', title='Landlord', action=action, landlord=landlord,
+                           bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
 
 
 @bp.route('/landlords', methods=['GET'])

@@ -1,4 +1,4 @@
-from flask import request
+from flask import redirect, request
 
 from app import db
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
@@ -49,8 +49,23 @@ def postemailacc(id, action):
     return redirect('/emailaccpage/{}'.format(id))
 
 
-def postlandlord(id):
-    if id > 0:
+def postincome(id, action):
+    if action == "edit":
+        income = Income.query.get(id)
+    else:
+        income = Income()
+    if not action == "edit":
+        db.session.add(income)
+        db.session.commit()
+        id = income.id
+    else:
+        db.session.commit()
+
+    return redirect('/emailaccpage/{}'.format(id))
+
+
+def postlandlord(id, action):
+    if action == "edit":
         landlord = Landlord.query.get(id)
     else:
         landlord = Landlord()
@@ -69,11 +84,12 @@ def postlandlord(id):
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
             (Manager.name == manager).one()[0]
-    if id < 1:
+    if not action == "edit":
         db.session.add(landlord)
         db.session.commit()
         id = landlord.id
-    db.session.commit()
+    else:
+        db.session.commit()
 
     return redirect('/landlordpage/{}'.format(id))
 
@@ -144,11 +160,11 @@ def postrentobj(id):
     if id < 1:
         rent.rentcode = request.form["rentcode"]
         rent.prop_rent.append(property)
-        db.session.add(rent)
-    # lots of challenges: I have allowed for editing an existing agent, but not switching to another or new agent
-    # I have not dealt with case where someone simply deletes all existing agentdetails
-    db.session.commit()
-    return
+        id = rent.id
+    else:
+        db.session.commit()
+
+    return redirect('/rentobjpage/{}'.format(id))
 
 
 def postagent(id):

@@ -71,17 +71,17 @@ def filterheadrents():
     return headrents
 
 
-def filterincome():
-    # if request.method == "POST":
-        # rcd = request.form["rentcode"]
-        # ten = request.form["tenantname"]
-        # pop = request.form["propaddr"]
-        # rents = getrents(rcd, ten, pop)
-    #     return redirect(url_for('main.income'))
-    # else:
-    #     rcd = "ZCAS"
-    #     rents = getrents(rcd, "", "")
-    income = None
+def filterincome(rcd, pay, typ):
+    income = \
+        Incomealloc.query.join(Income) \
+            .join(Chargetype) \
+            .join(Typebankacc) \
+            .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
+                           Typebankacc.accname, Chargetype.chargedesc) \
+            .filter(Incomealloc.rentcode.startswith([rcd]),
+                    Income.payer.ilike('%{}%'.format(pay)),
+                    Chargetype.chargedesc.ilike('%{}%'.format(typ))) \
+            .limit(50).all()
     return income
 
 
@@ -174,6 +174,30 @@ def getextrent(id):
         flash('N')
         return redirect(url_for('main.index'))
     return extrent
+
+
+def getincome(id):
+    if id > 0:
+        # existing income
+        income = \
+            Incomealloc.query.join(Income) \
+                .join(Chargetype) \
+                .join(Typebankacc) \
+                .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
+                               Typebankacc.accname, Chargetype.chargedesc) \
+                .filter(Income.id == id) \
+                .one_or_none()
+        if income is None:
+            flash('Invalid income id')
+            return redirect('/income')
+    else:
+        # new income
+        income = {
+            'id': 0,
+            'paydate': "2019-09-01"
+        }
+    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accnum).all()]
+    return income, bankaccs
 
 
 def getlandlord(id):
