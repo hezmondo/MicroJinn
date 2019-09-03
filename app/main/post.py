@@ -97,11 +97,9 @@ def postlandlord(id, action):
 def postrentobj(id):
     if id > 0:
         rent = Rent.query.get(id)
-        property = Property.query.filter(Property.rent_id == id).first()
         agent = Agent.query.filter(Agent.id == rent.agent_id).one_or_none()
     else:
         rent = Rent()
-        property = Property()
         agent = Agent()
 
     actype = request.form["actype"]
@@ -153,13 +151,8 @@ def postrentobj(id):
             db.session.add(agent)
         else:
             agent.agdetails = agdetails
-    property.propaddr = request.form["propaddr"]
-    proptype = request.form["proptype"]
-    property.typeprop_id = \
-        Typeproperty.query.with_entities(Typeproperty.id).filter(Typeproperty.proptypedet == proptype).one()[0]
     if id < 1:
         rent.rentcode = request.form["rentcode"]
-        rent.prop_rent.append(property)
         id = rent.id
     else:
         db.session.commit()

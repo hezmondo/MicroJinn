@@ -232,16 +232,13 @@ def rentobjpage(id):
         postrentobj(id)
     else:
         pass
-    rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, \
-    proptypedets, salegradedets, statusdets, tenuredets = getrentobj(id)
-    # totcharges = Rent.query.join(Charge).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-    #     filter(Rent.id == id) \
-    #         .one_or_none()
+    rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, proptypedets, \
+            salegradedets, statusdets, tenuredets, totcharges = getrentobj(id)
 
     return render_template('rentobjpage.html', action=action, title=action, rentobj=rentobj,
                        actypedets=actypedets, advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets,
-                       landlords=landlords, mailtodets=mailtodets, proptypedets=proptypedets,
-                       salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
+                       landlords=landlords, mailtodets=mailtodets, properties=properties, proptypedets=proptypedets,
+                       salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets, totcharges=totcharges)
 
 
 @bp.route('/utilities', methods=['GET'])

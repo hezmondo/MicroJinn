@@ -10,12 +10,8 @@
             <input type="text" class="form-control" name="rentcode" value="{{ rentobj.rentcode }}">
         </div>
         <div class="col-md-8">
-            <label for="propaddr">Property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rentobj.propaddr }}">
-        </div>
-        <div class="col-md-2">
-            <label for="proptype">Proptype:</label>
-            {{ widgets.combobox(name="proptype", items=proptypedets, item_selected=rentobj.proptypedet) }}
+            <label for="properties">Property address(es):</label>
+            {{ widgets.multiselect_as_select(name="properties", items=properties, items_selected=all) }}
         </div>
     </div>
     <div class="form-group row">
@@ -59,7 +55,7 @@
         </div>
         <div class="col-md-4">
             <label for="totcharges">Total charges:</label>
-            <input type="text" class="form-control" name="totcharges" value="{{ rentobj.totcharges }}">
+            <input type="text" class="form-control" name="totcharges" value="{{ totcharges }}">
         </div>
     </div>
     <div class="form-group row">

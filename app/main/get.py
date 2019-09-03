@@ -1,4 +1,5 @@
 from flask import flash, redirect, url_for, request
+from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -240,8 +241,7 @@ def getrentobj(id):
     if id > 0:
         # existing rent
         rentobj = \
-            Property.query \
-                .join(Rent) \
+            Rent.query \
                 .join(Landlord) \
                 .outerjoin(Agent) \
                 .join(Typeactype) \
@@ -249,15 +249,14 @@ def getrentobj(id):
                 .join(Typedeed) \
                 .join(Typefreq) \
                 .join(Typemailto) \
-                .join(Typeproperty) \
                 .join(Typesalegrade) \
                 .join(Typestatus) \
                 .join(Typetenure) \
                 .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                                Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                               Agent.agdetails, Landlord.name, Property.propaddr, Typeactype.actypedet,
+                               Agent.agdetails, Landlord.name, Typeactype.actypedet,
                                Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                               Typeproperty.proptypedet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                               Typesalegrade.salegradedet, Typestatus.statusdet,
                                Typetenure.tenuredet) \
                 .filter(Rent.id == id) \
                 .one_or_none()
@@ -280,6 +279,14 @@ def getrentobj(id):
     salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-
-    return rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, proptypedets, \
-           salegradedets, statusdets, tenuredets
+    totcharges = Charge.query.join(Rent).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
+        filter(Rent.id == id) \
+            .one_or_none()[0]
+    properties = [item[0] for item in \
+        Property.query \
+            .join(Rent) \
+            .with_entities(Property.propaddr) \
+            .filter(Rent.id == id) \
+            .all()]
+    return rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, proptypedets, \
+           salegradedets, statusdets, tenuredets, totcharges
