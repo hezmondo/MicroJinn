@@ -9,9 +9,30 @@
             <label for="rentcode">Rent code:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ rentobj.rentcode }}">
         </div>
-        <div class="col-md-8">
-            <label for="properties">Property address(es):</label>
-            {{ widgets.multiselect_as_select(name="properties", items=properties, items_selected=all) }}
+        <div class="table-fixed">
+            <table class="table" id="properties">
+                <thead>
+                <tr>
+                    <th style="width: 15.00%"></th>
+                    <th style="width: 10.00%">id</th>
+                    <th style="width: 50.00%">Property address</th>
+                    <th style="width: 10.00%">Property type</th>
+                    <th style="width: 15.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for property in properties %}
+                <tr id="{{ property.id }}">
+                    <td style="width: 15.00%"></td>
+                    <td style="width: 10.00%">{{ property.id }}</td>
+                    <td style="width: 50.00%">{{ property.propaddr }}</td>
+                    <td style="width: 10.00%"> {{ property.proptypedet }}</td>
+                    <td style="width: 5.00%"><a href="/propertypage/{{ property.id }}?action=edit">Edit</a></td>
+                    <td style="width: 15.00%"></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
     <div class="form-group row">
@@ -110,7 +131,7 @@
     <div class="form-group row">
         {% if action == "view" %}
         <div class="col-md-3">
-            <a href="/rentobjpage/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rent & property</a>
+            <a href="/rentobjpage/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rent</a>
         </div>
         <div class="col-md-3">
             <a href="/rentobjpage/{{ rentobj.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone this rent & property</a>

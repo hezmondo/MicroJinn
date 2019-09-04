@@ -4,8 +4,9 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getincome, getlandlord, getrentobj
-from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, postrentobj
+    getextrent, getincome, getlandlord, getproperty, getrentobj
+from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
+    postproperty, postrentobj
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -224,6 +225,18 @@ def properties():
     return render_template('properties.html', title='Properties', properties=properties)
 
 
+@bp.route('/propertypage/<int:id>', methods=["GET", "POST"])
+@login_required
+def propertypage(id):
+    if request.method == "POST":
+        postproperty(id)
+    else:
+        pass
+    property, proptypedets = getproperty(id)
+
+    return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
+
+
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def rentobjpage(id):
@@ -232,12 +245,12 @@ def rentobjpage(id):
         postrentobj(id)
     else:
         pass
-    rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, proptypedets, \
+    rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, \
             salegradedets, statusdets, tenuredets, totcharges = getrentobj(id)
 
     return render_template('rentobjpage.html', action=action, title=action, rentobj=rentobj,
                        actypedets=actypedets, advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets,
-                       landlords=landlords, mailtodets=mailtodets, properties=properties, proptypedets=proptypedets,
+                       landlords=landlords, mailtodets=mailtodets, properties=properties,
                        salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets, totcharges=totcharges)
 
 

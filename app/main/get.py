@@ -225,6 +225,27 @@ def getlandlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
+def getproperty(id):
+    if id > 0:
+        # existing property
+        property = \
+        Property.query \
+            .join(Typeproperty) \
+                .with_entities(Property.id, Property.propaddr, Typeproperty.proptypedet) \
+                .filter(Property.id == id) \
+                .one_or_none()
+        if property is None:
+            flash('Invalid property id')
+            return redirect('/properties')
+    else:
+        # new property
+        property = {
+            'id': 0
+        }
+    proptypedets = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
+    return property, proptypedets
+
+
 def getrentobj(id):
     # This method returns a "rentobj" object
     # information about a rent, plus its related property/agent/landlord stuff
@@ -275,18 +296,18 @@ def getrentobj(id):
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     mailtodets = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
-    proptypedets = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
     salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
     totcharges = Charge.query.join(Rent).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
         filter(Rent.id == id) \
             .one_or_none()[0]
-    properties = [item[0] for item in \
+    properties = \
         Property.query \
             .join(Rent) \
-            .with_entities(Property.propaddr) \
+            .join(Typeproperty) \
+            .with_entities(Property.id, Property.propaddr, Typeproperty.proptypedet) \
             .filter(Rent.id == id) \
-            .all()]
-    return rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, proptypedets, \
+            .all()
+    return rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, \
            salegradedets, statusdets, tenuredets, totcharges

@@ -94,6 +94,17 @@ def postlandlord(id, action):
     return redirect('/landlordpage/{}'.format(id))
 
 
+def postproperty(id):
+    property = Property.query.get(id)
+    property.propaddr = request.form["propaddr"]
+    proptypedet = request.form["proptypedet"]
+    property.typeprop_id = \
+        Typeproperty.query.with_entities(Typeproperty.id).filter \
+            (Typeproperty.proptypedet == proptypedet).one()[0]
+    db.session.commit()
+    return
+
+
 def postrentobj(id):
     if id > 0:
         rent = Rent.query.get(id)
