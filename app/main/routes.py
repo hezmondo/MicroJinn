@@ -153,6 +153,21 @@ def income():
     return render_template('income.html', title='Income', income=income)
 
 
+@bp.route('/incomeallocpage/<int:id>', methods=["POST", "GET"])
+@login_required
+def incomeallocpage(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        postincome(id, action)
+    else:
+        pass
+    bankaccs, chargedescs, income, incomeallocs, landlords = getincome(id)
+
+    return render_template('incomeallocpage.html', title='Income allocation', action=action, bankaccs=bankaccs,
+                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords
+                           )
+
+
 @bp.route('/incomepage/<int:id>', methods=["POST", "GET"])
 @login_required
 def incomepage(id):
@@ -161,10 +176,11 @@ def incomepage(id):
         postincome(id, action)
     else:
         pass
-    income, bankaccs = getincome(id)
+    bankaccs, chargedescs, income, incomeallocs, landlords = getincome(id)
 
-    return render_template('incomepage.html', title='Income', action=action, income=income,
-                           bankaccs=bankaccs, )
+    return render_template('incomepage.html', title='Income', action=action, bankaccs=bankaccs,
+                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords
+                           )
 
 
 @bp.route('/', methods=['GET', 'POST'])

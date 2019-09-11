@@ -78,7 +78,7 @@ def filterincome(rcd, pay, typ):
             .join(Chargetype) \
             .join(Typebankacc) \
             .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
-                           Typebankacc.accname, Chargetype.chargedesc) \
+                           Typebankacc.accdesc, Chargetype.chargedesc) \
             .filter(Incomealloc.rentcode.startswith([rcd]),
                     Income.payer.ilike('%{}%'.format(pay)),
                     Chargetype.chargedesc.ilike('%{}%'.format(typ))) \
@@ -181,24 +181,35 @@ def getincome(id):
     if id > 0:
         # existing income
         income = \
-            Incomealloc.query.join(Income) \
-                .join(Chargetype) \
-                .join(Typebankacc) \
-                .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
-                               Typebankacc.accname, Chargetype.chargedesc) \
+            Income.query.join(Typebankacc) \
+                .with_entities(Income.id, Income.paydate, Income.total, Income.payer,
+                               Typebankacc.accdesc) \
                 .filter(Income.id == id) \
                 .one_or_none()
         if income is None:
             flash('Invalid income id')
             return redirect('/income')
+        incomeallocs = \
+            Incomealloc.query.join(Landlord) \
+                .join(Chargetype) \
+                .with_entities(Incomealloc.income_id, Incomealloc.rentcode, Incomealloc.alloc_id, Incomealloc.total,
+                               Landlord.name, Chargetype.chargedesc) \
+                .filter(Incomealloc.income_id == id) \
+                .all()
     else:
         # new income
         income = {
             'id': 0,
             'paydate': "2019-09-01"
         }
-    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accnum).all()]
-    return income, bankaccs
+        incomeallocs = {
+            'id': 0
+        }
+    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
+    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+
+    return bankaccs, chargedescs, income, incomeallocs, landlords
 
 
 def getlandlord(id):
@@ -207,7 +218,7 @@ def getlandlord(id):
         landlord = \
             Landlord.query.join(Manager).join(Emailaccount).join(Typebankacc) \
                 .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                               Manager.name.label("manager"), Emailaccount.smtp_server, Typebankacc.accnum) \
+                               Manager.name.label("manager"), Emailaccount.smtp_server, Typebankacc.accdesc) \
                 .filter(Landlord.id == id) \
                 .one_or_none()
         if landlord is None:
@@ -221,7 +232,7 @@ def getlandlord(id):
         }
     managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
-    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accnum).all()]
+    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
     return landlord, managers, emailaccs, bankaccs
 
 

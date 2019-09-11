@@ -79,7 +79,7 @@ def postlandlord(id, action):
     bankacc = request.form["bankacc"]
     landlord.bankacc_id = \
         Typebankacc.query.with_entities(Typebankacc.id).filter \
-            (Typebankacc.accnum == bankacc).one()[0]
+            (Typebankacc.accdesc == bankacc).one()[0]
     manager = request.form["manager"]
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \

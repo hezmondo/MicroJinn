@@ -133,11 +133,11 @@ class Incomealloc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     alloc_id = db.Column(db.Integer)
     rentcode = db.Column(db.String(15))
-    landlord = db.Column(db.Integer)
     total = db.Column(db.Numeric(8,2))
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     income_id = db.Column(db.Integer, db.ForeignKey('income.id'))
- 
+    landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
+
     
 class Landlord(db.Model):
     __tablename__ = 'landlord'
@@ -151,6 +151,7 @@ class Landlord(db.Model):
     emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
+    incomealloc_landlord = db.relationship('Incomealloc', backref='landlord', lazy='dynamic')
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
@@ -268,6 +269,7 @@ class Typebankacc(db.Model):
     accname = db.Column(db.String(60))
     sortcode = db.Column(db.String(10))
     accnum = db.Column(db.String(15))
+    accdesc = db.Column(db.String(30))
 
     income_typebankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
     landlord_typebankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')

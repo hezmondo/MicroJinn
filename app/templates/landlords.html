@@ -37,8 +37,8 @@
             <th style="width: 25.00%">name</th>
             <th style="width: 25.00%">address</th>
             <th style="width: 10.00%">taxdate</th>
-            <th style="width: 10.00%">manager</th>
-            <th style="width: 10.00%">spare</th>
+            <th style="width: 25.00%">manager</th>
+            <th style="width: 15.00%"></th>
         </tr>
         </thead>
         <tbody>
@@ -46,9 +46,9 @@
         <tr id="{{ item.id }}">
             <td style="width: 25.00%">{{ item.name }}</td>
             <td style="width: 25.00%"> {{ item.addr }}</td>
-            <td style="width: 25.00%"> {{ item.addr }}</td>
-            <td style="width: 10.00%"> {{ item.manager }}</td>
-            <td style="width: 5.00%"><a href="/landlordpage/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"> {{ item.taxdate }}</td>
+            <td style="width: 25.00%"> {{ item.manager }}</td>
+            <td style="width: 15.00%"><a href="/landlordpage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
