@@ -1,4 +1,4 @@
-<!-- /templates/incomexpage.html  -->
+<!-- /templates/incomeformpage.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -12,7 +12,7 @@
         </div>
         <div class="col-md-2">
             <label for="paydate">Pay date:</label>
-            <input type="text" class="form-control" name="paydate" value="{{ incomeform.paydate.data }}">
+            <input type="date" class="form-control" name="paydate" value="{{ incomeform.paydate.data }}">
         </div>
         <div class="col-md-2">
             <label for="total">total:</label>

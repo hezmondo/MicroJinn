@@ -159,7 +159,13 @@ def income():
 def incomeallocpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postincome(id, action)
+        payer = request.form["payer"]
+        print(payer)
+        rentcodes = request.form.getlist("rentcode")
+        print(rentcodes)
+        print(request.form)
+        # postincome(id, action)
+        return redirect(url_for('income'))
     else:
         pass
     bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
@@ -170,9 +176,9 @@ def incomeallocpage(id):
                            )
 
 
-@bp.route('/incomexpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/incomeformpage/<int:id>', methods=["POST", "GET"])
 @login_required
-def incomexpage(id):
+def incomeformpage(id):
     action = request.args.get('action', "view", type=str)
     incomex = Income.query.get(id)
     incomeform = IncomeForm(obj=incomex)
@@ -192,13 +198,12 @@ def incomexpage(id):
     if request.method == "POST":
         # postincome(id, action)
         for entry in incomeform.incomeallocations.entries:
-            print(entry.data['rentcode'])
-            print(entry.data['amount'])
+            print(entry.data)
         return redirect(url_for('income'))
     else:
         pass
 
-    return render_template('incomeypage.html', title='Income allocation', action=action, bankaccs=bankaccs,
+    return render_template('incomeformpage.html', title='Income allocation', action=action, bankaccs=bankaccs,
                            chargedescs=chargedescs, landlords=landlords, paytypedets=paytypedets,
                            incomeform=incomeform
                            )

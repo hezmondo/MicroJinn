@@ -61,7 +61,22 @@ def postincome(id, action):
     else:
         db.session.commit()
 
-    return redirect('/emailaccpage/{}'.format(id))
+    return redirect('/incomepage/{}'.format(id))
+
+
+def postincomealloc(id, action):
+    if action == "edit":
+        income = Income.query.get(id)
+    else:
+        income = Income()
+    if not action == "edit":
+        db.session.add(income)
+        db.session.commit()
+        id = income.id
+    else:
+        db.session.commit()
+
+    return redirect('/incomepage/{}'.format(id))
 
 
 def postlandlord(id, action):
