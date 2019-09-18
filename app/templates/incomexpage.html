@@ -1,0 +1,37 @@
+<!-- /templates/incomexpage.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form action="" method="post" role="form">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="name">id:</label>
+            <input type="text" class="form-control" name="id" value="{{ income.id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="paydate">Pay date:</label>
+            <input type="text" class="form-control" name="paydate" value="{{ income.paydate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="total">total:</label>
+            <input type="text" class="form-control" name="total" value="{{ income.total }}">
+        </div>
+        <div class="col-md-2">
+            <label for="payer">payer:</label>
+            <input type="text" class="form-control" name="payer" value="{{ income.payer }}">
+        </div>
+        <div class="col-md-2">
+            <label for="bankaccount">Bank account:</label>
+            {{ widgets.combobox(name="bankaccount", items=bankaccs, item_selected=income.bankaccount) }}
+        </div>
+        <div class="col-md-2">
+            <label for="typepayment">Payment type:</label>
+            {{ widgets.combobox(name="typepayment", items=chargedescs, item_selected=income.typepayment) }}
+        </div>
+    </div>
+    {{ incomeform.incomeallocations() }}
+    <input type="submit" value="Submit!" />
+</form>
+{% endblock %}

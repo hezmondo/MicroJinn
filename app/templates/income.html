@@ -40,7 +40,7 @@
             <th style="width: 10.00%">Total</th>
             <th style="width: 15.00%">Payer</th>
             <th style="width: 20.00%">Bank account</th>
-            <th style="width: 25.00%">Income type</th>
+            <th style="width: 20.00%">Payment type</th>
         </tr>
         </thead>
         <tbody>
@@ -51,8 +51,8 @@
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 10.00%"> {{ item.total }}</td>
             <td style="width: 15.00%"> {{ item.payer }}</td>
-            <td style="width: 20.00%"> {{ item.accname }}</td>
-            <td style="width: 25.00%"> {{ item.chargedesc }}</td>
+            <td style="width: 20.00%"> {{ item.accdesc }}</td>
+            <td style="width: 20.00%"> {{ item.paytypedet }}</td>
             <td style="width: 5.00%"><a href="/incomepage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}

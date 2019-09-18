@@ -7,7 +7,8 @@ from app.main.get import filteragents, filtercharges, filteremailaccs, filterext
     getextrent, getincome, getlandlord, getproperty, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postproperty, postrentobj
-
+from app.main.forms import IncomeForm, IncomeAllocForm
+from app.models import Income
 
 @bp.route('/agents', methods=['GET', 'POST'])
 def agents():
@@ -161,10 +162,45 @@ def incomeallocpage(id):
         postincome(id, action)
     else:
         pass
-    bankaccs, chargedescs, income, incomeallocs, landlords = getincome(id)
+    bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
 
     return render_template('incomeallocpage.html', title='Income allocation', action=action, bankaccs=bankaccs,
-                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords
+                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords,
+                           paytypedets=paytypedets
+                           )
+
+
+@bp.route('/incomexpage/<int:id>', methods=["POST", "GET"])
+@login_required
+def incomexpage(id):
+    action = request.args.get('action', "view", type=str)
+    incomex = Income.query.get(id)
+    incomeform = IncomeForm(obj=incomex)
+    bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
+    incomeform.bankaccount = income.accdesc
+    incomeform.typepayment = income.paytypedet
+    incomeallocform = IncomeAllocForm()
+    for id, income_id, alloc_id, rentcode, total, name, chargedesc in incomeallocs:
+        incomeallocform.incall_id = id
+        incomeallocform.income_id = income_id
+        incomeallocform.alloc_id = alloc_id
+        incomeallocform.rentcode = rentcode
+        incomeallocform.amount = total
+        incomeallocform.name = name
+        incomeallocform.inc_type = chargedesc
+        incomeform.incomeallocations.append_entry(incomeallocform)
+    if request.method == "POST":
+        # postincome(id, action)
+        for entry in incomeform.incomeallocations.entries:
+            print(entry.data['rentcode'])
+            print(entry.data['amount'])
+        return redirect(url_for('income'))
+    else:
+        pass
+
+    return render_template('incomeypage.html', title='Income allocation', action=action, bankaccs=bankaccs,
+                           chargedescs=chargedescs, landlords=landlords, paytypedets=paytypedets,
+                           incomeform=incomeform
                            )
 
 
@@ -176,10 +212,11 @@ def incomepage(id):
         postincome(id, action)
     else:
         pass
-    bankaccs, chargedescs, income, incomeallocs, landlords = getincome(id)
+    bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
 
     return render_template('incomepage.html', title='Income', action=action, bankaccs=bankaccs,
-                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords
+                           chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords,
+                           paytypedets=paytypedets
                            )
 
 

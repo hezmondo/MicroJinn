@@ -77,8 +77,9 @@ def filterincome(rcd, pay, typ):
         Incomealloc.query.join(Income) \
             .join(Chargetype) \
             .join(Typebankacc) \
+            .join(Typepayment) \
             .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
-                           Typebankacc.accdesc, Chargetype.chargedesc) \
+                           Typebankacc.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
             .filter(Incomealloc.rentcode.startswith([rcd]),
                     Income.payer.ilike('%{}%'.format(pay)),
                     Chargetype.chargedesc.ilike('%{}%'.format(typ))) \
@@ -182,8 +183,9 @@ def getincome(id):
         # existing income
         income = \
             Income.query.join(Typebankacc) \
+                .join(Typepayment) \
                 .with_entities(Income.id, Income.paydate, Income.total, Income.payer,
-                               Typebankacc.accdesc) \
+                               Typepayment.paytypedet, Typebankacc.accdesc) \
                 .filter(Income.id == id) \
                 .one_or_none()
         if income is None:
@@ -192,8 +194,8 @@ def getincome(id):
         incomeallocs = \
             Incomealloc.query.join(Landlord) \
                 .join(Chargetype) \
-                .with_entities(Incomealloc.income_id, Incomealloc.rentcode, Incomealloc.alloc_id, Incomealloc.total,
-                               Landlord.name, Chargetype.chargedesc) \
+                .with_entities(Incomealloc.id, Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode,
+                               Incomealloc.total, Landlord.name, Chargetype.chargedesc) \
                 .filter(Incomealloc.income_id == id) \
                 .all()
     else:
@@ -208,8 +210,9 @@ def getincome(id):
     bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    paytypedets = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
 
-    return bankaccs, chargedescs, income, incomeallocs, landlords
+    return bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets
 
 
 def getlandlord(id):

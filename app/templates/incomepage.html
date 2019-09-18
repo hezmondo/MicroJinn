@@ -6,7 +6,7 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="name">id:</label>
+            <label for="id">id:</label>
             <input type="text" class="form-control" name="id" value="{{ income.id }}">
         </div>
         <div class="col-md-2">
@@ -22,14 +22,19 @@
             <input type="text" class="form-control" name="payer" value="{{ income.payer }}">
         </div>
         <div class="col-md-2">
-            <label for="bankacc">Bank account:</label>
-            {{ widgets.combobox(name="bankacc", items=bankaccs, item_selected=income.accdesc) }}
+            <label for="bankaccount">Bank account:</label>
+            {{ widgets.combobox(name="bankaccount", items=bankaccs, item_selected=income.accdesc) }}
+        </div>
+        <div class="col-md-2">
+            <label for="paytypedet">Payment type:</label>
+            {{ widgets.combobox(name="paytypedet", items=paytypedets, item_selected=income.paytypedet) }}
         </div>
     </div>
 <div class="table-fixed">
     <table class="table" id="incomealloc">
         <thead>
         <tr>
+            <th style="width: 10.00%">Id</th>
             <th style="width: 10.00%">Income id</th>
             <th style="width: 10.00%">Allocation id</th>
             <th style="width: 10.00%">Rentcode</th>
@@ -42,12 +47,12 @@
         {% for item in incomeallocs %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
+            <td style="width: 10.00%">{{ item.income_id }}</td>
             <td style="width: 10.00%">{{ item.alloc_id }}</td>
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 10.00%"> {{ item.total }}</td>
             <td style="width: 15.00%"> {{ item.name }}</td>
             <td style="width: 25.00%"> {{ item.chargedesc }}</td>
-            <td style="width: 5.00%"><a href="/incomeallocpage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
@@ -56,7 +61,7 @@
     <div class="form-group row">
         {% if action == "view" %}
         <div class="col-md-3">
-            <a href="/incomepage/{{ income.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this income</a>
+            <a href="/incomeallocpage/{{ income.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this income</a>
         </div>
         <div class="col-md-3">
             <a href="/incomepage/{{ income.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone this income</a>
