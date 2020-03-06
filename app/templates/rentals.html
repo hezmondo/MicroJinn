@@ -1,0 +1,38 @@
+<!-- /templates/rentals.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<div class="container">
+    <div class="row voffset2">
+        <div class="col-lg-12">
+            <h4 class="text-center">All rentals:</h4>
+        </div>
+    </div>
+</div>
+<div class="table-fixed">
+    <table class="table" id="rentals">
+        <thead>
+        <tr>
+            <th style="width: 10.00%">id</th>
+            <th style="width: 10.00%">Code</th>
+            <th style="width: 30.00%">Address</th>
+            <th style="width: 30.00%">Name</th>
+            <th style="width: 10.00%">Annual rent</th>
+            <th style="width: 10.00%">Spare</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in rentals %}
+        <tr id="{{ item.id }}">
+            <td style="width: 10.00%">{{ item.id }}</td>
+            <td style="width: 10.00%">{{ item.rentalcode }}</td>
+            <td style="width: 30.00%"> {{ item.propaddr }}</td>
+            <td style="width: 30.00%"> {{ item.tenantname }}</td>
+            <td style="width: 10.00%"> {{ item.rentpa }}</td>
+            <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}">View</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

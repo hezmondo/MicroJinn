@@ -4,11 +4,12 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getincome, getlandlord, getproperty, getrentobj
+    getextrent, getincome, getlandlord, getproperty, getrentals, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postproperty, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
 from app.models import Income
+
 
 @bp.route('/agents', methods=['GET', 'POST'])
 def agents():
@@ -165,7 +166,7 @@ def incomeallocpage(id):
         print(rentcodes)
         print(request.form)
         # postincome(id, action)
-        return redirect(url_for('income'))
+        return redirect(url_for('main.income'))
     else:
         pass
     bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
@@ -199,6 +200,7 @@ def incomeformpage(id):
         # postincome(id, action)
         for entry in incomeform.incomeallocations.entries:
             print(entry.data)
+        # print(request.form)
         return redirect(url_for('income'))
     else:
         pass
@@ -293,6 +295,13 @@ def propertypage(id):
     property, proptypedets = getproperty(id)
 
     return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
+
+
+@bp.route('/rentals', methods=['GET', 'POST'])
+def rentals():
+    rentals = getrentals()
+
+    return render_template('rentals.html', title='Rentals page', rentals=rentals)
 
 
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])

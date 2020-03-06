@@ -19,20 +19,20 @@
     <table class="table" id="emailaccs">
         <thead>
         <tr>
-            <th style="width: 25.00%">smtp_server</th>
+            <th style="width: 10.00%">smtp_server</th>
             <th style="width: 10.00%">spare</th>
         </tr>
         </thead>
         <tbody>
         {% for item in emailaccs %}
         <tr id="{{ item.id }}">
-            <td style="width: 25.00%">{{ item.id}}</td>
-            <td style="width: 25.00%">{{ item.smtp_server}}</td>
-            <td style="width: 25.00%">{{ item.smtp_user}}</td>
-            <td style="width: 25.00%">{{ item.smtp_sendfrom}}</td>
-            <td style="width: 25.00%">{{ item.imap_sentfolder}}</td>
-            <td style="width: 25.00%">{{ item.imap_draftfolder}}</td>
-            <td style="width: 5.00%"><a href="/emailaccpage/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%">{{ item.id}}</td>
+            <td style="width: 16.00%">{{ item.smtp_server}}</td>
+            <td style="width: 16.00%">{{ item.smtp_user}}</td>
+            <td style="width: 16.00%">{{ item.smtp_sendfrom}}</td>
+            <td style="width: 16.00%">{{ item.imap_sentfolder}}</td>
+            <td style="width: 16.00%">{{ item.imap_draftfolder}}</td>
+            <td style="width: 10.00%"><a href="/emailaccpage/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

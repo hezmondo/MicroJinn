@@ -1,7 +1,7 @@
 from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
+    Landlord, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -237,6 +237,15 @@ def getlandlord(id):
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
     bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
     return landlord, managers, emailaccs, bankaccs
+
+
+def getrentals():
+    rentals = \
+        Rental.query \
+            .with_entities(Rental.id, Rental.rentalcode, Rental.propaddr, Rental.tenantname, Rental.rentpa)\
+            .all()
+
+    return rentals
 
 
 def getproperty(id):

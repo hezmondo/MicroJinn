@@ -161,25 +161,40 @@ class Loan(db.Model):
     __tablename__ = 'loan'
 
     id = db.Column(db.Integer, primary_key=True)
-    loan_name = db.Column(db.String(30))
-    loan_start_date = db.Column(db.Date)
-    loan_end_date = db.Column(db.Date)
-    loan_int_rate = db.Column(db.Numeric(8,2))
-    loan_freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    loan_advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+    code = db.Column(db.String(30))
+    start_intrate = db.Column(db.Numeric(8,2))
+    end_date = db.Column(db.Date)
+    frequency = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+    lender = db.Column(db.String(45))
+    borrower = db.Column(db.String(45))
+    notes = db.Column(db.String(45))
+    val_date = db.Column(db.Date)
+    valuation = db.Column(db.Numeric(8,2))
 
-    ltrans_loan = db.relationship('Loan_trans', backref='loan', lazy='dynamic')
+    loan_trans_loan = db.relationship('Loan_trans', backref='loan', lazy='dynamic')
+    loan_uplift_loan = db.relationship('Loan_uplift', backref='loan', lazy='dynamic')
 
-    
+
 class Loan_trans(db.Model):
     __tablename__ = 'loan_trans'
 
     id = db.Column(db.Integer, primary_key=True)
-    trans_date = db.Column(db.Date)
-    trans_amount = db.Column(db.Numeric(8,2))
+    date = db.Column(db.Date)
+    amount = db.Column(db.Numeric(8,2))
+    memo = db.Column(db.String(60))
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
     
+class Loan_uplift(db.Model):
+    __tablename__ = 'loan_uplift'
+
+    id = db.Column(db.Integer, primary_key=True)
+    intrate = db.Column(db.Numeric(8, 2))
+    datestarts = db.Column(db.Date)
+    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
+
+
 class Manager(db.Model):
     __tablename__ = 'manager'
 
@@ -242,6 +257,34 @@ class Rent(db.Model):
     #     return sum of charges for this rent - is this possible?
 
 
+class Rental(db.Model):
+    __tablename__ = 'rental'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rentalcode = db.Column(db.String(15), index=True, unique=True)
+    propaddr = db.Column(db.String(120))
+    tenantname = db.Column(db.String(90))
+    rentpa = db.Column(db.Numeric(8,2))
+    arrears = db.Column(db.Numeric(8,2))
+    lastrentdate = db.Column(db.Date)
+    note = db.Column(db.String(90))
+    freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+
+    rental_trans_rental = db.relationship('Rental_trans', backref='rental', lazy='dynamic')
+
+
+class Rental_trans(db.Model):
+    __tablename__ = 'rental_trans'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    amount = db.Column(db.Numeric(8, 2))
+    payer = db.Column(db.String(60))
+    memo = db.Column(db.String(60))
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'))
+
+
 class Typeactype(db.Model):
     __tablename__ = 'typeactype'
 
@@ -259,6 +302,7 @@ class Typeadvarr(db.Model):
 
     rent_typeadvarr = db.relationship('Rent', backref='typeadvarr', lazy='dynamic')
     loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
+    rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
 
 
 class Typebankacc(db.Model):
@@ -303,6 +347,7 @@ class Typefreq(db.Model):
 
     rent_typefreq = db.relationship('Rent', backref='typefreq', lazy='dynamic')
     loan_typefreq = db.relationship('Loan', backref='typefreq', lazy='dynamic')
+    rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
     
 class Typemailto(db.Model):

@@ -9,32 +9,24 @@
             <label for="rentcode">Rent code:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ rentobj.rentcode }}">
         </div>
-        <div class="table-fixed">
-            <table class="table" id="properties">
-                <thead>
-                <tr>
-                    <th style="width: 15.00%"></th>
-                    <th style="width: 10.00%">id</th>
-                    <th style="width: 50.00%">Property address</th>
-                    <th style="width: 10.00%">Property type</th>
-                    <th style="width: 15.00%"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for property in properties %}
-                <tr id="{{ property.id }}">
-                    <td style="width: 15.00%"></td>
-                    <td style="width: 10.00%">{{ property.id }}</td>
-                    <td style="width: 50.00%">{{ property.propaddr }}</td>
-                    <td style="width: 10.00%"> {{ property.proptypedet }}</td>
-                    <td style="width: 5.00%"><a href="/propertypage/{{ property.id }}?action=edit">Edit</a></td>
-                    <td style="width: 15.00%"></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
     </div>
+    {% for property in properties %}
+    <div class="form-group row">
+        <div class="col-md-8">
+            <label for="prop_addr">Property address:</label>
+            <input type="text" class="form-control" name="prop_addr" value="{{ property.propaddr }}">
+        </div>
+        <div class="col-md-2">
+            <label for="prop_type">Property type:</label>
+            <input type="text" class="form-control" name="prop_type" value="{{ property.proptypedet }}">
+        </div>
+        {% if action != "view" %}
+        <div class="col-md-2">
+            <a href="/propertypage/{{ property.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit</a>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">Landlord:</label>
