@@ -4,9 +4,9 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getincome, getlandlord, getproperty, getrentals, getrentobj
+    getextrent, getincome, getlandlord, getproperty, getrental, getrentals, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
-    postproperty, postrentobj
+    postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
 from app.models import Income
 
@@ -299,9 +299,23 @@ def propertypage(id):
 
 @bp.route('/rentals', methods=['GET', 'POST'])
 def rentals():
-    rentals = getrentals()
+    rentals, rentsum = getrentals()
 
-    return render_template('rentals.html', title='Rentals page', rentals=rentals)
+    return render_template('rentals.html', title='Rentals page', rentals=rentals, rentsum=rentsum)
+
+
+@bp.route('/rentalpage/<int:id>', methods=["POST", "GET"])
+@login_required
+def rentalpage(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        postrental(id, action)
+    else:
+        pass
+    rental, advarrdets, freqdets = getrental(id)
+
+    return render_template('rentalpage.html', title='Rental', action=action, rental=rental,
+                           advarrdets=advarrdets, freqdets=freqdets)
 
 
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])

@@ -2,6 +2,13 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <a href="/rental/0?action=new" class="btn btn-block btn-primary" role="button">Add rental</a>
+        </div>
+    </div>
+</form>
 <div class="container">
     <div class="row voffset2">
         <div class="col-lg-12">
@@ -29,9 +36,19 @@
             <td style="width: 30.00%"> {{ item.propaddr }}</td>
             <td style="width: 30.00%"> {{ item.tenantname }}</td>
             <td style="width: 10.00%"> {{ item.rentpa }}</td>
-            <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}
+        <tr>
+        </tr>
+        <tr>
+            <td style="width: 10.00%"></td>
+            <td style="width: 10.00%"></td>
+            <td style="width: 30.00%">Total for all rents</td>
+            <td style="width: 30.00%"></td>
+            <td style="width: 10.00%"> {{ rentsum }}</td>
+            <td style="width: 10.00%"></td>
+        </tr>
         </tbody>
     </table>
 </div>

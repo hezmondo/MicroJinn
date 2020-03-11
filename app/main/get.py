@@ -239,15 +239,6 @@ def getlandlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
-def getrentals():
-    rentals = \
-        Rental.query \
-            .with_entities(Rental.id, Rental.rentalcode, Rental.propaddr, Rental.tenantname, Rental.rentpa)\
-            .all()
-
-    return rentals
-
-
 def getproperty(id):
     if id > 0:
         # existing property
@@ -267,6 +258,53 @@ def getproperty(id):
         }
     proptypedets = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
     return property, proptypedets
+
+
+def getrental(id):
+    # This method returns a "rental" object
+    # information about a rental
+    # plus all the list values to offer for various comboboxes
+    # all of this is to be shown in rentalpage.html
+    # that allows either editing etc. of an existing rental (whose `id` is specified)
+    # (in which case we fetch the rent info to edit)
+    # or it allows creation of a new rental (signified by id==0)
+    # (in which case for the rental info we have to "invent" an object
+    # with the same attributes as would have been fetched from the database
+    # but with "blanks", or default values, as desired for creating a new rental
+    # --- seems like Flask is happy for it not even to have the fields which will be referenced
+    # so just put in any defaults desired)
+    if id > 0:
+        # existing rental
+        rental = \
+            Rental.query \
+                .join(Typeadvarr) \
+                .join(Typefreq) \
+                .with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.lastrentdate,
+                               Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
+                               Typeadvarr.advarrdet, Typefreq.freqdet) \
+                .filter(Rental.id == id) \
+                .one_or_none()
+        if rental is None:
+            flash('Invalid rentalcode')
+            return redirect(url_for('auth.login'))
+    else:
+        # new rent
+        rental = {
+            'id': 0
+        }
+
+    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
+    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+    return rental, advarrdets, freqdets
+
+
+def getrentals():
+    rentals = \
+        Rental.query \
+            .with_entities(Rental.id, Rental.rentalcode, Rental.propaddr, Rental.tenantname, Rental.rentpa)\
+            .all()
+    rentsum = Rental.query.with_entities(func.sum(Rental.rentpa).label('totrent')).filter().first()[0]
+    return rentals, rentsum
 
 
 def getrentobj(id):

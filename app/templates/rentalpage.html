@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentalcode">Rental code:</label>
+            <input type="text" class="form-control" name="rentalcode" value="{{ rental.rentalcode }}">
+        </div>
+        <div class="col-md-10">
+            <label for="propaddr">Property address:</label>
+            <input type="text" class="form-control" name="propaddr" value="{{ rental.propaddr }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-12">
+            <label for="tenantname">Tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" value="{{ rental.tenantname }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="rentpa">Rent pa:</label>
+            <input type="text" class="form-control" name="rentpa" value="{{ rental.rentpa }}">
+        </div>
+        <div class="col-md-4">
+            <label for="arrears">Rent arrears:</label>
+            <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="lastrentdate">Last rent date:</label>
+            <input type="date" class="form-control" name="lastrentdate" value="{{ rental.lastrentdate }}">
+        </div>
+        <div class="col-md-9">
+            <label for="note">Notes:</label>
+            <input type="text" class="form-control" name="note" value="{{ rental.note }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="frequency">Frequency:</label>
+            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rental.freqdet) }}
+        </div>
+        <div class="col-md-3">
+            <label for="advarr">Advance/Arrears:</label>
+            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rental.advarrdet) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        {% if action != "view" %}
+        <div class="col-md-2">
+            <a href="/rentalpage/{{ rental.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit</a>
+        </div>
+        {% endif %}
+        <div class="col-md-3">
+            <a href="/rentalstatementpage/{{ rental.id }}" class="btn btn-block btn-primary" role="button">Produce statement for this rent</a>
+        </div>
+    </div>
+</form>
+{% endblock %}

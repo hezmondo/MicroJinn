@@ -2,7 +2,7 @@ from flask import redirect, request
 
 from app import db
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
+    Landlord, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
     Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -119,6 +119,21 @@ def postproperty(id):
     db.session.commit()
     return
 
+def postrental(id):
+    rental = Rental.query.get(id)
+    rental.propaddr = request.form["propaddr"]
+    rental.propaddr = request.form["tenantname"]
+    rental.agemail = request.form["rentpa"]
+    rental.arrears = request.form["arrears"]
+    rental.lastrentdate = request.form["lastrentdate"]
+    rental.note = request.form["note"]
+    rental.freq_id = \
+        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    rental.advarr_id = \
+        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    rental.arrears = request.form["arrears"]
+    db.session.commit()
+    return
 
 def postrentobj(id):
     if id > 0:
