@@ -266,12 +266,23 @@ class Rental(db.Model):
     tenantname = db.Column(db.String(90))
     rentpa = db.Column(db.Numeric(8,2))
     arrears = db.Column(db.Numeric(8,2))
-    lastrentdate = db.Column(db.Date)
+    startrentdate = db.Column(db.Date)
     note = db.Column(db.String(90))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
 
     rental_trans_rental = db.relationship('Rental_trans', backref='rental', lazy='dynamic')
+
+
+class Rental_statement(db.Model):
+    __tablename__ = 'rental_statement'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    memo = db.Column(db.String(60))
+    amount = db.Column(db.Numeric(8, 2))
+    payer = db.Column(db.String(60))
+    balance = db.Column(db.Numeric(8, 2))
 
 
 class Rental_trans(db.Model):

@@ -1,8 +1,8 @@
 from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
-    Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Landlord, Manager, Property, Rent, Rental, Rental_statement, Typeactype, Typeadvarr, Typebankacc, Typedeed, \
+    Typefreq, Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
 def filteragents(agd, age, agn):
@@ -279,7 +279,7 @@ def getrental(id):
             Rental.query \
                 .join(Typeadvarr) \
                 .join(Typefreq) \
-                .with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.lastrentdate,
+                .with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate,
                                Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
                                Typeadvarr.advarrdet, Typefreq.freqdet) \
                 .filter(Rental.id == id) \
@@ -305,6 +305,19 @@ def getrentals():
             .all()
     rentsum = Rental.query.with_entities(func.sum(Rental.rentpa).label('totrent')).filter().first()[0]
     return rentals, rentsum
+
+
+def getrentalstatement():
+
+    rentalstatement = \
+        Rental_statement.query \
+            .with_entities(Rental_statement.id, Rental_statement.date, Rental_statement.memo,
+                           Rental_statement.amount, Rental_statement.payer, Rental_statement.balance) \
+            .order_by(asc(Rental_statement.date), asc(Rental_statement.id)).limit(100).all()
+    # if rentalstatement is None:
+    #     flash('Invalid rental id')
+    #     return redirect(url_for('auth.login'))
+    return rentalstatement
 
 
 def getrentobj(id):

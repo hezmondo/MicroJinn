@@ -120,18 +120,22 @@ def postproperty(id):
     return
 
 def postrental(id):
-    rental = Rental.query.get(id)
+    if id > 0:
+        rental = Rental.query.get(id)
+    else:
+        rental = Rental()
     rental.propaddr = request.form["propaddr"]
-    rental.propaddr = request.form["tenantname"]
-    rental.agemail = request.form["rentpa"]
+    rental.tenantname = request.form["tenantname"]
+    rental.rentpa = request.form["rentpa"]
     rental.arrears = request.form["arrears"]
-    rental.lastrentdate = request.form["lastrentdate"]
+    rental.startrentdate = request.form["startrentdate"]
     rental.note = request.form["note"]
+    frequency = request.form["frequency"]
     rental.freq_id = \
         Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    advarr = request.form["advarr"]
     rental.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
-    rental.arrears = request.form["arrears"]
     db.session.commit()
     return
 

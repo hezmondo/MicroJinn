@@ -1,10 +1,11 @@
+import sqlalchemy
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getincome, getlandlord, getproperty, getrental, getrentals, getrentobj
+    getextrent, getincome, getlandlord, getproperty, getrental, getrentals, getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
@@ -309,13 +310,27 @@ def rentals():
 def rentalpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postrental(id, action)
+        postrental(id)
     else:
         pass
     rental, advarrdets, freqdets = getrental(id)
 
     return render_template('rentalpage.html', title='Rental', action=action, rental=rental,
                            advarrdets=advarrdets, freqdets=freqdets)
+
+
+@bp.route('/rentalstatementpage/<int:id>', methods=["GET", "POST"])
+@login_required
+def rentalstatementpage(id):
+    if request.method == "POST":
+        pass
+    else:
+        db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": id})
+        rentalstatement = getrentalstatement()
+        print("rentalstate")
+        print(rentalstatement)
+
+        return render_template('rentalstatement.html', title='Rental statement', rentalstatement=rentalstatement)
 
 
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])
