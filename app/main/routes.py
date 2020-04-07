@@ -326,6 +326,7 @@ def rentalstatementpage(id):
         pass
     else:
         db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": id})
+        db.session.commit()
         rentalstatement = getrentalstatement()
         print("rentalstate")
         print(rentalstatement)

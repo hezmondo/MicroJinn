@@ -313,7 +313,7 @@ def getrentalstatement():
         Rental_statement.query \
             .with_entities(Rental_statement.id, Rental_statement.date, Rental_statement.memo,
                            Rental_statement.amount, Rental_statement.payer, Rental_statement.balance) \
-            .order_by(asc(Rental_statement.date), asc(Rental_statement.id)).limit(100).all()
+            .all()
     # if rentalstatement is None:
     #     flash('Invalid rental id')
     #     return redirect(url_for('auth.login'))
