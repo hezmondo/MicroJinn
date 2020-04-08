@@ -129,6 +129,9 @@ def postrental(id):
     rental.rentpa = request.form["rentpa"]
     rental.arrears = request.form["arrears"]
     rental.startrentdate = request.form["startrentdate"]
+    if rental.astdate:
+        rental.astdate = request.form["astdate"]
+    rental.lastgastest = request.form["lastgastest"]
     rental.note = request.form["note"]
     frequency = request.form["frequency"]
     rental.freq_id = \

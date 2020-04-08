@@ -280,6 +280,7 @@ def getrental(id):
                 .join(Typeadvarr) \
                 .join(Typefreq) \
                 .with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate,
+                               Rental.astdate, Rental.lastgastest,
                                Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
                                Typeadvarr.advarrdet, Typefreq.freqdet) \
                 .filter(Rental.id == id) \
@@ -301,7 +302,8 @@ def getrental(id):
 def getrentals():
     rentals = \
         Rental.query \
-            .with_entities(Rental.id, Rental.rentalcode, Rental.propaddr, Rental.tenantname, Rental.rentpa)\
+            .with_entities(Rental.id, Rental.rentalcode, Rental.propaddr, Rental.tenantname,
+                           Rental.startrentdate, Rental.astdate, Rental.lastgastest, Rental.rentpa)\
             .all()
     rentsum = Rental.query.with_entities(func.sum(Rental.rentpa).label('totrent')).filter().first()[0]
     return rentals, rentsum

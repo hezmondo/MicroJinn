@@ -267,6 +267,8 @@ class Rental(db.Model):
     rentpa = db.Column(db.Numeric(8,2))
     arrears = db.Column(db.Numeric(8,2))
     startrentdate = db.Column(db.Date)
+    astdate = db.Column(db.Date)
+    lastgastest = db.Column(db.Date)
     note = db.Column(db.String(90))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))

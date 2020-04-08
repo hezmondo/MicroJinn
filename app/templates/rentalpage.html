@@ -21,13 +21,21 @@
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="rentpa">Rent pa:</label>
             <input type="text" class="form-control" name="rentpa" value="{{ rental.rentpa }}">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="arrears">Rent arrears:</label>
             <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}">
+        </div>
+        <div class="col-md-3">
+            <label for="astdate">AST start date:</label>
+            <input type="date" class="form-control" name="astdate" value="{{ rental.astdate }}">
+        </div>
+        <div class="col-md-3">
+            <label for="lastgastest">Last gas safe test:</label>
+            <input type="date" class="form-control" name="lastgastest" value="{{ rental.lastgastest }}">
         </div>
     </div>
     <div class="form-group row">
@@ -51,10 +59,6 @@
         </div>
     </div>
     <div class="form-group row">
-        {% if action == "view" %}
-        <div class="col-md-3">
-            <a href="/rentalpage/{{ rental.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rental</a>
-        </div>
         <div class="col-md-3">
             <a href="/rentalstatementpage/{{ rental.id }}" class="btn btn-block btn-primary" role="button">Produce statement for this rent</a>
         </div>
@@ -69,12 +73,9 @@
                onclick="return confirm('Are you sure you want to delete this rental?');"
                class="btn btn-block btn-warning" role="button">Delete this rental</a>
         </div>
-        {% else %}
-        <div class="col-md-3">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">Save changes</button>
         </div>
-        {% endif %}
-    </div>
     </div>
 </form>
 {% endblock %}
