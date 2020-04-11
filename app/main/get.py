@@ -1,7 +1,7 @@
 from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Rental, Rental_statement, Typeactype, Typeadvarr, Typebankacc, Typedeed, \
+    Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, Typeadvarr, Typebankacc, Typedeed, \
     Typefreq, Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -237,6 +237,68 @@ def getlandlord(id):
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
     bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
     return landlord, managers, emailaccs, bankaccs
+
+
+def getloan(id):
+    # This method returns a "loan" object
+    # information about a loan
+    # plus all the list values to offer for various comboboxes
+    # all of this is to be shown in loanpage.html
+    # that allows either editing etc. of an existing loan (whose `id` is specified)
+    # (in which case we fetch the rent info to edit)
+    # or it allows creation of a new loan (signified by id==0)
+    # (in which case for the loan info we have to "invent" an object
+    # with the same attributes as would have been fetched from the database
+    # but with "blanks", or default values, as desired for creating a new loan
+    # --- seems like Flask is happy for it not even to have the fields which will be referenced
+    # so just put in any defaults desired)
+    if id > 0:
+        # existing loan
+        loan = \
+            Loan.query \
+                .join(Typeadvarr) \
+                .join(Typefreq) \
+                .with_entities(Loan.id, Loan.code, Loan.start_intrate, Loan.end_date,
+                               Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation,
+                               Typeadvarr.advarrdet, Typefreq.freqdet) \
+                .filter(Loan.id == id) \
+                .one_or_none()
+        if loan is None:
+            flash('Invalid loancode')
+            return redirect(url_for('auth.login'))
+    else:
+        # new rent
+        loan = {
+            'id': 0
+        }
+
+    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
+    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+    return loan, advarrdets, freqdets
+
+
+def getloans():
+    loans = \
+        Loan.query \
+            .with_entities(Loan.id, Loan.code, Loan.start_intrate, Loan.end_date,
+                               Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation)\
+            .all()
+    loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval')).filter().first()[0]
+    return loans, loansum
+
+
+def getloanstatement():
+
+    loanstatement = \
+        Loan_statement.query \
+            .with_entities(Loan_statement.id, Loan_statement.date, Loan_statement.memo,
+                           Loan_statement.transaction, Loan_statement.rate, Loan_statement.interest, \
+                           Loan_statement.add_interest, Loan_statement.balance) \
+            .all()
+    # if loanstatement is None:
+    #     flash('Invalid loan id')
+    #     return redirect(url_for('auth.login'))
+    return loanstatement
 
 
 def getproperty(id):

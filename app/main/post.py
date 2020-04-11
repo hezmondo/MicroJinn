@@ -2,8 +2,8 @@ from flask import redirect, request
 
 from app import db
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, \
-    Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Landlord, Loan, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, \
+    Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
 def postcharge(id):
@@ -109,6 +109,29 @@ def postlandlord(id, action):
     return redirect('/landlordpage/{}'.format(id))
 
 
+def postloan(id):
+    if id > 0:
+        loan = Loan.query.get(id)
+    else:
+        loan = Loan()
+    loan.code = request.form["loancode"]
+    loan.start_intrate = request.form["start_intrate"]
+    loan.end_date = request.form["end_date"]
+    frequency = request.form["frequency"]
+    loan.freq_id = \
+        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    advarr = request.form["advarr"]
+    loan.advarr_id = \
+        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    loan.lender = request.form["lender"]
+    loan.borrower = request.form["borrower"]
+    loan.notes = request.form["notes"]
+    loan.val_date = request.form["val_date"]
+    loan.valuation = request.form["valuation"]
+    db.session.commit()
+    return
+
+
 def postproperty(id):
     property = Property.query.get(id)
     property.propaddr = request.form["propaddr"]
@@ -118,6 +141,7 @@ def postproperty(id):
             (Typeproperty.proptypedet == proptypedet).one()[0]
     db.session.commit()
     return
+
 
 def postrental(id):
     if id > 0:
@@ -141,6 +165,7 @@ def postrental(id):
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
     db.session.commit()
     return
+
 
 def postrentobj(id):
     if id > 0:

@@ -4,12 +4,13 @@ from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
-    filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, \
-    getextrent, getincome, getlandlord, getproperty, getrental, getrentals, getrentalstatement, getrentobj
+    filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
+    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getrental, getrentals, \
+    getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
-    postproperty, postrental, postrentobj
+    postloan, postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
-from app.models import Income
+from app.models import Income, Loan
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -261,6 +262,43 @@ def landlords():
     landlords = filterlandlords()
 
     return render_template('landlords.html', title='Landlords', landlords=landlords)
+
+
+@bp.route('/loanpage/<int:id>', methods=["POST", "GET"])
+@login_required
+def loanpage(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        postloan(id)
+    else:
+        pass
+    loan, advarrdets, freqdets = getloan(id)
+
+    return render_template('loanpage.html', title='Loan', action=action, loan=loan,
+                           advarrdets=advarrdets, freqdets=freqdets)
+
+
+@bp.route('/loans', methods=['GET', 'POST'])
+def loans():
+    loans, loansum = getloans()
+
+    return render_template('loans.html', title='Loans page', loans=loans, loansum=loansum)
+
+
+@bp.route('/loanstatementpage/<int:id>', methods=["GET", "POST"])
+@login_required
+def loanstatementpage(id):
+    if request.method == "POST":
+        pass
+    else:
+        db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x)"), params={"x": id})
+        db.session.commit()
+        loanstatement = getloanstatement()
+        loan = Loan.query.get(id)
+        loancode = loan.code
+
+        return render_template('loanstatement.html', title='Loan statement', loanstatement=loanstatement,
+                               loancode=loancode)
 
 
 @bp.route('/money', methods=['GET', 'POST'])

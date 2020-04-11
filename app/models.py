@@ -173,7 +173,7 @@ class Loan(db.Model):
     valuation = db.Column(db.Numeric(8,2))
 
     loan_trans_loan = db.relationship('Loan_trans', backref='loan', lazy='dynamic')
-    loan_uplift_loan = db.relationship('Loan_uplift', backref='loan', lazy='dynamic')
+    loan_interest_rate_loan = db.relationship('Loan_interest_rate', backref='loan', lazy='dynamic')
 
 
 class Loan_trans(db.Model):
@@ -186,13 +186,27 @@ class Loan_trans(db.Model):
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
     
-class Loan_uplift(db.Model):
-    __tablename__ = 'loan_uplift'
+class Loan_interest_rate(db.Model):
+    __tablename__ = 'loan_interest_rate'
 
     id = db.Column(db.Integer, primary_key=True)
     intrate = db.Column(db.Numeric(8, 2))
     datestarts = db.Column(db.Date)
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
+
+
+class Loan_statement(db.Model):
+    __tablename__ = 'loan_statement'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ltid = db.Column(db.Integer)
+    date = db.Column(db.Date)
+    memo = db.Column(db.String(60))
+    transaction = db.Column(db.Numeric(8, 2))
+    rate = db.Column(db.Numeric(8, 2))
+    interest = db.Column(db.Numeric(8, 2))
+    add_interest = db.Column(db.String(10))
+    balance = db.Column(db.Numeric(8, 2))
 
 
 class Manager(db.Model):
