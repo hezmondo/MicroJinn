@@ -1,8 +1,9 @@
 from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, Typeadvarr, Typebankacc, Typedeed, \
-    Typefreq, Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, \
+    Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeproperty, Typesalegrade, \
+    Typestatus, Typetenure, User, Emailaccount
 
 
 def filteragents(agd, age, agn):
@@ -258,8 +259,8 @@ def getloan(id):
             Loan.query \
                 .join(Typeadvarr) \
                 .join(Typefreq) \
-                .with_entities(Loan.id, Loan.code, Loan.start_intrate, Loan.end_date,
-                               Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation,
+                .with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
+                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa,
                                Typeadvarr.advarrdet, Typefreq.freqdet) \
                 .filter(Loan.id == id) \
                 .one_or_none()
@@ -280,19 +281,19 @@ def getloan(id):
 def getloans():
     loans = \
         Loan.query \
-            .with_entities(Loan.id, Loan.code, Loan.start_intrate, Loan.end_date,
-                               Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation)\
+            .with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
+                           Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa)\
             .all()
-    loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval')).filter().first()[0]
+    loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
+                        func.sum(Loan.interestpa).label('totint')).filter().first()
     return loans, loansum
 
 
 def getloanstatement():
-
     loanstatement = \
         Loan_statement.query \
             .with_entities(Loan_statement.id, Loan_statement.date, Loan_statement.memo,
-                           Loan_statement.transaction, Loan_statement.rate, Loan_statement.interest, \
+                           Loan_statement.transaction, Loan_statement.rate, Loan_statement.interest,
                            Loan_statement.add_interest, Loan_statement.balance) \
             .all()
     # if loanstatement is None:

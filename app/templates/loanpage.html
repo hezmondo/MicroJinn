@@ -10,8 +10,8 @@
             <input type="text" class="form-control" name="loancode" value="{{ loan.code }}">
         </div>
         <div class="col-md-3">
-            <label for="start_intrate">Start interest rate:</label>
-            <input type="text" class="form-control" name="start_intrate" value="{{ loan.start_intrate }}">
+            <label for="interest_rate">Interest rate:</label>
+            <input type="text" class="form-control" name="interest_rate" value="{{ loan.interest_rate }}">
         </div>
         <div class="col-md-2">
             <label for="end_date">End date:</label>
@@ -48,6 +48,10 @@
         <div class="col-md-2">
             <label for="valuation">Valuation:</label>
             <input type="text" class="form-control" name="valuation" value="{{ loan.valuation }}">
+        </div>
+        <div class="col-md-2">
+            <label for="interestpa">Interest pa:</label>
+            <input type="text" class="form-control" name="interestpa" value="{{ loan.interestpa }}">
         </div>
     </div>
     <div class="form-group row">

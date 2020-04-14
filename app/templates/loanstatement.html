@@ -36,6 +36,20 @@
             <td style="width: 10.00%"> {{ item.balance }}</td>
         </tr>
         {% endfor %}
+        <tr>
+        </tr>
+        {% for item in checksums %}
+        <tr id="{{ item.id }}">
+            <td style="width: 10.00%"></td>
+            <td style="width: 10.00%"></td>
+            <td style="width: 25.00%"> {{ item.memo }}</td>
+            <td style="width: 10.00%"> {{ item.amount }}</td>
+            <td style="width: 10.00%"></td>
+            <td style="width: 10.00%"></td>
+            <td style="width: 15.00%"></td>
+            <td style="width: 10.00%"></td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>

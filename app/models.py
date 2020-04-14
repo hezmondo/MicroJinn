@@ -162,7 +162,7 @@ class Loan(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
-    start_intrate = db.Column(db.Numeric(8,2))
+    interest_rate = db.Column(db.Numeric(8,2))
     end_date = db.Column(db.Date)
     frequency = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
@@ -171,6 +171,7 @@ class Loan(db.Model):
     notes = db.Column(db.String(45))
     val_date = db.Column(db.Date)
     valuation = db.Column(db.Numeric(8,2))
+    interestpa = db.Column(db.Numeric(8,2))
 
     loan_trans_loan = db.relationship('Loan_trans', backref='loan', lazy='dynamic')
     loan_interest_rate_loan = db.relationship('Loan_interest_rate', backref='loan', lazy='dynamic')
@@ -199,14 +200,14 @@ class Loan_statement(db.Model):
     __tablename__ = 'loan_statement'
 
     id = db.Column(db.Integer, primary_key=True)
-    ltid = db.Column(db.Integer)
+    ltid = db.Column(db.Integer, default=0)
     date = db.Column(db.Date)
     memo = db.Column(db.String(60))
-    transaction = db.Column(db.Numeric(8, 2))
-    rate = db.Column(db.Numeric(8, 2))
-    interest = db.Column(db.Numeric(8, 2))
-    add_interest = db.Column(db.String(10))
-    balance = db.Column(db.Numeric(8, 2))
+    transaction = db.Column(db.Numeric(8, 2), default='0.00')
+    rate = db.Column(db.Numeric(8, 2), default='0.00')
+    interest = db.Column(db.Numeric(8, 2), default='0.00')
+    add_interest = db.Column(db.String(10), default='No')
+    balance = db.Column(db.Numeric(8, 2), default='0.00')
 
 
 class Manager(db.Model):

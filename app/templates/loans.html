@@ -13,45 +13,45 @@
     <table class="table" id="rentals">
         <thead>
         <tr>
-            <th style="width: 4.00%">id</th>
+            <th style="width: 6.00%">id</th>
             <th style="width: 10.00%">Code</th>
             <th style="width: 14.00%">Borrower</th>
-            <th style="width: 10.00%">End date</th>
-            <th style="width: 12.00%">Interest rate</th>
+            <th style="width: 10.00%">Int rate</th>
             <th style="width: 12.00%">Lender</th>
             <th style="width: 10.00%">Notes</th>
             <th style="width: 10.00%">Valuation date</th>
             <th style="width: 10.00%">Valuation</th>
+            <th style="width: 10.00%">Interest pa</th>
             <th style="width: 8.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in loans %}
         <tr id="{{ item.id }}">
-            <td style="width: 4.00%">{{ item.id }}</td>
+            <td style="width: 6.00%">{{ item.id }}</td>
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 14.00%"> {{ item.borrower }}</td>
-            <td style="width: 10.00%"> {{ item.end_date.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 12.00%"> {{ item.start_intrate }}</td>
+            <td style="width: 10.00%"> {{ item.interest_rate }}</td>
             <td style="width: 12.00%"> {{ item.lender }}</td>
             <td style="width: 10.00%"> {{ item.notes }}</td>
             <td style="width: 10.00%"> {{ item.val_date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"> {{ item.valuation }}</td>
+            <td style="width: 10.00%"> {{ item.interestpa }}</td>
             <td style="width: 8.00%"><a href="/loanpage/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}
         <tr>
         </tr>
         <tr>
-            <td style="width: 4.00%"></td>
-            <td style="width: 8.00%"></td>
-            <td style="width: 12.00%">Total for all loans</td>
+            <td style="width: 6.00%"></td>
             <td style="width: 10.00%"></td>
-            <td style="width: 14.00%"></td>
+            <td style="width: 14.00%">Total for all loans</td>
+            <td style="width: 10.00%"></td>
             <td style="width: 12.00%"></td>
             <td style="width: 10.00%"></td>
             <td style="width: 10.00%"></td>
-            <td style="width: 10.00%"> {{ loansum }}</td>
+            <td style="width: 10.00%"> {{ loansum.totval }} </td>
+            <td style="width: 10.00%"> {{ loansum.totint }} </td>
             <td style="width: 8.00%"></td>
         </tr>
         </tbody>

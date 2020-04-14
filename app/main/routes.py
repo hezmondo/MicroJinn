@@ -291,14 +291,15 @@ def loanstatementpage(id):
     if request.method == "POST":
         pass
     else:
-        db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x)"), params={"x": id})
+        rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x)"), params={"x": id})
+        checksums = rproxy.fetchall()
         db.session.commit()
         loanstatement = getloanstatement()
         loan = Loan.query.get(id)
         loancode = loan.code
 
         return render_template('loanstatement.html', title='Loan statement', loanstatement=loanstatement,
-                               loancode=loancode)
+                               loancode=loancode, checksums=checksums)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
