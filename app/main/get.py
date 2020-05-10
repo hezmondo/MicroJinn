@@ -2,8 +2,8 @@ from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, \
-    Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeproperty, Typesalegrade, \
-    Typestatus, Typetenure, User, Emailaccount
+    Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
+    Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
 def filteragents(agd, age, agn):
@@ -97,6 +97,49 @@ def filterlandlords():
     return landlords
 
 
+def filterqueries():
+    actype = request.form.getlist("actype")
+    agent = request.form["agentname"]
+    # agentq = "" if agent == "any" else agent
+    arrears = request.form["arrears"]
+    enddate = request.form["enddate"]
+    landlord = request.form.getlist("landlord")
+    prdelivery = request.form.getlist("prdelivery")
+    rentcode = request.form["rentcode"]
+    rentcodeq = "" if rentcode == "any" else rentcode
+    rentpa = request.form["rentpa"]
+    runsize = request.form["runsize"]
+    source = request.form["source"]
+    sourceq = "" if source == "any" else source
+    status = request.form.getlist("status")
+    salegrade = request.form.getlist("salegrade")
+    tenantname = request.form["tenantname"]
+    tenantnameq = "" if tenantname == "any" else tenantname
+    tenure = request.form.getlist("tenure")
+
+    rentobjs = \
+        Property.query \
+            .join(Rent) \
+            .join(Landlord) \
+            .outerjoin(Agent) \
+            .join(Typeactype) \
+            .join(Typesalegrade) \
+            .join(Typestatus) \
+            .join(Typetenure) \
+            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.lastrentdate, Landlord.name,
+                           Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet,
+                           Typestatus.statusdet, Typetenure.tenuredet) \
+            .filter(Rent.rentcode.startswith([rentcodeq]),
+                    Typeactype.actypedet.in_(actype),
+                    Landlord.name.in_(landlord),
+                    Rent.tenantname.ilike('%{}%'.format(tenantnameq)),
+                    Rent.source.ilike('%{}%'.format(sourceq))) \
+            .limit(50).all()
+    return rentobjs, actype, agent, arrears, enddate, landlord, prdelivery, rentcode, \
+           rentpa, runsize, salegrade, source, status, tenantname, tenure
+
+
 def filterrentobjs(rcd, ten, pop):
     rentobjs = \
         Property.query \
@@ -177,6 +220,19 @@ def getextrent(id):
         flash('N')
         return redirect(url_for('main.index'))
     return extrent
+
+
+def getqueries():
+
+    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
+    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    options = ("Include", "Exclude", "Only")
+
+    return actypes, landlords, salegrades, statuses, tenures, options, prdeliveries
 
 
 def getincome(id):

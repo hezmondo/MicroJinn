@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="enddate">End date:</label>
+            <input type="text" class="form-control" name="enddate" value="{{ enddate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="runsize">Run size:</label>
+            <input type="text" class="form-control" name="runsize" value="{{ runsize }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentcode">Rentcode starts with:</label>
+            <input type="text" class="form-control" name="rentcode" value="{{ rentcode }}">
+        </div>
+        <div class="col-md-2">
+            <label for="source">Source:</label>
+            <input type="text" class="form-control" name="source" value="{{ source }}">
+        </div>
+        <div class="col-md-2">
+            <label for="tenantname">Tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" value="{{ tenantname }}">
+        </div>
+        <div class="col-md-2">
+            <label for="agentname">Agent name:</label>
+            <input type="text" class="form-control" name="agentname" value="{{ agent }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-4">
+            <label for="landlord">Landlord:</label>
+            {{ widgets.multiselect(name="landlord", items=landlords, items_selected=landlord) }}
+        </div>
+        <div class="col-md-2">
+            <label for="tenure">Tenure:</label>
+            {{ widgets.multiselect(name="tenure", items=tenures, items_selected=tenure) }}
+        </div>
+        <div class="col-md-2">
+            <label for="salegrade">Sale grade:</label>
+            {{ widgets.multiselect(name="salegrade", items=salegrades, items_selected=salegrade) }}
+        </div>
+        <div class="col-md-2">
+            <label for="status">Status:</label>
+            {{ widgets.multiselect(name="status", items=statuses, items_selected=status) }}
+        </div>
+        <div class="form-group col-md-2">
+            <label for="actype">Actype:</label>
+            {{ widgets.multiselect(name="actype", items=actypes, items_selected=actype) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="agents">Mailto agent:</label>
+            {{ widgets.combobox(name="agents", items=options, item_selected=options[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="charges">Charges:</label>
+            {{ widgets.combobox(name="charges", items=options, item_selected=options[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="emailable">Emailable:</label>
+            {{ widgets.combobox(name="emailable", items=options, item_selected=options[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="forsale">For sale:</label>
+            {{ widgets.combobox(name="forsale", items=options, item_selected=options[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="prdelivery">PR delivery:</label>
+            {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentpa">Rent pa:</label>
+            <input type="text" class="form-control" name="rentpa" value="any">
+        </div>
+        <div class="col-md-2">
+            <label for="arrears">Rent arrears:</label>
+            <input type="text" class="form-control" name="arrears" value="any">
+        </div>
+        <div class="col-md-2">
+            <label for="rentperiods">Rent periods owing:</label>
+            <input type="text" class="form-control" name="rentperiods" value="any">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">Filter now</button>
+        </div>
+    </div>
+    <div class="form-group row">
+    </div>
+</form>
+<div class="container">
+    <div class="row voffset2">
+        <div class="col-lg-12">
+            <h4 class="text-center">Filtered to show:</h4>
+        </div>
+    </div>
+</div>
+<div class="table-fixed">
+    <table class="table" id="rents">
+        <thead>
+        <tr>
+            <th style="width: 10.00%">rentcode</th>
+            <th style="width: 25.00%">propaddr</th>
+            <th style="width: 25.00%">tenantname</th>
+            <th style="width: 10.00%">rentpa</th>
+            <th style="width: 10.00%">arrears</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in rentobjs %}
+        <tr id="{{ item.id }}">
+            <td style="width: 10.00%">{{ item.rentcode }}</td>
+            <td style="width: 25.00%">{{ item.propaddr }}</td>
+            <td style="width: 25.00%"> {{ item.tenantname }}</td>
+            <td style="width: 10.00%"> {{ item.rentpa }}</td>
+            <td style="width: 10.00%"> {{ item.arrears }}</td>
+            <td style="width: 5.00%"><a href="/rentobjpage/{{ item.id }}?action=view">View</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -4,13 +4,14 @@ from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
-    filterincome, filterlandlords, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
-    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getrental, getrentals, \
+    filterincome, filterlandlords, filterqueries, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
+    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getqueries, getrental, getrentals, \
     getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postloan, postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
-from app.models import Income, Loan
+from app.models import Agent, Charge, Emailaccount, Income, Landlord, Loan, Loan_interest_rate, Loan_trans, \
+    Property, Rent, Rental
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -91,6 +92,14 @@ def deleteitem(id):
         if landlord:
             db.session.delete(landlord)
             db.session.commit()
+    elif item == "loan":
+        delete_loan = Loan.query.get(id)
+        # delete_loan_trans = Loan_trans.query.filter(Loan_trans.loan_id == id).all()
+        # delete_loan_interest_rate = Loan_interest_rate.query.filter(Loan_interest_rate.loan_id == id).all()
+        # db.session.delete(delete_loan_interest_rate)
+        # db.session.delete(delete_loan_trans)
+        db.session.delete(delete_loan)
+        db.session.commit()
     elif item == "rentprop":
         delete_rent = Rent.query.get(id)
         delete_property = Property.query.filter(Property.rent_id == id).first()
@@ -335,6 +344,34 @@ def propertypage(id):
     property, proptypedets = getproperty(id)
 
     return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
+
+
+@bp.route('/queries', methods=['GET', 'POST'])
+def queries():
+    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueries()
+
+    if request.method == "POST":
+        rentobjs, actype, agent, arrears, enddate, landlord, prdelivery, rentcode, \
+        rentpa, runsize, salegrade, source, status, tenantname, tenure = filterqueries()
+    else:
+        actype = actypes[1]
+        agent = "any"
+        arrears = "any"
+        enddate = "2020-06-24"
+        landlord = landlords[0]
+        prdelivery = prdeliveries
+        rentcode = "any"
+        rentobjs = filterrentobjs("ZWEF", "", "")
+        runsize = 200
+        salegrade = salegrades
+        status = statuses
+        tenure = tenures
+
+    return render_template('queriespage.html', title='Queries page', actype=actype, actypes=actypes, agent=agent,
+                           arrears=arrears, enddate=enddate, landlord=landlord, landlords=landlords,
+                           options=options, prdelivery=prdelivery, prdeliveries=prdeliveries,
+                           rentcode=rentcode, rentobjs=rentobjs, runsize=runsize, salegrade=salegrade,
+                           salegrades=salegrades, status=status, statuses=statuses, tenure=tenure, tenures=tenures)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])

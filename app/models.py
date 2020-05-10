@@ -257,6 +257,7 @@ class Rent(db.Model):
     deed_id = db.Column(db.Integer, db.ForeignKey('typedeed.id'))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     mailto_id = db.Column(db.Integer, db.ForeignKey('typemailto.id'))
+    prdelivery_id = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
     salegrade_id = db.Column(db.Integer, db.ForeignKey('typesalegrade.id'))
     status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
@@ -394,6 +395,15 @@ class Typepayment(db.Model):
     paytypedet = db.Column(db.String(45))
 
     income_typepayment = db.relationship('Income', backref='typepayment', lazy='dynamic')
+
+
+class Typeprdelivery(db.Model):
+    __tablename__ = 'typeprdelivery'
+
+    id = db.Column(db.Integer, primary_key=True)
+    prdeliverydet = db.Column(db.String(45))
+
+    rent_typeprdelivery = db.relationship('Rent', backref='typeprdelivery', lazy='dynamic')
 
 
 class Typeproperty(db.Model):
