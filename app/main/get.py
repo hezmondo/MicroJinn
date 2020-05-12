@@ -143,7 +143,7 @@ def filterqueries():
                            Typetenure.tenuredet) \
             .filter(Rent.rentcode.startswith([rentcodeq]),
                     Typeactype.actypedet.in_(actype),
-                    Agent.agdetails.ilike('%{}%'.format(agentdetailsq)),
+                    or_(Agent.agdetails.ilike('%{}%'.format(agentdetailsq)), Agent.agdetails == None ),
                     Landlord.name.in_(landlord),
                     Typesalegrade.salegradedet.in_(salegrade),
                     Property.propaddr.ilike('%{}%'.format(propaddrq)),
