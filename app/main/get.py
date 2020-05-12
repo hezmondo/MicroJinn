@@ -98,47 +98,64 @@ def filterlandlords():
 
 
 def filterqueries():
-    actype = request.form.getlist("actype")
-    agent = request.form["agentname"]
-    # agentq = "" if agent == "any" else agent
-    arrears = request.form["arrears"]
-    enddate = request.form["enddate"]
-    landlord = request.form.getlist("landlord")
-    prdelivery = request.form.getlist("prdelivery")
-    rentcode = request.form["rentcode"]
+    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
+    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    options = ("Include", "Exclude", "Only")
+    actype = request.form.getlist("actype") if request.form.getlist("actype") else actypes
+    agentdetails = request.form.get("agentdetails") if request.form.get("agentdetails") else "any"
+    arrears = request.form.get("arrears") if request.form.get("arrears") else "any"
+    enddate = request.form.get("enddate")  if request.form.get("enddate") else "2120-12-31"
+    landlord = request.form.getlist("landlord") if request.form.getlist("landlord") else landlords
+    prdelivery = request.form.getlist("prdelivery") if request.form.getlist("prdelivery") else prdeliveries
+    propaddr = request.form.get("propaddr") if request.form.get("propaddr") else "any"
+    rentcode = request.form.get("rentcode") if request.form.get("rentcode") else "any"
+    rentpa = request.form.get("rentpa") if request.form.get("rentpa") else "any"
+    runsize = request.form.get("runsize") if request.form.get("runsize") else 50
+    salegrade = request.form.getlist("salegrade") if request.form.getlist("salegrade") else salegrades
+    source = request.form.get("source") if request.form.get("source") else "any"
+    status = request.form.getlist("status") if request.form.getlist("status") else statuses
+    tenantname = request.form.get("tenantname") if request.form.get("tenantname") else "any"
+    tenure = request.form.getlist("tenure") if request.form.getlist("tenure") else tenures
+    agentdetailsq = "" if agentdetails == "any" else agentdetails
+    propaddrq = "" if propaddr == "any" else propaddr
     rentcodeq = "" if rentcode == "any" else rentcode
-    rentpa = request.form["rentpa"]
-    runsize = request.form["runsize"]
-    source = request.form["source"]
     sourceq = "" if source == "any" else source
-    status = request.form.getlist("status")
-    salegrade = request.form.getlist("salegrade")
-    tenantname = request.form["tenantname"]
     tenantnameq = "" if tenantname == "any" else tenantname
-    tenure = request.form.getlist("tenure")
-
     rentobjs = \
         Property.query \
             .join(Rent) \
             .join(Landlord) \
             .outerjoin(Agent) \
+            .outerjoin(Charge) \
             .join(Typeactype) \
-            .join(Typesalegrade) \
+            .join(Typeprdelivery) \
             .join(Typestatus) \
+            .join(Typesalegrade) \
             .join(Typetenure) \
-            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.lastrentdate, Landlord.name,
-                           Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet,
-                           Typestatus.statusdet, Typetenure.tenuredet) \
+            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
+                           Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                           func.sum(Charge.chargebalance).label('totcharge'),
+                           Typetenure.tenuredet) \
             .filter(Rent.rentcode.startswith([rentcodeq]),
                     Typeactype.actypedet.in_(actype),
+                    Agent.agdetails.ilike('%{}%'.format(agentdetailsq)),
                     Landlord.name.in_(landlord),
+                    Typesalegrade.salegradedet.in_(salegrade),
+                    Property.propaddr.ilike('%{}%'.format(propaddrq)),
+                    Rent.source.ilike('%{}%'.format(sourceq)),
+                    Typestatus.statusdet.in_(status),
                     Rent.tenantname.ilike('%{}%'.format(tenantnameq)),
-                    Rent.source.ilike('%{}%'.format(sourceq))) \
-            .limit(50).all()
-    return rentobjs, actype, agent, arrears, enddate, landlord, prdelivery, rentcode, \
-           rentpa, runsize, salegrade, source, status, tenantname, tenure
-
+                    Typetenure.tenuredet.in_(tenure)) \
+            .group_by(Rent.id) \
+            .limit(runsize).all()
+    return rentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
+           rentpa, runsize, salegrade, source, status, tenantname, tenure, \
+           actypes, landlords, salegrades, statuses, tenures, options, prdeliveries
 
 def filterrentobjs(rcd, ten, pop):
     rentobjs = \
@@ -220,19 +237,6 @@ def getextrent(id):
         flash('N')
         return redirect(url_for('main.index'))
     return extrent
-
-
-def getqueries():
-
-    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    options = ("Include", "Exclude", "Only")
-
-    return actypes, landlords, salegrades, statuses, tenures, options, prdeliveries
 
 
 def getincome(id):

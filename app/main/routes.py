@@ -5,7 +5,7 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterqueries, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
-    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getqueries, getrental, getrentals, \
+    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getrental, getrentals, \
     getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postloan, postproperty, postrental, postrentobj
@@ -346,32 +346,19 @@ def propertypage(id):
     return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
 
 
-@bp.route('/queries', methods=['GET', 'POST'])
+@bp.route('/queries/', methods=['GET', 'POST'])
 def queries():
-    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueries()
+    action = request.args.get('action', "view", type=str)
+    rentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
+    rentpa, runsize, salegrade, source, status, tenantname, tenure,\
+    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = filterqueries()
 
-    if request.method == "POST":
-        rentobjs, actype, agent, arrears, enddate, landlord, prdelivery, rentcode, \
-        rentpa, runsize, salegrade, source, status, tenantname, tenure = filterqueries()
-    else:
-        actype = actypes[1]
-        agent = "any"
-        arrears = "any"
-        enddate = "2020-06-24"
-        landlord = landlords[0]
-        prdelivery = prdeliveries
-        rentcode = "any"
-        rentobjs = filterrentobjs("ZWEF", "", "")
-        runsize = 200
-        salegrade = salegrades
-        status = statuses
-        tenure = tenures
-
-    return render_template('queriespage.html', title='Queries page', actype=actype, actypes=actypes, agent=agent,
-                           arrears=arrears, enddate=enddate, landlord=landlord, landlords=landlords,
-                           options=options, prdelivery=prdelivery, prdeliveries=prdeliveries,
-                           rentcode=rentcode, rentobjs=rentobjs, runsize=runsize, salegrade=salegrade,
-                           salegrades=salegrades, status=status, statuses=statuses, tenure=tenure, tenures=tenures)
+    return render_template('queriespage.html', title='Queries page', action=action, actype=actype, actypes=actypes,
+                           agentdetails=agentdetails, arrears=arrears, enddate=enddate, landlord=landlord,
+                           landlords=landlords, options=options, prdelivery=prdelivery, prdeliveries=prdeliveries,
+                           propaddr=propaddr, rentcode=rentcode, rentobjs=rentobjs, rentpa=rentpa, runsize=runsize,
+                           salegrade=salegrade, salegrades=salegrades, source=source, status=status, statuses=statuses,
+                           tenantname=tenantname, tenure=tenure, tenures=tenures)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])
