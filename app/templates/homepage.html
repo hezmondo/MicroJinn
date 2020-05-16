@@ -7,23 +7,27 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ rentcode }}">
+            <input type="text" class="form-control" name="rentcode" placeholder="any" value="{{ rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ tenantname }}">
+            <input type="text" class="form-control" name="tenantname" placeholder="any" value="{{ tenantname }}">
         </div>
         <div class="col-md-2">
             <label for="propaddr">Property details:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ propaddr }}">
+            <input type="text" class="form-control" name="propaddr" placeholder="any" value="{{ propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" value="{{ source }}">
+            <input type="text" class="form-control" name="source" placeholder="any" value="{{ source }}">
         </div>
         <div class="col-md-2">
             <label for="agentdetails">Agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" value="{{ agentdetails }}">
+            <input type="text" class="form-control" name="agentdetails" placeholder="any" value="{{ agentdetails }}">
+        </div>
+        <div class="col-md-2">
+            <label for="count">Count:</label>
+            <input type="text" class="form-control" name="count" value="{{ qrentobjs|length }}">
         </div>
     </div>
     {% if action == "advanced" %}
@@ -38,15 +42,15 @@
         </div>
         <div class="col-md-2">
             <label for="rentpa">Rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" value="any">
+            <input type="text" class="form-control" name="rentpa" placeholder="any" value="{{ rentpa }}">
         </div>
         <div class="col-md-2">
             <label for="arrears">Rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="any">
+            <input type="text" class="form-control" name="arrears" placeholder="any" value="{{ arrears }}">
         </div>
         <div class="col-md-2">
             <label for="rentperiods">Rent periods owing:</label>
-            <input type="text" class="form-control" name="rentperiods" value="any">
+            <input type="text" class="form-control" name="rentperiods" placeholder="any" value="{{ rentperiods }}">
         </div>
     </div>
     <div class="form-group row">
@@ -92,19 +96,23 @@
             <label for="prdelivery">PR delivery:</label>
             {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery) }}
         </div>
+        <div class="col-md-2">
+            <label for="savename">Save filter as:</label>
+            <input type="text" class="form-control" name="savename" value="">
+        </div>
     </div>
     {% endif %}
     <div class="form-group row">
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">Filter now</button>
         </div>
-        {% if action == "view" %}
+        {% if action == "advanced" %}
         <div class="col-md-3">
-            <a href="/queries/?action=advanced" class="btn btn-block btn-primary" role="button">Advanced filter</a>
+            <a href="/index" class="btn btn-block btn-primary" role="button">Basic filter</a>
         </div>
         {% else %}
         <div class="col-md-3">
-            <a href="/queries/?action=view" class="btn btn-block btn-primary" role="button">Basic filter</a>
+            <a href="/queries" class="btn btn-block btn-primary" role="button">Advanced filter</a>
         </div>
         {% endif %}
     </div>
@@ -117,7 +125,7 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="rents">
+    <table class="table" id="qrentobjs">
         <thead>
         <tr>
             <th style="width: 8.00%">rentcode</th>
@@ -132,7 +140,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rentobjs %}
+        {% for item in qrentobjs %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>

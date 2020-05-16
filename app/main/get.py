@@ -1,3 +1,4 @@
+import json
 from flask import flash, redirect, url_for, request
 from sqlalchemy import asc, desc, extract, func, literal, and_, or_
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
@@ -98,33 +99,67 @@ def filterlandlords():
 
 
 def filterqueries():
-    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    options = ("Include", "Exclude", "Only")
-    actype = request.form.getlist("actype") if request.form.getlist("actype") else actypes
-    agentdetails = request.form.get("agentdetails") if request.form.get("agentdetails") else "any"
-    arrears = request.form.get("arrears") if request.form.get("arrears") else "any"
-    enddate = request.form.get("enddate")  if request.form.get("enddate") else "2120-12-31"
-    landlord = request.form.getlist("landlord") if request.form.getlist("landlord") else landlords
-    prdelivery = request.form.getlist("prdelivery") if request.form.getlist("prdelivery") else prdeliveries
-    propaddr = request.form.get("propaddr") if request.form.get("propaddr") else "any"
-    rentcode = request.form.get("rentcode") if request.form.get("rentcode") else "any"
-    rentpa = request.form.get("rentpa") if request.form.get("rentpa") else "any"
-    runsize = request.form.get("runsize") if request.form.get("runsize") else 50
-    salegrade = request.form.getlist("salegrade") if request.form.getlist("salegrade") else salegrades
-    source = request.form.get("source") if request.form.get("source") else "any"
-    status = request.form.getlist("status") if request.form.getlist("status") else statuses
-    tenantname = request.form.get("tenantname") if request.form.get("tenantname") else "any"
-    tenure = request.form.getlist("tenure") if request.form.getlist("tenure") else tenures
-    agentdetailsq = "" if agentdetails == "any" else agentdetails
-    propaddrq = "" if propaddr == "any" else propaddr
-    rentcodeq = "" if rentcode == "any" else rentcode
-    sourceq = "" if source == "any" else source
-    tenantnameq = "" if tenantname == "any" else tenantname
+    with open("stored_allan.json", "r") as read_file:
+        returns = json.load(read_file)
+    actype = request.form.getlist("actype") or returns["act"]
+    agentdetails = request.form.get("agentdetails") or returns["agd"]
+    arrears = request.form.get("arrears") or returns["arr"]
+    enddate = request.form.get("enddate") or returns["end"]
+    landlord = request.form.getlist("landlord") or returns["lld"]
+    prdelivery = request.form.getlist("prdelivery") or returns["prd"]
+    propaddr = request.form.get("propaddr") or returns["pop"]
+    rentcode = request.form.get("rentcode") or returns["rcd"]
+    rentpa = request.form.get("rentpa") or returns["rpa"]
+    runsize = request.form.get("runsize") or returns["run"]
+    salegrade = request.form.getlist("salegrade") or returns["sal"]
+    savename = request.form.get("savename") or returns["sav"]
+    source = request.form.get("source") or returns["soc"]
+    status = request.form.getlist("status") or returns["sta"]
+    tenantname = request.form.get("tenantname") or returns["tna"]
+    tenure = request.form.getlist("tenure") or returns["ten"]
+    if savename and savename != "":
+        store = {}
+        store["act"] = actype
+        store["agd"] = agentdetails
+        store["arr"] = arrears
+        store["end"] = enddate
+        store["lld"] = landlord
+        store["prd"] = prdelivery
+        store["pop"] = propaddr
+        store["rcd"] = rentcode
+        store["rpa"] = rentpa
+        store["run"] = runsize
+        store["sal"] = salegrade
+        store["sav"] = savename
+        store["soc"] = source
+        store["sta"] = status
+        store["tna"] = tenantname
+        store["ten"] = tenure
+        with open("stored_{}.json".format(savename), "w") as write_file:
+            json.dump(store, write_file)
+    queriesfilter = []
+    if actype != actypes and actype != "any":
+        queriesfilter.append(Typeactype.actypedet.in_(actype))
+    if agentdetails and agentdetails != "any":
+        queriesfilter.append(Agent.agdetails.ilike('%{}%'.format(agentdetails)))
+    if landlord != landlords and landlord != "any":
+        queriesfilter.append(Landlord.name.in_(landlord))
+    if prdelivery != prdeliveries and prdelivery != "any":
+        queriesfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
+    if propaddr and propaddr != "any":
+        queriesfilter.append(Property.propaddr.ilike('%{}%'.format(propaddr)))
+    if rentcode and rentcode != "any":
+        queriesfilter.append(Rent.rentcode.startswith([rentcode]))
+    if salegrade != salegrades and salegrade != "any":
+        queriesfilter.append(Typesalegrade.salegradedet.in_(salegrade))
+    if source and source != "any":
+        queriesfilter.append(Rent.source.ilike('%{}%'.format(source)))
+    if status != statuses and status != "any":
+        queriesfilter.append(Typestatus.statusdet.in_(status))
+    if tenantname and tenantname != "any":
+        queriesfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
+    if tenure != tenures and tenure != "any":
+        queriesfilter.append(Typetenure.tenuredet.in_(tenure))
     rentobjs = \
         Property.query \
             .join(Rent) \
@@ -141,21 +176,13 @@ def filterqueries():
                            Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            func.sum(Charge.chargebalance).label('totcharge'),
                            Typetenure.tenuredet) \
-            .filter(Rent.rentcode.startswith([rentcodeq]),
-                    Typeactype.actypedet.in_(actype),
-                    or_(Agent.agdetails.ilike('%{}%'.format(agentdetailsq)), Agent.agdetails == None ),
-                    Landlord.name.in_(landlord),
-                    Typesalegrade.salegradedet.in_(salegrade),
-                    Property.propaddr.ilike('%{}%'.format(propaddrq)),
-                    Rent.source.ilike('%{}%'.format(sourceq)),
-                    Typestatus.statusdet.in_(status),
-                    Rent.tenantname.ilike('%{}%'.format(tenantnameq)),
-                    Typetenure.tenuredet.in_(tenure)) \
+            .filter(*queriesfilter) \
             .group_by(Rent.id) \
             .limit(runsize).all()
+    print(rentobjs)
     return rentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-           rentpa, runsize, salegrade, source, status, tenantname, tenure, \
-           actypes, landlords, salegrades, statuses, tenures, options, prdeliveries
+           rentpa, runsize, salegrade, source, status, tenantname, tenure
+
 
 def filterrentobjs(rcd, ten, pop):
     rentobjs = \
@@ -381,6 +408,120 @@ def getproperty(id):
         }
     proptypedets = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
     return property, proptypedets
+
+
+def getqrentobjs(queriesfilter, runsize):
+    # return options for each multiple choice control
+    # queriesfilter = filter
+    qrentobjs = \
+        Property.query \
+            .join(Rent) \
+            .join(Landlord) \
+            .outerjoin(Agent) \
+            .outerjoin(Charge) \
+            .join(Typeactype) \
+            .join(Typeprdelivery) \
+            .join(Typestatus) \
+            .join(Typesalegrade) \
+            .join(Typetenure) \
+            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
+                           Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                           func.sum(Charge.chargebalance).label('totcharge'),
+                           Typetenure.tenuredet) \
+            .filter(*queriesfilter) \
+            .group_by(Rent.id) \
+            .limit(runsize).all()
+    print(qrentobjs)
+    return qrentobjs
+
+
+def getqueryoptions():
+    # return options for each multiple choice control
+    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
+    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    options = ("Include", "Exclude", "Only")
+
+    return actypes, landlords, salegrades, statuses, tenures, options, prdeliveries
+
+
+def getqueryparams(action):
+    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
+    with open("stored_qall.json", "r") as read_file:
+        returns = json.load(read_file)
+    queriesfilter = []
+    rentcode = request.form.get("rentcode") if request.method == "POST" else returns["rcd"]
+    if rentcode and rentcode != "any":
+        queriesfilter.append(Rent.rentcode.startswith([rentcode]))
+    agentdetails = request.form.get("agentdetails") if request.method == "POST" else returns["agd"]
+    if agentdetails and agentdetails != "any":
+        queriesfilter.append(Agent.agdetails.ilike('%{}%'.format(agentdetails)))
+    propaddr = request.form.get("propaddr") if request.method == "POST" else returns["pop"]
+    if propaddr and propaddr != "any":
+        queriesfilter.append(Property.propaddr.ilike('%{}%'.format(propaddr)))
+    source = request.form.get("source") if request.method == "POST" else returns["soc"]
+    if source and source != "any":
+        queriesfilter.append(Rent.source.ilike('%{}%'.format(source)))
+    tenantname = request.form.get("tenantname") if request.method == "POST" else returns["tna"]
+    if tenantname and tenantname != "any":
+        queriesfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
+    if action == "advanced":
+        actype = request.form.getlist("actype") if request.method == "POST" else returns["act"]
+        arrears = request.form.get("arrears") if request.method == "POST" else returns["arr"]
+        enddate = request.form.get("enddate") if request.method == "POST" else returns["end"]
+        landlord = request.form.getlist("landlord") if request.method == "POST" else returns["lld"]
+        prdelivery = request.form.getlist("prdelivery") if request.method == "POST" else returns["prd"]
+        rentpa = request.form.get("rentpa") if request.method == "POST" else returns["rpa"]
+        rentperiods = request.form.get("rentperiods") if request.method == "POST" else returns["rpd"]
+        runsize = request.form.get("runsize") if request.method == "POST" else returns["run"]
+        salegrade = request.form.getlist("salegrade") if request.method == "POST" else returns["sal"]
+        savename = request.form.get("savename") if request.method == "POST" else returns["sav"]
+        status = request.form.getlist("status") if request.method == "POST" else returns["sta"]
+        tenure = request.form.getlist("tenure") if request.method == "POST" else returns["ten"]
+        # if savename and savename != "":
+        #     store = {}
+        #     store["act"] = actype
+        #     store["agd"] = agentdetails
+        #     store["arr"] = arrears
+        #     store["end"] = enddate
+        #     store["lld"] = landlord
+        #     store["prd"] = prdelivery
+        #     store["pop"] = propaddr
+        #     store["rcd"] = rentcode
+        #     store["rpa"] = rentpa
+        #     store["run"] = runsize
+        #     store["sal"] = salegrade
+        #     store["sav"] = savename
+        #     store["soc"] = source
+        #     store["sta"] = status
+        #     store["tna"] = tenantname
+        #     store["ten"] = tenure
+        #     with open("stored_{}.json".format(savename), "w") as write_file:
+        #         json.dump(store, write_file)
+        if actype != actypes and actype != "any":
+            queriesfilter.append(Typeactype.actypedet.in_(actype))
+        if landlord != landlords and landlord != "any":
+            queriesfilter.append(Landlord.name.in_(landlord))
+        if prdelivery != prdeliveries and prdelivery != "any":
+            queriesfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
+        if salegrade != salegrades and salegrade != "any":
+            queriesfilter.append(Typesalegrade.salegradedet.in_(salegrade))
+        if status != statuses and status != "any":
+            queriesfilter.append(Typestatus.statusdet.in_(status))
+        if tenure != tenures and tenure != "any":
+            queriesfilter.append(Typetenure.tenuredet.in_(tenure))
+    else:
+        runsize = 100
+    qrentobjs = getqrentobjs(queriesfilter, runsize)
+    if action == "basic":
+        return qrentobjs, agentdetails, propaddr, rentcode, source, tenantname
+    else:
+        return qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
+           rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure
 
 
 def getrental(id):

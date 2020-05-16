@@ -235,6 +235,13 @@ class Property(db.Model):
     def __repr__(self):
         return '<Property {}>'.format(self.propaddr)
 
+class Query(db.Model):
+    __tablename__ = 'query'
+
+    id = db.Column(db.Integer, primary_key=True)
+    desc = db.Column(db.String(30))
+    content = db.Column(db.String(270))
+
 
 class Rent(db.Model):
     __tablename__ = 'rent'

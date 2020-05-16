@@ -5,8 +5,8 @@ from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
     filterincome, filterlandlords, filterqueries, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
-    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getrental, getrentals, \
-    getrentalstatement, getrentobj
+    getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getqueryoptions, getqueryparams, \
+    getrental, getrentals, getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postloan, postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
@@ -241,15 +241,10 @@ def incomepage(id):
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/index', methods=['GET', 'POST'])
 def index():
-    if request.method == "POST":
-        rcd = request.form["rentcode"]
-        ten = request.form["tenantname"]
-        pop = request.form["propaddr"]
-        rentobjs = filterrentobjs(rcd, ten, pop)
-    else:
-        rentobjs = filterrentobjs("ZWEF", "", "")
+    qrentobjs, agentdetails, propaddr, rentcode, source, tenantname = getqueryparams("basic")
 
-    return render_template('index.html', title='Rent and property search page', rentobjs=rentobjs)
+    return render_template('homepage.html', title='Home page', agentdetails=agentdetails, propaddr=propaddr,
+                           rentcode=rentcode, qrentobjs=qrentobjs, source=source, tenantname=tenantname)
 
 
 @bp.route('/landlordpage/<int:id>', methods=["POST", "GET"])
@@ -346,17 +341,17 @@ def propertypage(id):
     return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
 
 
-@bp.route('/queries/', methods=['GET', 'POST'])
+@bp.route('/queries', methods=['GET', 'POST'])
 def queries():
-    action = request.args.get('action', "view", type=str)
-    rentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-    rentpa, runsize, salegrade, source, status, tenantname, tenure,\
-    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = filterqueries()
+    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
 
-    return render_template('queriespage.html', title='Queries page', action=action, actype=actype, actypes=actypes,
+    qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
+    rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure = getqueryparams("advanced")
+
+    return render_template('homepage.html', title='Home page', action='advanced', actype=actype, actypes=actypes,
                            agentdetails=agentdetails, arrears=arrears, enddate=enddate, landlord=landlord,
                            landlords=landlords, options=options, prdelivery=prdelivery, prdeliveries=prdeliveries,
-                           propaddr=propaddr, rentcode=rentcode, rentobjs=rentobjs, rentpa=rentpa, runsize=runsize,
+                           propaddr=propaddr, rentcode=rentcode, qrentobjs=qrentobjs, rentpa=rentpa, runsize=runsize,
                            salegrade=salegrade, salegrades=salegrades, source=source, status=status, statuses=statuses,
                            tenantname=tenantname, tenure=tenure, tenures=tenures)
 
