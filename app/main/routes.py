@@ -10,8 +10,8 @@ from app.main.get import filteragents, filtercharges, filteremailaccs, filterext
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
     postloan, postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
-from app.models import Agent, Charge, Emailaccount, Income, Landlord, Loan, Loan_interest_rate, Loan_trans, \
-    Property, Rent, Rental
+from app.models import Agent, Charge, Emailaccount, Income, Jstore, Landlord, Loan, \
+    Loan_interest_rate, Loan_trans, Property, Rent, Rental
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -111,7 +111,7 @@ def deleteitem(id):
     return redirect(url_for('main.index'))
 
 
-@bp.route('/emailaccpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/emailaccpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def emailaccpage(id):
     action = request.args.get('action', "view", type=str)
@@ -166,7 +166,7 @@ def income():
     return render_template('income.html', title='Income', income=income)
 
 
-@bp.route('/incomeallocpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/incomeallocpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def incomeallocpage(id):
     action = request.args.get('action', "view", type=str)
@@ -188,7 +188,7 @@ def incomeallocpage(id):
                            )
 
 
-@bp.route('/incomeformpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/incomeformpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def incomeformpage(id):
     action = request.args.get('action', "view", type=str)
@@ -222,7 +222,7 @@ def incomeformpage(id):
                            )
 
 
-@bp.route('/incomepage/<int:id>', methods=["POST", "GET"])
+@bp.route('/incomepage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def incomepage(id):
     action = request.args.get('action', "view", type=str)
@@ -247,7 +247,7 @@ def index():
                            rentcode=rentcode, qrentobjs=qrentobjs, source=source, tenantname=tenantname)
 
 
-@bp.route('/landlordpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/landlordpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def landlordpage(id):
     action = request.args.get('action', "view", type=str)
@@ -268,7 +268,20 @@ def landlords():
     return render_template('landlords.html', title='Landlords', landlords=landlords)
 
 
-@bp.route('/loanpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/loadquery', methods=['GET', 'POST'])
+def loadquery():
+    if request.method == "POST":
+        jqname = request.form["jqname"]
+        return redirect("/queries/?name={}".format(jqname))
+        # return redirect("main.queries/?name=PALLAN")
+    else:
+        pass
+    jqueries = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
+
+    return render_template('loadquery.html', title='Load saved query', jqueries=jqueries)
+
+
+@bp.route('/loanpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def loanpage(id):
     action = request.args.get('action', "view", type=str)
@@ -341,19 +354,20 @@ def propertypage(id):
     return render_template('propertypage.html', title='Property', property=property, proptypedets=proptypedets)
 
 
-@bp.route('/queries', methods=['GET', 'POST'])
+@bp.route('/queries/', methods=['GET', 'POST'])
 def queries():
-    actypes, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
+    name = request.args.get('name', "basic", type=str)
+    actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
 
     qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-    rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure = getqueryparams("advanced")
+    rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure = getqueryparams(name)
 
     return render_template('homepage.html', title='Home page', action='advanced', actype=actype, actypes=actypes,
-                           agentdetails=agentdetails, arrears=arrears, enddate=enddate, landlord=landlord,
-                           landlords=landlords, options=options, prdelivery=prdelivery, prdeliveries=prdeliveries,
-                           propaddr=propaddr, rentcode=rentcode, qrentobjs=qrentobjs, rentpa=rentpa, runsize=runsize,
-                           salegrade=salegrade, salegrades=salegrades, source=source, status=status, statuses=statuses,
-                           tenantname=tenantname, tenure=tenure, tenures=tenures)
+                           agentdetails=agentdetails, arrears=arrears, enddate=enddate, floads=floads,
+                           landlord=landlord, landlords=landlords, options=options, prdelivery=prdelivery,
+                           prdeliveries=prdeliveries, propaddr=propaddr, rentcode=rentcode, qrentobjs=qrentobjs,
+                           rentpa=rentpa, runsize=runsize, salegrade=salegrade, salegrades=salegrades, source=source,
+                           status=status, statuses=statuses, tenantname=tenantname, tenure=tenure, tenures=tenures)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])
@@ -363,7 +377,7 @@ def rentals():
     return render_template('rentals.html', title='Rentals page', rentals=rentals, rentsum=rentsum)
 
 
-@bp.route('/rentalpage/<int:id>', methods=["POST", "GET"])
+@bp.route('/rentalpage/<int:id>', methods=['GET', 'POST'])
 @login_required
 def rentalpage(id):
     action = request.args.get('action', "view", type=str)

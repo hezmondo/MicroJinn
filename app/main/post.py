@@ -2,9 +2,9 @@ from flask import redirect, request
 
 from app import db
 from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Loan, Manager, Property, Query, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, \
+    Landlord, Loan, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
-import json
+
 
 def postcharge(id):
     charge = Charge.query.get(id)
@@ -139,14 +139,6 @@ def postproperty(id):
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter \
             (Typeproperty.proptypedet == proptypedet).one()[0]
-    db.session.commit()
-    return
-
-
-def postquery(fullquery):
-    query = Query.query.get(id)
-    query.desc = request.form["queryname"]
-    query.content = json.dumps(fullquery)
     db.session.commit()
     return
 

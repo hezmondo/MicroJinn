@@ -139,6 +139,14 @@ class Incomealloc(db.Model):
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
 
     
+class Jstore(db.Model):
+    __tablename__ = 'jstore'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30))
+    content = db.Column(db.String(900))
+
+
 class Landlord(db.Model):
     __tablename__ = 'landlord'
 
@@ -234,14 +242,6 @@ class Property(db.Model):
 
     def __repr__(self):
         return '<Property {}>'.format(self.propaddr)
-
-class Query(db.Model):
-    __tablename__ = 'query'
-
-    id = db.Column(db.Integer, primary_key=True)
-    desc = db.Column(db.String(30))
-    content = db.Column(db.String(270))
-
 
 class Rent(db.Model):
     __tablename__ = 'rent'
