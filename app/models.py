@@ -1,10 +1,12 @@
-from datetime import datetime
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from hashlib import md5
 from time import time
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import db, login
+# from app.main.cached_data import getCached_data_querier
 
 
 class Agent(db.Model):
@@ -39,16 +41,16 @@ class Chargetype(db.Model):
     charge_chargetype = db.relationship('Charge', backref='chargetype', lazy='dynamic')
 
 
-class Datef2(db.Model):
-    __tablename__ = 'datef2'
+class Date_f2(db.Model):
+    __tablename__ = 'date_f2'
 
     code = db.Column(db.String(10), primary_key=True)
     date1 = db.Column(db.Date)
     date2 = db.Column(db.Date)
 
 
-class Datef4(db.Model):
-    __tablename__ = 'datef4'
+class Date_f4(db.Model):
+    __tablename__ = 'date_f4'
 
     code = db.Column(db.String(10), primary_key=True)
     date1 = db.Column(db.Date)
@@ -275,7 +277,35 @@ class Rent(db.Model):
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
 
-    # @classmethod
+    @classmethod
+    def next_date(self):
+        datesquerier = getCached_data_querier()
+        nextdate = None
+        if Rent.frequency == 1:
+            nextdate = Rent.lastrentdate + relativedelta(years=1)
+        elif Rent.frequency == 2:
+            dateF2 = datesquerier.getDateF2(Rent.datecode)
+            if Rent.lastrentdate.month == dateF2.date1.month and Rent.lastrentdate.day == dateF2.date1.day:
+                nextdate = date(Rent.lastrentdate.year, dateF2.date2.month, dateF2.date2.day)
+            elif Rent.lastrentdate.month == dateF2.date2.month and Rent.lastrentdate.day == dateF2.date2.day:
+                nextdate = date(Rent.lastrentdate.year + 1, dateF2.date1.month, dateF2.date1.day)
+        elif Rent.frequency == 4:
+            dateF4 = datesquerier.getDateF4(Rent.datecode)
+            if Rent.lastrentdate.month == dateF4.date1.month and Rent.lastrentdate.day == dateF4.date1.day:
+                nextdate = date(Rent.lastrentdate.year, dateF4.date2.month, dateF4.date2.day)
+
+            elif Rent.lastrentdate.month == dateF4.date2.month and Rent.lastrentdate.day == dateF4.date2.day:
+                nextdate = date(Rent.lastrentdate.year, dateF4.date3.month, dateF4.date3.day)
+
+            elif Rent.lastrentdate.month == dateF4.date3.month and Rent.lastrentdate.day == dateF4.date3.day:
+                nextdate = date(Rent.lastrentdate.year, dateF4.date4.month, dateF4.date4.day)
+
+            elif Rent.lastrentdate.month == dateF4.date4.month and Rent.lastrentdate.day == dateF4.date4.day:
+                nextdate = date(Rent.lastrentdate.year + 1, dateF4.date1.month, dateF4.date1.day)
+        return nextdate
+
+
+# @classmethod
     # def totcharges(self):
     #     return sum of charges for this rent - is this possible?
 

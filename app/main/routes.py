@@ -243,8 +243,9 @@ def incomepage(id):
 def index():
     qrentobjs, agentdetails, propaddr, rentcode, source, tenantname = getqueryparams("basic")
 
-    return render_template('homepage.html', title='Home page', agentdetails=agentdetails, propaddr=propaddr,
-                           rentcode=rentcode, qrentobjs=qrentobjs, source=source, tenantname=tenantname)
+    return render_template('homepage.html', title='Home page', agentdetails=agentdetails, jname="QALL",
+                           propaddr=propaddr, rentcode=rentcode, qrentobjs=qrentobjs,
+                           source=source, tenantname=tenantname)
 
 
 @bp.route('/landlordpage/<int:id>', methods=['GET', 'POST'])
@@ -273,7 +274,6 @@ def loadquery():
     if request.method == "POST":
         jqname = request.form["jqname"]
         return redirect("/queries/?name={}".format(jqname))
-        # return redirect("main.queries/?name=PALLAN")
     else:
         pass
     jqueries = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
@@ -356,15 +356,18 @@ def propertypage(id):
 
 @bp.route('/queries/', methods=['GET', 'POST'])
 def queries():
-    name = request.args.get('name', "basic", type=str)
+    jname = request.args.get('name', "basic", type=str)
     actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
 
     qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-    rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure = getqueryparams(name)
+    rentpa, rentperiods, runsize, salegrade, savename, source, status, tenantname, tenure = getqueryparams(jname)
+
+    if savename and savename != "":
+        jname = savename
 
     return render_template('homepage.html', title='Home page', action='advanced', actype=actype, actypes=actypes,
                            agentdetails=agentdetails, arrears=arrears, enddate=enddate, floads=floads,
-                           landlord=landlord, landlords=landlords, options=options, prdelivery=prdelivery,
+                           jname=jname, landlord=landlord, landlords=landlords, options=options, prdelivery=prdelivery,
                            prdeliveries=prdeliveries, propaddr=propaddr, rentcode=rentcode, qrentobjs=qrentobjs,
                            rentpa=rentpa, runsize=runsize, salegrade=salegrade, salegrades=salegrades, source=source,
                            status=status, statuses=statuses, tenantname=tenantname, tenure=tenure, tenures=tenures)

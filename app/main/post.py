@@ -1,7 +1,7 @@
 from flask import redirect, request
 
 from app import db
-from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 

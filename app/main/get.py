@@ -2,7 +2,7 @@ import json
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.models import Agent, Charge, Chargetype, Datef2, Datef4, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
     Jstore, Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
     Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -486,7 +486,7 @@ def getqueryparams(name):
         savename = request.form.get("savename") if request.method == "POST" else ""
         status = request.form.getlist("status") if request.method == "POST" else returns["sta"]
         tenure = request.form.getlist("tenure") if request.method == "POST" else returns["ten"]
-        if savename and savename != "":
+        if savename and savename != "" and savename != jname:
             store = {}
             store["act"] = actype
             store["agd"] = agentdetails
@@ -532,7 +532,7 @@ def getqueryparams(name):
         return qrentobjs, agentdetails, propaddr, rentcode, source, tenantname
     else:
         return qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-           rentpa, rentperiods, runsize, salegrade, source, status, tenantname, tenure
+           rentpa, rentperiods, runsize, salegrade, savename, source, status, tenantname, tenure
 
 
 def getrental(id):
