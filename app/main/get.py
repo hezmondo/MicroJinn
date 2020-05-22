@@ -99,107 +99,6 @@ def filterlandlords():
     return landlords
 
 
-def filterqueries():
-    with open("stored_allan.json", "r") as read_file:
-        returns = json.load(read_file)
-    actype = request.form.getlist("actype") or returns["act"]
-    agentdetails = request.form.get("agentdetails") or returns["agd"]
-    arrears = request.form.get("arrears") or returns["arr"]
-    enddate = request.form.get("enddate") or returns["end"]
-    landlord = request.form.getlist("landlord") or returns["lld"]
-    prdelivery = request.form.getlist("prdelivery") or returns["prd"]
-    propaddr = request.form.get("propaddr") or returns["pop"]
-    rentcode = request.form.get("rentcode") or returns["rcd"]
-    rentpa = request.form.get("rentpa") or returns["rpa"]
-    runsize = request.form.get("runsize") or returns["run"]
-    salegrade = request.form.getlist("salegrade") or returns["sal"]
-    savename = request.form.get("savename") or returns["sav"]
-    source = request.form.get("source") or returns["soc"]
-    status = request.form.getlist("status") or returns["sta"]
-    tenantname = request.form.get("tenantname") or returns["tna"]
-    tenure = request.form.getlist("tenure") or returns["ten"]
-    if savename and savename != "":
-        store = {}
-        store["act"] = actype
-        store["agd"] = agentdetails
-        store["arr"] = arrears
-        store["end"] = enddate
-        store["lld"] = landlord
-        store["prd"] = prdelivery
-        store["pop"] = propaddr
-        store["rcd"] = rentcode
-        store["rpa"] = rentpa
-        store["run"] = runsize
-        store["sal"] = salegrade
-        store["sav"] = savename
-        store["soc"] = source
-        store["sta"] = status
-        store["tna"] = tenantname
-        store["ten"] = tenure
-        with open("stored_{}.json".format(savename), "w") as write_file:
-            json.dump(store, write_file)
-    queriesfilter = []
-    if actype != actypes and actype != "any":
-        queriesfilter.append(Typeactype.actypedet.in_(actype))
-    if agentdetails and agentdetails != "any":
-        queriesfilter.append(Agent.agdetails.ilike('%{}%'.format(agentdetails)))
-    if landlord != landlords and landlord != "any":
-        queriesfilter.append(Landlord.name.in_(landlord))
-    if prdelivery != prdeliveries and prdelivery != "any":
-        queriesfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
-    if propaddr and propaddr != "any":
-        queriesfilter.append(Property.propaddr.ilike('%{}%'.format(propaddr)))
-    if rentcode and rentcode != "any":
-        queriesfilter.append(Rent.rentcode.startswith([rentcode]))
-    if salegrade != salegrades and salegrade != "any":
-        queriesfilter.append(Typesalegrade.salegradedet.in_(salegrade))
-    if source and source != "any":
-        queriesfilter.append(Rent.source.ilike('%{}%'.format(source)))
-    if status != statuses and status != "any":
-        queriesfilter.append(Typestatus.statusdet.in_(status))
-    if tenantname and tenantname != "any":
-        queriesfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
-    if tenure != tenures and tenure != "any":
-        queriesfilter.append(Typetenure.tenuredet.in_(tenure))
-    rentobjs = \
-        Property.query \
-            .join(Rent) \
-            .join(Landlord) \
-            .outerjoin(Agent) \
-            .outerjoin(Charge) \
-            .join(Typeactype) \
-            .join(Typeprdelivery) \
-            .join(Typestatus) \
-            .join(Typesalegrade) \
-            .join(Typetenure) \
-            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
-                           Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                           func.sum(Charge.chargebalance).label('totcharge'),
-                           Typetenure.tenuredet) \
-            .filter(*queriesfilter) \
-            .group_by(Rent.id) \
-            .limit(runsize).all()
-    print(rentobjs)
-    return rentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-           rentpa, runsize, salegrade, source, status, tenantname, tenure
-
-
-def filterrentobjs(rcd, ten, pop):
-    rentobjs = \
-        Property.query \
-            .join(Rent) \
-            .join(Landlord) \
-            .outerjoin(Agent) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.tenantname, Rent.rentpa, Rent.arrears, Rent.lastrentdate,
-                           Property.propaddr, Landlord.name, Agent.agdetails) \
-            .filter(Rent.rentcode.startswith([rcd]),
-                    Rent.tenantname.ilike('%{}%'.format(ten)),
-                    Property.propaddr.ilike('%{}%'.format(pop))) \
-            .all()
-    return rentobjs
-
-
 def getagent(id):
     ida = id
     agent = \
@@ -426,6 +325,7 @@ def getqrentobjs(queriesfilter, runsize):
             .join(Typesalegrade) \
             .join(Typetenure) \
             .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
+                           func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
                            Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                            Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            func.sum(Charge.chargebalance).label('totcharge'),
@@ -433,6 +333,7 @@ def getqrentobjs(queriesfilter, runsize):
             .filter(*queriesfilter) \
             .group_by(Rent.id) \
             .limit(runsize).all()
+    print("qrentobjs")
     print(qrentobjs)
     return qrentobjs
 

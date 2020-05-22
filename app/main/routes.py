@@ -4,7 +4,7 @@ from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import filteragents, filtercharges, filteremailaccs, filterextrents, filterheadrents, \
-    filterincome, filterlandlords, filterqueries, filterrentobjs, getagent, getcharge, getemailacc, getextrent, \
+    filterincome, filterlandlords, getagent, getcharge, getemailacc, getextrent, \
     getincome, getlandlord, getloan, getloans, getloanstatement, getproperty, getqueryoptions, getqueryparams, \
     getrental, getrentals, getrentalstatement, getrentobj
 from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
