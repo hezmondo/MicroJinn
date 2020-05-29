@@ -13,26 +13,26 @@
     <table class="table" id="rentals">
         <thead>
         <tr>
-            <th style="width: 6.00%">id</th>
+            <th style="width: 5.00%">id</th>
             <th style="width: 8.00%">Code</th>
             <th style="width: 22.00%">Address</th>
-            <th style="width: 18.00%">Name</th>
-            <th style="width: 10.00%">Annual rent</th>
-            <th style="width: 10.00%">AST date</th>
-            <th style="width: 16.00%">Gas safe</th>
+            <th style="width: 19.00%">Name</th>
+            <th style="width: 12.00%">Annual rent</th>
+            <th style="width: 12.00%">AST date</th>
+            <th style="width: 12.00%">Gas safe</th>
             <th style="width: 10.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in rentals %}
         <tr id="{{ item.id }}">
-            <td style="width: 6.00%">{{ item.id }}</td>
+            <td style="width: 5.00%">{{ item.id }}</td>
             <td style="width: 8.00%">{{ item.rentalcode }}</td>
             <td style="width: 22.00%"> {{ item.propaddr }}</td>
-            <td style="width: 18.00%"> {{ item.tenantname }}</td>
-            <td style="width: 10.00%"> {{ item.rentpa }}</td>
-            <td style="width: 10.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
-            <td style="width: 16.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
+            <td style="width: 19.00%"> {{ item.tenantname }}</td>
+            <td style="width: 12.00%"> {{ item.rentpa }}</td>
+            <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
+            <td style="width: 12.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}

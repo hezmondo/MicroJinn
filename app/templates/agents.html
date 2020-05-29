@@ -19,7 +19,7 @@
             <button type="submit" class="btn btn-block btn-primary">Search</button>
         </div>
         <div class="col-md-6">
-            <a href="/agents" class="btn btn-block btn-primary" role="button">Add agent</a>
+            <a href="/agentpage/0?action=new" class="btn btn-block btn-primary" role="button">Add agent</a>
         </div>
     </div>
 </form>
@@ -46,7 +46,7 @@
             <td style="width: 10.00%">{{ item.agdetails }}</td>
             <td style="width: 25.00%">{{ item.agemail }}</td>
             <td style="width: 25.00%"> {{ item.agnotes }}</td>
-            <td style="width: 5.00%"><a href="/agentpage/{{ item.id }}">View</a></td>
+            <td style="width: 5.00%"><a href="/agentpage/{{ item.id }}?action=edit">View/edit</a></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -60,7 +60,7 @@
     </div>
     <div class="form-group row">
         <div class="col-md-3">
-            <a href="/rentalstatementpage/{{ rental.id }}" class="btn btn-block btn-primary" role="button">Produce statement for this rental</a>
+            <a href="/rentalstatementpage/{{ rental.id }}" class="btn btn-block btn-primary" role="button">Produce statement</a>
         </div>
         <div class="col-md-2">
             <a href="/rentalpage/{{ rental.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone this rental</a>
@@ -71,7 +71,7 @@
         <div class="col-md-2">
             <a href="/deleteitem/{{ rental.id }}?item=rental"
                onclick="return confirm('Are you sure you want to delete this rental?');"
-               class="btn btn-block btn-warning" role="button">Delete this rental</a>
+               class="btn btn-block btn-danger" role="button">Delete this rental</a>
         </div>
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">Save changes</button>

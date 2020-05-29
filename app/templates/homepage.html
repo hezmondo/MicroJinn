@@ -3,7 +3,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" id="target">
+<form action="/index" method="post">
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rentcode starts with:</label>
@@ -27,10 +27,10 @@
         </div>
         <div class="col-md-2">
             <label for="count">Count:</label>
-            <input type="text" class="form-control" name="count" value="{{ qrentobjs|length }}">
+            <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
         </div>
     </div>
-    {% if action == "advanced" %}
+    {% if action != "basic" %}
     <div class="form-group row">
         <div class="col-md-2">
             <label for="enddate">End date:</label>
@@ -97,37 +97,43 @@
             {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery or prdeliveries) }}
         </div>
     </div>
-    {% endif %}
-    <div class="form-group row">
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Filter now</button>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <button type="submit" formaction="/queries/?action=filter" class="btn btn-block btn-success ">Search</button>
         </div>
-        {% if action == "advanced" %}
         <div class="col-md-2">
             <a href="/loadquery" class="btn btn-block btn-primary" role="button">Load saved filter:</a>
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Save filter as:</button>
+            <input type="text" class="form-control" name="jname" placeholder="query name" value="{{ jname }}">
         </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" name="savename" placeholder="name for saved query" value="">
-        </div>
-        {% else %}
         <div class="col-md-3">
-            <a href="/queries/?name={{ jname}}" class="btn btn-block btn-primary" role="button">Advanced filter</a>
+            <button type="submit" formaction="/queries/?action=save" class="btn btn-block btn-danger ">Save query as</button>
         </div>
-        {% endif %}
     </div>
+    {% else %}
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success ">Search</button>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" formaction="/externalrents" class="btn btn-block btn-primary ">Search external</button>
+        </div>
+        <div class="col-md-3">
+            <a href="/queries/?action=view" class="btn btn-block btn-danger" role="button">Advanced filter</a>
+        </div>
+    </div>
+    {% endif %}
 </form>
-<div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h4 class="text-center">Filter name: {{ jname }}</h4>
-        </div>
-    </div>
-</div>
+<!--<div class="container">-->
+<!--    <div class="row voffset2">-->
+<!--        <div class="col-lg-12">-->
+<!--            <h4 class="text-center">Filter name: {{ jname }}</h4>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 <div class="table-fixed">
-    <table class="table" id="qrentobjs">
+    <table class="table" id="rentprops">
         <thead>
         <tr>
             <th style="width: 8.00%">rentcode</th>
@@ -142,7 +148,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in qrentobjs %}
+        {% for item in rentprops %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>
@@ -152,7 +158,7 @@
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 20.00%"> {{ item.agdetails }}</td>
-            <td style="width: 5.00%"><a href="/rentobjpage/{{ item.id }}?action=view">View</a></td>
+            <td style="width: 5.00%"><a href="/rentobjpage/{{ item.id }}?action=edit">View/edit</a></td>
         </tr>
         {% endfor %}
         </tbody>

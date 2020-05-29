@@ -6,6 +6,23 @@ from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, 
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
+def postagent(id):
+    if id and id > 0 :
+        agent = Agent.query.get(id)
+    else:
+        agent = Agent()
+    agent.agdetails = request.form["address"]
+    agent.agemail = request.form["email"]
+    agent.agnotes = request.form["notes"]
+    if id == 0 or id is None:
+        db.session.add(agent)
+        db.session.commit()
+        id = agent.id
+    else:
+        db.session.commit()
+
+    return redirect('/agentpage/{}'.format(id))
+
 def postcharge(id):
     charge = Charge.query.get(id)
     charge.chargetype_id = \
@@ -231,12 +248,3 @@ def postrentobj(id):
         db.session.commit()
 
     return redirect('/rentobjpage/{}'.format(id))
-
-
-def postagent(id):
-    agent = Agent.query.get(id)
-    agent.agdetails = request.form["address"]
-    agent.agemail = request.form["email"]
-    agent.agnotes = request.form["notes"]
-    db.session.commit()
-    return

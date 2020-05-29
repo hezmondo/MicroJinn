@@ -1,5 +1,7 @@
 import json
 from app import db
+from datetime import date
+from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
@@ -42,28 +44,6 @@ def filteremailaccs():
     return emailaccs
 
 
-def filterextrents():
-    if request.method == "POST":
-        rcd = request.form["rentcode"]
-        ten = request.form["tenantname"]
-        pop = request.form["propaddr"]
-    else:
-        rcd = "lus"
-        ten = ""
-        pop = ""
-    extrents = \
-        Extrent.query \
-            .join(Extmanager) \
-            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
-                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
-                           Extmanager.codename, Extrent.agentdetails) \
-            .filter(Extrent.rentcode.startswith([rcd]),
-                    Extrent.tenantname.ilike('%{}%'.format(ten)),
-                    Extrent.propaddr.ilike('%{}%'.format(pop))) \
-            .all()
-
-    return extrents
-
 def filterheadrents():
 #     if request.method == "POST":
         # hrcd = request.form["headrentcode"]
@@ -100,15 +80,21 @@ def filterlandlords():
 
 
 def getagent(id):
-    ida = id
-    agent = \
-        Agent.query \
-            .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-            .filter(Agent.id == ida) \
-            .one_or_none()
-    if agent is None:
-        flash('Invalid agent code')
-        return redirect(url_for('main.agents'))
+    if id > 0:
+        # existing agent
+        agent = \
+            Agent.query \
+                .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
+                .filter(Agent.id == id) \
+                .one_or_none()
+        if agent is None:
+            flash('Invalid agent code')
+            return redirect(url_for('main.agents'))
+    else:
+        # new agent
+        agent = {
+            'id': 0
+        }
     return agent
 
 
@@ -146,13 +132,13 @@ def getemailacc(id):
     return emailacc
 
 
-def getextrent(id):
+def getexternalrent(id):
     # if request.method == "POST":
     #
     #     return redirect(url_for('main.index'))
     # else:
     # pass
-    extrent = \
+    externalrent = \
         Extrent.query \
             .join(Extmanager) \
             .with_entities(Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
@@ -160,10 +146,10 @@ def getextrent(id):
                            Extmanager.codename, Extrent.agentdetails) \
             .filter(Extrent.id == id) \
                 .one_or_none()
-    if extrent is None:
+    if externalrent is None:
         flash('N')
         return redirect(url_for('main.index'))
-    return extrent
+    return externalrent
 
 
 def getincome(id):
@@ -310,36 +296,8 @@ def getproperty(id):
     return property, proptypedets
 
 
-def getqrentobjs(queriesfilter, runsize):
-    # return options for each multiple choice control
-    # queriesfilter = filter
-    qrentobjs = \
-        Property.query \
-            .join(Rent) \
-            .join(Landlord) \
-            .outerjoin(Agent) \
-            .outerjoin(Charge) \
-            .join(Typeactype) \
-            .join(Typeprdelivery) \
-            .join(Typestatus) \
-            .join(Typesalegrade) \
-            .join(Typetenure) \
-            .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
-                           func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
-                           Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-                           Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                           func.sum(Charge.chargebalance).label('totcharge'),
-                           Typetenure.tenuredet) \
-            .filter(*queriesfilter) \
-            .group_by(Rent.id) \
-            .limit(runsize).all()
-    print("qrentobjs")
-    print(qrentobjs)
-    return qrentobjs
-
-
 def getqueryoptions():
-    # return options for each multiple choice control
+    # return options for each multiple choice control in home page and queries page
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
@@ -352,103 +310,13 @@ def getqueryoptions():
     return actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries
 
 
-def getqueryparams(name):
-    jname = "QALL" if name == "basic" else name
-    actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
-    returns = Jstore.query.with_entities(Jstore.content).filter(Jstore.name == jname)[0][0]
-    print(returns)
-    returns = json.loads(returns)
-    queriesfilter = []
-    agentdetails = request.form.get("agentdetails") if request.method == "POST" else returns["agd"]
-    if agentdetails and agentdetails != "any":
-        queriesfilter.append(Agent.agdetails.ilike('%{}%'.format(agentdetails)))
-    propaddr = request.form.get("propaddr") if request.method == "POST" else returns["pop"]
-    if propaddr and propaddr != "any":
-        queriesfilter.append(Property.propaddr.ilike('%{}%'.format(propaddr)))
-    rentcode = request.form.get("rentcode") if request.method == "POST" else returns["rcd"]
-    if rentcode and rentcode != "any":
-        queriesfilter.append(Rent.rentcode.startswith([rentcode]))
-    source = request.form.get("source") if request.method == "POST" else returns["soc"]
-    if source and source != "any":
-        queriesfilter.append(Rent.source.ilike('%{}%'.format(source)))
-    tenantname = request.form.get("tenantname") if request.method == "POST" else returns["tna"]
-    if tenantname and tenantname != "any":
-        queriesfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
-    if name != "basic":
-        actype = request.form.getlist("actype") if request.method == "POST" else returns["act"]
-        arrears = request.form.get("arrears") if request.method == "POST" else returns["arr"]
-        enddate = request.form.get("enddate") if request.method == "POST" else "2020-12-31"
-        landlord = request.form.getlist("landlord") if request.method == "POST" else returns["lld"]
-        prdelivery = request.form.getlist("prdelivery") if request.method == "POST" else returns["prd"]
-        rentpa = request.form.get("rentpa") if request.method == "POST" else returns["rpa"]
-        rentperiods = request.form.get("rentperiods") if request.method == "POST" else returns["rpd"]
-        runsize = request.form.get("runsize") if request.method == "POST" else 200
-        salegrade = request.form.getlist("salegrade") if request.method == "POST" else returns["sal"]
-        savename = request.form.get("savename") if request.method == "POST" else ""
-        status = request.form.getlist("status") if request.method == "POST" else returns["sta"]
-        tenure = request.form.getlist("tenure") if request.method == "POST" else returns["ten"]
-        if savename and savename != "" and savename != jname:
-            store = {}
-            store["act"] = actype
-            store["agd"] = agentdetails
-            store["arr"] = arrears
-            store["lld"] = landlord
-            store["prd"] = prdelivery
-            store["pop"] = propaddr
-            store["rcd"] = rentcode
-            store["rpa"] = rentpa
-            store["rpd"] = rentperiods
-            store["sal"] = salegrade
-            store["soc"] = source
-            store["sta"] = status
-            store["tna"] = tenantname
-            store["ten"] = tenure
-            jstore = Jstore()
-            jstore.name = savename
-            jstore.content = json.dumps(store)
-            db.session.add(jstore)
-            db.session.commit()
-        if actype != actypes and actype != "any":
-            queriesfilter.append(Typeactype.actypedet.in_(actype))
-        if arrears and arrears != "any":
-            queriesfilter.append(text("Rent.arrears {}".format(arrears)))
-        if landlord != landlords and landlord != "any":
-            queriesfilter.append(Landlord.name.in_(landlord))
-        if prdelivery != prdeliveries and prdelivery != "any":
-            queriesfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
-        if rentpa and rentpa != "any":
-            queriesfilter.append(text("Rent.rentpa {}".format(rentpa)))
-        if rentperiods and rentperiods != "any":
-            queriesfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
-        if salegrade != salegrades and salegrade != "any":
-            queriesfilter.append(Typesalegrade.salegradedet.in_(salegrade))
-        if status != statuses and status != "any":
-            queriesfilter.append(Typestatus.statusdet.in_(status))
-        if tenure != tenures and tenure != "any":
-            queriesfilter.append(Typetenure.tenuredet.in_(tenure))
-    else:
-        runsize = 100
-    qrentobjs = getqrentobjs(queriesfilter, runsize)
-    if name == "basic":
-        return qrentobjs, agentdetails, propaddr, rentcode, source, tenantname
-    else:
-        return qrentobjs, actype, agentdetails, arrears, enddate, landlord, prdelivery, propaddr, rentcode, \
-           rentpa, rentperiods, runsize, salegrade, savename, source, status, tenantname, tenure
-
-
 def getrental(id):
-    # This method returns a "rental" object
-    # information about a rental
-    # plus all the list values to offer for various comboboxes
-    # all of this is to be shown in rentalpage.html
-    # that allows either editing etc. of an existing rental (whose `id` is specified)
-    # (in which case we fetch the rent info to edit)
-    # or it allows creation of a new rental (signified by id==0)
-    # (in which case for the rental info we have to "invent" an object
-    # with the same attributes as would have been fetched from the database
-    # but with "blanks", or default values, as desired for creating a new rental
-    # --- seems like Flask is happy for it not even to have the fields which will be referenced
-    # so just put in any defaults desired)
+    # This method returns "rental"; information about a rental and the list values for various comboboxes,
+    # all to be shown in rentalpage.html, allowing editing an existing rental (for which info is fetched via Rental.id
+    # or creation of a new rent (signified by id==0), in which case we have to "invent" an object with the same
+    # attributes as would have been fetched from the database but with "blanks", or default values, as desired for
+    # creating a new rental; --- seems like Flask is happy for it not even to have the fields which will be
+    # referenced, so just put in any defaults desired)
     if id > 0:
         # existing rental
         rental = \
@@ -498,19 +366,181 @@ def getrentalstatement():
     return rentalstatement
 
 
+def getrentobjects(action, name):
+    jname = name
+    agentdetails = request.form.get("agentdetails") or ""
+    propaddr = request.form.get("propaddr") or ""
+    rentcode = request.form.get("rentcode") or ""
+    source = request.form.get("source") or ""
+    tenantname = request.form.get("tenantname") or ""
+    enddate = request.form.get("enddate") or date.today() + relativedelta(days=35)
+    runsize = request.form.get("runsize") or 300
+    qfilterbasic = getqfilterbasic(action, agentdetails, propaddr, rentcode, source, tenantname)
+    if action == "basic" or action == "external":
+        rentprops = getrentobjs(action, qfilterbasic, runsize)
+        return agentdetails, propaddr, rentcode, source, tenantname, rentprops
+    else:
+        actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
+        if request.method == "POST":
+            jname = request.form.get("jname")
+            actype = request.form.getlist("actype")
+            arrears = request.form.get("arrears")
+            landlord = request.form.getlist("landlord")
+            prdelivery = request.form.getlist("prdelivery")
+            rentpa = request.form.get("rentpa")
+            rentperiods = request.form.get("rentperiods")
+            salegrade = request.form.getlist("salegrade")
+            status = request.form.getlist("status")
+            tenure = request.form.getlist("tenure")
+        else:
+            returns = Jstore.query.with_entities(Jstore.content).filter(Jstore.name == jname)[0][0]
+            print(returns)
+            returns = json.loads(returns)
+            agentdetails = returns["agd"]
+            actype = returns["act"]
+            arrears = returns["arr"]
+            landlord = returns["lld"]
+            prdelivery = returns["prd"]
+            propaddr = returns["pop"]
+            rentcode = returns["rcd"]
+            rentpa = returns["rpa"]
+            rentperiods = returns["rpd"]
+            salegrade = returns["sal"]
+            status = returns["sta"]
+            source = returns["soc"]
+            tenantname = returns["tna"]
+            tenure = returns["ten"]
+        qfilter = getqfilterbasic(action, agentdetails, propaddr, rentcode, source, tenantname)
+        if actype and actype != actypes and actype != "":
+            qfilter.append(Typeactype.actypedet.in_(actype))
+        if arrears and arrears != "":
+            qfilter.append(text("Rent.arrears {}".format(arrears)))
+        if landlord and landlord != landlords and landlord != "":
+            qfilter.append(Landlord.name.in_(landlord))
+        if prdelivery and prdelivery != prdeliveries and prdelivery != "":
+            qfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
+        if rentpa and rentpa != "":
+            qfilter.append(text("Rent.rentpa {}".format(rentpa)))
+        if rentperiods and rentperiods != "":
+            qfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
+        if salegrade and salegrade != salegrades and salegrade != "":
+            qfilter.append(Typesalegrade.salegradedet.in_(salegrade))
+        if status and status != statuses and status != "":
+            qfilter.append(Typestatus.statusdet.in_(status))
+        if tenure and tenure != tenures and tenure != "":
+            qfilter.append(Typetenure.tenuredet.in_(tenure))
+        if action == "save":
+            store = {}
+            store["act"] = actype
+            store["agd"] = agentdetails
+            store["arr"] = arrears
+            store["lld"] = landlord
+            store["prd"] = prdelivery
+            store["pop"] = propaddr
+            store["rcd"] = rentcode
+            store["rpa"] = rentpa
+            store["rpd"] = rentperiods
+            store["sal"] = salegrade
+            store["soc"] = source
+            store["sta"] = status
+            store["tna"] = tenantname
+            store["ten"] = tenure
+            jstore = Jstore()
+            jstore.name = jname
+            jstore.content = json.dumps(store)
+            db.session.add(jstore)
+            db.session.commit()
+        rentprops = getrentobjs(action, qfilter, runsize)
+
+        return actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures, \
+               actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, \
+               rentperiods, runsize, salegrade, source, status, tenantname, tenure, rentprops
+
+
+def getqfilterbasic(action, agentdetails, propaddr, rentcode, source, tenantname):
+    qfilterbasic = []
+    if agentdetails and agentdetails != "":
+        if action == "external":
+            qfilterbasic.append(Extrent.agentdetails.ilike('%{}%'.format(agentdetails)))
+        else:
+            qfilterbasic.append(Agent.agdetails.ilike('%{}%'.format(agentdetails)))
+    if propaddr and propaddr != "":
+        if action == "external":
+            qfilterbasic.append(Extrent.propaddr.ilike('%{}%'.format(propaddr)))
+        else:
+            qfilterbasic.append(Property.propaddr.ilike('%{}%'.format(propaddr)))
+    if rentcode and rentcode != "":
+        if action == "external":
+            qfilterbasic.append(Extrent.rentcode.startswith([rentcode]))
+        else:
+            qfilterbasic.append(Rent.rentcode.startswith([rentcode]))
+    if source and source != "":
+        if action == "external":
+            qfilterbasic.append(Extrent.source.ilike('%{}%'.format(source)))
+        else:
+            qfilterbasic.append(Rent.source.ilike('%{}%'.format(source)))
+    if tenantname and tenantname != "":
+        if action == "external":
+            qfilterbasic.append(Extrent.tenantname.ilike('%{}%'.format(tenantname)))
+        else:
+            qfilterbasic.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
+
+    return qfilterbasic
+
+
+def getrentobjs(action, qfilter, runsize):
+    if action == "basic":
+        rentobjs = \
+            Property.query \
+                .join(Rent) \
+                .outerjoin(Agent) \
+                .with_entities(Rent.id, Agent.agdetails, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
+                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                               Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
+                .filter(*qfilter) \
+                .group_by(Rent.id) \
+                .limit(runsize).all()
+    elif action == "external":
+        rentobjs = \
+            Extrent.query \
+            .join(Extmanager) \
+            .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
+                           Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
+                           Extmanager.codename, Extrent.agentdetails) \
+            .filter(*qfilter) \
+            .limit(runsize).all()
+    else:
+        rentobjs = \
+            Property.query \
+                .join(Rent) \
+                .join(Landlord) \
+                .outerjoin(Agent) \
+                .outerjoin(Charge) \
+                .join(Typeactype) \
+                .join(Typeprdelivery) \
+                .join(Typestatus) \
+                .join(Typesalegrade) \
+                .join(Typetenure) \
+                .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
+                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                               Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                               Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
+                               func.sum(Charge.chargebalance).label('totcharge'),
+                               Typetenure.tenuredet) \
+                .filter(*qfilter) \
+                .group_by(Rent.id) \
+                .limit(runsize).all()
+
+    return rentobjs
+
+
 def getrentobj(id):
-    # This method returns a "rentobj" object
-    # information about a rent, plus its related property/agent/landlord stuff
-    # plus all the list values to offer for various comboboxes
-    # all of this is to be shown in rentobjpage.html
-    # that allows either editing etc. of an existing rent (whose `id` is specified)
-    # (in which case we fetch the rent info to edit)
-    # or it allows creation of a new rent (signified by id==0)
-    # (in which case for the rent info we have to "invent" an object
-    # with the same attributes as would have been fetched from the database
-    # but with "blanks", or default values, as desired for creating a new rent
-    # --- seems like Flask is happy for it not even to have the fields which will be referenced
-    # so just put in any defaults desired)
+    # This method returns "rentobj"; information about a rent, its related property/agent/landlord stuff, plus
+    # the list values for various comboboxes, all to be shown in rentobjpage.html, allowing editing an existing
+    # rent (for which rent info is fetched via Rent.id or creation of a new rent (signified by id==0), in which
+    # case we have to "invent" an object with the same attributes as would have been fetched from the database
+    # but with "blanks", or default values, as desired for creating a new rent; --- seems like Flask is happy
+    # for it not even to have the fields which will be referenced, so just put in any defaults desired)
     if id > 0:
         # existing rent
         rentobj = \
@@ -526,6 +556,7 @@ def getrentobj(id):
                 .join(Typestatus) \
                 .join(Typetenure) \
                 .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
                                Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
                                Agent.agdetails, Landlord.name, Typeactype.actypedet,
                                Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
