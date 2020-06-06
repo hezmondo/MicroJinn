@@ -67,16 +67,39 @@ def filterincome(rcd, pay, typ):
                     Income.payer.ilike('%{}%'.format(pay)),
                     Chargetype.chargedesc.ilike('%{}%'.format(typ))) \
             .limit(50).all()
+
     return income
 
 
-def filterlandlords():
-    landlords = \
-        Landlord.query.join(Manager) \
-            .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                           Manager.name.label("manager")) \
+def getaccount(id):
+    if id > 0:
+        # existing account
+        account = \
+            Typebankacc.query \
+                .with_entities(Typebankacc.id, Typebankacc.bankname, Typebankacc.accname, Typebankacc.sortcode,
+                               Typebankacc.accnum, Typebankacc.accdesc) \
+                .filter(Typebankacc.id == id) \
+                .one_or_none()
+        if account is None:
+            flash('Invalid account')
+            return redirect(url_for('auth.login'))
+    else:
+        # new account
+        account = {
+            'id': 0
+        }
+
+    return account
+
+
+def getaccounts():
+    accounts = \
+        Typebankacc.query \
+            .with_entities(Typebankacc.id, Typebankacc.bankname, Typebankacc.accname, Typebankacc.sortcode,
+                           Typebankacc.accnum, Typebankacc.accdesc) \
             .all()
-    return landlords
+
+    return accounts
 
 
 def getagent(id):
@@ -213,6 +236,16 @@ def getlandlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
+def getlandlords():
+    landlords = \
+        Landlord.query.join(Manager) \
+            .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
+                           Manager.name.label("manager")) \
+            .all()
+
+    return landlords
+
+
 def getloan(id):
     # This method returns a "loan" object
     # information about a loan
@@ -299,12 +332,17 @@ def getproperty(id):
 def getqueryoptions():
     # return options for each multiple choice control in home page and queries page
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+    actypes.insert(0, "all actypes")
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    landlords.insert(0, "all landlords")
     floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
     prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
     salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+    salegrades.insert(0, "all salegrades")
     statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    statuses.insert(0, "all statuses")
     tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    tenures.insert(0, "all tenures")
     options = ("Include", "Exclude", "Only")
 
     return actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries
@@ -411,11 +449,11 @@ def getrentobjects(action, name):
             tenantname = returns["tna"]
             tenure = returns["ten"]
         qfilter = getqfilterbasic(action, agentdetails, propaddr, rentcode, source, tenantname)
-        if actype and actype != actypes and actype != "":
+        if actype and actype != actypes and actype[0] != "all actypes":
             qfilter.append(Typeactype.actypedet.in_(actype))
         if arrears and arrears != "":
             qfilter.append(text("Rent.arrears {}".format(arrears)))
-        if landlord and landlord != landlords and landlord != "":
+        if landlord and landlord != landlords and landlord[0] != "all landlords":
             qfilter.append(Landlord.name.in_(landlord))
         if prdelivery and prdelivery != prdeliveries and prdelivery != "":
             qfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
@@ -423,11 +461,11 @@ def getrentobjects(action, name):
             qfilter.append(text("Rent.rentpa {}".format(rentpa)))
         if rentperiods and rentperiods != "":
             qfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
-        if salegrade and salegrade != salegrades and salegrade != "":
+        if salegrade and salegrade != salegrades and salegrade[0] != "all salegrades":
             qfilter.append(Typesalegrade.salegradedet.in_(salegrade))
-        if status and status != statuses and status != "":
+        if status and status != statuses and status[0] != "all statuses":
             qfilter.append(Typestatus.statusdet.in_(status))
-        if tenure and tenure != tenures and tenure != "":
+        if tenure and tenure != tenures and tenure[0] != "all tenures":
             qfilter.append(Typetenure.tenuredet.in_(tenure))
         if action == "save":
             store = {}
@@ -445,10 +483,19 @@ def getrentobjects(action, name):
             store["sta"] = status
             store["tna"] = tenantname
             store["ten"] = tenure
-            jstore = Jstore()
-            jstore.name = jname
-            jstore.content = json.dumps(store)
-            db.session.add(jstore)
+            j_id = \
+                Jstore.query.with_entities(Jstore.id).filter \
+                    (Jstore.name == jname).one()[0]
+            if j_id:
+                jstore = Jstore.query.get(j_id)
+                jstore.name = jname
+                jstore.content = json.dumps(store)
+                db.session.commit()
+            else:
+                jstore = Jstore()
+                jstore.name = jname
+                jstore.content = json.dumps(store)
+                db.session.add(jstore)
             db.session.commit()
         rentprops = getrentobjs(action, qfilter, runsize)
 

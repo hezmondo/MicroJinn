@@ -33,7 +33,7 @@
             <td style="width: 12.00%"> {{ item.rentpa }}</td>
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
             <td style="width: 12.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}?action=view">View</a></td>
+            <td style="width: 10.00%"><a href="/rentalpage/{{ item.id }}?action=edit">View</a></td>
         </tr>
         {% endfor %}
         <tr>

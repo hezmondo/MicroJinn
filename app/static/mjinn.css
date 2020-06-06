@@ -28,3 +28,18 @@
   background-color: #159e34 !important;
   border-color: #2f080e;
 }
+.mt-100 {
+    margin-top: 100px
+}
+
+body {
+    background: #CDDBD9;
+    background: -webkit-linear-gradient(to right, #0083B0, #CDDBD9);
+    background: linear-gradient(to right, #a2bbc3, #CDDBD9);
+    color: #514B64;
+    min-height: 100vh
+}
+select:-internal-list-box option:checked {
+    background-color: rgb(206, 227, 227) !important;
+    color: rgb(16, 16, 16) !important;
+}

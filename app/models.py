@@ -234,6 +234,29 @@ class Manager(db.Model):
         return '<Manager {}>'.format(self.name)
 
         
+class Money_category(db.Model):
+    __tablename__ = 'money_category'
+
+    id = db.Column(db.Integer, primary_key=True)
+    cat_name = db.Column(db.String(60))
+
+    moneytrans_moneycat = db.relationship('Money_transaction', backref='money_category', lazy='dynamic')
+
+
+class Money_transaction(db.Model):
+    __tablename__ = 'Money_transaction'
+
+    id = db.Column(db.Integer, primary_key=True)
+    num = db.Column(db.Integer)
+    date = db.Column(db.Date)
+    payer = db.Column(db.String(60))
+    amount = db.Column(db.Numeric(8, 2))
+    memo = db.Column(db.String(90))
+    cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
+    cleared = db.Column(db.Integer)
+    acc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+
+
 class Property(db.Model):
     __tablename__ = 'property'
 
@@ -382,6 +405,7 @@ class Typebankacc(db.Model):
     accdesc = db.Column(db.String(30))
 
     income_typebankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
+    money_trans_typebankacc = db.relationship('Money_transaction', backref='typebankacc', lazy='dynamic')
     landlord_typebankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')
 
 

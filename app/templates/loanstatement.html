@@ -38,12 +38,12 @@
         {% endfor %}
         <tr>
         </tr>
-        {% for item in checksums %}
-        <tr id="{{ item.id }}">
+        {% for checksum in checksums %}
+        <tr id="{{ checksum.id }}">
             <td style="width: 10.00%"></td>
             <td style="width: 10.00%"></td>
-            <td style="width: 25.00%"> {{ item.memo }}</td>
-            <td style="width: 10.00%"> {{ item.amount }}</td>
+            <td style="width: 25.00%"> {{ checksum.memo }}</td>
+            <td style="width: 10.00%"> {{ checksum.amount }}</td>
             <td style="width: 10.00%"></td>
             <td style="width: 10.00%"></td>
             <td style="width: 15.00%"></td>

@@ -6,6 +6,23 @@ from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, 
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
+def postaccount(id, action):
+    if action == "edit":
+        account = Typebankacc.query.get(id)
+    else:
+        account = Typebankacc()
+    account.bankname = request.form["bankname"]
+    account.accname = request.form["accname"]
+    account.sortcode = request.form["sortcode"]
+    account.accnum = request.form["accnum"]
+    account.accdesc = request.form["accdesc"]
+    db.session.add(account)
+    db.session.commit()
+    id = account.id
+
+    return redirect('/account/{}'.format(id))
+
+
 def postagent(id):
     if id and id > 0 :
         agent = Agent.query.get(id)
@@ -116,12 +133,9 @@ def postlandlord(id, action):
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
             (Manager.name == manager).one()[0]
-    if not action == "edit":
-        db.session.add(landlord)
-        db.session.commit()
-        id = landlord.id
-    else:
-        db.session.commit()
+    db.session.add(landlord)
+    db.session.commit()
+    id = landlord.id
 
     return redirect('/landlordpage/{}'.format(id))
 
@@ -160,8 +174,8 @@ def postproperty(id):
     return
 
 
-def postrental(id):
-    if id > 0:
+def postrental(id, action):
+    if action == "edit":
         rental = Rental.query.get(id)
     else:
         rental = Rental()
@@ -180,8 +194,11 @@ def postrental(id):
     advarr = request.form["advarr"]
     rental.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    db.session.add(rental)
     db.session.commit()
-    return
+    id = rental.id
+
+    return redirect('/rentalpage/{}'.format(id))
 
 
 def postrentobj(id):

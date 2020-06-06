@@ -7,23 +7,23 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" placeholder="any" value="{{ rentcode }}">
+            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" placeholder="any" value="{{ tenantname }}">
+            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ tenantname }}">
         </div>
         <div class="col-md-2">
             <label for="propaddr">Property details:</label>
-            <input type="text" class="form-control" name="propaddr" placeholder="any" value="{{ propaddr }}">
+            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" placeholder="any" value="{{ source }}">
+            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ source }}">
         </div>
         <div class="col-md-2">
             <label for="agentdetails">Agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" placeholder="any" value="{{ agentdetails }}">
+            <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ agentdetails }}">
         </div>
         <div class="col-md-2">
             <label for="count">Count:</label>
@@ -42,37 +42,37 @@
         </div>
         <div class="col-md-2">
             <label for="rentpa">Rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" placeholder="example: > 75" value="{{ rentpa }}">
+            <input type="text" class="form-control" name="rentpa" data-toggle="tooltip" title="Example = 100" value="{{ rentpa }}">
         </div>
         <div class="col-md-2">
             <label for="arrears">Rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" placeholder="example: = 125" value="{{ arrears }}">
+            <input type="text" class="form-control" name="arrears" data-toggle="tooltip" title="Example < 100" value="{{ arrears }}">
         </div>
         <div class="col-md-2">
             <label for="rentperiods">Rent periods owing:</label>
-            <input type="text" class="form-control" name="rentperiods" placeholder="example: > 5" value="{{ rentperiods }}">
+            <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip" title="Example > 5" value="{{ rentperiods }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">Landlord:</label>
-            {{ widgets.multiselect(name="landlord", items=landlords, items_selected=landlord or landlords) }}
+            {{ widgets.multiselect_as_select(name="landlord", items=landlords, items_selected=landlord or landlords) }}
         </div>
         <div class="col-md-2">
             <label for="tenure">Tenure:</label>
-            {{ widgets.multiselect(name="tenure", items=tenures, items_selected=tenure or tenures) }}
+            {{ widgets.multiselect_as_select(name="tenure", items=tenures, items_selected=tenure or tenures) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">Sale grade:</label>
-            {{ widgets.multiselect(name="salegrade", items=salegrades, items_selected=salegrade or salegrades) }}
+            {{ widgets.multiselect_as_select(name="salegrade", items=salegrades, items_selected=salegrade or salegrades) }}
         </div>
         <div class="col-md-2">
             <label for="status">Status:</label>
-            {{ widgets.multiselect(name="status", items=statuses, items_selected=status or statuses) }}
+            {{ widgets.multiselect_as_select(name="status", items=statuses, items_selected=status or statuses) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">Actype:</label>
-            {{ widgets.multiselect(name="actype", items=actypes, items_selected=actype or actypes) }}
+            {{ widgets.multiselect_as_select(name="actype", items=actypes, items_selected=actype or actypes) }}
         </div>
     </div>
     <div class="form-group row">
@@ -92,10 +92,19 @@
             <label for="forsale">For sale:</label>
             {{ widgets.combobox(name="forsale", items=options, item_selected=options[0]) }}
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="prdelivery">PR delivery:</label>
             {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery or prdeliveries) }}
         </div>
+    </div>
+<!--    <div class="form-group row">-->
+<!--        <div class="col-md-4">-->
+<!--            <select class="selectpicker" multiple data-live-search="true">-->
+<!--              <option>Mustard</option>-->
+<!--              <option>Ketchup</option>-->
+<!--              <option>Relish</option>-->
+<!--            </select>-->
+<!--        </div>-->
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
