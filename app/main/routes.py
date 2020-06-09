@@ -43,7 +43,7 @@ def agents():
 
 
 @bp.route('/agentpage/<int:id>', methods=["GET", "POST"])
-@login_required
+# @login_required
 def agentpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -73,7 +73,7 @@ def charges():
 
 
 @bp.route('/chargepage/<int:id>', methods=["GET", "POST"])
-@login_required
+# @login_required
 def chargepage(id):
     if request.method == "POST":
         postcharge(id)
@@ -85,7 +85,7 @@ def chargepage(id):
 
 
 @bp.route('/deleteitem/<int:id>')
-@login_required
+# @login_required
 def deleteitem(id):
     item = request.args.get('item', "view", type=str)
     if item == "agent":
@@ -126,7 +126,7 @@ def deleteitem(id):
 
 
 @bp.route('/emailaccpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def emailaccpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -182,7 +182,7 @@ def income():
 
 
 @bp.route('/incomeallocpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def incomeallocpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -204,7 +204,7 @@ def incomeallocpage(id):
 
 
 @bp.route('/incomeformpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def incomeformpage(id):
     action = request.args.get('action', "view", type=str)
     incomex = Income.query.get(id)
@@ -238,7 +238,7 @@ def incomeformpage(id):
 
 
 @bp.route('/incomepage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def incomepage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -264,7 +264,7 @@ def index():
 
 
 @bp.route('/landlordpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def landlordpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -297,7 +297,7 @@ def loadquery():
 
 
 @bp.route('/loanpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def loanpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -318,7 +318,7 @@ def loans():
 
 
 @bp.route('/loanstatementpage/<int:id>', methods=["GET", "POST"])
-@login_required
+# @login_required
 def loanstatementpage(id):
     if request.method == "POST":
         pass
@@ -336,9 +336,9 @@ def loanstatementpage(id):
 
 @bp.route('/money', methods=['GET', 'POST'])
 def money():
-    accounts = getaccounts()
+    accounts, accsums = getaccounts()
 
-    return render_template('money.html', title='Money', accounts=accounts)
+    return render_template('money.html', title='Money', accounts=accounts, accsums=accsums)
 
 
 # @bp.route('/money_edit', methods=['GET', 'POST'])
@@ -356,7 +356,7 @@ def money():
 
 
 @bp.route('/payrequests', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def payrequests():
     payrequests = None
 
@@ -364,7 +364,7 @@ def payrequests():
 
 
 @bp.route('/properties', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def properties():
     properties = None
 
@@ -372,7 +372,7 @@ def properties():
 
 
 @bp.route('/propertypage/<int:id>', methods=["GET", "POST"])
-@login_required
+# @login_required
 def propertypage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
@@ -423,7 +423,7 @@ def rentalpage(id):
 
 
 @bp.route('/rentalstatementpage/<int:id>', methods=["GET", "POST"])
-@login_required
+# @login_required
 def rentalstatementpage(id):
     if request.method == "POST":
         pass
@@ -438,7 +438,7 @@ def rentalstatementpage(id):
 
 
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])
-@login_required
+# @login_required
 def rentobjpage(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":

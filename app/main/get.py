@@ -96,10 +96,14 @@ def getaccounts():
     accounts = \
         Typebankacc.query \
             .with_entities(Typebankacc.id, Typebankacc.bankname, Typebankacc.accname, Typebankacc.sortcode,
-                           Typebankacc.accnum, Typebankacc.accdesc) \
+                           Typebankacc.accnum, Typebankacc.accdesc,
+                           func.mjinn.acc_balance(Typebankacc.id, 1, date.today()).label('cbalance'),
+                           func.mjinn.acc_balance(Typebankacc.id, 0, date.today()).label('ubalance')) \
             .all()
+    accsums = Typebankacc.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
+                        func.mjinn.acc_total(0).label('uncleared')).filter().first()
 
-    return accounts
+    return accounts, accsums
 
 
 def getagent(id):

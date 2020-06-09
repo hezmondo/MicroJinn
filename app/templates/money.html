@@ -14,8 +14,7 @@
         <thead>
         <tr>
             <th style="width: 10.00%">Account id</th>
-            <th style="width: 20.00%">Account name</th>
-            <th style="width: 30.00%">Account details</th>
+            <th style="width: 50.00%">Account description</th>
             <th style="width: 15.00%">Cleared balance</th>
             <th style="width: 15.00%">Uncleared balance</th>
             <th style="width: 10.00%">Action</th>
@@ -25,9 +24,8 @@
         {% for item in accounts %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
-            <td style="width: 20.00%">{{ item.accname }}</td>
-            <td style="width: 30.00%"> {{ item.accdesc }}</td>
-            <td style="width: 15.00%"> {{ item.balance }}</td>
+            <td style="width: 50.00%"> {{ item.accdesc }}</td>
+            <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
             <td style="width: 10.00%"><a href="/money_filter/{{ item.id }}">View</a></td>
         </tr>
@@ -35,11 +33,10 @@
         <tr>
         </tr>
         <tr>
-            <td style="width: 10.00%"></td>
-            <td style="width: 20.00%">Total for all accounts</td>
-            <td style="width: 30.00%"></td>
-            <td style="width: 15.00%"> {{ balancesum }}</td>
-            <td style="width: 15.00%"> {{ ubalancesum }}</td>
+            <td style="width: 10%"></td>
+            <td style="width: 50.00%">Total for all accounts</td>
+            <td style="width: 15.00%"> {{ accsums.cleared }}</td>
+            <td style="width: 15.00%"> {{ accsums.uncleared }}</td>
             <td style="width: 10.00%"></td>
         </tr>
         </tbody>
