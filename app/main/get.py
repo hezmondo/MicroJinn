@@ -5,7 +5,8 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
-    Jstore, Landlord, Loan, Loan_statement, Manager, Property, Rent, Rental, Rental_statement, Typeactype, \
+    Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_transaction, \
+    Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
     Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
@@ -20,20 +21,6 @@ def filteragents(agd, age, agn):
             .all()
 
     return agents
-
-def filtercharges(rcd, cdt):
-    charges = \
-        Charge.query \
-            .join(Rent) \
-            .join(Chargetype) \
-            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
-                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(Rent.rentcode.startswith([rcd]),
-                    Charge.chargedetails.ilike('%{}%'.format(cdt))) \
-            .all()
-
-    return charges
-
 
 def filteremailaccs():
     emailaccs = \
@@ -61,7 +48,7 @@ def filterincome(rcd, pay, typ):
             .join(Chargetype) \
             .join(Typebankacc) \
             .join(Typepayment) \
-            .with_entities(Income.id, Income.paydate, Incomealloc.rentcode, Income.total, Income.payer,
+            .with_entities(Income.id, Income.date, Incomealloc.rentcode, Income.amount, Income.payer,
                            Typebankacc.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
             .filter(Incomealloc.rentcode.startswith([rcd]),
                     Income.payer.ilike('%{}%'.format(pay)),
@@ -100,10 +87,35 @@ def getaccounts():
                            func.mjinn.acc_balance(Typebankacc.id, 1, date.today()).label('cbalance'),
                            func.mjinn.acc_balance(Typebankacc.id, 0, date.today()).label('ubalance')) \
             .all()
+
     accsums = Typebankacc.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
                         func.mjinn.acc_total(0).label('uncleared')).filter().first()
 
     return accounts, accsums
+
+
+def get_acctrans(id):
+    acctrans = \
+        Money_transaction.query \
+            .join(Typebankacc) \
+            .join(Money_category) \
+            .with_entities(Money_transaction.id, Money_transaction.num, Money_transaction.date,
+                           Money_transaction.payer, Money_transaction.amount, Money_transaction.memo,
+                           Typebankacc.accdesc, Money_category.cat_name, Money_transaction.cleared) \
+            .filter(Typebankacc.id == id) \
+            .order_by(desc(Money_transaction.date)).limit(100).all()
+
+    accsums = Money_transaction.query.with_entities(func.mjinn.acc_balance(Typebankacc.id, 1,
+                       date.today()).label('cbalance'), func.mjinn.acc_balance(Typebankacc.id,
+                               0, date.today()).label('ubalance')) \
+            .filter().first()
+    accs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
+    accs.insert(0, "all accounts")
+    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
+    cats.insert(0, "all categories")
+    cleareds = ["Cleared", "Uncleared"]
+
+    return acctrans, accs, accsums, cats, cleareds
 
 
 def getagent(id):
@@ -136,6 +148,20 @@ def getcharge(id):
             .one_or_none()
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
     return charge, chargedescs
+
+
+def get_charges(rcd, cdt):
+    charges = \
+        Charge.query \
+            .join(Rent) \
+            .join(Chargetype) \
+            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
+                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+            .filter(Rent.rentcode.startswith([rcd]),
+                    Charge.chargedetails.ilike('%{}%'.format(cdt))) \
+            .all()
+
+    return charges
 
 
 def getemailacc(id):
@@ -185,7 +211,7 @@ def getincome(id):
         income = \
             Income.query.join(Typebankacc) \
                 .join(Typepayment) \
-                .with_entities(Income.id, Income.paydate, Income.total, Income.payer,
+                .with_entities(Income.id, Income.date, Income.amount, Income.payer,
                                Typepayment.paytypedet, Typebankacc.accdesc) \
                 .filter(Income.id == id) \
                 .one_or_none()

@@ -14,22 +14,20 @@
             <input type="text" class="form-control" name="memo" value="">
         </div>
         <div class="col-md-2">
-            <label for="category">category:</label>
-            {{ widgets.combobox(name="category", items=cats, item_selected=category) }}
+            <label for="category">Category:</label>
+            {{ widgets.combobox(name="category", items=cats, item_selected=cats[0]) }}
         </div>
         <div class="col-md-2">
             <label for="account">Account:</label>
-            {{ widgets.combobox(name="account", items=accounts, item_selected=account) }}
+            {{ widgets.combobox(name="account", items=accs, item_selected=accs[0]) }}
         </div>
         <div class="col-md-2">
             <label for="cleared">cleared:</label>
-            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=transaction.cleared) }}
+            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=cleareds[0]) }}
         </div>
-    </div>
-    <div class="form-group row">
         <div class="col-md-2">
             <label for="balance">Balance:</label>
-            <input type="text" class="form-control" name="balance" value="{{ balance }}">
+            <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
         </div>
     </div>
 </form>
@@ -44,31 +42,29 @@
     <table class="table" id="rentprops">
         <thead>
         <tr>
-            <th style="width: 8.00%">id</th>
+            <th style="width: 7.00%">id</th>
             <th style="width: 8.00%">num</th>
-            <th style="width: 8.00%">Date</th>
-            <th style="width: 10.00%">Payee</th>
-            <th style="width: 8.00%">Amount</th>
+            <th style="width: 11.00%">Date</th>
+            <th style="width: 15.00%">Payer</th>
+            <th style="width: 9.00%">Amount</th>
             <th style="width: 15.00%">Memo</th>
-            <th style="width: 8.00%">Cleared</th>
-            <th style="width: 15.00%">Account</th>
+            <th style="width: 14.00%">Account</th>
             <th style="width: 15.00%">Category</th>
-            <th style="width: 5.00%"></th>
+            <th style="width: 6.00%"></th>
         </tr>
         </thead>
         <tbody>
-        {% for item in rentprops %}
+        {% for item in acctrans %}
         <tr id="{{ item.id }}">
-            <td style="width: 8.00%">{{ item.id }}</td>
+            <td style="width: 7.00%">{{ item.id }}</td>
             <td style="width: 8.00%"> {{ item.num }}</td>
-            <td style="width: 8.00%"> {{ item.date }}</td>
-            <td style="width: 10.00%"> {{ item.payee }}</td>
-            <td style="width: 8.00%"> {{ item.amount }}</td>
+            <td style="width: 11.00%"> {{ item.date.strftime('%d-%b-%Y') }}</td>
+            <td style="width: 15.00%"> {{ item.payer }}</td>
+            <td style="width: 9.00%"> {{ item.amount }}</td>
             <td style="width: 15.00%">{{ item.memo }}</td>
-            <td style="width: 8.00%"> {{ item.cleared }}</td>
-            <td style="width: 15.00%"> {{ item.account }}</td>
-            <td style="width: 15.00%"> {{ item.category }}</td>
-            <td style="width: 5.00%"><a href="/money_edit/{{ item.id }}?action=edit">View/edit</a></td>
+            <td style="width: 14.00%"> {{ item.accdesc }}</td>
+            <td style="width: 15.00%"> {{ item.cat_name }}</td>
+            <td style="width: 6.00%"><a href="/money_edit/{{ item.id }}?action=edit">View/edit</a></td>
         </tr>
         {% endfor %}
         </tbody>

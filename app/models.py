@@ -120,11 +120,11 @@ class Income(db.Model):
     __tablename__ = 'income'
 
     id = db.Column(db.Integer, primary_key=True)
-    paydate = db.Column(db.Date)
-    total = db.Column(db.Numeric(8,2))
+    date = db.Column(db.Date)
     payer = db.Column(db.String(90))
-    typebankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
-    typepayment_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
+    amount = db.Column(db.Numeric(8,2))
+    paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
 
     incomealloc_income = db.relationship('Incomealloc', backref='income', lazy='dynamic')
 
@@ -240,7 +240,7 @@ class Money_category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cat_name = db.Column(db.String(60))
 
-    moneytrans_moneycat = db.relationship('Money_transaction', backref='money_category', lazy='dynamic')
+    moneytrans_cat = db.relationship('Money_transaction', backref='money_category', lazy='dynamic')
 
 
 class Money_transaction(db.Model):
@@ -254,7 +254,7 @@ class Money_transaction(db.Model):
     memo = db.Column(db.String(90))
     cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
     cleared = db.Column(db.Integer)
-    acc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
 
 
 class Property(db.Model):
@@ -404,9 +404,9 @@ class Typebankacc(db.Model):
     accnum = db.Column(db.String(15))
     accdesc = db.Column(db.String(30))
 
-    income_typebankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
-    money_trans_typebankacc = db.relationship('Money_transaction', backref='typebankacc', lazy='dynamic')
-    landlord_typebankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')
+    income_bankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
+    money_trans_bankacc = db.relationship('Money_transaction', backref='typebankacc', lazy='dynamic')
+    landlord_bankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')
 
 
 class Typedeed(db.Model):
@@ -455,7 +455,7 @@ class Typepayment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     paytypedet = db.Column(db.String(45))
 
-    income_typepayment = db.relationship('Income', backref='typepayment', lazy='dynamic')
+    income_paytype = db.relationship('Income', backref='typepayment', lazy='dynamic')
 
 
 class Typeprdelivery(db.Model):

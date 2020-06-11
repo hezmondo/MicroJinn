@@ -31,7 +31,12 @@
 .mt-100 {
     margin-top: 100px
 }
-
+table tr td {
+  padding: 20px;
+}
+.warning {
+  background: #76A0D3 !important;
+}
 body {
     background: #CDDBD9;
     background: -webkit-linear-gradient(to right, #0083B0, #CDDBD9);
