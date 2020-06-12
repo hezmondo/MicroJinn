@@ -102,13 +102,20 @@ def get_acctrans(id):
             .with_entities(Money_transaction.id, Money_transaction.num, Money_transaction.date,
                            Money_transaction.payer, Money_transaction.amount, Money_transaction.memo,
                            Typebankacc.accdesc, Money_category.cat_name, Money_transaction.cleared) \
-            .filter(Typebankacc.id == id) \
-            .order_by(desc(Money_transaction.date)).limit(100).all()
+            .filter(Typebankacc.id == id).union\
+            (Income.query \
+                    .join(Typebankacc) \
+                    .join(Incomealloc)
+                    .with_entities(Income.id, literal("0").label('num'), Income.date,
+                                   Income.payer, Income.amount, Incomealloc.rentcode,
+                                   Typebankacc.accdesc, literal("Jinn BACS income").label('cat_name'), literal("1").label('cleared')) \
+                    .filter(Typebankacc.id == id)).order_by(desc(Money_transaction.date), desc(Income.date)) \
+                    .limit(200)
 
-    accsums = Money_transaction.query.with_entities(func.mjinn.acc_balance(Typebankacc.id, 1,
-                       date.today()).label('cbalance'), func.mjinn.acc_balance(Typebankacc.id,
-                               0, date.today()).label('ubalance')) \
+    accsums = Money_transaction.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()) \
+                    .label('cbalance'), func.mjinn.acc_balance(Typebankacc.id, 0, date.today()).label('ubalance')) \
             .filter().first()
+
     accs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
     accs.insert(0, "all accounts")
     cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
