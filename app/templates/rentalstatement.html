@@ -22,7 +22,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rentalstatement %}
+        {% for item in rentalstatem %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 12.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
@@ -36,3 +36,4 @@
     </table>
 </div>
 {% endblock %}
+

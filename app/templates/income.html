@@ -1,25 +1,34 @@
 <!-- /templates/income.html  -->
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row">
-        <div class="col-md-4">
-            <input type="text" class="form-control" name="rentcode" placeholder="Rentcode">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
+            <label for="payer">Payer:</label>
             <input type="text" class="form-control" name="payer" placeholder="Payer">
         </div>
-        <div class="col-md-4">
-            <input type="text" class="form-control" name="type" placeholder="Income type">
+        <div class="col-md-2">
+            <label for="rentcode">Rentcode:</label>
+            <input type="text" class="form-control" name="rentcode" placeholder="Rentcode">
+        </div>
+        <div class="col-md-2">
+            <label for="accountdesc">Account:</label>
+            {{ widgets.combobox(name="accountdesc", items=bankaccs, item_selected=bankaccs[0]) }}
+        </div>
+        <div class="col-md-2">
+            <label for="paymtype">Payment type:</label>
+            {{ widgets.combobox(name="paymtype", items=paytypes, item_selected=paytypes[0]) }}
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-6">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-primary">Search</button>
         </div>
-        <div class="col-md-6">
-            <a href="/agents" class="btn btn-block btn-primary" role="button">Add income</a>
+        <div class="col-md-2">
+            <a href="/agents" class="btn btn-block btn-primary" role="button">Add income item</a>
         </div>
     </div>
 </form>
@@ -31,29 +40,28 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="income">
+    <table class="table" id="incomeitems">
         <thead>
         <tr>
-            <th style="width: 10.00%">Id</th>
             <th style="width: 10.00%">Date</th>
-            <th style="width: 10.00%">Rentcode</th>
-            <th style="width: 10.00%">Total</th>
             <th style="width: 15.00%">Payer</th>
+            <th style="width: 10.00%">Amount</th>
+            <th style="width: 10.00%">Rentcode</th>
             <th style="width: 20.00%">Bank account</th>
             <th style="width: 20.00%">Payment type</th>
+            <th style="width: 10.00%"></th>
         </tr>
         </thead>
         <tbody>
-        {% for item in income %}
+        {% for item in incomeitems %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.id }}</td>
-            <td style="width: 10.00%">{{ item.paydate }}</td>
-            <td style="width: 10.00%"> {{ item.rentcode }}</td>
-            <td style="width: 10.00%"> {{ item.total }}</td>
+            <td style="width: 10.00%">{{ item.date }}</td>
             <td style="width: 15.00%"> {{ item.payer }}</td>
+            <td style="width: 10.00%"> {{ item.amount }}</td>
+            <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 20.00%"> {{ item.accdesc }}</td>
-            <td style="width: 20.00%"> {{ item.paytypedet }}</td>
-            <td style="width: 5.00%"><a href="/incomepage/{{ item.id }}">View</a></td>
+            <td style="width: 20.00%"> {{ item.paytype }}</td>
+            <td style="width: 10.00%"><a href="/income_item/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

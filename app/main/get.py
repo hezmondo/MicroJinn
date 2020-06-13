@@ -5,9 +5,9 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
-    Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_transaction, \
+    Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
-    Typeadvarr, Typebankacc, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
+    Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
     Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -40,89 +40,6 @@ def filterheadrents():
         # headrents = getheadrents("", "COMP", "")
     headrents = None
     return headrents
-
-
-def filterincome(rcd, pay, typ):
-    income = \
-        Incomealloc.query.join(Income) \
-            .join(Chargetype) \
-            .join(Typebankacc) \
-            .join(Typepayment) \
-            .with_entities(Income.id, Income.date, Incomealloc.rentcode, Income.amount, Income.payer,
-                           Typebankacc.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
-            .filter(Incomealloc.rentcode.startswith([rcd]),
-                    Income.payer.ilike('%{}%'.format(pay)),
-                    Chargetype.chargedesc.ilike('%{}%'.format(typ))) \
-            .limit(50).all()
-
-    return income
-
-
-def getaccount(id):
-    if id > 0:
-        # existing account
-        account = \
-            Typebankacc.query \
-                .with_entities(Typebankacc.id, Typebankacc.bankname, Typebankacc.accname, Typebankacc.sortcode,
-                               Typebankacc.accnum, Typebankacc.accdesc) \
-                .filter(Typebankacc.id == id) \
-                .one_or_none()
-        if account is None:
-            flash('Invalid account')
-            return redirect(url_for('auth.login'))
-    else:
-        # new account
-        account = {
-            'id': 0
-        }
-
-    return account
-
-
-def getaccounts():
-    accounts = \
-        Typebankacc.query \
-            .with_entities(Typebankacc.id, Typebankacc.bankname, Typebankacc.accname, Typebankacc.sortcode,
-                           Typebankacc.accnum, Typebankacc.accdesc,
-                           func.mjinn.acc_balance(Typebankacc.id, 1, date.today()).label('cbalance'),
-                           func.mjinn.acc_balance(Typebankacc.id, 0, date.today()).label('ubalance')) \
-            .all()
-
-    accsums = Typebankacc.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
-                        func.mjinn.acc_total(0).label('uncleared')).filter().first()
-
-    return accounts, accsums
-
-
-def get_acctrans(id):
-    acctrans = \
-        Money_transaction.query \
-            .join(Typebankacc) \
-            .join(Money_category) \
-            .with_entities(Money_transaction.id, Money_transaction.num, Money_transaction.date,
-                           Money_transaction.payer, Money_transaction.amount, Money_transaction.memo,
-                           Typebankacc.accdesc, Money_category.cat_name, Money_transaction.cleared) \
-            .filter(Typebankacc.id == id).union\
-            (Income.query \
-                    .join(Typebankacc) \
-                    .join(Incomealloc)
-                    .with_entities(Income.id, literal("0").label('num'), Income.date,
-                                   Income.payer, Income.amount, Incomealloc.rentcode,
-                                   Typebankacc.accdesc, literal("Jinn BACS income").label('cat_name'), literal("1").label('cleared')) \
-                    .filter(Typebankacc.id == id)).order_by(desc(Money_transaction.date), desc(Income.date)) \
-                    .limit(200)
-
-    accsums = Money_transaction.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()) \
-                    .label('cbalance'), func.mjinn.acc_balance(Typebankacc.id, 0, date.today()).label('ubalance')) \
-            .filter().first()
-
-    accs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
-    accs.insert(0, "all accounts")
-    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
-    cats.insert(0, "all categories")
-    cleareds = ["Cleared", "Uncleared"]
-
-    return acctrans, accs, accsums, cats, cleareds
 
 
 def getagent(id):
@@ -216,10 +133,10 @@ def getincome(id):
     if id > 0:
         # existing income
         income = \
-            Income.query.join(Typebankacc) \
+            Income.query.join(Money_account) \
                 .join(Typepayment) \
                 .with_entities(Income.id, Income.date, Income.amount, Income.payer,
-                               Typepayment.paytypedet, Typebankacc.accdesc) \
+                               Typepayment.paytypedet, Money_account.accdesc) \
                 .filter(Income.id == id) \
                 .one_or_none()
         if income is None:
@@ -229,7 +146,7 @@ def getincome(id):
             Incomealloc.query.join(Landlord) \
                 .join(Chargetype) \
                 .with_entities(Incomealloc.id, Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode,
-                               Incomealloc.total, Landlord.name, Chargetype.chargedesc) \
+                               Incomealloc.amount, Landlord.name, Chargetype.chargedesc) \
                 .filter(Incomealloc.income_id == id) \
                 .all()
     else:
@@ -241,7 +158,7 @@ def getincome(id):
         incomeallocs = {
             'id': 0
         }
-    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     paytypedets = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
@@ -249,13 +166,51 @@ def getincome(id):
     return bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets
 
 
+def get_incomeitems():
+    qfilter = []
+    payer = request.form.get("payer") or ""
+    if payer and payer != "":
+        qfilter.append(Income.payer.ilike('%{}%'.format(payer)))
+    rentcode = request.form.get("rentcode") or ""
+    if rentcode and rentcode != "":
+        qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
+    accountdesc = request.form["accountdesc"] if request.method == "POST" else ""
+    paymtype = request.form["paymtype"] if request.method == "POST" else ""
+    if accountdesc and accountdesc != "" and accountdesc != "all accounts":
+        qfilter.append(Money_account.accdesc == accountdesc)
+    if paymtype and paymtype != ""and paymtype != "all payment types":
+        qfilter.append(Typepayment.paytypedet == paymtype)
+
+    incomeitems = \
+        Incomealloc.query.join(Income) \
+            .join(Chargetype) \
+            .join(Money_account) \
+            .join(Typepayment) \
+            .with_entities(Income.id, Income.date, Incomealloc.rentcode, Income.amount, Income.payer,
+                           Money_account.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
+            .filter(*qfilter).order_by(desc(Income.date)) \
+            .limit(50).all()
+
+    return incomeitems
+
+
+def get_income_options():
+    # return options for each multiple choice control in income page
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
+    bankaccs.insert(0, "all accounts")
+    paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
+    paytypes.insert(0, "all payment types")
+
+    return bankaccs, paytypes
+
+
 def getlandlord(id):
     if id > 0:
         # existing landlord
         landlord = \
-            Landlord.query.join(Manager).join(Emailaccount).join(Typebankacc) \
+            Landlord.query.join(Manager).join(Emailaccount).join(Money_account) \
                 .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                               Manager.name.label("manager"), Emailaccount.smtp_server, Typebankacc.accdesc) \
+                               Manager.name.label("manager"), Emailaccount.smtp_server, Money_account.accdesc) \
                 .filter(Landlord.id == id) \
                 .one_or_none()
         if landlord is None:
@@ -269,7 +224,7 @@ def getlandlord(id):
         }
     managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
-    bankaccs = [value for (value,) in Typebankacc.query.with_entities(Typebankacc.accdesc).all()]
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     return landlord, managers, emailaccs, bankaccs
 
 
@@ -345,6 +300,92 @@ def getloanstatement():
     return loanstatement
 
 
+def get_moneyaccount(id):
+    if id > 0:
+        # existing bank account
+        moneyacc = \
+            Money_account.query \
+                .with_entities(Money_account.id, Money_account.bankname, Money_account.accname, Money_account.sortcode,
+                               Money_account.accnum, Money_account.accdesc) \
+                .filter(Money_account.id == id) \
+                .one_or_none()
+        if moneyacc is None:
+            flash('Invalid account')
+            return redirect(url_for('auth.login'))
+    else:
+        # new bank account
+        moneyacc = {
+            'id': 0
+        }
+
+    return moneyacc
+
+
+def get_moneydets():
+    moneydets = \
+        Money_account.query \
+            .with_entities(Money_account.id, Money_account.bankname, Money_account.accname, Money_account.sortcode,
+                           Money_account.accnum, Money_account.accdesc,
+                           func.mjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
+                           func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')) \
+            .all()
+
+    accsums = Money_account.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
+                                            func.mjinn.acc_total(0).label('uncleared')).filter().first()
+
+    return moneydets, accsums
+
+
+def get_moneyitem(id):
+    bankitem = \
+        Money_item.query \
+            .join(Money_account) \
+            .join(Money_category) \
+            .with_entities(Money_item.id, Money_item.num, Money_item.date,
+                           Money_item.payer, Money_item.amount, Money_item.memo,
+                           Money_account.accdesc, Money_category.cat_name, Money_item.cleared) \
+            .filter(Money_item.id == id) \
+            .one_or_none()
+
+    return bankitem
+
+
+def get_moneyitems(id):
+    moneyitems = \
+        Money_item.query \
+            .join(Money_account) \
+            .join(Money_category) \
+            .with_entities(Money_item.id, Money_item.num, Money_item.date,
+                           Money_item.payer, Money_item.amount, Money_item.memo,
+                           Money_account.accdesc, Money_category.cat_name, Money_item.cleared) \
+            .filter(Money_account.id == id).union\
+            (Income.query \
+             .join(Money_account) \
+             .join(Incomealloc)
+             .with_entities(Income.id, literal("0").label('num'), Income.date,
+                            Income.payer, Income.amount, Incomealloc.rentcode,
+                            Money_account.accdesc, literal("Jinn BACS income").label('cat_name'), literal("1").label('cleared')) \
+             .filter(Money_account.id == id)).order_by(desc(Money_item.date), desc(Income.date)) \
+                    .limit(200)
+
+    accsums = Money_item.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()) \
+                                             .label('cbalance'), func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')) \
+            .filter().first()
+
+    return moneyitems, accsums
+
+
+def get_money_options():
+    # return options for each multiple choice control in money_edit and money_filter pages
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
+    bankaccs.insert(0, "all accounts")
+    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
+    cats.insert(0, "all categories")
+    cleareds = ["Cleared", "Uncleared"]
+
+    return bankaccs, cats, cleareds
+
+
 def getproperty(id):
     if id > 0:
         # existing property
@@ -366,7 +407,7 @@ def getproperty(id):
     return property, proptypedets
 
 
-def getqueryoptions():
+def get_queryoptions():
     # return options for each multiple choice control in home page and queries page
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     actypes.insert(0, "all actypes")
@@ -382,12 +423,12 @@ def getqueryoptions():
     tenures.insert(0, "all tenures")
     options = ("Include", "Exclude", "Only")
 
-    return actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries
+    return actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures
 
 
 def getrental(id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
-    # all to be shown in rentalpage.html, allowing editing an existing rental (for which info is fetched via Rental.id
+    # all to be shown in rental.html, allowing editing an existing rental (for which info is fetched via Rental.id
     # or creation of a new rent (signified by id==0), in which case we have to "invent" an object with the same
     # attributes as would have been fetched from the database but with "blanks", or default values, as desired for
     # creating a new rental; --- seems like Flask is happy for it not even to have the fields which will be
@@ -428,17 +469,17 @@ def getrentals():
     return rentals, rentsum
 
 
-def getrentalstatement():
+def getrentalstatem():
 
-    rentalstatement = \
+    rentalstatem = \
         Rental_statement.query \
             .with_entities(Rental_statement.id, Rental_statement.date, Rental_statement.memo,
                            Rental_statement.amount, Rental_statement.payer, Rental_statement.balance) \
             .all()
-    # if rentalstatement is None:
+    # if rentalstatem is None:
     #     flash('Invalid rental id')
     #     return redirect(url_for('auth.login'))
-    return rentalstatement
+    return rentalstatem
 
 
 def getrentobjects(action, name):
@@ -455,7 +496,7 @@ def getrentobjects(action, name):
         rentprops = getrentobjs(action, qfilterbasic, runsize)
         return agentdetails, propaddr, rentcode, source, tenantname, rentprops
     else:
-        actypes, floads, landlords, salegrades, statuses, tenures, options, prdeliveries = getqueryoptions()
+        actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures = get_queryoptions()
         if request.method == "POST":
             jname = request.form.get("jname")
             actype = request.form.getlist("actype")

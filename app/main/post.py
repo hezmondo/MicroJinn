@@ -2,25 +2,9 @@ from flask import redirect, request
 
 from app import db
 from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Loan, Manager, Property, Rent, Rental, Typeactype, Typeadvarr, Typebankacc, Typedeed, Typefreq, \
+    Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, \
+    Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
-
-
-def postaccount(id, action):
-    if action == "edit":
-        account = Typebankacc.query.get(id)
-    else:
-        account = Typebankacc()
-    account.bankname = request.form["bankname"]
-    account.accname = request.form["accname"]
-    account.sortcode = request.form["sortcode"]
-    account.accnum = request.form["accnum"]
-    account.accdesc = request.form["accdesc"]
-    db.session.add(account)
-    db.session.commit()
-    id = account.id
-
-    return redirect('/account/{}'.format(id))
 
 
 def postagent(id):
@@ -39,6 +23,7 @@ def postagent(id):
         db.session.commit()
 
     return redirect('/agentpage/{}'.format(id))
+
 
 def postcharge(id):
     charge = Charge.query.get(id)
@@ -127,17 +112,16 @@ def postlandlord(id, action):
             (Emailaccount.smtp_server == emailacc).one()[0]
     bankacc = request.form["bankacc"]
     landlord.bankacc_id = \
-        Typebankacc.query.with_entities(Typebankacc.id).filter \
-            (Typebankacc.accdesc == bankacc).one()[0]
+        Money_account.query.with_entities(Money_account.id).filter \
+            (Money_account.accdesc == bankacc).one()[0]
     manager = request.form["manager"]
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
             (Manager.name == manager).one()[0]
     db.session.add(landlord)
     db.session.commit()
-    id = landlord.id
-
-    return redirect('/landlordpage/{}'.format(id))
+    id_ = landlord.id
+    return id_
 
 
 def postloan(id):
@@ -161,6 +145,49 @@ def postloan(id):
     loan.valuation = request.form["valuation"]
     db.session.commit()
     return
+
+
+def post_moneyaccount(id, action):
+    if action == "edit":
+        account = Money_account.query.get(id)
+    else:
+        account = Money_account()
+    account.bankname = request.form["bankname"]
+    account.accname = request.form["accname"]
+    account.sortcode = request.form["sortcode"]
+    account.accnum = request.form["accnum"]
+    account.accdesc = request.form["accdesc"]
+    db.session.add(account)
+    db.session.commit()
+    id_ = account.id
+
+    return id_
+
+
+def post_moneyitem(id, action):
+    if action == "edit":
+        bankitem = Money_item.query.get(id)
+    else:
+        bankitem = Money_item()
+    bankitem.num = request.form["num"]
+    bankitem.date = request.form["date"]
+    bankitem.amount = request.form["amount"]
+    bankitem.payer = request.form["payer"]
+    accdesc = request.form["accdesc"]
+    bankitem.bankacc_id = \
+        Money_account.query.with_entities(Money_account.id).filter \
+            (Money_account.accdesc == accdesc).one()[0]
+    cleared = request.form["cleared"]
+    bankitem.cleared = 1 if cleared == "cleared" else 0
+    cat = request.form["category"]
+    bankitem.cat_name = \
+        Money_category.query.with_entities(Money_category.id).filter \
+            (Money_category.cat_name == cat).one()[0]
+    db.session.add(bankitem)
+    db.session.commit()
+    id_ = bankitem.id
+
+    return id_
 
 
 def postproperty(id):
@@ -198,7 +225,7 @@ def postrental(id, action):
     db.session.commit()
     id = rental.id
 
-    return redirect('/rentalpage/{}'.format(id))
+    return redirect('/rental/{}'.format(id))
 
 
 def postrentobj(id):

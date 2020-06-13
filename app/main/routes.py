@@ -4,27 +4,15 @@ from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import filteragents, get_charges, filteremailaccs, filterheadrents, \
-    filterincome, getaccount, getaccounts, get_acctrans, getagent, getcharge, getemailacc, getexternalrent, \
-    getincome, getlandlord, getlandlords, getloan, getloans, getloanstatement, getproperty, getqueryoptions, \
-    getrental, getrentals, getrentalstatement, getrentobj, getrentobjects
-from app.main.post import postaccount, postagent, postcharge, postemailacc, postincome, postlandlord, \
-    postloan, postproperty, postrental, postrentobj
+    getagent, getcharge, getemailacc, getexternalrent, getincome, get_incomeitems, get_income_options,\
+    getlandlord, getlandlords, getloan, getloans, getloanstatement, get_moneyaccount, \
+    get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
+    getproperty, getrental, getrentals, getrentalstatem, getrentobj, getrentobjects
+from app.main.post import postagent, postcharge, postemailacc, postincome, postlandlord, \
+    postloan, post_moneyaccount, post_moneyitem, postproperty, postrental, postrentobj
 from app.main.forms import IncomeForm, IncomeAllocForm
-from app.models import Agent, Charge, Emailaccount, Income, Jstore, Landlord, Loan, \
-    Loan_interest_rate, Loan_trans, Property, Rent, Rental
-
-
-@bp.route('/account/<int:id>', methods=['GET', 'POST'])
-@login_required
-def account(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        postaccount(id, action)
-    else:
-        pass
-    account = getaccount(id)
-
-    return render_template('account.html', title='Bank Account', action=action, account=account)
+from app.models import Agent, Charge, Emailaccount, Income, Jstore, Landlord, Loan, Money_account, \
+    Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -92,20 +80,30 @@ def deleteitem(id):
         agent = Agent.query.get(id)
         db.session.delete(agent)
         db.session.commit()
+    elif item == "bankitem":
+        bankitem = Money_item.query.get(id)
+        if bankitem:
+            db.session.delete(bankitem)
+            db.session.commit()
+            return redirect('/charges')
     elif item == "charge":
         charge = Charge.query.get(id)
-        db.session.delete(charge)
-        db.session.commit()
+        if charge:
+            db.session.delete(charge)
+            db.session.commit()
+            return redirect('/charges')
     elif item == "emailacc":
         emailacc = Emailaccount.query.get(id)
-        db.session.delete(emailacc)
-        db.session.commit()
-        # return redirect('/emailaccs')
+        if emailacc:
+            db.session.delete(emailacc)
+            db.session.commit()
+            return redirect('/emailaccs')
     elif item == "landlord":
         landlord = Landlord.query.get(id)
         if landlord:
             db.session.delete(landlord)
             db.session.commit()
+            return redirect('/landlords')
     elif item == "loan":
         delete_loan = Loan.query.get(id)
         # delete_loan_trans = Loan_trans.query.filter(Loan_trans.loan_id == id).all()
@@ -170,15 +168,10 @@ def headrents():
 
 @bp.route('/income', methods=['GET', 'POST'])
 def income():
-    if request.method == "POST":
-        rcd = request.form["rentcode"]
-        pay = request.form["payer"]
-        typ = request.form["type"]
-        income = filterincome(rcd, pay, typ)
-    else:
-        income = filterincome("", "", "")
+    incomeitems = get_incomeitems()
+    bankaccs, paytypes = get_income_options()
 
-    return render_template('income.html', title='Income', income=income)
+    return render_template('income.html', bankaccs=bankaccs, paytypes=paytypes, incomeitems=incomeitems)
 
 
 @bp.route('/incomeallocpage/<int:id>', methods=['GET', 'POST'])
@@ -237,9 +230,9 @@ def incomeformpage(id):
                            )
 
 
-@bp.route('/incomepage/<int:id>', methods=['GET', 'POST'])
+@bp.route('/income_item/<int:id>', methods=['GET', 'POST'])
 @login_required
-def incomepage(id):
+def income_item(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         postincome(id, action)
@@ -247,7 +240,7 @@ def incomepage(id):
         pass
     bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets = getincome(id)
 
-    return render_template('incomepage.html', title='Income', action=action, bankaccs=bankaccs,
+    return render_template('income_item.html', title='Income', action=action, bankaccs=bankaccs,
                            chargedescs=chargedescs, income=income, incomeallocs=incomeallocs, landlords=landlords,
                            paytypedets=paytypedets
                            )
@@ -264,17 +257,18 @@ def index():
                            rentprops=rentprops)
 
 
-@bp.route('/landlordpage/<int:id>', methods=['GET', 'POST'])
+@bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
 @login_required
-def landlordpage(id):
+def landlord(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        postlandlord(id, action)
+        id_ = postlandlord(id, action)
+        return redirect('/landlord/{}?action=view'.format(id_))
     else:
         pass
     landlord, managers, emailaccs, bankaccs = getlandlord(id)
 
-    return render_template('landlordpage.html', title='Landlord', action=action, landlord=landlord,
+    return render_template('landlord.html', title='Landlord', action=action, landlord=landlord,
                            bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
 
 
@@ -282,7 +276,7 @@ def landlordpage(id):
 def landlords():
     landlords = getlandlords()
 
-    return render_template('landlords.html', title='Landlords', landlords=landlords)
+    return render_template('landlords.html', landlords=landlords)
 
 
 @bp.route('/loadquery', methods=['GET', 'POST'])
@@ -337,25 +331,56 @@ def loanstatementpage(id):
 
 @bp.route('/money', methods=['GET', 'POST'])
 def money():
-    accounts, accsums = getaccounts()
+    moneydets, accsums = get_moneydets()
 
-    return render_template('money.html', title='Money', accounts=accounts, accsums=accsums)
-
-
-@bp.route('/money_edit', methods=['GET', 'POST'])
-def money_edit():
-    rentals, rentsum = getrentals()
-
-    return render_template('money_edit.html', title='money_edit page', rentals=rentals, rentsum=rentsum)
+    return render_template('money.html', moneydets=moneydets, accsums=accsums)
 
 
-@bp.route('/money_filter/<int:id>', methods=["GET", "POST"])
+@bp.route('/money_account/<int:id>', methods=['GET', 'POST'])
 @login_required
-def money_filter(id):
-    acctrans, accs, accsums, cats, cleareds = get_acctrans(id)
+def money_account(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_moneyaccount(id, action)
+        return redirect('/money_account/{}?action=view'.format(id_))
+    else:
+        pass
+    account = get_moneyaccount(id)
 
-    return render_template('money_filter.html', acctrans=acctrans,
-                           accs=accs, accsums=accsums, cats=cats, cleareds=cleareds)
+    return render_template('money_account.html', action=action, account=account)
+
+
+@bp.route('/money_accounts', methods=['GET', 'POST'])
+def money_accounts():
+    moneyaccs = Money_account.query.all()
+
+    return render_template('money_accounts.html', moneyaccs=moneyaccs)
+
+
+@bp.route('/money_item/<int:id>', methods=['GET', 'POST'])
+def money_item(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_moneyitem(id, action)
+        return redirect('/money_item/{}?action=view'.format(id_))
+
+    else:
+        pass
+    bankaccs, cats, cleareds = get_money_options()
+    moneyitem = get_moneyitem(id)
+
+    return render_template('money_item.html', action=action, moneyitem=moneyitem, bankaccs=bankaccs,
+                           cats=cats, cleareds=cleareds)
+
+
+@bp.route('/money_items/<int:id>', methods=["GET", "POST"])
+@login_required
+def money_items(id):
+    bankaccs, cats, cleareds = get_money_options()
+    moneyitems, accsums = get_moneyitems(id)
+
+    return render_template('money_items.html', moneyitems=moneyitems,
+                           bankaccs=bankaccs, accsums=accsums, cats=cats, cleareds=cleareds)
 
 
 @bp.route('/payrequests', methods=['GET', 'POST'])
@@ -408,12 +433,12 @@ def queries():
 def rentals():
     rentals, rentsum = getrentals()
 
-    return render_template('rentals.html', title='Rentals page', rentals=rentals, rentsum=rentsum)
+    return render_template('rentals.html', rentals=rentals, rentsum=rentsum)
 
 
-@bp.route('/rentalpage/<int:id>', methods=['GET', 'POST'])
+@bp.route('/rental/<int:id>', methods=['GET', 'POST'])
 # @login_required
-def rentalpage(id):
+def rental(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         postrental(id, action)
@@ -421,23 +446,23 @@ def rentalpage(id):
         pass
     rental, advarrdets, freqdets = getrental(id)
 
-    return render_template('rentalpage.html', title='Rental', action=action, rental=rental,
+    return render_template('rental.html', title='Rental', action=action, rental=rental,
                            advarrdets=advarrdets, freqdets=freqdets)
 
 
-@bp.route('/rentalstatementpage/<int:id>', methods=["GET", "POST"])
+@bp.route('/rentalstatement/<int:id>', methods=["GET", "POST"])
 # @login_required
-def rentalstatementpage(id):
+def rentalstatement(id):
     if request.method == "POST":
         pass
     else:
         db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": id})
         db.session.commit()
-        rentalstatement = getrentalstatement()
-        print("rentalstate")
-        print(rentalstatement)
+        rentalstatem = getrentalstatem()
+        print("rentalstatem")
+        print(rentalstatem)
 
-        return render_template('rentalstatement.html', title='Rental statement', rentalstatement=rentalstatement)
+        return render_template('rentalstatement.html', title='Rental statement', rentalstatem=rentalstatem)
 
 
 @bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])

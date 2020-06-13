@@ -124,7 +124,7 @@ class Income(db.Model):
     payer = db.Column(db.String(90))
     amount = db.Column(db.Numeric(8,2))
     paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
     incomealloc_income = db.relationship('Incomealloc', backref='income', lazy='dynamic')
 
@@ -135,7 +135,7 @@ class Incomealloc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     alloc_id = db.Column(db.Integer)
     rentcode = db.Column(db.String(15))
-    total = db.Column(db.Numeric(8,2))
+    amount = db.Column(db.Numeric(8,2))
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     income_id = db.Column(db.Integer, db.ForeignKey('income.id'))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
@@ -157,7 +157,7 @@ class Landlord(db.Model):
     addr = db.Column(db.String(180))
     taxdate = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
     emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
@@ -234,17 +234,32 @@ class Manager(db.Model):
         return '<Manager {}>'.format(self.name)
 
         
+class Money_account(db.Model):
+    __tablename__ = 'money_account'
+
+    id = db.Column(db.Integer, primary_key=True)
+    bankname = db.Column(db.String(45))
+    accname = db.Column(db.String(60))
+    sortcode = db.Column(db.String(10))
+    accnum = db.Column(db.String(15))
+    accdesc = db.Column(db.String(30))
+
+    income_moneyaccount = db.relationship('Income', backref='money_account', lazy='dynamic')
+    moneyitem_moneyaccount = db.relationship('Money_item', backref='money_account', lazy='dynamic')
+    landlord_moneyaccount = db.relationship('Landlord', backref='money_account', lazy='dynamic')
+
+
 class Money_category(db.Model):
     __tablename__ = 'money_category'
 
     id = db.Column(db.Integer, primary_key=True)
     cat_name = db.Column(db.String(60))
 
-    moneytrans_cat = db.relationship('Money_transaction', backref='money_category', lazy='dynamic')
+    moneyitem_moneycategory = db.relationship('Money_item', backref='money_category', lazy='dynamic')
 
 
-class Money_transaction(db.Model):
-    __tablename__ = 'Money_transaction'
+class Money_item(db.Model):
+    __tablename__ = 'Money_item'
 
     id = db.Column(db.Integer, primary_key=True)
     num = db.Column(db.Integer)
@@ -254,7 +269,7 @@ class Money_transaction(db.Model):
     memo = db.Column(db.String(90))
     cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
     cleared = db.Column(db.Integer)
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('typebankacc.id'))
+    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
 class Property(db.Model):
@@ -392,21 +407,6 @@ class Typeadvarr(db.Model):
     rent_typeadvarr = db.relationship('Rent', backref='typeadvarr', lazy='dynamic')
     loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
-
-
-class Typebankacc(db.Model):
-    __tablename__ = 'typebankacc'
-
-    id = db.Column(db.Integer, primary_key=True)
-    bankname = db.Column(db.String(45))
-    accname = db.Column(db.String(60))
-    sortcode = db.Column(db.String(10))
-    accnum = db.Column(db.String(15))
-    accdesc = db.Column(db.String(30))
-
-    income_bankacc = db.relationship('Income', backref='typebankacc', lazy='dynamic')
-    money_trans_bankacc = db.relationship('Money_transaction', backref='typebankacc', lazy='dynamic')
-    landlord_bankacc = db.relationship('Landlord', backref='typebankacc', lazy='dynamic')
 
 
 class Typedeed(db.Model):
