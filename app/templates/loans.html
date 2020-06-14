@@ -10,7 +10,7 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="rentals">
+    <table class="table" id="loans">
         <thead>
         <tr>
             <th style="width: 6.00%">id</th>
@@ -37,7 +37,7 @@
             <td style="width: 10.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 10.00%"> {{ item.valuation }}</td>
             <td style="width: 10.00%"> {{ item.interestpa }}</td>
-            <td style="width: 8.00%"><a href="/loanpage/{{ item.id }}?action=view">View</a></td>
+            <td style="width: 8.00%"><a href="/loan/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}
         <tr>
@@ -60,7 +60,7 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-3">
-            <a href="/loanpage/0?action=new" class="btn btn-block btn-primary" role="button">Add new loan</a>
+            <a href="/loan/0?action=new" class="btn btn-block btn-primary" role="button">Add new loan</a>
         </div>
     </div>
 </form>

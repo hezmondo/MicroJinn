@@ -11,110 +11,60 @@ from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, 
     Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
-def filteragents(agd, age, agn):
-    agents = \
-        Agent.query \
-            .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-            .filter(Agent.agdetails.ilike('%{}%'.format(agd)),
-                    Agent.agemail.ilike('%{}%'.format(age)),
-                    Agent.agnotes.ilike('%{}%'.format(agn))) \
-            .all()
+def get_agent(id):
+    agent = Agent.query.filter(Agent.id == id).one_or_none()
 
-    return agents
-
-def filteremailaccs():
-    emailaccs = \
-        Emailaccount.query \
-            .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_user,
-                           Emailaccount.smtp_sendfrom, Emailaccount.imap_sentfolder, Emailaccount.imap_draftfolder) \
-            .all()
-    return emailaccs
-
-
-def filterheadrents():
-#     if request.method == "POST":
-        # hrcd = request.form["headrentcode"]
-        # agd = request.form["agentdetails"]
-        # pop = request.form["propaddr"]
-    # else:
-        # headrents = getheadrents("", "COMP", "")
-    headrents = None
-    return headrents
-
-
-def getagent(id):
-    if id > 0:
-        # existing agent
-        agent = \
-            Agent.query \
-                .with_entities(Agent.id, Agent.agdetails, Agent.agemail, Agent.agnotes) \
-                .filter(Agent.id == id) \
-                .one_or_none()
-        if agent is None:
-            flash('Invalid agent code')
-            return redirect(url_for('main.agents'))
-    else:
-        # new agent
-        agent = {
-            'id': 0
-        }
     return agent
 
 
-def getcharge(id):
+def get_agents():
+    agd = request.form.get("address") or ""
+    age = request.form.get("email") or ""
+    agn = request.form.get("notes") or ""
+    agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
+                    Agent.agnotes.ilike('%{}%'.format(agn))).all()
+
+    return agents
+
+
+def get_charge(id):
     charge = \
-        Charge.query \
-            .join(Rent) \
-            .join(Chargetype) \
-            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
-                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(Charge.id == id) \
-            .one_or_none()
+        Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
+               Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+                .filter(Charge.id == id).one_or_none()
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+
     return charge, chargedescs
 
 
-def get_charges(rcd, cdt):
-    charges = \
-        Charge.query \
-            .join(Rent) \
-            .join(Chargetype) \
-            .with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc, Charge.chargestartdate,
-                           Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(Rent.rentcode.startswith([rcd]),
-                    Charge.chargedetails.ilike('%{}%'.format(cdt))) \
+def get_charges(rentcode):
+    if request.method == "POST":
+        rcd = request.form.get("rentcode") or ""
+        cdt = request.form.get("chargedetails") or ""
+    else:
+        rcd = rentcode if rentcode else ""
+        cdt = ""
+    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
+                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+            .filter(Rent.rentcode.startswith([rcd]), Charge.chargedetails.ilike('%{}%'.format(cdt))) \
             .all()
 
     return charges
 
 
-def getemailacc(id):
-    if id > 0:
-        # existing emailacc
-        emailacc = \
-            Emailaccount.query \
-                .with_entities(Emailaccount.id, Emailaccount.smtp_server, Emailaccount.smtp_port,
-                               Emailaccount.smtp_timeout, Emailaccount.smtp_debug, Emailaccount.smtp_tls,
-                               Emailaccount.smtp_user, Emailaccount.smtp_password, Emailaccount.smtp_sendfrom,
-                               Emailaccount.imap_server, Emailaccount.imap_port, Emailaccount.imap_tls,
-                               Emailaccount.imap_user, Emailaccount.imap_password, Emailaccount.imap_sentfolder,
-                               Emailaccount.imap_draftfolder) \
-                .filter(Emailaccount.id == id) \
-                .one_or_none()
-    else:
-        # new emailacc
-        emailacc = {
-            'id': 0
-        }
+def get_emailaccounts():
+    emailaccs = Emailaccount.query.all()
+
+    return emailaccs
+
+
+def get_emailaccount(id):
+    emailacc = Emailaccount.query.filter(Emailaccount.id == id).one_or_none()
+
     return emailacc
 
 
-def getexternalrent(id):
-    # if request.method == "POST":
-    #
-    #     return redirect(url_for('main.index'))
-    # else:
-    # pass
+def get_externalrent(id):
     externalrent = \
         Extrent.query \
             .join(Extmanager) \
@@ -123,47 +73,36 @@ def getexternalrent(id):
                            Extmanager.codename, Extrent.agentdetails) \
             .filter(Extrent.id == id) \
                 .one_or_none()
-    if externalrent is None:
-        flash('N')
-        return redirect(url_for('main.index'))
+
     return externalrent
 
 
-def getincome(id):
-    if id > 0:
-        # existing income
-        income = \
-            Income.query.join(Money_account) \
-                .join(Typepayment) \
-                .with_entities(Income.id, Income.date, Income.amount, Income.payer,
-                               Typepayment.paytypedet, Money_account.accdesc) \
-                .filter(Income.id == id) \
-                .one_or_none()
-        if income is None:
-            flash('Invalid income id')
-            return redirect('/income')
-        incomeallocs = \
-            Incomealloc.query.join(Landlord) \
-                .join(Chargetype) \
-                .with_entities(Incomealloc.id, Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode,
-                               Incomealloc.amount, Landlord.name, Chargetype.chargedesc) \
-                .filter(Incomealloc.income_id == id) \
-                .all()
-    else:
-        # new income
-        income = {
-            'id': 0,
-            'paydate': "2019-09-01"
-        }
-        incomeallocs = {
-            'id': 0
-        }
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    paytypedets = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
+def get_headrents():
+    headrents = None
 
-    return bankaccs, chargedescs, income, incomeallocs, landlords, paytypedets
+    return headrents
+
+
+def get_incomealloc(id):
+    income = \
+        Income.query.join(Money_account) \
+            .join(Typepayment) \
+            .with_entities(Income.id, Income.date, Income.amount, Income.payer,
+                           Typepayment.paytypedet, Money_account.accdesc) \
+            .filter(Income.id == id) \
+            .one_or_none()
+    # if income is None:
+    #     flash('Invalid income id')
+    #     return redirect('/income')
+    incomeallocs = \
+        Incomealloc.query.join(Landlord) \
+            .join(Chargetype) \
+            .with_entities(Incomealloc.id, Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode,
+                           Incomealloc.amount, Landlord.name, Chargetype.chargedesc) \
+            .filter(Incomealloc.income_id == id) \
+            .all()
+
+    return income, incomeallocs
 
 
 def get_incomeitems():
@@ -194,8 +133,8 @@ def get_incomeitems():
     return incomeitems
 
 
-def get_income_options():
-    # return options for each multiple choice control in income page
+def get_incomeoptions():
+    # return options for multiple choice controls in income
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     bankaccs.insert(0, "all accounts")
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
@@ -204,77 +143,50 @@ def get_income_options():
     return bankaccs, paytypes
 
 
-def getlandlord(id):
-    if id > 0:
-        # existing landlord
-        landlord = \
-            Landlord.query.join(Manager).join(Emailaccount).join(Money_account) \
-                .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                               Manager.name.label("manager"), Emailaccount.smtp_server, Money_account.accdesc) \
-                .filter(Landlord.id == id) \
-                .one_or_none()
-        if landlord is None:
-            flash('Invalid landlord id')
-            return redirect('/landlords')
-    else:
-        # new landlord
-        landlord = {
-            'id': 0,
-            'taxdate': "2000-04-05"
-        }
+def get_incomeitemoptions():
+    # return options for multiple choice controls in income_item
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
+    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
+
+    return bankaccs, chargedescs, landlords, paytypes
+
+
+def get_landlord(id):
+    landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
+                 Landlord.name, Landlord.addr, Landlord.taxdate, Manager.name.label("manager"),
+                     Emailaccount.smtp_server, Money_account.accdesc).filter(Landlord.id == id).one_or_none()
+
     managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     return landlord, managers, emailaccs, bankaccs
 
 
-def getlandlords():
-    landlords = \
-        Landlord.query.join(Manager) \
-            .with_entities(Landlord.id, Landlord.name, Landlord.addr, Landlord.taxdate,
-                           Manager.name.label("manager")) \
-            .all()
+def get_landlords():
+    landlords = Landlord.query.join(Manager).with_entities(Landlord.id, Landlord.name, Landlord.addr,
+                   Landlord.taxdate, Manager.name.label("manager")).all()
 
     return landlords
 
 
-def getloan(id):
-    # This method returns a "loan" object
-    # information about a loan
-    # plus all the list values to offer for various comboboxes
-    # all of this is to be shown in loanpage.html
-    # that allows either editing etc. of an existing loan (whose `id` is specified)
-    # (in which case we fetch the rent info to edit)
-    # or it allows creation of a new loan (signified by id==0)
-    # (in which case for the loan info we have to "invent" an object
-    # with the same attributes as would have been fetched from the database
-    # but with "blanks", or default values, as desired for creating a new loan
-    # --- seems like Flask is happy for it not even to have the fields which will be referenced
-    # so just put in any defaults desired)
-    if id > 0:
-        # existing loan
-        loan = \
-            Loan.query \
-                .join(Typeadvarr) \
-                .join(Typefreq) \
-                .with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa,
-                               Typeadvarr.advarrdet, Typefreq.freqdet) \
-                .filter(Loan.id == id) \
-                .one_or_none()
-        if loan is None:
-            flash('Invalid loancode')
-            return redirect(url_for('auth.login'))
-    else:
-        # new rent
-        loan = {
-            'id': 0
-        }
+def get_loan(id):
+    loan = \
+        Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
+                 Loan.end_date, Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation,
+                     Loan.interestpa, Typeadvarr.advarrdet, Typefreq.freqdet) \
+            .filter(Loan.id == id).one_or_none()
 
+    return loan
+
+
+def get_loan_options():
+    # return options for each multiple choice control in money_edit and money_filter pages
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
-    return loan, advarrdets, freqdets
 
+    return advarrdets, freqdets
 
 def getloans():
     loans = \
@@ -482,7 +394,7 @@ def getrentalstatem():
     return rentalstatem
 
 
-def getrentobjects(action, name):
+def get_rentobjects(action, name):
     jname = name
     agentdetails = request.form.get("agentdetails") or ""
     propaddr = request.form.get("propaddr") or ""

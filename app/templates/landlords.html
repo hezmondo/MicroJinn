@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-</div><div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h3 class="text-center">All landlords:</h3>
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-9">
+            <input class="form-control form-control-lg" type="text" placeholder="Showing all landlords" readonly>
+        </div>
+        <div class="col-md-3">
+            <a href="/landlord/0?action=new" class="btn btn-block btn-danger" role="button">Add new landlord</a>
         </div>
     </div>
-</div>
+</form>
 <div class="table-fixed">
     <table class="table" id="landlords">
         <thead>
@@ -31,12 +34,5 @@
         {% endfor %}
         </tbody>
     </table>
-<form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-3">
-            <a href="/landlord/0?action=new" class="btn btn-block btn-danger" role="button">Add new landlord</a>
-        </div>
-    </div>
-</form>
 </div>
 {% endblock %}	

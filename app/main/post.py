@@ -7,26 +7,26 @@ from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, 
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
-def postagent(id):
-    if id and id > 0 :
+def post_agent(id, action):
+    if action == "edit":
         agent = Agent.query.get(id)
     else:
         agent = Agent()
     agent.agdetails = request.form["address"]
     agent.agemail = request.form["email"]
     agent.agnotes = request.form["notes"]
-    if id == 0 or id is None:
-        db.session.add(agent)
-        db.session.commit()
-        id = agent.id
+    db.session.add(agent)
+    db.session.commit()
+    id_ = agent.id
+
+    return id_
+
+
+def post_charge(id, action):
+    if action == "edit":
+        charge = Charge.query.get(id)
     else:
-        db.session.commit()
-
-    return redirect('/agentpage/{}'.format(id))
-
-
-def postcharge(id):
-    charge = Charge.query.get(id)
+        charge = Charge()
     charge.chargetype_id = \
         Chargetype.query.with_entities(Chargetype.id).filter(
             Chargetype.chargedesc == request.form["chargedesc"]).one()[0]
@@ -34,11 +34,14 @@ def postcharge(id):
     charge.chargetotal = request.form["chargetotal"]
     charge.chargedetails = request.form["chargedetails"]
     charge.chargebalance = request.form["chargebalance"]
+    db.session.add(charge)
     db.session.commit()
-    return
+    id_ = charge.id
+
+    return id_
 
 
-def postemailacc(id, action):
+def post_emailaccount(id, action):
     if action == "edit":
         emailacc = Emailaccount.query.get(id)
     else:
@@ -58,47 +61,31 @@ def postemailacc(id, action):
     emailacc.imap_password = request.form["imap_password"]
     emailacc.imap_sentfolder = request.form["imap_sentfolder"]
     emailacc.imap_draftfolder = request.form["imap_draftfolder"]
-    if not action == "edit":
-        db.session.add(emailacc)
-        db.session.commit()
-        id = emailacc.id
-    else:
-        db.session.commit()
+    db.session.add(emailacc)
+    db.session.commit()
+    id_ = emailacc.id
 
-    return redirect('/emailaccpage/{}'.format(id))
+    return id_
 
 
-def postincome(id, action):
+def post_incomeitem(id, action):
     if action == "edit":
         income = Income.query.get(id)
     else:
         income = Income()
-    if not action == "edit":
-        db.session.add(income)
-        db.session.commit()
-        id = income.id
-    else:
-        db.session.commit()
+    payer = request.form["payer"]
+    print(payer)
+    rentcodes = request.form.getlist("rentcode")
+    print(rentcodes)
+    print(request.form)
+    db.session.add(income)
+    db.session.commit()
+    id_ = income.id
 
-    return redirect('/incomepage/{}'.format(id))
-
-
-def postincomealloc(id, action):
-    if action == "edit":
-        income = Income.query.get(id)
-    else:
-        income = Income()
-    if not action == "edit":
-        db.session.add(income)
-        db.session.commit()
-        id = income.id
-    else:
-        db.session.commit()
-
-    return redirect('/incomepage/{}'.format(id))
+    return id_
 
 
-def postlandlord(id, action):
+def post_landlord(id, action):
     if action == "edit":
         landlord = Landlord.query.get(id)
     else:
@@ -124,8 +111,8 @@ def postlandlord(id, action):
     return id_
 
 
-def postloan(id):
-    if id > 0:
+def post_loan(id, action):
+    if action == "edit":
         loan = Loan.query.get(id)
     else:
         loan = Loan()
@@ -144,7 +131,9 @@ def postloan(id):
     loan.val_date = request.form["val_date"]
     loan.valuation = request.form["valuation"]
     db.session.commit()
-    return
+    id_ = loan.id
+
+    return id_
 
 
 def post_moneyaccount(id, action):

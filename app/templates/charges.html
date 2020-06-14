@@ -17,7 +17,7 @@
 <div class="container">
     <div class="row voffset2">
         <div class="col-lg-12">
-            <h4 class="text-center">Filtered to show:</h4>
+            <h4 class="text-center">Charges:</h4>
         </div>
     </div>
 </div>
@@ -26,11 +26,11 @@
         <thead>
         <tr>
             <th style="width: 10.00%">rentcode</th>
-            <th style="width: 25.00%">chargedesc</th>
-            <th style="width: 10.00%">chargestartdate</th>
-            <th style="width: 10.00%">chargetotal</th>
-            <th style="width: 25.00%">chargedetails</th>
-            <th style="width: 10.00%">chargebalance</th>
+            <th style="width: 25.00%">description</th>
+            <th style="width: 10.00%">start date</th>
+            <th style="width: 10.00%">total</th>
+            <th style="width: 25.00%">details</th>
+            <th style="width: 10.00%">balance</th>
         </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
             <td style="width: 25.00%"> {{ charge.chargedetails }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
-            <td style="width: 5.00%"><a href="/chargepage/{{ charge.id }}">View</a></td>
+            <td style="width: 5.00%"><a href="/charge/{{ charge.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="chargeid">Charge id:</label>
+            <input type="text" class="form-control" name="chargeid" value="{{ charge.id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="{{ charge.rentcode }}">
+        </div>
+        <div class="col-md-6">
+            <label for="chargedesc">Charge type:</label>
+            {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=charge.chargedesc) }}
+        </div>
+        <div class="col-md-2">
+            <label for="chargestartdate">Charge start date:</label>
+            <input type="date" class="form-control" name="chargestartdate" value="{{ charge.chargestartdate }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="chargetotal">Charge total:</label>
+            <input type="text" class="form-control" name="chargetotal" value="{{ charge.chargetotal }}">
+        </div>
+        <div class="col-md-4">
+            <label for="chargedetails">Charge details:</label>
+            <input type="text" class="form-control" name="chargedetails" value="{{ charge.chargedetails }}">
+        </div>
+        <div class="col-md-2">
+            <label for="chargebalance">Charge balance:</label>
+            <input type="text" class="form-control" name="chargebalance" value="{{ charge.chargebalance }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        {% if action == "view" %}
+        <div class="col-md-4">
+            <a href="/charge/{{ charge.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this charge</a>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" formaction="/queries/{{ charge.id }}?action=new" class="btn btn-block btn-danger ">Save query as</button>
+        </div>
+        <div class="col-md-4">
+            <a href="/charge/{{ charge.id }}?action=add" class="btn btn-block btn-danger" role="button">Add new charge for this rentcode</a>
+        </div>
+        {% elif action == "edit" %}
+        <div class="col-md-3">
+            <a href="/deleteitem/{{ charge.id }}?item=charge"
+               onclick="return confirm('Are you sure you want to delete this charge?');"
+               class="btn btn-block btn-warning" role="button">Delete charge</a>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save changes</button>
+        </div>
+        {% else %}
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save as new charge</button>
+        </div>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}
+
