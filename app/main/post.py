@@ -68,13 +68,14 @@ def post_emailaccount(id, action):
     return id_
 
 
-def post_incomeitem(id, action):
+def post_incomeobject(id, action):
     if action == "edit":
         income = Income.query.get(id)
     else:
         income = Income()
-    payer = request.form["payer"]
+    payer = request.form.get("payer")
     print(payer)
+    paytype = request.form.get("paytype")
     rentcodes = request.form.getlist("rentcode")
     print(rentcodes)
     print(request.form)
@@ -179,18 +180,24 @@ def post_moneyitem(id, action):
     return id_
 
 
-def postproperty(id):
-    property = Property.query.get(id)
+def post_property(id, action):
+    if action == "edit":
+        property = Property.query.get(id)
+    else:
+        property = Property()
     property.propaddr = request.form["propaddr"]
     proptypedet = request.form["proptypedet"]
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter \
             (Typeproperty.proptypedet == proptypedet).one()[0]
+    db.session.add(property)
     db.session.commit()
-    return
+    id_ = property.id
+
+    return id_
 
 
-def postrental(id, action):
+def post_rental(id, action):
     if action == "edit":
         rental = Rental.query.get(id)
     else:
@@ -212,10 +219,9 @@ def postrental(id, action):
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
     db.session.add(rental)
     db.session.commit()
-    id = rental.id
+    id_ = rental.id
 
-    return redirect('/rental/{}'.format(id))
-
+    return id_
 
 def postrentobj(id):
     if id > 0:

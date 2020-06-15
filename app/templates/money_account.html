@@ -7,44 +7,44 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="bankname">Bank name:</label>
-            <input type="text" class="form-control" name="bankname" value="{{ account.bankname }}">
+            <input type="text" class="form-control" name="bankname" value="{{ moneyacc.bankname }}">
         </div>
         <div class="col-md-3">
             <label for="accname">Account name:</label>
-            <input type="text" class="form-control" name="accname" value="{{ account.accname }}">
+            <input type="text" class="form-control" name="accname" value="{{ moneyacc.accname }}">
         </div>
         <div class="col-md-2">
             <label for="sortcode">Sort code:</label>
-            <input type="text" class="form-control" name="sortcode" value="{{ account.sortcode }}">
+            <input type="text" class="form-control" name="sortcode" value="{{ moneyacc.sortcode }}">
         </div>
         <div class="col-md-2">
             <label for="accnum">Account number:</label>
-            <input type="text" class="form-control" name="accnum" value="{{ account.accnum }}">
+            <input type="text" class="form-control" name="accnum" value="{{ moneyacc.accnum }}">
         </div>
         <div class="col-md-3">
             <label for="accdesc">Account description:</label>
-            <input type="text" class="form-control" name="accdesc" value="{{ account.accdesc }}">
+            <input type="text" class="form-control" name="accdesc" value="{{ moneyacc.accdesc }}">
         </div>
     </div>
     <div class="form-group row">
-        {% if action == "edit" %}
+        {% if action == "view" %}
+       <div class="col-md-3">
+            <a href="/money_account/{{ moneyacc.id }}?action==edit" class="btn btn-block btn-primary" role="button">Edit this account</a>
+        </div>
         <div class="col-md-3">
-            <a href="/deleteitem/{{ account.id }}?item=account"
+            <a href="/money_account/{{ moneyacc.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this account</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/money_account/0?action=new" class="btn btn-block btn-primary" role="button">Add new account</a>
+        </div>
+        {% elif action == "edit" %}
+        <div class="col-md-3">
+            <a href="/deleteitem/{{ moneyacc.id }}?item=account"
                onclick="return confirm('Are you sure you want to delete this account?');"
                class="btn btn-block btn-danger" role="button">Delete this account</a>
         </div>
         <div class="col-md-3">
             <button type="submit" class="btn btn-block btn-success">Save changes</button>
-        </div>
-        {% elif action == "view" %}
-        <div class="col-md-3">
-            <a href="/money_account/{{ account.id }}?action==edit" class="btn btn-block btn-primary" role="button">Edit this account</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/money_account/{{ account.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this account</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/money_account/0?action=new" class="btn btn-block btn-primary" role="button">Add new account</a>
         </div>
         {% else %}
         <div class="col-md-3">

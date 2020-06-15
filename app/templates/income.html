@@ -28,7 +28,7 @@
             <button type="submit" class="btn btn-block btn-primary">Search</button>
         </div>
         <div class="col-md-2">
-            <a href="/income_item/0?action=new" class="btn btn-block btn-primary" role="button">Add income item</a>
+            <a href="/income_object/0?action=new" class="btn btn-block btn-primary" role="button">Add income item</a>
         </div>
     </div>
 </form>
@@ -61,7 +61,7 @@
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 20.00%"> {{ item.accdesc }}</td>
             <td style="width: 20.00%"> {{ item.paytype }}</td>
-            <td style="width: 10.00%"><a href="/income_item/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="/income_object/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
