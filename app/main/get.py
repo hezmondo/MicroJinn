@@ -469,7 +469,7 @@ def getrentobjs(action, qfilter, runsize):
 
 def getrentobj(id):
     # This method returns "rentobj"; information about a rent, its related property/agent/landlord stuff, plus
-    # the list values for various comboboxes, all to be shown in rentobjpage.html, allowing editing an existing
+    # the list values for various comboboxes, all to be shown in rent_object.html, allowing editing an existing
     # rent (for which rent info is fetched via Rent.id or creation of a new rent (signified by id==0), in which
     # case we have to "invent" an object with the same attributes as would have been fetched from the database
     # but with "blanks", or default values, as desired for creating a new rent; --- seems like Flask is happy

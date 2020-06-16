@@ -58,49 +58,55 @@ def charge(id):
 def delete_item(id):
     item = request.args.get('item', "view", type=str)
     if item == "agent":
-        agent = Agent.query.get(id)
-        db.session.delete(agent)
+        d_agent = Agent.query.get(id)
+        db.session.delete(d_agent)
         db.session.commit()
         return redirect('/agents')
     elif item == "bankitem":
-        bankitem = Money_item.query.get(id)
-        if bankitem:
-            db.session.delete(bankitem)
+        d_bankitem = Money_item.query.get(id)
+        if d_bankitem:
+            db.session.delete(d_bankitem)
             db.session.commit()
             return redirect('/money')
     elif item == "charge":
-        charge = Charge.query.get(id)
-        if charge:
-            db.session.delete(charge)
+        d_charge = Charge.query.get(id)
+        if d_charge:
+            db.session.delete(d_charge)
             db.session.commit()
             return redirect('/charges')
     elif item == "emailacc":
-        emailacc = Emailaccount.query.get(id)
-        if emailacc:
-            db.session.delete(emailacc)
+        d_emailacc = Emailaccount.query.get(id)
+        if d_emailacc:
+            db.session.delete(d_emailacc)
             db.session.commit()
             return redirect('/emailaccs')
     elif item == "landlord":
-        landlord = Landlord.query.get(id)
-        if landlord:
-            db.session.delete(landlord)
+        d_landlord = Landlord.query.get(id)
+        if d_landlord:
+            db.session.delete(d_landlord)
             db.session.commit()
             return redirect('/landlords')
     elif item == "loan":
-        delete_loan = Loan.query.get(id)
+        d_loan = Loan.query.get(id)
         # delete_loan_trans = Loan_trans.query.filter(Loan_trans.loan_id == id).all()
         # delete_loan_interest_rate = Loan_interest_rate.query.filter(Loan_interest_rate.loan_id == id).all()
         # db.session.delete(delete_loan_interest_rate)
         # db.session.delete(delete_loan_trans)
-        db.session.delete(delete_loan)
+        db.session.delete(d_loan)
         db.session.commit()
         return redirect('/loans')
+    elif item == "moneyacc":
+        d_moneyacc = Money_account.query.get(id)
+        if d_moneyacc:
+            db.session.delete(d_moneyacc)
+            db.session.commit()
+            return redirect('/money_accounts')
     elif item == "rentprop":
-        delete_rent = Rent.query.get(id)
-        delete_property = Property.query.filter(Property.rent_id == id).first()
-        if delete_property:
-            db.session.delete(delete_property)
-        db.session.delete(delete_rent)
+        d_rent = Rent.query.get(id)
+        d_property = Property.query.filter(Property.rent_id == id).first()
+        if d_property:
+            db.session.delete(d_property)
+        db.session.delete(d_rent)
         db.session.commit()
         return redirect(url_for('main.index'))
 
@@ -388,7 +394,7 @@ def rentobjpage(id):
     rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, \
             salegradedets, statusdets, tenuredets, totcharges = getrentobj(id)
 
-    return render_template('rentobjpage.html', action=action, title=action, rentobj=rentobj,
+    return render_template('rent_object.html', action=action, title=action, rentobj=rentobj,
                        actypedets=actypedets, advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets,
                        landlords=landlords, mailtodets=mailtodets, properties=properties,
                        salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets, totcharges=totcharges)

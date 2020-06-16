@@ -139,17 +139,17 @@ def post_loan(id, action):
 
 def post_moneyaccount(id, action):
     if action == "edit":
-        account = Money_account.query.get(id)
+        moneyacc = Money_account.query.get(id)
     else:
-        account = Money_account()
-    account.bankname = request.form["bankname"]
-    account.accname = request.form["accname"]
-    account.sortcode = request.form["sortcode"]
-    account.accnum = request.form["accnum"]
-    account.accdesc = request.form["accdesc"]
-    db.session.add(account)
+        moneyacc = Money_account()
+    moneyacc.bankname = request.form["bankname"]
+    moneyacc.accname = request.form["accname"]
+    moneyacc.sortcode = request.form["sortcode"]
+    moneyacc.accnum = request.form["accnum"]
+    moneyacc.accdesc = request.form["accdesc"]
+    db.session.add(moneyacc)
     db.session.commit()
-    id_ = account.id
+    id_ = moneyacc.id
 
     return id_
 

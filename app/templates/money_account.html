@@ -29,7 +29,7 @@
     <div class="form-group row">
         {% if action == "view" %}
        <div class="col-md-3">
-            <a href="/money_account/{{ moneyacc.id }}?action==edit" class="btn btn-block btn-primary" role="button">Edit this account</a>
+            <a href="/money_account/{{ moneyacc.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this account</a>
         </div>
         <div class="col-md-3">
             <a href="/money_account/{{ moneyacc.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this account</a>
@@ -39,9 +39,9 @@
         </div>
         {% elif action == "edit" %}
         <div class="col-md-3">
-            <a href="/deleteitem/{{ moneyacc.id }}?item=account"
+            <a href="/delete_item/{{ moneyacc.id }}?item=moneyacc"
                onclick="return confirm('Are you sure you want to delete this account?');"
-               class="btn btn-block btn-danger" role="button">Delete this account</a>
+               class="btn btn-block btn-warning" role="button">Delete this account</a>
         </div>
         <div class="col-md-3">
             <button type="submit" class="btn btn-block btn-success">Save changes</button>

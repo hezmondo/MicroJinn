@@ -2,13 +2,16 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h4 class="text-center">All loans:</h4>
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-9">
+            <input class="form-control form-control-lg" type="text" placeholder="Showing all loans" readonly>
+        </div>
+        <div class="col-md-3">
+            <a href="/loan/0?action=new" class="btn btn-block btn-danger" role="button">Add new loan</a>
         </div>
     </div>
-</div>
+</form>
 <div class="table-fixed">
     <table class="table" id="loans">
         <thead>
@@ -57,12 +60,4 @@
         </tbody>
     </table>
 </div>
-<form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-3">
-            <a href="/loan/0?action=new" class="btn btn-block btn-primary" role="button">Add new loan</a>
-        </div>
-    </div>
-</form>
-
 {% endblock %}

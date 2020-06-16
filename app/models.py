@@ -116,6 +116,28 @@ class Extrent(db.Model):
         return '<Extrent {}>'.format(self.rentcode)
         
         
+class Headrent(db.Model):
+    __tablename__ = 'headrent'
+
+    id = db.Column(db.Integer, primary_key=True)
+    hrcode = db.Column(db.String(15), index=True, unique=True)
+    rentpa = db.Column(db.Numeric(8,2))
+    arrears = db.Column(db.Numeric(8,2))
+    lastrentdate = db.Column(db.Date)
+    datecode = db.Column(db.String(10))
+    source = db.Column(db.String(20))
+    reference = db.Column(db.String(60))
+    note = db.Column(db.String(120))
+    landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
+    agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
+    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+    freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
+    tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
+
+    def __repr__(self):
+        return '<Rent {}>'.format(self.hrcode)
+
 class Income(db.Model):
     __tablename__ = 'income'
 
