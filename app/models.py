@@ -16,6 +16,7 @@ class Agent(db.Model):
     agdetails = db.Column(db.String(180))
     agemail = db.Column(db.String(60))
     agnotes = db.Column(db.String(60))
+    code = db.Column(db.String(15))
 
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
@@ -135,8 +136,6 @@ class Headrent(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
-    def __repr__(self):
-        return '<Rent {}>'.format(self.hrcode)
 
 class Income(db.Model):
     __tablename__ = 'income'
@@ -189,6 +188,50 @@ class Landlord(db.Model):
         return '<Landlord {}>'.format(self.name)
 
 
+class Lease(db.Model):
+    __tablename__ = 'lease'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    term = db.Column(db.Integer)
+    startdate = db.Column(db.Date)
+    startrent = db.Column(db.Numeric(8, 2))
+    info = db.Column(db.String(180))
+    upliftdate = db.Column(db.Date)
+    impvaluek = db.Column(db.Numeric(10, 2))
+    uplift_type = db.Column(db.String(15))
+    rentcap = db.Column(db.Numeric(8, 2))
+    lastvalue = db.Column(db.Numeric(8, 2))
+    last_value_date = db.Column(db.Date)
+
+
+class Lease_extension(db.Model):
+    __tablename__ = 'lease_extension'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    date = db.Column(db.Date)
+    value = db.Column(db.Integer)
+
+
+class Lease_relativity(db.Model):
+    __tablename__ = 'lease_relativity'
+
+    id = db.Column(db.Integer, primary_key=True)
+    unexpired = db.Column(db.Integer)
+    relativity = db.Column(db.Numeric(8, 2))
+
+
+class Lease_uplift_type(db.Model):
+    __tablename__ = 'lease_uplift_type'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(15))
+    years = db.Column(db.Integer)
+    method = db.Column(db.String(15))
+    value = db.Column(db.Numeric(8, 2))
+
+
 class Loan(db.Model):
     __tablename__ = 'loan'
 
@@ -209,16 +252,6 @@ class Loan(db.Model):
     loan_interest_rate_loan = db.relationship('Loan_interest_rate', backref='loan', lazy='dynamic')
 
 
-class Loan_trans(db.Model):
-    __tablename__ = 'loan_trans'
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
-    amount = db.Column(db.Numeric(8,2))
-    memo = db.Column(db.String(60))
-    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
-
-    
 class Loan_interest_rate(db.Model):
     __tablename__ = 'loan_interest_rate'
 
@@ -232,14 +265,24 @@ class Loan_statement(db.Model):
     __tablename__ = 'loan_statement'
 
     id = db.Column(db.Integer, primary_key=True)
-    ltid = db.Column(db.Integer, default=0)
+    ltid = db.Column(db.Integer)
     date = db.Column(db.Date)
     memo = db.Column(db.String(60))
-    transaction = db.Column(db.Numeric(8, 2), default='0.00')
-    rate = db.Column(db.Numeric(8, 2), default='0.00')
-    interest = db.Column(db.Numeric(8, 2), default='0.00')
-    add_interest = db.Column(db.String(10), default='No')
-    balance = db.Column(db.Numeric(8, 2), default='0.00')
+    transaction = db.Column(db.Numeric(8, 2))
+    rate = db.Column(db.Numeric(8, 2))
+    interest = db.Column(db.Numeric(8, 2))
+    add_interest = db.Column(db.String(10))
+    balance = db.Column(db.Numeric(8, 2))
+
+
+class Loan_trans(db.Model):
+    __tablename__ = 'loan_trans'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    amount = db.Column(db.Numeric(8, 2))
+    memo = db.Column(db.String(60))
+    loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
 
 class Manager(db.Model):
@@ -281,7 +324,7 @@ class Money_category(db.Model):
 
 
 class Money_item(db.Model):
-    __tablename__ = 'Money_item'
+    __tablename__ = 'money_item'
 
     id = db.Column(db.Integer, primary_key=True)
     num = db.Column(db.Integer)
@@ -337,32 +380,32 @@ class Rent(db.Model):
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
 
-    @classmethod
-    def next_date(self):
-        datesquerier = getCached_data_querier()
-        nextdate = None
-        if Rent.frequency == 1:
-            nextdate = Rent.lastrentdate + relativedelta(years=1)
-        elif Rent.frequency == 2:
-            dateF2 = datesquerier.getDateF2(Rent.datecode)
-            if Rent.lastrentdate.month == dateF2.date1.month and Rent.lastrentdate.day == dateF2.date1.day:
-                nextdate = date(Rent.lastrentdate.year, dateF2.date2.month, dateF2.date2.day)
-            elif Rent.lastrentdate.month == dateF2.date2.month and Rent.lastrentdate.day == dateF2.date2.day:
-                nextdate = date(Rent.lastrentdate.year + 1, dateF2.date1.month, dateF2.date1.day)
-        elif Rent.frequency == 4:
-            dateF4 = datesquerier.getDateF4(Rent.datecode)
-            if Rent.lastrentdate.month == dateF4.date1.month and Rent.lastrentdate.day == dateF4.date1.day:
-                nextdate = date(Rent.lastrentdate.year, dateF4.date2.month, dateF4.date2.day)
-
-            elif Rent.lastrentdate.month == dateF4.date2.month and Rent.lastrentdate.day == dateF4.date2.day:
-                nextdate = date(Rent.lastrentdate.year, dateF4.date3.month, dateF4.date3.day)
-
-            elif Rent.lastrentdate.month == dateF4.date3.month and Rent.lastrentdate.day == dateF4.date3.day:
-                nextdate = date(Rent.lastrentdate.year, dateF4.date4.month, dateF4.date4.day)
-
-            elif Rent.lastrentdate.month == dateF4.date4.month and Rent.lastrentdate.day == dateF4.date4.day:
-                nextdate = date(Rent.lastrentdate.year + 1, dateF4.date1.month, dateF4.date1.day)
-        return nextdate
+    # @classmethod
+    # def next_date(self):
+    #     datesquerier = getCached_data_querier()
+    #     nextdate = None
+    #     if Rent.frequency == 1:
+    #         nextdate = Rent.lastrentdate + relativedelta(years=1)
+    #     elif Rent.frequency == 2:
+    #         dateF2 = datesquerier.getDateF2(Rent.datecode)
+    #         if Rent.lastrentdate.month == dateF2.date1.month and Rent.lastrentdate.day == dateF2.date1.day:
+    #             nextdate = date(Rent.lastrentdate.year, dateF2.date2.month, dateF2.date2.day)
+    #         elif Rent.lastrentdate.month == dateF2.date2.month and Rent.lastrentdate.day == dateF2.date2.day:
+    #             nextdate = date(Rent.lastrentdate.year + 1, dateF2.date1.month, dateF2.date1.day)
+    #     elif Rent.frequency == 4:
+    #         dateF4 = datesquerier.getDateF4(Rent.datecode)
+    #         if Rent.lastrentdate.month == dateF4.date1.month and Rent.lastrentdate.day == dateF4.date1.day:
+    #             nextdate = date(Rent.lastrentdate.year, dateF4.date2.month, dateF4.date2.day)
+    #
+    #         elif Rent.lastrentdate.month == dateF4.date2.month and Rent.lastrentdate.day == dateF4.date2.day:
+    #             nextdate = date(Rent.lastrentdate.year, dateF4.date3.month, dateF4.date3.day)
+    #
+    #         elif Rent.lastrentdate.month == dateF4.date3.month and Rent.lastrentdate.day == dateF4.date3.day:
+    #             nextdate = date(Rent.lastrentdate.year, dateF4.date4.month, dateF4.date4.day)
+    #
+    #         elif Rent.lastrentdate.month == dateF4.date4.month and Rent.lastrentdate.day == dateF4.date4.day:
+    #             nextdate = date(Rent.lastrentdate.year + 1, dateF4.date1.month, dateF4.date1.day)
+    #     return nextdate
 
 
 # @classmethod
@@ -380,11 +423,11 @@ class Rental(db.Model):
     rentpa = db.Column(db.Numeric(8,2))
     arrears = db.Column(db.Numeric(8,2))
     startrentdate = db.Column(db.Date)
-    astdate = db.Column(db.Date)
-    lastgastest = db.Column(db.Date)
     note = db.Column(db.String(90))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+    astdate = db.Column(db.Date)
+    lastgastest = db.Column(db.Date)
 
     rental_trans_rental = db.relationship('Rental_trans', backref='rental', lazy='dynamic')
 
