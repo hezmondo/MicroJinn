@@ -149,7 +149,7 @@ def externalrentpage(id):
 def headrents():
     headrents = get_headrents()
 
-    return render_template('headrents.html', title='Headrents', headrents=headrents)
+    return render_template('headrents.html', headrents=headrents)
 
 
 @bp.route('/income', methods=['GET', 'POST'])
@@ -282,13 +282,23 @@ def money_account(id):
     return render_template('money_account.html', action=action, moneyacc=moneyacc)
 
 
+@bp.route('/money_deduce/<int:id>', methods=['GET', 'POST'])
+def money_deduce(id):
+    action = request.args.get('action', "view", type=str)
+    if action == "X":
+        return redirect('/income_object/{}'.format(id))
+    else:
+        return redirect('/money_item/{}'.format(id))
+
+
 @bp.route('/money_items/<int:id>', methods=["GET", "POST"])
 @login_required
 def money_items(id):
+    action = request.args.get('action', "account", type=str)
     bankaccs, cats, cleareds = get_money_options()
-    moneyitems, accsums = get_moneyitems(id)
+    accsums, moneyitems, values = get_moneyitems(id, action)
 
-    return render_template('money_items.html', moneyitems=moneyitems,
+    return render_template('money_items.html', action=action, moneyitems=moneyitems, values=values,
                            bankaccs=bankaccs, accsums=accsums, cats=cats, cleareds=cleareds)
 
 

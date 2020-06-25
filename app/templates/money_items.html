@@ -7,62 +7,67 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="payee">Payee:</label>
-            <input type="text" class="form-control" name="payee" value="">
+            <input type="text" class="form-control" name="payee" value="{{ values.payee }}">
         </div>
         <div class="col-md-2">
             <label for="memo">Memo:</label>
-            <input type="text" class="form-control" name="memo" value="">
+            <input type="text" class="form-control" name="memo" value="{{ values.memo }}">
         </div>
         <div class="col-md-2">
             <label for="category">Category:</label>
-            {{ widgets.combobox(name="category", items=cats, item_selected=cats[0]) }}
+            {{ widgets.combobox(name="category", items=cats, item_selected=values.category) }}
         </div>
+        {% if action == "allaccs" %}
         <div class="col-md-2">
-            <label for="account">Account:</label>
-            {{ widgets.combobox(name="account", items=bankaccs, item_selected=bankaccs[0]) }}
+            <label for="accdesc">Account:</label>
+            {{ widgets.combobox(name="accdesc", items=bankaccs, item_selected=values['accdesc']) }}
         </div>
+        {% endif %}
         <div class="col-md-2">
             <label for="cleared">cleared:</label>
-            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=cleareds[0]) }}
+            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=values.cleared) }}
         </div>
         <div class="col-md-2">
             <label for="balance">Balance:</label>
             <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
         </div>
     </div>
-</form>
-</div><div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h4 class="text-center">Filtered to show:</h4>
+    <div class="form-group row">
+        <div class="col-md-9">
+            <input class="form-control form-control-lg" type="text" placeholder="Show transactions for {{ values.accdesc }}" readonly>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-danger">Filter now</button>
         </div>
     </div>
-</div>
+</form>
 <div class="table-fixed">
     <table class="table" id="moneyitems">
         <thead>
         <tr>
-            <th style="width: 10.00%">num</th>
-            <th style="width: 12.00%">Date</th>
-            <th style="width: 15.00%">Payer</th>
-            <th style="width: 10.00%">Amount</th>
-            <th style="width: 15.00%">Memo</th>
-            <th style="width: 15.00%">Account</th>
-            <th style="width: 15.00%">Category</th>
+            <th style="width: 8.00%">id</th>
+            <th style="width: 8.00%">num</th>
+            <th style="width: 12.00%">date</th>
+            <th style="width: 14.00%">payer</th>
+            <th style="width: 10.00%">amount</th>
+            <th style="width: 14.00%">memo</th>
+            <th style="width: 12.00%">account</th>
+            <th style="width: 14.00%">cCategory</th>
             <th style="width: 8.00%"></th>
         </tr>
         </thead>
         <tbody>
         {% for item in moneyitems %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%"> {{ item.num }}</td>
+            <td style="width: 8.00%"> {{ item.id }}</td>
+            <td style="width: 8.00%"> {{ item.num }}</td>
             <td style="width: 12.00%"> {{ item.date.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 15.00%"> {{ item.payer }}</td>
+            <td style="width: 14.00%"> {{ item.payer }}</td>
             <td style="width: 10.00%"> {{ item.amount }}</td>
-            <td style="width: 15.00%">{{ item.memo }}</td>
-            <td style="width: 15.00%"> {{ item.accdesc }}</td>
-            <td style="width: 15.00%"> {{ item.cat_name }}</td>
-            <td style="width: 8.00%"><a href="/money_item/{{ item.id }}?action=view">View</a></td>
+            <td style="width: 14.00%">{{ item.memo }}</td>
+            <td style="width: 12.00%"> {{ item.accdesc }}</td>
+            <td style="width: 14.00%"> {{ item.cat_name }}</td>
+            <td style="width: 8.00%"><a href="/money_deduce/{{ item.id }}?action={{ item.num }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

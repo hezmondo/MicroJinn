@@ -2,13 +2,19 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h4 class="text-center">All accounts:</h4>
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-4">
+            <input class="form-control form-control-lg" type="text" placeholder="Showing all accounts" readonly>
+        </div>
+        <div class="col-md-4">
+            <a href="/money_account/0?action=new" class="btn btn-block btn-danger" role="button">Add new account</a>
+        </div>
+        <div class="col-md-4">
+            <a href="/money_items/0?action=allaccs" class="btn btn-block btn-danger" role="button">Show all account transactions</a>
         </div>
     </div>
-</div>
+</form>
 <div class="table-fixed">
     <table class="table" id="money">
         <thead>
@@ -27,7 +33,7 @@
             <td style="width: 50.00%"> {{ item.accdesc }}</td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
-            <td style="width: 10.00%"><a href="/money_items/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="/money_items/{{ item.id }}?action=account">View</a></td>
         </tr>
         {% endfor %}
         <tr>
