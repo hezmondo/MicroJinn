@@ -73,13 +73,28 @@ def post_incomeobject(id, action):
         income = Income.query.get(id)
     else:
         income = Income()
-    payer = request.form.get("payer")
-    print(payer)
+    income.paydate = request.form.get("paydate")
+    income.amount = request.form.get("amount")
+    income.payer = request.form.get("payer")
+    bankacc = request.form.get("bankacc")
+    income.bankacc_id = \
+        Money_account.query.with_entities(Money_account.id).filter(Money_account.accdesc == bankacc).one()[0]
     paytype = request.form.get("paytype")
-    rentcodes = request.form.getlist("rentcode")
-    print(rentcodes)
-    print(request.form)
+    income.paytype_id = \
+        Typepayment.query.with_entities(Typepayment.id).filter(Typepayment.paytypedet == paytype).one()[0]
     db.session.add(income)
+    allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
+                     request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
+                     request.form.getlist('landlord'))
+    for incall_id, rentcode, alloctot, chargedesc, landlord in allocs:
+        incalloc = Incomealloc.query.get(incall_id)
+        incalloc.rentcode = rentcode
+        incalloc.amount = alloctot
+        incalloc.chargetype_id = \
+            Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
+        incalloc.landlord_id = \
+            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+        income.incomealloc_income.append(incalloc)
     db.session.commit()
     id_ = income.id
 

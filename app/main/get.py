@@ -117,7 +117,7 @@ def get_incomeobject(id):
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
     incomeallocs = Incomealloc.query.join(Landlord).join(Chargetype).with_entities(Incomealloc.id,
-                    Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode, Incomealloc.amount,
+                    Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
                     Landlord.name, Chargetype.chargedesc).filter(Incomealloc.income_id == id).all()
 
     return income, incomeallocs
@@ -260,7 +260,7 @@ def get_moneyitems(id, action):
                   Income.date, Income.payer, Income.amount, Incomealloc.rentcode.label('memo'), Money_account.accdesc,
                       literal("BACS income").label('cat_name'), literal("1").label('cleared')) \
              .filter(*income_filter)) \
-             .order_by(desc(Money_item.date), desc(Income.date)).limit(100)
+             .order_by(desc(Money_item.date), desc(Income.date), Money_item.memo, Incomealloc.rentcode).limit(100)
 
     accsums = Money_item.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()).label('cbalance'),
                  func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
