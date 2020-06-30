@@ -147,9 +147,9 @@ def externalrentpage(id):
 
 @bp.route('/headrents', methods=['GET', 'POST'])
 def headrents():
-    headrents = get_headrents()
+    headrents, statuses = get_headrents()
 
-    return render_template('headrents.html', headrents=headrents)
+    return render_template('headrents.html', headrents=headrents, statuses=statuses)
 
 
 @bp.route('/income', methods=['GET', 'POST'])

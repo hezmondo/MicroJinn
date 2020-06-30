@@ -4,8 +4,8 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
-    Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
+from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Headrent, Income, \
+    Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
     Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -74,9 +74,15 @@ def get_externalrent(id):
 
 
 def get_headrents():
-    headrents = None
-
-    return headrents
+    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    statuses.insert(0, "all statuses")
+    # tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    # tenures.insert(0, "all tenures")
+    headrents = Headrent.query.join(Typestatus).outerjoin(Agent).with_entities(Agent.agdetails, Headrent.hrcode,
+                Headrent.rentpa, Headrent.arrears, Headrent.freq_id, Headrent.lastrentdate, Headrent.propaddr,
+                func.mjinn.next_date(Headrent.lastrentdate, Headrent.freq_id, 1).label('nextrentdate'),
+                Typestatus.statusdet).limit(100).all()
+    return headrents, statuses
 
 
 def get_incomeitems():

@@ -128,6 +128,7 @@ class Headrent(db.Model):
     datecode = db.Column(db.String(10))
     source = db.Column(db.String(20))
     reference = db.Column(db.String(60))
+    propaddr = db.Column(db.String(180))
     note = db.Column(db.String(120))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))

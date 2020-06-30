@@ -1,6 +1,7 @@
 from flask import redirect, request
 
 from app import db
+from app.main.common import commit_to_database
 from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, \
@@ -16,7 +17,7 @@ def post_agent(id, action):
     agent.agemail = request.form["email"]
     agent.agnotes = request.form["notes"]
     db.session.add(agent)
-    db.session.commit()
+    commit_to_database()
     id_ = agent.id
 
     return id_
@@ -69,6 +70,7 @@ def post_emailaccount(id, action):
 
 
 def post_incomeobject(id, action):
+    # this object comprises 1 income record plus 1 or more incomealloc records. First, we do the income record
     if action == "edit":
         income = Income.query.get(id)
     else:
@@ -82,7 +84,9 @@ def post_incomeobject(id, action):
     paytype = request.form.get("paytype")
     income.paytype_id = \
         Typepayment.query.with_entities(Typepayment.id).filter(Typepayment.paytypedet == paytype).one()[0]
+    # having set the column values, we add this single income record to the db session
     db.session.add(income)
+    # now we get the income allocations from the request form to post 1 or more records to the incomealloc table
     allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
                      request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
                      request.form.getlist('landlord'))
@@ -94,8 +98,11 @@ def post_incomeobject(id, action):
             Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
         incalloc.landlord_id = \
             Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+        # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
         income.incomealloc_income.append(incalloc)
+    # having added the income record and all incomealloc records to the db session, we now attempt a commit
     db.session.commit()
+    # in case of a new record, we need to find and return the new id, to display the new (or updated) income object
     id_ = income.id
 
     return id_
