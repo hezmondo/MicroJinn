@@ -11,7 +11,7 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_ema
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj, get_rentobjects
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
-from app.models import Agent, Charge, Emailaccount, Income, Jstore, Landlord, Loan, Money_account, \
+from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, Money_account, \
     Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental
 
 
@@ -80,6 +80,12 @@ def delete_item(id):
             db.session.delete(d_emailacc)
             db.session.commit()
             return redirect('/emailaccs')
+    elif item == "incomealloc":
+        d_alloc = Incomealloc.query.get(id)
+        if d_alloc:
+            db.session.delete(d_alloc)
+            db.session.commit()
+            return redirect('/income')
     elif item == "landlord":
         d_landlord = Landlord.query.get(id)
         if d_landlord:

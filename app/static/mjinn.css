@@ -1,6 +1,8 @@
+#xalloc {
+    display: none;
+}
 .btn-danger
 {
-
   background-color: hsl(351, 68%, 11%) !important;
   background-repeat: repeat-x;
   background-image: -o-linear-gradient(top, #d12741, #2f080e);

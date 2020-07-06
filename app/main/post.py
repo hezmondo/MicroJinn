@@ -90,12 +90,21 @@ def post_incomeobject(id, action):
     allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
                      request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
                      request.form.getlist('landlord'))
+    print(request.form)
     for incall_id, rentcode, alloctot, chargedesc, landlord in allocs:
-        incalloc = Incomealloc.query.get(incall_id)
+        print(incall_id, rentcode, alloctot, chargedesc, landlord)
+        if alloctot == "0" or alloctot == "0.00":
+            continue
+        if incall_id and int(incall_id) > 0:
+            incalloc = Incomealloc.query.get(int(incall_id))
+        else:
+            incalloc = Incomealloc()
         incalloc.rentcode = rentcode
         incalloc.amount = alloctot
+        print(incalloc.amount)
         incalloc.chargetype_id = \
             Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
+        print(incalloc.chargetype_id)
         incalloc.landlord_id = \
             Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
         # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
