@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="paydate">pay date:</label>
+            <input type="date" class="form-control" name="paydate" value="{{ today }}">
+        </div>
+        <div class="col-md-3">
+            <label for="amount">amount:</label>
+            <input type="text" class="form-control" name="amount" value="{{ post_tot }}">
+        </div>
+        <div class="col-md-6">
+            <label for="payer">payer:</label>
+            <input type="text" class="form-control" name="payer" value="{{ post.tenantname }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="bankacc">bank account:</label>
+            {{ widgets.combobox(name="bankacc", items=bankaccs, item_selected=post.accdesc) }}
+        </div>
+        <div class="col-md-3">
+            <label for="paytype">payment type:</label>
+            {{ widgets.combobox(name="paytype", items=paytypes, item_selected=post.paytypedet) }}
+        </div>
+        <div class="col-md-2">
+            <label for="id">id:</label>
+            <input type="text" class="form-control" name="id" value="0">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-12">
+            <h4 class="text-center">Plus charges:</h4>
+        </div>
+    </div>
+    {% for item in allocs %}
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rencode">Rent code:</label>
+            <input type="text" class="form-control" name="rencode" value="{{ item.rentcode }}">
+        </div>
+        <div class="col-md-2">
+            <label for="alloctot">Amount:</label>
+            <input type="text" class="form-control" name="alloctot" value="{{ item.chargebalance }}">
+        </div>
+        <div class="col-md-2">
+            <label for="chargdesc">Charge type:</label>
+            {{ widgets.combobox(name="chargdesc", items=chargedescs, item_selected=item.chargedesc) }}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="form-group row">
+        <div class="col-md-3">
+            <button id="show-xalloc" type="button">Show extra allocation</button>
+        </div>
+    </div>
+    <div id="xalloc">
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label for="rentcode">Rent code:</label>
+                <input type="text" class="form-control" name="rentcode" value="">
+            </div>
+            <div class="col-md-2">
+                <label for="alloctot">Amount:</label>
+                <input type="text" class="form-control" name="alloctot" value="0">
+            </div>
+            <div class="col-md-3">
+                <label for="chargedesc">Charge type:</label>
+                {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=chargedescs[0]) }}
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-3">
+                <button id="add-alloc" type="button">Add allocation</button>
+            </div>
+        </div>
+    </div>
+    <div id="newalloc">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save as new posting</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

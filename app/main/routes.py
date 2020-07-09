@@ -4,7 +4,7 @@ from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_emailaccount, get_emailaccounts, \
-    get_externalrent, get_headrents, get_incomeobject, \
+    get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
     get_landlord, get_landlords, get_loan, get_loan_options, get_loans, get_loanstatement, get_moneyaccount, \
     get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
@@ -178,6 +178,19 @@ def income_object(id):
 
     return render_template('income_object.html', action=action, bankaccs=bankaccs, chargedescs=chargedescs,
                            income=income, incomeallocs=incomeallocs, landlords=landlords, paytypes=paytypes)
+
+
+@bp.route('/income_post/<int:id>', methods=['GET', 'POST'])
+@login_required
+def income_post(id):
+    if request.method == "POST":
+        id = post_incomeobject(id, "new")
+
+    bankaccs, chargedescs, landlords, paytypes = get_incomeobjectoptions()
+    allocs, post, post_tot, today = get_incomepost(id)
+
+    return render_template('income_post.html', allocs=allocs, bankaccs=bankaccs, chargedescs=chargedescs,
+                           paytypes=paytypes, post=post, post_tot=post_tot, today=today)
 
 
 @bp.route('/', methods=['GET', 'POST'])

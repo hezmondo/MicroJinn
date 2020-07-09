@@ -1,5 +1,7 @@
 import json
+from decimal import Decimal
 from app import db
+import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
@@ -137,6 +139,28 @@ def get_incomeobjectoptions():
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
 
     return bankaccs, chargedescs, landlords, paytypes
+
+
+def get_incomepost(id):
+    post = Rent.query.join(Landlord).join(Money_account).join(Charge).with_entities(Rent.rentcode,
+                Rent.arrears, Rent.datecode, Rent.lastrentdate, Rent.landlord_id,
+                func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                func.sum(Charge.chargebalance).label('chargetot'),
+                Rent.rentpa, Rent.tenantname, Rent.freq_id, Money_account.accdesc) \
+                .filter(Rent.id == id) \
+                .one_or_none()
+    arrears = post.arrears
+    today = datetime.date.today()
+    allocs = Charge.query.join(Chargetype).join(Rent).with_entities(Rent.rentcode, Charge.chargebalance,
+                    Chargetype.chargedesc).filter(Charge.rent_id == id).all()
+    if post.chargetot and post.chargetot > 0:
+        post_tot = arrears + post.chargetot
+    elif arrears > 0:
+        post_tot = arrears
+    else:
+        post_tot = post.rentpa
+
+    return allocs, post, post_tot, today
 
 
 def get_landlords():
