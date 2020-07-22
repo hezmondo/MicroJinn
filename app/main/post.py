@@ -2,7 +2,7 @@ from flask import redirect, request
 
 from app import db
 from app.main.common import commit_to_database
-from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -87,28 +87,51 @@ def post_incomeobject(id, action):
     # having set the column values, we add this single income record to the db session
     db.session.add(income)
     # now we get the income allocations from the request form to post 1 or more records to the incomealloc table
-    allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
-                     request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
-                     request.form.getlist('landlord'))
-    print(request.form)
-    for incall_id, rentcode, alloctot, chargedesc, landlord in allocs:
-        print(incall_id, rentcode, alloctot, chargedesc, landlord)
-        if alloctot == "0" or alloctot == "0.00":
-            continue
-        if incall_id and int(incall_id) > 0:
-            incalloc = Incomealloc.query.get(int(incall_id))
-        else:
+    if action == "edit":
+        allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
+                         request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
+                         request.form.getlist('landlord'))
+        for incall_id, rentcode, alloctot, chargedesc, landlord in allocs:
+            print(incall_id, rentcode, alloctot, chargedesc, landlord)
+            if alloctot == "0" or alloctot == "0.00":
+                continue
+            if incall_id and int(incall_id) > 0:
+                incalloc = Incomealloc.query.get(int(incall_id))
+            else:
+                incalloc = Incomealloc()
+            incalloc.rentcode = rentcode
+            incalloc.amount = alloctot
+            print(incalloc.amount)
+            incalloc.chargetype_id = \
+                Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
+            print(incalloc.chargetype_id)
+            incalloc.landlord_id = \
+                Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+            # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
+            income.incomealloc_income.append(incalloc)
+    else:
+        allocs = zip(request.form.getlist('rentcode'), request.form.getlist("c_id"), request.form.getlist("chargedesc"),
+                     request.form.getlist('alloctot'), request.form.getlist('landlord'))
+        for rentcode, alloctot, c_id, chargedesc, landlord in allocs:
+            print(rentcode, alloctot, c_id, chargedesc, landlord)
+            if alloctot == "0" or alloctot == "0.00":
+                continue
             incalloc = Incomealloc()
-        incalloc.rentcode = rentcode
-        incalloc.amount = alloctot
-        print(incalloc.amount)
-        incalloc.chargetype_id = \
-            Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
-        print(incalloc.chargetype_id)
-        incalloc.landlord_id = \
-            Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
-        # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
-        income.incomealloc_income.append(incalloc)
+            incalloc.rentcode = rentcode
+            incalloc.amount = alloctot
+            print(incalloc.amount)
+            incalloc.chargetype_id = \
+                Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
+            print(incalloc.chargetype_id)
+            incalloc.landlord_id = \
+                Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+            # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
+            income.incomealloc_income.append(incalloc)
+            # now we have to deal with updating or deleting existing charges
+            if c_id  and c_id > 0:
+                d_charge = Charge.query.get(c_id)
+                db.session.delete(d_charge)
+
     # having added the income record and all incomealloc records to the db session, we now attempt a commit
     db.session.commit()
     # in case of a new record, we need to find and return the new id, to display the new (or updated) income object

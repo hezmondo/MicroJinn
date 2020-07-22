@@ -40,16 +40,24 @@
     {% for item in allocs %}
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rencode">Rent code:</label>
-            <input type="text" class="form-control" name="rencode" value="{{ item.rentcode }}">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="{{ item.rentcode }}">
         </div>
         <div class="col-md-2">
-            <label for="alloctot">Amount:</label>
-            <input type="text" class="form-control" name="alloctot" value="{{ item.chargebalance }}">
+            <label for="c_id">Amount:</label>
+            <input type="text" class="form-control" name="c_id" value="{{ item.id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="c_bal">Amount:</label>
+            <input type="text" class="form-control" name="c_bal" value="{{ item.chargebalance }}">
         </div>
         <div class="col-md-2">
             <label for="chargdesc">Charge type:</label>
             {{ widgets.combobox(name="chargdesc", items=chargedescs, item_selected=item.chargedesc) }}
+        </div>
+        <div class="col-md-2">
+            <label for="alloctot">Amount:</label>
+            <input type="text" class="form-control" name="alloctot" value="{{ item.chargebalance }}">
         </div>
     </div>
     {% endfor %}

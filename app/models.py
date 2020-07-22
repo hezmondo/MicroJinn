@@ -42,22 +42,23 @@ class Chargetype(db.Model):
     charge_chargetype = db.relationship('Charge', backref='chargetype', lazy='dynamic')
 
 
-class Date_f2(db.Model):
-    __tablename__ = 'date_f2'
+class Dates(db.Model):
+    __tablename__ = 'dates'
 
-    code = db.Column(db.String(10), primary_key=True)
-    date1 = db.Column(db.Date)
-    date2 = db.Column(db.Date)
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    month = db.Column(db.Integer)
+    day = db.Column(db.Integer)
 
 
-class Date_f4(db.Model):
-    __tablename__ = 'date_f4'
+class Doc(db.Model):
+    __tablename__ = 'doc'
 
-    code = db.Column(db.String(10), primary_key=True)
-    date1 = db.Column(db.Date)
-    date2 = db.Column(db.Date)
-    date3 = db.Column(db.Date)
-    date4 = db.Column(db.Date)
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    desc = db.Column(db.String(60))
+
+    letter_doc = db.relationship('Letter', backref='doc', lazy='dynamic')
 
 
 class Emailaccount(db.Model):
@@ -155,7 +156,6 @@ class Incomealloc(db.Model):
     __tablename__ = 'incomealloc'
 
     id = db.Column(db.Integer, primary_key=True)
-    alloc_id = db.Column(db.Integer)
     rentcode = db.Column(db.String(15))
     amount = db.Column(db.Numeric(8,2))
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
@@ -231,6 +231,19 @@ class Lease_uplift_type(db.Model):
     years = db.Column(db.Integer)
     method = db.Column(db.String(15))
     value = db.Column(db.Numeric(8, 2))
+
+
+class Letter(db.Model):
+    __tablename__ = 'letter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    subject = db.Column(db.String(60))
+    part1 = db.Column(db.String(900))
+    part2 = db.Column(db.String(900))
+    part3 = db.Column(db.String(900))
+    type_id = db.Column(db.Integer, db.ForeignKey('typeletter.id'))
+    doc_id = db.Column(db.Integer, db.ForeignKey('doc.id'))
 
 
 class Loan(db.Model):
@@ -506,6 +519,15 @@ class Typefreq(db.Model):
     rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
     
+class Typeletter(db.Model):
+    __tablename__ = 'typeletter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ltypedet = db.Column(db.String(45))
+
+    letter_typeletter = db.relationship('Letter', backref='typeletter', lazy='dynamic')
+
+
 class Typemailto(db.Model):
     __tablename__ = 'typemailto'
 

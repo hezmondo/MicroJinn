@@ -1,12 +1,11 @@
 import json
-from decimal import Decimal
 from app import db
 import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.models import Agent, Charge, Chargetype, Date_f2, Date_f4, Extmanager, Extrent, Headrent, Income, \
+from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
@@ -125,7 +124,7 @@ def get_incomeobject(id):
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
     incomeallocs = Incomealloc.query.join(Landlord).join(Chargetype).with_entities(Incomealloc.id,
-                    Incomealloc.income_id, Incomealloc.alloc_id, Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
+                    Incomealloc.income_id, Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
                     Landlord.name, Chargetype.chargedesc).filter(Incomealloc.income_id == id).all()
 
     return income, incomeallocs
@@ -151,8 +150,8 @@ def get_incomepost(id):
                 .one_or_none()
     arrears = post.arrears
     today = datetime.date.today()
-    allocs = Charge.query.join(Chargetype).join(Rent).with_entities(Rent.rentcode, Charge.chargebalance,
-                    Chargetype.chargedesc).filter(Charge.rent_id == id).all()
+    allocs = Charge.query.join(Chargetype).join(Rent).join(Landlord).with_entities(Rent.rentcode, Charge.id,
+                   Chargetype.chargedesc, Charge.chargebalance, Landlord.name).filter(Charge.rent_id == id).all()
     if post.chargetot and post.chargetot > 0:
         post_tot = arrears + post.chargetot
     elif arrears > 0:
@@ -497,7 +496,7 @@ def getrentobjs(action, qfilter, runsize):
                 .join(Rent) \
                 .outerjoin(Agent) \
                 .with_entities(Rent.id, Agent.agdetails, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                               func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
                 .filter(*qfilter) \
                 .group_by(Rent.id) \
@@ -524,7 +523,7 @@ def getrentobjs(action, qfilter, runsize):
                 .join(Typesalegrade) \
                 .join(Typetenure) \
                 .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
-                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                               func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                                Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                func.sum(Charge.chargebalance).label('totcharge'),
@@ -558,7 +557,7 @@ def getrentobj(id):
                 .join(Typestatus) \
                 .join(Typetenure) \
                 .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                               func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                               func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                                Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
                                Agent.agdetails, Landlord.name, Typeactype.actypedet,
                                Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,

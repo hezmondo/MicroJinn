@@ -184,7 +184,7 @@ def income_object(id):
 @login_required
 def income_post(id):
     if request.method == "POST":
-        id = post_incomeobject(id, "new")
+        post_incomeobject(id, "new")
 
     bankaccs, chargedescs, landlords, paytypes = get_incomeobjectoptions()
     allocs, post, post_tot, today = get_incomepost(id)

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+    <form method="POST" id="target">
+		<div class="form-group row">
+			<div class="col-md-2">
+				<label for="lcode">Code:</label>
+				<input type="text" class="form-control" name="lcode" value="{{ item.code }}">
+			</div>
+            <div class="col-md-4">
+                <label for="stype">Type:</label>
+                {{ widgets.combobox(name="type", items=types, item_selected=typedet) }}
+            </div>
+            <div class="col-md-8">
+				<label for="ldesc">Description:</label>
+				<input type="text" class="form-control" name="ldesc" value="{{ item.ldesc }}">
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-md-2">
+				<label for="lsalutation">Salutation:</label>
+				<input type="text" class="form-control" name="lsalutation" value="{{ item.lsalutation }}">
+			</div>
+            <div class="col-md-4">
+                <label for="lsubject">Subject:</label>
+				<input type="text" class="form-control" name="lsubject" value="{{ item.lsubject }}">
+            </div>
+            <div class="col-md-2">
+				<label for="lref">Description:</label>
+				<input type="text" class="form-control" name="lref" value="{{ item.lref }}">
+			</div>
+            <div class="col-md-2">
+				<label for="ldate">Date:</label>
+				<input type="text" class="form-control" name="ldate" value="{{ item.ldate }}">
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-md-12">
+				<label for="lpart1">Part 1:</label>
+				<textarea class="form-control" rows="8" name="lpart1" >{{ item.lpart1 }}</textarea>
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-md-12">
+				<label for="lpart2">Part 2:</label>
+				<textarea class="form-control" rows="8" name="lpart12" >{{ item.lpart2 }}</textarea>
+			</div>
+		</div>
+		<div class="form-group row">
+			<div class="col-md-12">
+				<label for="lpart3">Part 3:</label>
+				<textarea class="form-control" rows="8" name="lpart3" >{{ item.lpart3 }}</textarea>
+			</div>
+		</div>
+    </form>
+{% endblock %}
+
