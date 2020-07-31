@@ -177,8 +177,8 @@ class Landlord(db.Model):
     __tablename__ = 'landlord'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(90))
-    addr = db.Column(db.String(180))
+    landlordname = db.Column(db.String(90))
+    landlordaddr = db.Column(db.String(180))
     taxdate = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
     bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
@@ -304,9 +304,9 @@ class Manager(db.Model):
     __tablename__ = 'manager'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(90))
-    addr1 = db.Column(db.String(180))
-    addr2 = db.Column(db.String(180))
+    managername = db.Column(db.String(90))
+    manageraddr = db.Column(db.String(180))
+    manageraddr2 = db.Column(db.String(180))
 
     landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
 

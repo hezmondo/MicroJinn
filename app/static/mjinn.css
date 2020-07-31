@@ -50,3 +50,35 @@ select:-internal-list-box option:checked {
     background-color: rgb(206, 227, 227) !important;
     color: rgb(16, 16, 16) !important;
 }
+/* letters.css */
+/* standard CSS for letters */
+
+/* font family */
+/* body {
+/*     font-family: Verdana, Tahoma, sans-serif;
+/* }
+
+/* font sizes */
+
+.font-size-25px {
+    font-size: 12.75pt;
+}
+
+.font-size-large {
+    font-size: 12.5pt;
+}
+
+.font-size-medium {
+    font-size: 10.5pt;
+}
+
+.font-size-small {
+    font-size: 9.5pt;
+}
+
+.font-size-17px {
+    font-size: 9pt;
+}
+
+/* End of letters.css */
+

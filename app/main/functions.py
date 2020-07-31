@@ -1,130 +1,29 @@
+import hashlib
 import typing
-import datetime
 import decimal
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
 import re
 from app.main.exceptions import RentIntegerException
 
-# List of basic functions that don't rely on GUI elements or on specific objects like rents or cases.
-# includes string/date/decimal conversion functions
 
-#     """n old periods enables the variables to look backwards e.g. 0 = next rent date, 1 = last rent date,
-#        2 = rent date before last, etc.
-#
-#        If no rent then just pass a list of tuples of variables with associated example
-#
-#        Might be nice to do it without DbHandler but not sure how receipts could be handled"""
-#     # jon: Removed dbHandler=None parameter, not used
-#
-#     today = datetime.date.today()
-#
-#     rent_date = annual_rent = period_rent = charges = arrears = tot = period_start_date = period_end_date = \
-#         tot_rent_start_date = iswas = s_lastIncomeDate = m_lastIncomeTotal = None
-#
-#     if rent:
-#         if n_periods == 1:
-#             rent_date = rent.info['NextRentDate']
-#         elif n_periods < 1:
-#             rent_date = rent.info['LastRentDate']
-#         else:
-#             raise Exception("Rent {} tried to call word_variables for a rent date before lastRentDate".format(
-#                 rent.info['RentCode']))
-#
-#         annual_rent = rent.info['Rent']
-#         period_rent = rent.periodRent()
-#         charges = rent.info['ChargesBalance'] if rent.info['ChargesBalance'] is not None else money(0.00)
-#
-#         if pay_request and n_periods == 1:
-#             arrears = rent.info['Arrears']
-#             tot = arrears + charges + period_rent
-#         elif pay_request:
-#             arrears = rent.info['Arrears'] - period_rent if rent.info['Arrears'] >= period_rent else 0
-#             tot = arrears + charges + period_rent
-#         else:
-#             arrears = rent.info['Arrears']
-#             tot = arrears + charges
-#
-#         period_start_date, period_end_date = rent.payReqDates(rent_date)
-#
-#         if n_periods < 1:
-#             tot_rent_start_date = rent.arrearsStartDate() if arrears > 0 else period_start_date
-#         else:
-#             tot_rent_start_date = rent.arrearsStartDate()
-#
-#         iswas = "is" if rent_date > today else "was"
-#
-#         if rent.dict_lastRec is not None:
-#             s_lastIncomeDate = dateToStr(rent.dict_lastRec['PayDate'])
-#             m_lastIncomeTotal = money(rent.dict_lastRec['IncomeTotal'])
-#         else:
-#             s_lastIncomeDate = ""
-#             m_lastIncomeTotal = money(0.00)
-#
-#     word_variables = [
-#         ('#AdvArr#', rent.advArr() if rent else "in advance"),
-#         ('#AnnualRent#', moneyToStr(annual_rent if rent else 25.00, pound=True)),
-#         ('#Arrears#', moneyToStr(arrears if rent else 75.00, pound=True)),
-#         ('#BankName#', rent.landlord['BankName'] if rent else "Natwest RH"),
-#         ('#BankSortCode#', rent.landlord['BankSortCode'] if rent else "00-00-00"),
-#         ('#BankAccountNumber#', rent.landlord['BankAccountNumber'] if rent else "10101010"),
-#         ('#BankAccountName#', rent.landlord['BankAccountName'] if rent else "R Hesmondhalgh & D Maloney"),
-#         ('#ChargeType#', rent.chargeType() if rent else "ground rent"),
-#         ('#ChargeTypeCap#', rent.chargeType().capitalize() if rent else "Ground rent"),
-#         ('#ChargesStat#', rent.chargesStatement() if rent else ""),
-#         ('#IsWas#', iswas if rent else "'is' or 'was'"),
-#         ('#HashCode#', rent.hashCode() if rent else "Abracadabra"),
-#         ('#Landlord#', rent.landlord['Name'] if rent else "Richard Hesmondhalgh"),
-#         ('#LandlordAddress#', rent.landlord['Address'] if rent else "Hawthorn Dene, School Lane, West Hill, Ottery St. Mary, Devon EX11 1UP"),
-#         ('#PaidToDate#', dateToStr(rent.info['PaidToDate']) if rent else "27/09/2008"),
-#         ('#LastIncomeDate#', s_lastIncomeDate if rent else "22/02/2002"),
-#         ('#LastIncomeTotal#', moneyToStr(m_lastIncomeTotal if rent else 5.00, pound=True)),
-#         ('#LastRentDate#', dateToStr(rent.info['LastRentDate']) if rent else "01/06/2014"),
-#         ('#Lessor#', rent.lessor() if rent else "Lessor/Rent Charge owner"),
-#         ('#MailAddrFlat#', rent.mailAddr().replace("\n", ", ") if rent else ""),
-#         ('#Manager#', rent.landlord['Manager'] if rent else "Secure Equity Assets Management Ltd."),
-#         ('#ManagerAddress#', rent.landlord['ManagerAddress'] if rent else "Hawthorn Dene, School Lane, West Hill, Ottery St. Mary, Devon EX11 1UP"),
-#         ('#ManagerDet#', rent.landlord['ManagerDetails'] if rent else "Registered in England company number 6397879"),
-#         ('#NFee#', moneyToStr(rent.info['NFeeTotal'] if rent else 15.00, pound=True)),
-#         ('#NextRentDate#', dateToStr(rent.info['NextRentDate']) if rent else "21/01/2012"),
-#         ('#NextRentStat#', rent.nextRentStatement() if rent else ""),
-#         ('#OwingStat#', rent.newOwingStatement() if rent else ""),
-#         ('#Period#', rent.wordPeriodShort() if rent else "half-year or quarter-year e.g.\n'due #Period#ly' = 'due half-yearly'\n'one #Period#'s rent' = 'one half-year's rent'"),
-#         ('#PeriodRent#', moneyToStr(period_rent if rent else 12.50, pound=True)),
-#         ('#PeriodRentDouble#', moneyToStr(2 * period_rent if rent else 12.50, pound=True)),
-#         # ('#PriceBase#', moneyToStr(rent.info['PriceBase'] if rent else 999999.99, pound=True)),
-#         ('#Price#', moneyToStr(rent.priceFull() if rent else 999999.99, pound=True)),
-#         ('#PricePM#', moneyToStr(rent.pricePM() if rent else 999999.99, pound=True)),
-#         ('#PropAddr#', rent.propAddr() if rent else ""),
-#         ('#PropAddrFlat#', rent.propAddr().replace("\n", ", ") if rent else ""),
-#         ('#ReceiptStat#', "PLACEHOLDER" if rent else "charge details on separate lines"),
-#         # THis statement can only be generated
-#         # with a specific receipt ID passed, therefore is found at 'run-time' rather than always being accessible
-#         ('#RedRent#', rent.reducedRent(False) if rent else 'numerical reduced rent'),
-#         ('#RedRentStat#', rent.redRenStatement() if rent else "one sentence statement describing reduced rent"),
-#         ('#RentCode#', rent.info['RentCode'] if rent else "DUMMY"),
-#         ('#RentOwingPeriod#', "{} to {}".format(dateToStr(rent.arrearsStartDate()) if rent else "01/01/2012",
-#                                                 dateToStr(rent.arrearsEndDate()) if rent else "31/12/2012")),
-#         ('#RentOwingPeriodStart#', dateToStr(rent.arrearsStartDate()) if rent else "01/01/2012"),
-#         ('#RentOwingPeriodEnd#', dateToStr(rent.arrearsEndDate()) if rent else "01/01/2014"),
-#         ('#PayRequestRentPeriod#', "{} to {}".format(dateToStr(tot_rent_start_date) if rent else "01/01/2012",
-#                                                      dateToStr(period_end_date) if rent else "01/06/2013")),
-#         ('#Source#', rent.info['Source'] if rent else "Source"),
-#         ('#TenantName#', rent.info['TenantName'] if rent else "Joe Smith"),
-#         ('#TenureType#', rent.tenure() if rent else "leasehold"),
-#         ('#Today#', dateToStr(today) if rent else dateToStr(today)),
-#         ('#TotCharges#', moneyToStr(rent.info['ChargesBalance'] if rent else 999.99, pound=True)),
-#         ('#TotalDue#', moneyToStr(tot if rent else 80.00, pound=True)),
-#     ]
-#
-#     # Currently handling receipt statement differently because I didn't want to pass word variables a DbHandler,
-#     # but this might be changed, especially when considering letters without a rent
-#
-#     return {x: y for x, y in word_variables}
+def hashCode(rentcode):
+    salt = "230498slkdfn348975ejhsoadjflkj"
+    code = rentcode
+    encodestring = salt + code
+    hash_object = hashlib.sha1(encodestring.encode('utf-8'))
+    hex_dig = hash_object.hexdigest()
+    return (hex_dig[0:6])
 
-# Date, rent, numerical functions
+#
+#   date and formatting functions
+#
 
-def validateDate(date: str):
-    return parseDateSoft(date) is not None
+def dateToStr(date):
+    # convert a datetime.date to a string in UK format
+    # date of `None` returns an empty string
+    if date is None:
+        return ""
+    return date.strftime("%d/%m/%Y")
 
 
 def strToInt(string: str) -> typing.Union[int, None]:
@@ -196,34 +95,6 @@ def truncateString(string: str, length: int) -> str:
     return string if string is None or len(string) <= length else string[0:length - 3] + '…'
 
 
-def rentInt(num, den, redRent=None):
-    # jon: we don't understand exactly what this doing why
-    # just leave it as-is
-    # laurence: This code takes in "num",the amount money in an income posting that is contributed to the rent payment
-    # after costs. "den", is the self.rent.periodRent value.
-    # This code attempts to take the num value(rent contribution) and determine how many times it covers the periodRent.
-    # Essentially it tries to work out how many periods of rent can be covered by the rent contribution
-    # Now if it fails to get an integer value it will try for a reduced rent value before raising an exception
-
-    dec_answer = (num / den).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-    dec_answer_rounded = int(dec_answer.quantize(1, rounding=ROUND_HALF_DOWN))
-
-    if abs(dec_answer - dec_answer_rounded) < 0.02:
-        return dec_answer_rounded
-
-    elif redRent > 0:
-        # Remove a gale of reduced rent if a reducedRent value is present
-        rentContribution = num - redRent
-        dec_answer = (rentContribution / den).quantize(Decimal('0.01'), rounding=ROUND_DOWN)
-        dec_answer_rounded = int(dec_answer.quantize(1, rounding=ROUND_HALF_DOWN))
-        if abs(dec_answer - dec_answer_rounded) < 0.02:
-            # Add one integer value for the reduced rent deducted
-            return dec_answer_rounded + 1
-    else:
-        raise RentIntegerException("bad income multiple of rent")
-        # return dec_answer
-
-
 def extractRentCodeStub(rentCode):
     rentCodeRegex = re.search("^(?P<stub>[a-zA-Z]+)", rentCode)
     return rentCodeRegex.group("stub")
@@ -240,53 +111,45 @@ def splitAddressPostcode(address: str) -> typing.List[str]:
     return parts
 
 
-def dateToStr(date):
-    # convert a datetime.date to a string in UK format
-    # date of `None` returns an empty string
-    if date is None:
-        return ""
-    return date.strftime(UkDateFormat)
+# def strToDate(date: str) -> typing.Union[datetime.date, None]:
+#     # convert a string to a datetime.date
+#     # always uses UK format
+#     # Note that this function *only* accepts a full date (4-digit-year)
+#     # and raises an exeception if converting fails
+#     # it is suitable for a string which is known to be a good, full date, e.g. returned from `dateToStr()` above
+#     # use `parseDataSoft()` or similar if you want a more forgiving conversion
+#     # string of `None`/empty returns `None`
+#     if str is None or str == "":
+#         return None
+#     return datetime.datetime.strptime(date, UkDateFormat).date()
 
 
-def strToDate(date: str) -> typing.Union[datetime.date, None]:
-    # convert a string to a datetime.date
-    # always uses UK format
-    # Note that this function *only* accepts a full date (4-digit-year)
-    # and raises an exeception if converting fails
-    # it is suitable for a string which is known to be a good, full date, e.g. returned from `dateToStr()` above
-    # use `parseDataSoft()` or similar if you want a more forgiving conversion
-    # string of `None`/empty returns `None`
-    if str is None or str == "":
-        return None
-    return datetime.datetime.strptime(date, UkDateFormat).date()
+# def parseDateHard(date: str, parent=None) -> typing.Union[datetime.date, None]:
+#     # converts a str (D/M/Y) to a datetime.date
+#     # with an ErrorMsgBox() if str not a valid date
+#     # None => str not a valid date
+#     pyDate = parseDateSoft(date)
+#     # if pyDate is None:
+#     #     from widgets.messageboxes import ErrorMsgBox
+#     #     ErrorMsgBox("Date '{}' not in correct format.\nLooking for D/M/Y".format(date), parent).exec()
+#     #     return None
+#     return pyDate
 
 
-def parseDateHard(date: str, parent=None) -> typing.Union[datetime.date, None]:
-    # converts a str (D/M/Y) to a datetime.date
-    # with an ErrorMsgBox() if str not a valid date
-    # None => str not a valid date
-    pyDate = parseDateSoft(date)
-    # if pyDate is None:
-    #     from widgets.messageboxes import ErrorMsgBox
-    #     ErrorMsgBox("Date '{}' not in correct format.\nLooking for D/M/Y".format(date), parent).exec()
-    #     return None
-    return pyDate
+# def parseDateSoft(date: str) -> typing.Union[datetime.date, None]:
+#     # converts a str (D/M/Y) to a datetime.date
+#     # None => str not a valid date
+#     try:
+#         return datetime.datetime.strptime(date, UkDateFormat).date()
+#     except ValueError:
+#         try:
+#             return datetime.datetime.strptime(date, UkDateFormatYear2).date()
+#         except ValueError:
+#             return None
 
 
-def parseDateSoft(date: str) -> typing.Union[datetime.date, None]:
-    # converts a str (D/M/Y) to a datetime.date
-    # None => str not a valid date
-    try:
-        return datetime.datetime.strptime(date, UkDateFormat).date()
-    except ValueError:
-        try:
-            return datetime.datetime.strptime(date, UkDateFormatYear2).date()
-        except ValueError:
-            return None
-
-
-def isValidFullDateStr(date: str) -> bool:
-    return re.fullmatch(r"\d\d?/\d\d?/\d\d\d\d", date) is not None
+# def isValidFullDateStr(date: str) -> bool:
+#     return re.fullmatch(r"\d\d?/\d\d?/\d\d\d\d", date) is not None
 
 
 def isValidDecimal(inputText) -> bool:
@@ -303,6 +166,31 @@ def isValidInt(inputText) -> bool:
         return True
     except ValueError:
         return False
+#
+# -    HTML functions
+#
+def appendHtmlFragmentToHtmlDocument(htmlDocument: str, htmlFragment: str) -> str:
+    # Append htmlFragment to the "end of" htmlDocument
+    # htmlDocument (e.g. PRX.html):
+    #   assumed to be a full document, i.e. <html> <head>...</head> <body>...</body> </html>
+    # htmlFragment (e.g. s166.html):
+    #   fragment without <html>/<head>/<body>
+    # Return "properly formed" HTML document:
+    # <html>
+    #   <head> ... </head>
+    #   <body>
+    #     htmlDocument
+    #     htmlFragment
+    #   </body>
+    # </html>
+    m = re.match(r"(.*)(</(body|html)>\s*)", htmlFragment, (re.DOTALL|re.IGNORECASE))
+    if m:
+        raise ValueError("appendHtmlFragmentToHtmlDocument(): Bad htmlFragment")
+    m = re.match(r"(.*)(</body>\s*</html>\s*)", htmlDocument, (re.DOTALL|re.IGNORECASE))
+    if not m:
+        raise ValueError("appendHtmlFragmentToHtmlDocument(): Bad htmlDocument")
+    htmlDocument = m.group(1) + htmlFragment + m.group(2)
+    return htmlDocument
 
 
 def htmlEntitize(text: str) -> str:
@@ -317,6 +205,75 @@ def htmlEntitize(text: str) -> str:
     return html
 
 
+def htmlSpecialMarkDown(html: str) -> str:
+    # Replace our "special markdown" sequences
+    # Used for "Clause"s whose text is taken from various database table columns
+    # to allow users a very simple way of getting a couple of formatting effects
+
+    # **bold text**
+    html = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', html)
+
+    # //italic text//
+    html = re.sub(r'//(.+?)//', r'<i>\1</i>', html)
+
+    # __underlined text__
+    html = re.sub(r'__(.+?)__', r'<u>\1</u>', html)
+
+    return html
+
+
+def previewHeaderHtml():
+    return "<div style=\"z-index:-1; position:absolute; font-size:1200%; opacity:0.5;\">" \
+           "    PREVIEW" \
+           "</div>"
+
+
+# Merge variables which may occur in the html
+class PayRequestMergeVariables:
+    # htmlfunctions.py
+    RentTable = "%RentTable%"
+    ArrearsTable = "%ArrearsTable%"
+    ChargesTable = "%ChargesTable%"
+    HeaderOverlay = "%HeaderOverlay%"
+
+
+def mergeChargesTable(htmlText, charges):
+    # htmlfunctions.py
+    chargeHtml = ""
+    if charges:
+        for charge in charges:
+            chargeHtml += createHtmlTableRow(charge[0], charge[1])
+    return htmlText.replace(PayRequestMergeVariables.ChargesTable, chargeHtml)
+
+
+# Creates a single html table row with two cells, the right of which is aligned right (since it's the numerical value)
+def createHtmlTableRow(leftCell, rightCell):
+    # htmlfunctions.py
+    return "<tr>" \
+           "    <td>{}</td>" \
+           "    <td align=\"right\">{}</td>" \
+           "</tr>" \
+        .format(htmlEntitize(leftCell), htmlEntitize(rightCell))
+
+
+def constructCharges(chargesList):
+    # mailvariables.py
+    charges = []
+
+    for charge in chargesList:
+        chargeDetail = "{}{}:".format(charge["ChargeDetails"],
+                                      " - balance owing" if charge["ChargeBalance"] < charge["ChargeTotal"] else "")
+        chargeAmount = moneyToStr(charge["ChargeBalance"], commas=False, pound=True)
+
+        charges.append([chargeDetail, chargeAmount])
+
+    return charges
+
+
+def formatCharges(mergeDict):
+    # htmlfunctions.py, eprpayrequestfunctions.py
+    mergeDict["ChargeDetails"] = "\n".join([charge[0] for charge in mergeDict["Charges"]])
+    mergeDict["ChargeAmounts"] = "\n".join([charge[1] for charge in mergeDict["Charges"]])
 
 
 UkDateFormat = "%d/%m/%Y"

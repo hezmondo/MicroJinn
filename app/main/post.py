@@ -1,7 +1,7 @@
 from flask import redirect, request
 
 from app import db
-from app.main.common import commit_to_database
+from app.main.database import commit_to_database
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, \
@@ -89,10 +89,9 @@ def post_incomeobject(id, action):
     # now we get the income allocations from the request form to post 1 or more records to the incomealloc table
     if action == "edit":
         allocs = zip(request.form.getlist("incall_id"), request.form.getlist('rentcode'),
-                         request.form.getlist('alloctot'), request.form.getlist("chargedesc"),
-                         request.form.getlist('landlord'))
-        for incall_id, rentcode, alloctot, chargedesc, landlord in allocs:
-            print(incall_id, rentcode, alloctot, chargedesc, landlord)
+                         request.form.getlist('alloctot'), request.form.getlist("chargedesc"))
+        for incall_id, rentcode, alloctot, chargedesc in allocs:
+            print(incall_id, rentcode, alloctot, chargedesc)
             if alloctot == "0" or alloctot == "0.00":
                 continue
             if incall_id and int(incall_id) > 0:
@@ -106,7 +105,7 @@ def post_incomeobject(id, action):
                 Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
             print(incalloc.chargetype_id)
             incalloc.landlord_id = \
-                Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+                Landlord.query.join(Rent).with_entities(Landlord.id).filter(Rent.rentcode == rentcode).one()[0]
             # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
             income.incomealloc_income.append(incalloc)
     else:
@@ -124,7 +123,7 @@ def post_incomeobject(id, action):
                 Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
             print(incalloc.chargetype_id)
             incalloc.landlord_id = \
-                Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+                Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == landlord).one()[0]
             # having set the column values, we add each incomealloc record to the db session (using the ORM relationship)
             income.incomealloc_income.append(incalloc)
             # now we have to deal with updating or deleting existing charges
@@ -145,8 +144,8 @@ def post_landlord(id, action):
         landlord = Landlord.query.get(id)
     else:
         landlord = Landlord()
-    landlord.name = request.form["name"]
-    landlord.addr = request.form["address"]
+    landlord.landlordname = request.form["name"]
+    landlord.landlordaddr = request.form["address"]
     landlord.taxdate = request.form["taxdate"]
     emailacc = request.form["emailacc"]
     landlord.emailacc_id = \
@@ -159,7 +158,7 @@ def post_landlord(id, action):
     manager = request.form["manager"]
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
-            (Manager.name == manager).one()[0]
+            (Manager.managername == manager).one()[0]
     db.session.add(landlord)
     db.session.commit()
     id_ = landlord.id
@@ -305,7 +304,7 @@ def postrentobj(id):
         Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
     landlord = request.form["landlord"]
     rent.landlord_id = \
-        Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
+        Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == landlord).one()[0]
     rent.lastrentdate = request.form["lastrentdate"]
     mailto = request.form["mailto"]
     rent.mailto_id = \
@@ -340,4 +339,4 @@ def postrentobj(id):
     else:
         db.session.commit()
 
-    return redirect('/rentobjpage/{}'.format(id))
+    return redirect('/rentobject/{}'.format(id))

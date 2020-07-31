@@ -1,25 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<!-- Local CSS -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='letters.css') }}">
-	<!--	<link href="letters.css" rel="stylesheet" type="text/css">-->
-</head>
-<body>
-	<div>
+{% extends 'base.html' %}
+
+{% block app_content %}
+	<div contenteditable="true">
 		<div class="font-size-large" align="center">
-			<b>{{ rentobj.name }}</b>
+			<b>{{ rentobj.managername }}</b>
 		</div>
 		<div class="font-size-small" align="center">
-			{{ addressdata.addr1 }}
+			{{ addressdata.manageraddr }}
 			<br />
-			{{ addressdata.addr2 }}
+			{{ addressdata.manageraddr2 }}
 			<br />
 		</div>
 		<div class="font-size-medium" align="right">
 			Our Ref: {{ rentobj.rentcode }}
 			<br />
-			Date:
+			Date: {{ today_date }}
 		</div>
 		<div class="font-size-medium" align="left">
 			<!-- Postal address -->
@@ -61,5 +56,4 @@
 			<b>Richard</b>
 		</div>
 	</div>
-</body>
-</html>
+{% endblock %}

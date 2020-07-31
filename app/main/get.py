@@ -134,7 +134,7 @@ def get_incomeobjectoptions():
     # return options for multiple choice controls in income_object
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
 
     return bankaccs, chargedescs, landlords, paytypes
@@ -151,7 +151,7 @@ def get_incomepost(id):
     arrears = post.arrears
     today = datetime.date.today()
     allocs = Charge.query.join(Chargetype).join(Rent).join(Landlord).with_entities(Rent.rentcode, Charge.id,
-                   Chargetype.chargedesc, Charge.chargebalance, Landlord.name).filter(Charge.rent_id == id).all()
+                   Chargetype.chargedesc, Charge.chargebalance, Landlord.landlordname).filter(Charge.rent_id == id).all()
     if post.chargetot and post.chargetot > 0:
         post_tot = arrears + post.chargetot
     elif arrears > 0:
@@ -163,18 +163,18 @@ def get_incomepost(id):
 
 
 def get_landlords():
-    landlords = Landlord.query.join(Manager).with_entities(Landlord.id, Landlord.name, Landlord.addr,
-                   Landlord.taxdate, Manager.name.label("manager")).all()
+    landlords = Landlord.query.join(Manager).with_entities(Landlord.id, Landlord.landlordname, Landlord.landlordaddr,
+                   Landlord.taxdate, Manager.managername).all()
 
     return landlords
 
 
 def get_landlord(id):
     landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
-                 Landlord.name, Landlord.addr, Landlord.taxdate, Manager.name.label("manager"),
+                 Landlord.landlordname, Landlord.landlordaddr, Landlord.taxdate, Manager.managername,
                      Emailaccount.smtp_server, Money_account.accdesc).filter(Landlord.id == id).one_or_none()
 
-    managers = [value for (value,) in Manager.query.with_entities(Manager.name).all()]
+    managers = [value for (value,) in Manager.query.with_entities(Manager.managername).all()]
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
 
@@ -231,10 +231,11 @@ def getmaildata(rent_id, income_id, letter_id):
     allocdata = None
     letterdata = Letter.query.with_entities(Letter.subject, Letter.part1, Letter.part2, Letter.part3,
                         Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
-    addressdata = Landlord.query.join(Rent).join(Manager).with_entities(Landlord.addr, Manager.name,
+    addressdata = Landlord.query.join(Rent).join(Manager).with_entities(
+                    Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
                     func.mjinn.mail_addr(rent_id, 0, 0).label('mailaddr'),
-                    func.mjinn.prop_addr(rent_id).label('propaddr'),
-                    Manager.addr1, Manager.addr2).filter(Rent.id == rent_id).one_or_none()
+                    func.mjinn.prop_addr(rent_id).label('propaddr')
+                    ).filter(Rent.id == rent_id).one_or_none()
 
     return incomedata, allocdata, letterdata, addressdata
 
@@ -344,7 +345,7 @@ def get_queryoptions():
     # return options for each multiple choice control in home page and queries page
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     actypes.insert(0, "all actypes")
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
     landlords.insert(0, "all landlords")
     floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
     prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
@@ -432,7 +433,7 @@ def get_rentobjects(action, name):
         if arrears and arrears != "":
             qfilter.append(text("Rent.arrears {}".format(arrears)))
         if landlord and landlord != landlords and landlord[0] != "all landlords":
-            qfilter.append(Landlord.name.in_(landlord))
+            qfilter.append(Landlord.landlordname.in_(landlord))
         if prdelivery and prdelivery != prdeliveries and prdelivery != "":
             qfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
         if rentpa and rentpa != "":
@@ -548,7 +549,7 @@ def getrentobjs(action, qfilter, runsize):
                 .join(Typetenure) \
                 .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
                                func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
-                               Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                               Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                func.sum(Charge.chargebalance).label('totcharge'),
                                Typetenure.tenuredet) \
@@ -563,6 +564,7 @@ def getrentobj_main(id):
     rentobj = \
         Rent.query \
             .join(Landlord) \
+            .join(Manager) \
             .outerjoin(Agent) \
             .join(Typeactype) \
             .join(Typeadvarr) \
@@ -576,9 +578,9 @@ def getrentobj_main(id):
                            func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                           Agent.agdetails, Landlord.name, Typeactype.actypedet,
-                           Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                           Typesalegrade.salegradedet, Typestatus.statusdet,
+                           Agent.agdetails, Landlord.landlordname, Manager.managername,
+                           Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
+                           Typemailto.mailtodet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            Typetenure.tenuredet) \
             .filter(Rent.id == id) \
             .one_or_none()
@@ -608,7 +610,7 @@ def getrentobj_combos(id):
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
     mailtodets = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
