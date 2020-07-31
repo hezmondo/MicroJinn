@@ -131,19 +131,22 @@
     <div class="form-group row">
         {% if action == "view" %}
         <div class="col-md-2">
-            <a href="/rentobjpage/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit rent/prop</a>
+            <a href="/rentobject/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit rent/prop</a>
         </div>
         <div class="col-md-2">
-            <a href="/rentobjpage/{{ rentobj.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone rent/prop</a>
+            <a href="/rentobject/{{ rentobj.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone rent/prop</a>
         </div>
         <div class="col-md-2">
-            <a href="/rentobjpage/0?action=new" class="btn btn-block btn-primary" role="button">New rent/property</a>
+            <a href="/rentobject/0?action=new" class="btn btn-block btn-primary" role="button">New rent/property</a>
         </div>
         <div class="col-md-2">
             <a href="/charges?rentcode={{ rentobj.rentcode }}" class="btn btn-block btn-primary" role="button">View charges</a>
         </div>
         <div class="col-md-2">
             <a href="/income_post/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">Post income</a>
+        </div>
+        <div class="col-md-2">
+            <a href="/mail/{{ rentobj.id }}?action=rent" class="btn btn-block btn-primary" role="button">Write letter</a>
         </div>
         {% else %}
         <div class="col-md-2">

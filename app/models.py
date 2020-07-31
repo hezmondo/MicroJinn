@@ -40,6 +40,7 @@ class Chargetype(db.Model):
     chargedesc = db.Column(db.String(60))
 
     charge_chargetype = db.relationship('Charge', backref='chargetype', lazy='dynamic')
+    incomealloc_chargetype = db.relationship('Incomealloc', backref='chargetype', lazy='dynamic')
 
 
 class Dates(db.Model):
@@ -160,7 +161,8 @@ class Incomealloc(db.Model):
     amount = db.Column(db.Numeric(8,2))
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     income_id = db.Column(db.Integer, db.ForeignKey('income.id'))
-    landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
+    landlord_id = db.Column(db.Integer)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
     
 class Jstore(db.Model):
@@ -183,7 +185,6 @@ class Landlord(db.Model):
     emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
-    incomealloc_landlord = db.relationship('Incomealloc', backref='landlord', lazy='dynamic')
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
@@ -390,6 +391,7 @@ class Rent(db.Model):
 
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
+    incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)

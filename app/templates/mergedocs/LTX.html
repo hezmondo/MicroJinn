@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Local CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='letters.css') }}">
+	<!--	<link href="letters.css" rel="stylesheet" type="text/css">-->
+</head>
+<body>
+	<div>
+		<div class="font-size-large" align="center">
+			<b>{{ rentobj.name }}</b>
+		</div>
+		<div class="font-size-small" align="center">
+			{{ addressdata.addr1 }}
+			<br />
+			{{ addressdata.addr2 }}
+			<br />
+		</div>
+		<div class="font-size-medium" align="right">
+			Our Ref: {{ rentobj.rentcode }}
+			<br />
+			Date:
+		</div>
+		<div class="font-size-medium" align="left">
+			<!-- Postal address -->
+        	{% for item in mailaddr %}
+				{{ item }}
+				<br />
+        	{% endfor %}
+			<br />
+			<br />
+			<br />
+			<br />
+			<!-- Salutation -->
+			Dear {{ rentobj.tenantname }}
+			<br />
+			<br />
+			<!-- Subject -->
+			<b>{{ subject }}</b>
+			<br />
+			<br />
+			<!-- Clauses -->
+			{{ part1 }}
+			<br />
+			<br />
+			{{ part2 }}
+			<br />
+			<br />
+			{{ part3 }}
+			<br />
+			<br />
+			<!-- Letter footer-->
+			<br />
+			<br />
+			Yours sincerely
+			<br />
+			<br />
+			<br />
+			<br />
+			<br />
+			<b>Richard</b>
+		</div>
+	</div>
+</body>
+</html>

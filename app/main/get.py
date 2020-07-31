@@ -6,10 +6,10 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
+    Incomealloc, Jstore, Landlord, Letter, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
-    Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Typesalegrade, Typestatus, Typetenure, Emailaccount
 
 
 # functions listed in alphabetical order, save for  master function first in each group
@@ -123,9 +123,9 @@ def get_incomeobject(id):
     income = Income.query.join(Money_account).join(Typepayment).with_entities(Income.id, Income.date, Income.amount,
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
-    incomeallocs = Incomealloc.query.join(Landlord).join(Chargetype).with_entities(Incomealloc.id,
-                    Incomealloc.income_id, Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
-                    Landlord.name, Chargetype.chargedesc).filter(Incomealloc.income_id == id).all()
+    incomeallocs = Incomealloc.query.join(Chargetype).join(Rent).with_entities(Incomealloc.id,
+                    Incomealloc.income_id, Rent.rentcode, Incomealloc.amount.label("alloctot"),
+                    Chargetype.chargedesc).filter(Incomealloc.income_id == id).all()
 
     return income, incomeallocs
 
@@ -213,6 +213,30 @@ def get_loanstatement():
                            Loan_statement.add_interest, Loan_statement.balance).all()
 
     return loanstatement
+
+
+def getmaildata(rent_id, income_id, letter_id):
+    if income_id == 0:
+        incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
+                        Income.date.label("paydate"), Income.amount.label("payamount"), Typepayment.paytypedet) \
+                        .filter(Incomealloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
+        # income_id = incomedata.id
+    else:
+        incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
+                        Income.date.label("paydate"), Income.amount.label("payamount"), Typepayment.paytypedet) \
+                        .filter(Income.id == income_id).first()
+    # allocdata = Incomealloc.join(Chargetype).with_entities(Incomealloc.id, Incomealloc.income_id,
+    #                     Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
+    #                     Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
+    allocdata = None
+    letterdata = Letter.query.with_entities(Letter.subject, Letter.part1, Letter.part2, Letter.part3,
+                        Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
+    addressdata = Landlord.query.join(Rent).join(Manager).with_entities(Landlord.addr, Manager.name,
+                    func.mjinn.mail_addr(rent_id, 0, 0).label('mailaddr'),
+                    func.mjinn.prop_addr(rent_id).label('propaddr'),
+                    Manager.addr1, Manager.addr2).filter(Rent.id == rent_id).one_or_none()
+
+    return incomedata, allocdata, letterdata, addressdata
 
 
 def get_moneyaccount(id):
@@ -535,45 +559,51 @@ def getrentobjs(action, qfilter, runsize):
     return rentobjs
 
 
-def getrentobj(id):
-    # This method returns "rentobj"; information about a rent, its related property/agent/landlord stuff, plus
-    # the list values for various comboboxes, all to be shown in rent_object.html, allowing editing an existing
-    # rent (for which rent info is fetched via Rent.id or creation of a new rent (signified by id==0), in which
-    # case we have to "invent" an object with the same attributes as would have been fetched from the database
-    # but with "blanks", or default values, as desired for creating a new rent; --- seems like Flask is happy
-    # for it not even to have the fields which will be referenced, so just put in any defaults desired)
-    if id > 0:
-        # existing rent
-        rentobj = \
-            Rent.query \
-                .join(Landlord) \
-                .outerjoin(Agent) \
-                .join(Typeactype) \
-                .join(Typeadvarr) \
-                .join(Typedeed) \
-                .join(Typefreq) \
-                .join(Typemailto) \
-                .join(Typesalegrade) \
-                .join(Typestatus) \
-                .join(Typetenure) \
-                .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                               func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
-                               Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
-                               Agent.agdetails, Landlord.name, Typeactype.actypedet,
-                               Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
-                               Typesalegrade.salegradedet, Typestatus.statusdet,
-                               Typetenure.tenuredet) \
-                .filter(Rent.id == id) \
-                .one_or_none()
-        if rentobj is None:
-            flash('Invalid rent code')
-            return redirect(url_for('auth.login'))
-    else:
-        # new rent
-        rentobj = {
-            'id': 0
-        }
+def getrentobj_main(id):
+    rentobj = \
+        Rent.query \
+            .join(Landlord) \
+            .outerjoin(Agent) \
+            .join(Typeactype) \
+            .join(Typeadvarr) \
+            .join(Typedeed) \
+            .join(Typefreq) \
+            .join(Typemailto) \
+            .join(Typesalegrade) \
+            .join(Typestatus) \
+            .join(Typetenure) \
+            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                           func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
+                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
+                           Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
+                           Agent.agdetails, Landlord.name, Typeactype.actypedet,
+                           Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet, Typemailto.mailtodet,
+                           Typesalegrade.salegradedet, Typestatus.statusdet,
+                           Typetenure.tenuredet) \
+            .filter(Rent.id == id) \
+            .one_or_none()
+    if rentobj is None:
+        flash('Invalid rent code')
+        return redirect(url_for('auth.login'))
 
+    totcharges = Charge.query.join(Rent).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
+        filter(Rent.id == id) \
+            .one_or_none()[0]
+
+    properties = \
+        Property.query \
+            .join(Rent) \
+            .join(Typeproperty) \
+            .with_entities(Property.id, Property.propaddr, Typeproperty.proptypedet) \
+            .filter(Rent.id == id) \
+            .all()
+
+    return rentobj, properties, totcharges
+
+
+def getrentobj_combos(id):
+    # This method returns the list values for various comboboxes, all to be shown in rent_object.html,
+    # allowing editing an existing rent
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
@@ -583,15 +613,5 @@ def getrentobj(id):
     salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    totcharges = Charge.query.join(Rent).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-        filter(Rent.id == id) \
-            .one_or_none()[0]
-    properties = \
-        Property.query \
-            .join(Rent) \
-            .join(Typeproperty) \
-            .with_entities(Property.id, Property.propaddr, Typeproperty.proptypedet) \
-            .filter(Rent.id == id) \
-            .all()
-    return rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, \
-           salegradedets, statusdets, tenuredets, totcharges
+
+    return actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, statusdets, tenuredets

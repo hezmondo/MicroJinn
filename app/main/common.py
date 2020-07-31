@@ -1,25 +1,20 @@
-import logging
-import typing
-import re
-from app import db
-from flask import abort
-from sqlalchemy import exc
+# common.py - attempt to put all commonly used stuff here
 
-dbLogger = logging.getLogger("dbLogger")
+import os
+
+def preferredEncoding() -> str:
+    # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
+    # ("utf-8" for Linux, "cp1252" for Windows)
+    import locale
+    return locale.getpreferredencoding()
 
 
-def commit_to_database():
-    """A shared function to make a commit to the database and
-       handle exceptions if encountered"""
-    dbLogger.info('Committing changes to db...')
-    try:
-        db.session.commit()
-    except AssertionError as err:
-        db.session.rollback()
-        abort(409, err)
-    except (exc.IntegrityError) as err:
-        db.session.rollback()
-        abort(409, err.orig)
-    except Exception as err:
-        db.session.rollback()
-        abort(500, err)
+def readFromFile(filename):
+    basedir = os.path.abspath(os.path.dirname('mjinn'))
+    mergedir = os.path.join(basedir, 'app/templates/mergedocs')
+    filePath = os.path.join(mergedir, filename)
+    # with open(htmlFilePath, "r" encoding="utf-8") as f:
+    #     htmlText = f.read()
+    with filePath.open('r', encoding="utf-8") as f:
+        fileText = f.read()
+    return fileText

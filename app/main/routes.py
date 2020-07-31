@@ -8,9 +8,10 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_ema
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
     get_landlord, get_landlords, get_loan, get_loan_options, get_loans, get_loanstatement, get_moneyaccount, \
     get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
-    get_property, get_rental, getrentals, get_rentalstatement, getrentobj, get_rentobjects
+    get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, get_rentobjects
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
+from app.main.writemail import writeMail
 from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, Money_account, \
     Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental
 
@@ -275,6 +276,20 @@ def loanstatementpage(id):
                                loancode=loancode, checksums=checksums)
 
 
+@bp.route('/mail/<int:id>', methods=["GET", "POST"])
+@login_required
+def mail(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+    #     postmail(id)
+    # else:
+        pass
+    subject, part1, part2, part3, rentobj, letterdata, addressdata, mailaddr = writeMail(id, 0, 2)
+
+    return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
+                           rentobj=rentobj, letterdata=letterdata, addressdata=addressdata,
+                           mailaddr=mailaddr)
+
 @bp.route('/money', methods=['GET', 'POST'])
 def money():
     moneydets, accsums = get_moneydets()
@@ -412,21 +427,25 @@ def rentalstatement(id):
     return render_template('rentalstatement.html', title='Rental statement', rentalstatem=rentalstatem)
 
 
-@bp.route('/rentobjpage/<int:id>', methods=['GET', 'POST'])
+@bp.route('/rentobject/<int:id>', methods=['GET', 'POST'])
 # @login_required
-def rentobjpage(id):
+def rentobject(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         postrentobj(id)
     else:
         pass
-    rentobj, actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, properties, \
-            salegradedets, statusdets, tenuredets, totcharges = getrentobj(id)
+
+    rentobj, properties, totcharges = getrentobj_main(id)
+
+    actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, \
+        statusdets, tenuredets = getrentobj_combos(id)
+
 
     return render_template('rent_object.html', action=action, title=action, rentobj=rentobj,
-                       actypedets=actypedets, advarrdets=advarrdets, deedcodes=deedcodes, freqdets=freqdets,
-                       landlords=landlords, mailtodets=mailtodets, properties=properties,
-                       salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets, totcharges=totcharges)
+                       properties=properties, totcharges=totcharges, actypedets=actypedets, advarrdets=advarrdets,
+                       deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
+                       salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
 
 
 @bp.route('/utilities', methods=['GET'])

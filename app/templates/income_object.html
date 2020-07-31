@@ -39,12 +39,12 @@
         </div>
     </div>
     {% for item in incomeallocs %}
-    <div class="form-group row no-gutters align-items-end">
-        <div class="col-md-1">
+    <div class="form-group row">
+        <div class="col-md-2">
             <label for="incall_id">Id:</label>
             <input type="text" class="form-control" name="incall_id" value="{{ item.id }}">
         </div>
-        <div class="col-md-1">
+        <div class="col-md-2">
             <label for="income_id">Income id:</label>
             <input type="text" class="form-control" name="income_id" value="{{ item.income_id }}">
         </div>
@@ -52,17 +52,13 @@
             <label for="rentcode">Rent code:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ item.rentcode }}">
         </div>
-        <div class="col-md-1">
+        <div class="col-md-2">
             <label for="alloctot">Amount:</label>
             <input type="text" class="form-control" name="alloctot" value="{{ item.alloctot }}">
         </div>
         <div class="col-md-2">
             <label for="chargedesc">Charge type:</label>
             {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=item.chargedesc) }}
-        </div>
-        <div class="col-md-3">
-            <label for="landlord">Landlord:</label>
-            {{ widgets.combobox(name="landlord", items=landlords, item_selected=item.name) }}
         </div>
         <div class="col-md-2">
             <a href="/delete_item/{{ item.id }}?item=incomealloc"
@@ -77,31 +73,25 @@
         </div>
     </div>
     <div id="xalloc">
-        <div class="form-group row no-gutters">
-            <div class="col-md-1">
-                <label for="incall_id">Id:</label>
-                <input type="text" class="form-control" name="incall_id" value="0">
-            </div>
-            <div class="col-md-1">
-                <label for="income_id">Income id:</label>
-                <input type="text" class="form-control" name="income_id" value="{{ income.id }}">
-            </div>
-            <div class="col-md-2">
-                <label for="rentcode">Rent code:</label>
-                <input type="text" class="form-control" name="rentcode" value="">
-            </div>
-            <div class="col-md-2">
-                <label for="alloctot">Amount:</label>
-                <input type="text" class="form-control" name="alloctot" value="0">
-            </div>
-            <div class="col-md-3">
-                <label for="chargedesc">Charge type:</label>
-                {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=chargedescs[0]) }}
-            </div>
-            <div class="col-md-3">
-                <label for="landlord">Landlord:</label>
-                {{ widgets.combobox(name="landlord", items=landlords, item_selected=landlords[0]) }}
-            </div>
+        <div class="col-md-2">
+            <label for="incall_id">Id:</label>
+            <input type="text" class="form-control" name="incall_id" value="0">
+        </div>
+        <div class="col-md-2">
+            <label for="income_id">Income id:</label>
+            <input type="text" class="form-control" name="income_id" value="{{ income_id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentcode">Rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="">
+        </div>
+        <div class="col-md-2">
+            <label for="alloctot">Amount:</label>
+            <input type="text" class="form-control" name="alloctot" value="0">
+        </div>
+        <div class="col-md-2">
+            <label for="chargedesc">Charge type:</label>
+            {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=chargedescs[0]) }}
         </div>
         <div class="form-group row">
             <div class="col-md-3">
@@ -121,7 +111,6 @@
                 <th style="width: 12.00%">Income id</th>
                 <th style="width: 12.00%">Rentcode</th>
                 <th style="width: 12.00%">Amount</th>
-                <th style="width: 26.00%">Landlord</th>
                 <th style="width: 26.00%">Income type</th>
             </tr>
             </thead>
@@ -132,7 +121,6 @@
                 <td style="width: 12.00%">{{ item.income_id }}</td>
                 <td style="width: 12.00%"> {{ item.rentcode }}</td>
                 <td style="width: 12.00%"> {{ item.alloctot }}</td>
-                <td style="width: 26.00%"> {{ item.name }}</td>
                 <td style="width: 26.00%"> {{ item.chargedesc }}</td>
             </tr>
             {% endfor %}
