@@ -363,6 +363,16 @@ class Property(db.Model):
     def __repr__(self):
         return '<Property {}>'.format(self.propaddr)
 
+
+class Recent(db.Model):
+    __tablename__ = 'recent'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rent_id = db.Column(db.Integer)
+    agent_id = db.Column(db.Integer)
+    number = db.Column(db.Integer)
+
+
 class Rent(db.Model):
     __tablename__ = 'rent'
 

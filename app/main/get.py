@@ -3,7 +3,7 @@ from app import db
 import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from flask import flash, redirect, url_for, request
+from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Letter, Loan, Loan_statement, Manager, Money_category, Money_item, \
@@ -233,7 +233,6 @@ def getmaildata(rent_id, income_id, letter_id):
                         Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
     addressdata = Landlord.query.join(Rent).join(Manager).with_entities(
                     Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
-                    func.mjinn.mail_addr(rent_id, 0, 0).label('mailaddr'),
                     func.mjinn.prop_addr(rent_id).label('propaddr')
                     ).filter(Rent.id == rent_id).one_or_none()
 
@@ -577,6 +576,7 @@ def getrentobj_main(id):
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
+                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
                            Agent.agdetails, Landlord.landlordname, Manager.managername,
                            Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
