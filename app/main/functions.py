@@ -1,4 +1,5 @@
 import hashlib
+import datetime
 import typing
 import decimal
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
@@ -23,7 +24,20 @@ def dateToStr(date):
     # date of `None` returns an empty string
     if date is None:
         return ""
-    return date.strftime("%d/%m/%Y")
+    return date.strftime("%d-%b-%Y")
+
+
+def strToDate(date: str) -> typing.Union[datetime.date, None]:
+    # convert a string to a datetime.date
+    # always uses UK format
+    # Note that this function *only* accepts a full date (4-digit-year)
+    # and raises an exeception if converting fails
+    # it is suitable for a string which is known to be a good, full date, e.g. returned from `dateToStr()` above
+    # use `parseDataSoft()` or similar if you want a more forgiving conversion
+    # string of `None`/empty returns `None`
+    if str is None or str == "":
+        return None
+    return datetime.datetime.strptime(date, UkDateFormat).date()
 
 
 def strToInt(string: str) -> typing.Union[int, None]:
@@ -109,19 +123,6 @@ def splitAddressPostcode(address: str) -> typing.List[str]:
     # but I'm leaving it as-is
     parts = re.split(r'(\b[A-Z]{1,2}[0-9][A-Z0-9]? +[0-9][ABD-HJLNP-UW-Z]{2}\b)', address, flags=re.IGNORECASE)
     return parts
-
-
-# def strToDate(date: str) -> typing.Union[datetime.date, None]:
-#     # convert a string to a datetime.date
-#     # always uses UK format
-#     # Note that this function *only* accepts a full date (4-digit-year)
-#     # and raises an exeception if converting fails
-#     # it is suitable for a string which is known to be a good, full date, e.g. returned from `dateToStr()` above
-#     # use `parseDataSoft()` or similar if you want a more forgiving conversion
-#     # string of `None`/empty returns `None`
-#     if str is None or str == "":
-#         return None
-#     return datetime.datetime.strptime(date, UkDateFormat).date()
 
 
 # def parseDateHard(date: str, parent=None) -> typing.Union[datetime.date, None]:
@@ -276,5 +277,5 @@ def formatCharges(mergeDict):
     mergeDict["ChargeAmounts"] = "\n".join([charge[1] for charge in mergeDict["Charges"]])
 
 
-UkDateFormat = "%d/%m/%Y"
-UkDateFormatYear2 = "%d/%m/%y"
+UkDateFormat = "%d-%b-%Y"
+UkDateFormatYear2 = "%d-%b-%y"

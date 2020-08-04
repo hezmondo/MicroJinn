@@ -1,4 +1,5 @@
 import sqlalchemy
+import datetime
 from flask import render_template, redirect, url_for, request, session
 from flask_login import login_required
 from app import db
@@ -12,6 +13,7 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_ema
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
+from app.main.functions import dateToStr, strToDate
 from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, Money_account, \
     Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, Typemailto
 
@@ -259,13 +261,18 @@ def loans():
     return render_template('loans.html', title='Loans page', loans=loans, loansum=loansum)
 
 
-@bp.route('/loanstatementpage/<int:id>', methods=["GET", "POST"])
+@bp.route('/loanstat_dialog/<int:id>', methods=["GET", "POST"])
+def loanstat_dialog(id):
+
+    return render_template('loanstat_dialog.html', loanid = id, today = datetime.date.today())
+
+
+@bp.route('/loanstatement/<int:id>', methods=["GET", "POST"])
 @login_required
-def loanstatementpage(id):
+def loanstatement(id):
     if request.method == "POST":
-        pass
-    else:
-        rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x)"), params={"x": id})
+        stat_date = request.form["statdate"]
+        rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"), params={"x": id, "y": stat_date})
         checksums = rproxy.fetchall()
         db.session.commit()
         loanstatement = get_loanstatement()

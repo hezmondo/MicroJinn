@@ -13,7 +13,7 @@ def make_shell_context():
 
 @app.context_processor
 def inject_today_date():
-    return {'today_date': datetime.date.today().strftime('%d-%b-%Y')}
+    return {'today_date': datetime.date.today()}
 
 
 if __name__ == '__main__':
