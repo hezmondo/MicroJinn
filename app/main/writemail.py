@@ -1,17 +1,24 @@
 import datetime
 from app.main.common import readFromFile
-from app.main.functions import dateToStr, hashCode, moneyToStr
+from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.get import getmaildata, getrentobj_main
 from app.main.functions import htmlSpecialMarkDown
 
 def writeMail(rent_id, income_id, letter_id):
     # This function takes in rent details and outputs a mail item (letter/email)
 
-    rentobj, properties, totcharges = getrentobj_main(rent_id)
-    incomedata, allocdata, letterdata, addressdata = getmaildata(rent_id, income_id, letter_id)
+    rentobj, properties = getrentobj_main(rent_id)
+    incomedata, allocdata, bankdata, addressdata, letterdata = getmaildata(rent_id, income_id, letter_id)
+    arrears = rentobj.arrears or 0.00
+    totcharges = rentobj.totcharges or 0.00
+    totdue = arrears + totcharges or 0.00
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "in elevence",
-        '#arrears#': moneyToStr(rentobj.arrears if rentobj else 111.00, pound=True),
+        '#accname#': bankdata.accname if bankdata else "some accname",
+        '#accnum#': bankdata.accnum if bankdata else "some accnumber",
+        '#sortcode#': bankdata.sortcode if bankdata else "some sortcode",
+        '#bankname#': bankdata.bankname if bankdata else "some bankname",
+        '#arrears#': moneyToStr(arrears if rentobj else 1111.00, pound=True),
         '#hashcode#': hashCode(rentobj.rentcode) if rentobj else "some hashcode",
         '#landlordaddr#': addressdata.landlordaddr if addressdata else "some landlord address",
         '#lastrentdate#': dateToStr(rentobj.lastrentdate) if rentobj else "11/11/2011",
@@ -20,16 +27,19 @@ def writeMail(rent_id, income_id, letter_id):
         '#manageraddr2#': addressdata.manageraddr2 if addressdata else "some manager address2",
         '#nextrentdate#': dateToStr(rentobj.nextrentdate) if rentobj else "11/11/2011",
         '#paidtodate#': dateToStr(rentobj.paidtodate) if rentobj else "11/11/2011",
-        '#payamount#': moneyToStr(incomedata.payamount if incomedata else 111.00, pound=True),
+        '#payamount#': moneyToStr(incomedata.payamount, pound=True),
         '#paydate#': dateToStr(incomedata.paydate) if incomedata else "11/11/2011",
         '#payer#': incomedata.payer if incomedata else "some payer",
         '#paytypedet#': incomedata.paytypedet if incomedata else "somepaytype",
         '#periodly#': rentobj.freqdet if rentobj else "eleventhly",
-        '#propaddr#': addressdata.propaddr if addressdata else "some property address",
+        '#propaddr#': rentobj.propaddr if rentobj else "some property address",
         '#rentcode#': rentobj.rentcode if rentobj else "some rentcode",
-        '#rentpa#': moneyToStr(rentobj.rentpa if rentobj else 11.00, pound=True),
+        '#rentpa#': moneyToStr(rentobj.rentpa if rentobj else 1111.00, pound=True),
         '#rent_type#': "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent",
-        '#Today#': dateToStr(datetime.date.today())
+        '#tenantname#': rentobj.tenantname if rentobj else "some tenant name",
+        '#totcharges#': moneyToStr(totcharges if rentobj else 1111.00, pound=True),
+        '#totdue#': moneyToStr(totdue if rentobj else 1111.00, pound=True),
+        '#today#': dateToStr(datetime.date.today())
     }
 
     subject = letterdata.subject
@@ -42,10 +52,7 @@ def writeMail(rent_id, income_id, letter_id):
     part2 = doReplace(word_variables, part2)
     part3 = doReplace(word_variables, part3)
 
-    mailaddr = addressdata.mailaddr
-    mailaddr = mailaddr.split(", ")
-
-    return subject, part1, part2, part3, rentobj, letterdata, addressdata, mailaddr
+    return subject, part1, part2, part3, rentobj, letterdata, addressdata
 
 
 def doReplace(dict, clause):
@@ -55,12 +62,7 @@ def doReplace(dict, clause):
     return clause
 
      # word_variables = [
-#         ('#BankName#', rent.landlord['BankName'] if rent else "Natwest RH"),
-#         ('#BankSortCode#', rent.landlord['BankSortCode'] if rent else "00-00-00"),
-#         ('#BankAccountNumber#', rent.landlord['BankAccountNumber'] if rent else "10101010"),
-#         ('#BankAccountName#', rent.landlord['BankAccountName'] if rent else "R Hesmondhalgh & D Maloney"),
 #         ('#ChargesStat#', rent.chargesStatement() if rent else ""),
-#         ('#HashCode#', rent.hashCode() if rent else "Abracadabra"),
 #         ('#NFee#', moneyToStr(rent.info['NFeeTotal'] if rent else 15.00, pound=True)),
 #         ('#NextRentStat#', rent.nextRentStatement() if rent else ""),
 #         ('#OwingStat#', rent.newOwingStatement() if rent else ""),
@@ -75,7 +77,6 @@ def doReplace(dict, clause):
 #         # with a specific receipt ID passed, therefore is found at 'run-time' rather than always being accessible
 #         ('#RedRent#', rent.reducedRent(False) if rent else 'numerical reduced rent'),
 #         ('#RedRentStat#', rent.redRenStatement() if rent else "one sentence statement describing reduced rent"),
-#         ('#RentCode#', rent.info['RentCode'] if rent else "DUMMY"),
 #         ('#RentOwingPeriod#', "{} to {}".format(dateToStr(rent.arrearsStartDate()) if rent else "01/01/2012",
 #                                                 dateToStr(rent.arrearsEndDate()) if rent else "31/12/2012")),
 #         ('#RentOwingPeriodStart#', dateToStr(rent.arrearsStartDate()) if rent else "01/01/2012"),
@@ -83,11 +84,6 @@ def doReplace(dict, clause):
 #         ('#PayRequestRentPeriod#', "{} to {}".format(dateToStr(tot_rent_start_date) if rent else "01/01/2012",
 #                                                      dateToStr(period_end_date) if rent else "01/06/2013")),
 #         ('#Source#', rent.info['Source'] if rent else "Source"),
-#         ('#TenantName#', rent.info['TenantName'] if rent else "Joe Smith"),
-#         ('#TenureType#', rent.tenure() if rent else "leasehold"),
-#         ('#Today#', dateToStr(today) if rent else dateToStr(today)),
-#         ('#TotCharges#', moneyToStr(rent.info['ChargesBalance'] if rent else 999.99, pound=True)),
-#         ('#TotalDue#', moneyToStr(tot if rent else 80.00, pound=True)),
 #     ]
 #
 #     # Currently handling receipt statement differently because I didn't want to pass word variables a DbHandler,

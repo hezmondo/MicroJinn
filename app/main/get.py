@@ -14,12 +14,14 @@ from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Headrent,
 
 # functions listed in alphabetical order, save for  master function first in each group
 def get_agents():
-    agd = request.form.get("address") or ""
-    age = request.form.get("email") or ""
-    agn = request.form.get("notes") or ""
-    agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
-                    Agent.agnotes.ilike('%{}%'.format(agn))).all()
-
+    if request.method == "POST":
+        agd = request.form.get("address") or ""
+        age = request.form.get("email") or ""
+        agn = request.form.get("notes") or ""
+        agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
+                        Agent.agnotes.ilike('%{}%'.format(agn))).all()
+    else:
+        agents = Agent.query.filter(Agent.id.in_([1, 5, 11, 16, 25, 28, 35]))
     return agents
 
 
@@ -229,14 +231,17 @@ def getmaildata(rent_id, income_id, letter_id):
     #                     Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
     #                     Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
     allocdata = None
-    letterdata = Letter.query.with_entities(Letter.subject, Letter.part1, Letter.part2, Letter.part3,
-                        Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
+    bankdata = Money_account.query.join(Landlord).join(Rent).with_entities(Money_account.accname, Money_account.accnum,
+                        Money_account.sortcode, Money_account.bankname).filter(Rent.id == rent_id)\
+                .one_or_none()
     addressdata = Landlord.query.join(Rent).join(Manager).with_entities(
                     Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
-                    func.mjinn.prop_addr(rent_id).label('propaddr')
                     ).filter(Rent.id == rent_id).one_or_none()
 
-    return incomedata, allocdata, letterdata, addressdata
+    letterdata = Letter.query.with_entities(Letter.subject, Letter.part1, Letter.part2, Letter.part3,
+                        Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
+
+    return incomedata, allocdata, bankdata, addressdata, letterdata
 
 
 def get_moneyaccount(id):
@@ -523,7 +528,6 @@ def getrentobjs(action, qfilter, runsize):
                                func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
                 .filter(*qfilter) \
-                .group_by(Rent.id) \
                 .limit(runsize).all()
     elif action == "external":
         rentobjs = \
@@ -548,12 +552,11 @@ def getrentobjs(action, qfilter, runsize):
                 .join(Typetenure) \
                 .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
                                func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
+                               func.mjinn.tot_charges(Rent.id, 1).label('totcharges'),
                                Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                               func.sum(Charge.chargebalance).label('totcharge'),
                                Typetenure.tenuredet) \
                 .filter(*qfilter) \
-                .group_by(Rent.id) \
                 .limit(runsize).all()
 
     return rentobjs
@@ -577,6 +580,8 @@ def getrentobj_main(id):
                            func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
+                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname,
                            Agent.agdetails, Landlord.landlordname, Manager.managername,
                            Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
@@ -588,10 +593,6 @@ def getrentobj_main(id):
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
 
-    totcharges = Charge.query.join(Rent).with_entities(func.sum(Charge.chargebalance).label("totcharges")). \
-        filter(Rent.id == id) \
-            .one_or_none()[0]
-
     properties = \
         Property.query \
             .join(Rent) \
@@ -600,7 +601,7 @@ def getrentobj_main(id):
             .filter(Rent.id == id) \
             .all()
 
-    return rentobj, properties, totcharges
+    return rentobj, properties
 
 
 def getrentobj_combos(id):

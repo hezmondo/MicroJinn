@@ -14,8 +14,8 @@ from app.main.post import post_agent, post_charge, post_emailaccount, post_incom
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import dateToStr, strToDate
-from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, Money_account, \
-    Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, Typemailto
+from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Letter, Loan, \
+    Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, Typemailto
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -286,22 +286,20 @@ def loanstatement(id):
 @bp.route('/mail/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail(id):
-    agents = get_agents()
-
-    return render_template('mail_dialog.html', agents=agents)
-
-
-@bp.route('/mail_write/<int:id>', methods=["GET", "POST"])
-@login_required
-def mail_write(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        pass
-    subject, part1, part2, part3, rentobj, letterdata, addressdata, mailaddr = writeMail(id, 0, 2)
+        mailaddr = request.form['mailaddr']
+        print(request.form)
+        letter_id = request.form['goBtn']
+        subject, part1, part2, part3, rentobj, letterdata, addressdata = writeMail(id, 0, letter_id)
+        mailaddr = mailaddr.split(", ")
 
-    return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
-                           rentobj=rentobj, letterdata=letterdata, addressdata=addressdata,
-                           mailaddr=mailaddr)
+        return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
+                               rentobj=rentobj, letterdata=letterdata, addressdata=addressdata,
+                               mailaddr=mailaddr)
+    else:
+        letters = Letter.query.filter(Letter.id.in_([1, 2, 3]))
+
+        return render_template('mail_dialog.html', letters=letters, rent_id = id)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -450,7 +448,7 @@ def rentobject(id):
     else:
         pass
 
-    rentobj, properties, totcharges = getrentobj_main(id)
+    rentobj, properties = getrentobj_main(id)
 
     actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, \
         statusdets, tenuredets = getrentobj_combos(id)
@@ -458,9 +456,11 @@ def rentobject(id):
     session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
+    session['propaddr'] = rentobj.propaddr
+    session['tenantname'] = rentobj.tenantname
 
     return render_template('rent_object.html', action=action, title=action, rentobj=rentobj,
-                       properties=properties, totcharges=totcharges, actypedets=actypedets, advarrdets=advarrdets,
+                       properties=properties, actypedets=actypedets, advarrdets=advarrdets,
                        deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
                        salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
 
