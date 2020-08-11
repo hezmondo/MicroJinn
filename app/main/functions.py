@@ -1,10 +1,43 @@
+import logging
+import re
 import hashlib
 import datetime
 import typing
 import decimal
+from app import db
+from flask import abort
+from sqlalchemy import exc
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
-import re
 from app.main.exceptions import RentIntegerException
+
+
+dbLogger = logging.getLogger("dbLogger")
+
+
+def backup_database():
+    """A  function to backup the mjinn database and
+       handle exceptions if encountered"""
+    dbLogger.info('Committing changes to db...')
+    return
+    # try:
+    #     pass
+
+
+def commit_to_database():
+    """A shared function to make a commit to the database and
+       handle exceptions if encountered"""
+    dbLogger.info('Committing changes to db...')
+    try:
+        db.session.commit()
+    except AssertionError as err:
+        db.session.rollback()
+        abort(409, err)
+    except (exc.IntegrityError) as err:
+        db.session.rollback()
+        abort(409, err.orig)
+    except Exception as err:
+        db.session.rollback()
+        abort(500, err)
 
 
 def hashCode(rentcode):

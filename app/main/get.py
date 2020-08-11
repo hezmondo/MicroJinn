@@ -552,7 +552,7 @@ def getrentobjs(action, qfilter, runsize):
                 .join(Typetenure) \
                 .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
                                func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
-                               func.mjinn.tot_charges(Rent.id, 1).label('totcharges'),
+                               func.mjinn.tot_charges(Rent.id).label('totcharges'),
                                Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                Typetenure.tenuredet) \

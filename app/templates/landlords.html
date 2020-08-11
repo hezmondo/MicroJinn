@@ -25,10 +25,10 @@
         <tbody>
         {% for item in landlords %}
         <tr id="{{ item.id }}">
-            <td style="width: 25.00%">{{ item.name }}</td>
-            <td style="width: 30.00%"> {{ item.addr }}</td>
-            <td style="width: 10.00%"> {{ item.taxdate }}</td>
-            <td style="width: 25.00%"> {{ item.manager }}</td>
+            <td style="width: 25.00%">{{ item.landlordname }}</td>
+            <td style="width: 30.00%"> {{ item.landlordaddr }}</td>
+            <td style="width: 10.00%"> {{ item.taxdate.strftime('%d-%b-%Y') }}</td>
+            <td style="width: 25.00%"> {{ item.managername }}</td>
             <td style="width: 10.00%"><a href="/landlord/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}

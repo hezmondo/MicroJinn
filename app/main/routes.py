@@ -13,7 +13,7 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_ema
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
-from app.main.functions import dateToStr, strToDate
+from app.main.functions import backup_database, dateToStr, strToDate
 from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Letter, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, Typemailto
 
@@ -35,6 +35,15 @@ def agent(id):
     agent = get_agent(id)
 
     return render_template('agent.html', action=action, agent=agent)
+
+
+@bp.route('/backup', methods=['GET', 'POST'])
+# @login_required
+def backup():
+    if request.method == "POST":
+        backup_database()
+
+    return render_template('backup.html')
 
 
 @bp.route('/charges', methods=['GET', 'POST'])
@@ -399,7 +408,7 @@ def queries():
     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
     runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjects(action, name)
 
-    return render_template('homepage.html', title='Home page', action=action, actypes=actypes, floads=floads,
+    return render_template('homepage.html', action=action, actypes=actypes, floads=floads,
                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegrades=salegrades,
                            statuses=statuses, tenures=tenures, actype=actype, agentdetails=agentdetails,
                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
