@@ -40,6 +40,11 @@ def commit_to_database():
         abort(500, err)
 
 
+def update_agent_recent():
+    # mylist = curr.recent_agents
+    return
+
+
 def hashCode(rentcode):
     salt = "230498slkdfn348975ejhsoadjflkj"
     code = rentcode

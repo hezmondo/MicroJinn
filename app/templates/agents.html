@@ -34,19 +34,19 @@
     <table class="table" id="agents">
         <thead>
         <tr>
-            <th style="width: 10.00%">Agent address</th>
+            <th style="width: 40.00%">Agent address</th>
             <th style="width: 25.00%">Agent email</th>
             <th style="width: 25.00%">Agent notes</th>
-            <th style="width: 25.00%">Spare</th>
+            <th style="width: 10.00%">Spare</th>
         </tr>
         </thead>
         <tbody>
         {% for item in agents %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.agdetails }}</td>
+            <td style="width: 40.00%">{{ item.agdetails }}</td>
             <td style="width: 25.00%">{{ item.agemail }}</td>
             <td style="width: 25.00%"> {{ item.agnotes }}</td>
-            <td style="width: 5.00%"><a href="/agent/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="/agent/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

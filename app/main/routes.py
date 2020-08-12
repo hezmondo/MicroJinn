@@ -1,7 +1,7 @@
 import sqlalchemy
 import datetime
 from flask import render_template, redirect, url_for, request, session
-from flask_login import login_required
+from flask_login import current_user, login_required
 from app import db
 from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_emailaccount, get_emailaccounts, \
@@ -9,7 +9,8 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_ema
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
     get_landlord, get_landlords, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
-    get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, get_rentobjects
+    get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
+    get_rentobjects_advanced, get_rentobjects_basic
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
@@ -155,9 +156,9 @@ def external_rents():
                            source=source, tenantname=tenantname, rentprops=rentprops)
 
 
-@bp.route('/externalrentpage/<int:id>', methods=["GET"])
+@bp.route('/externalrent/<int:id>', methods=["GET"])
 @login_required
-def externalrentpage(id):
+def externalrent(id):
     externalrent = get_externalrent(id)
 
     return render_template('external_rent.html', externalrent=externalrent)
@@ -209,11 +210,11 @@ def income_post(id):
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects("basic", "queryall")
+    action = request.args.get('action', "view", type=str)
+    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects_basic(action)
 
-    return render_template('homepage.html', action="basic", agentdetails=agentdetails, jname="queryall",
-                           propaddr=propaddr, rentcode=rentcode, source=source, tenantname=tenantname,
-                           rentprops=rentprops)
+    return render_template('home.html', agentdetails=agentdetails, propaddr=propaddr,
+                           rentcode=rentcode, source=source, tenantname=tenantname, rentprops=rentprops)
 
 
 @bp.route('/landlords', methods=['GET'])
@@ -406,9 +407,9 @@ def queries():
     name = request.args.get('name', "queryall", type=str)
     actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures, \
     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjects(action, name)
+    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjects_advanced(action, name)
 
-    return render_template('homepage.html', action=action, actypes=actypes, floads=floads,
+    return render_template('queries.html', action=action, actypes=actypes, floads=floads,
                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegrades=salegrades,
                            statuses=statuses, tenures=tenures, actype=actype, agentdetails=agentdetails,
                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
