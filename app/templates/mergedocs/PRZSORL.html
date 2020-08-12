@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="letters.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<!-- %if %IsLetter% -->
+	<!-- Payreq header -->
+	<!-- %include "payreq_header.html" -->
+	<!-- %endif %IsLetter% -->
+
+	<!-- %if %IsEmail% -->
+	<!-- Email header -->
+	<!-- %include "email_header.html" -->
+	<!-- %endif %IsEmail% -->
+
+	<!-- Main part of pay request -->
+	<div class="font-size-medium" align="left">
+		<div style="float: left"><b>Invoice date: </b>%SendDate%</div>
+		<div style="float: right"><b>Invoice number: </b>%RentCode%-%SendDate%</div>
+		<br />
+		<br />
+		<b>Property:</b>
+		%PropAddr%
+		<br />
+		<br />
+		<b>Lease: </b> 7th November 1979 between Middlesborough Council (1) and British Gas (2)
+		<br />
+		<br />
+		<b>Invoice details:</b>
+		<br />
+
+		<!-- Table of owings -->
+		<table width="100%" border="1" cellspacing="0" cellpadding="2">
+			<!-- Jinn to insert these rows (if they exist) -->
+			%RentTable%
+			%ArrearsTable%
+			%ChargesTable%			
+			<br />
+			<tr>
+				<td>
+					<b>The total amount payable is:</b>
+				</td>
+				<td align="right">
+					<b>%TotalDue%</b>
+				</td>
+			</tr>
+		</table>
+		<br />
+		<b>Terms: </b> Payment due on rent due date		
+		<br />
+		<br />
+		If you would like to pay by BACS or standing order, our bank is Natwest, our account is Richard Hesmondhalgh, the sort code is 53-50-55 and our account number is 11219262. Please make sure that you give your property reference ZSORL with any BACS payment and please email us to confirm any BACS payment.	
+		<br />
+		<br />
+		This invoice is for %AccountSummary%. If you would like a receipt for your payment, please enclose a stamped envelope with your address written on.
+		<br />
+		<br />
+		<hr width = "80%" />
+		<div align="center">
+			<b>PAYMENT ADVICE Ref: %RentCode%</b>
+			<br />
+			Please return this section with your payment by cheque or PO.
+		</div>
+		<br />
+		Enclosed cheque/PO for %TotalDue% for ground rent due for the period from %PeriodStartDate% to %PeriodEndDate% for property: %PropAddr%.
+		<br />
+		<br />
+	</div>		
+</body>
+</html>

@@ -7,16 +7,17 @@ from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_emailaccount, get_emailaccounts, \
     get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
-    get_landlord, get_landlords, get_loan, get_loan_options, get_loans, get_loanstatement, \
+    get_landlord, get_landlords, get_letter, get_letters, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
-from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, \
+from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_letter, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Emailaccount, Income, Incomealloc, Jstore, Landlord, Letter, Loan, \
-    Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, Typemailto
+from app.models import Agent, Charge, Doc, Emailaccount, Income, Incomealloc, Jstore, Landlord, Letter, Loan, \
+    Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
+    Typeletter, Typemailto
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -239,6 +240,27 @@ def landlord(id):
                            bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
 
 
+@bp.route('/letters', methods=['GET'])
+def letters():
+    letters = get_letters()
+
+    return render_template('letters.html', letters=letters)
+
+
+@bp.route('/letter/<int:id>', methods=['GET', 'POST'])
+@login_required
+def letter(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_letter(id, action)
+        return redirect('/letter/{}?action=view'.format(id_))
+    letter = get_letter(id)
+    session['let_types'] = [value for (value,) in Typeletter.query.with_entities(Typeletter.ltypedet).all()]
+    session['doc_codes'] = [value for (value,) in Doc.query.with_entities(Doc.code).all()]
+
+    return render_template('letter.html', action=action, letter=letter)
+
+
 @bp.route('/loadquery', methods=['GET', 'POST'])
 def loadquery():
     if request.method == "POST":
@@ -299,15 +321,15 @@ def mail(id):
     if request.method == "POST":
         mailaddr = request.form['mailaddr']
         print(request.form)
-        letter_id = request.form['goBtn']
-        subject, part1, part2, part3, rentobj, letterdata, addressdata = writeMail(id, 0, letter_id)
+        letter_id = int(request.form['goBtn'])
+        subject, part1, part2, part3, rentobj, letter, addressdata = writeMail(id, 0, letter_id)
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
-                               rentobj=rentobj, letterdata=letterdata, addressdata=addressdata,
+                               rentobj=rentobj, letter=letter, addressdata=addressdata,
                                mailaddr=mailaddr)
     else:
-        letters = Letter.query.filter(Letter.id.in_([1, 2, 3]))
+        letters = get_letters()
 
         return render_template('mail_dialog.html', letters=letters, rent_id = id)
 

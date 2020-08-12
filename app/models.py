@@ -240,7 +240,7 @@ class Letter(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15))
-    subject = db.Column(db.String(60))
+    subject = db.Column(db.String(150))
     part1 = db.Column(db.String(900))
     part2 = db.Column(db.String(900))
     part3 = db.Column(db.String(900))

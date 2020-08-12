@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="letters.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<!-- Payreq header -->
+
+	<!-- %if %IsLetter% -->
+	<!-- %include "payreq_header.html" -->
+	<!-- %endif %IsLetter% -->
+
+	<!-- %if %IsEmail% -->
+	<!-- %include "email_header.html" -->
+	<!-- %endif %IsEmail% -->
+
+	<div class="font-size-medium" align="left">
+		<!-- Subject -->
+        <b>%Bold%</b>
+        <br />
+
+		<!-- Table of owings -->
+		<!-- %include "payreq_table_forsale.html" -->
+		
+		<!-- Clauses -->
+		<!-- %include "payreq_clauses_normal.html" -->
+
+		<!-- %if %ChargeType% == "ground rent" % -->
+        <br />
+		<div class="font-size-small">
+			Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is %Landlord% whose address (at which notices, including notices in proceedings, should be served) is %ManagerAddress%.
+		</div>
+		<!-- %endif %ChargeType% -->
+
+		<br />
+		This account is for %AccountSummary%. If you would like a receipt for a payment sent by post, please enclose a stamped envelope with your address on it.
+		<br />
+		<br />
+
+		<!-- Payreq footer and remittance advice -->
+		<!-- %include "payreq_footer_forsale.html" -->
+
+		<!-- %if %IsEmail% -->
+		<!-- %include "email_footer.html" -->
+		<!-- %endif %IsEmail% -->
+	</div>
+
+	<!-- Include S166 here -->
+	<!-- %if %IncludeS166% -->
+	<!-- %include "s166.html" -->
+	<!-- %endif -->
+</body>
+</html>

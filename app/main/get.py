@@ -6,43 +6,46 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Headrent, Income, \
+from app.models import Agent, Charge, Chargetype, Doc, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Letter, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
-    Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typepayment, Typeprdelivery, Typeproperty, \
-    Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Typeadvarr, Money_account, Typedeed, Typefreq, Typeletter, Typemailto, Typepayment, Typeprdelivery, \
+    Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
 # functions listed in alphabetical order, save for  master function first in each group
 def get_agents():
-    agd = request.form.get("address") or ""
-    age = request.form.get("email") or ""
-    agn = request.form.get("notes") or ""
-    agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
-                    Agent.agnotes.ilike('%{}%'.format(agn))).all()
+    if request.method == "POST":
+        agd = request.form.get("address") or ""
+        age = request.form.get("email") or ""
+        agn = request.form.get("notes") or ""
+        agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
+                        Agent.agnotes.ilike('%{}%'.format(agn))).all()
+    else:
+        id_list = json.loads(current_user.recent_agents)
+        agents = Agent.query.filter(Agent.id.in_(id_list))
+        # agents = Agent.query.filter(Agent.id == func.any(id_list))
+        # agents = db.session.query(Agent.agdetails).filter(Agent.id == func.any(id_list))
 
+        # sql_tmpl = "select * from Agent where id in :iddata"
+        # params = {
+        #     'iddata': (1, 2, 3, 4),
+        # }
+        # agents = db.session.execute(text(sql_tmpl), params)
     return agents
-    # if request.method == "POST":
-    #     agd = request.form.get("address") or ""
-    #     age = request.form.get("email") or ""
-    #     agn = request.form.get("notes") or ""
-    #     agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
-    #                     Agent.agnotes.ilike('%{}%'.format(agn))).all()
-    # else:
-    #     mylist = current_user.recent_agents
-    #     agents = Agent.query.filter(Agent.id.in_(mylist))
-    # return agents
 
 
 def get_agent(id):
+    id_list = json.loads(current_user.recent_agents)
+    if id not in id_list:
+        id_list.insert(0, id)
+        id_list.pop()
+        user = current_user
+        user.recent_agents = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
+
     agent = Agent.query.filter(Agent.id == id).one_or_none()
-    # print(current_user.recent_agents)
-    # mylist = current_user.recent_agents
-    # mylist.insert(0, id)
-    # mylist.pop()
-    # current_user.recent_agents = mylist
-    # db.session.add(User)
-    # db.session.commit()
 
     return agent
 
@@ -199,6 +202,39 @@ def get_landlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
+def get_letters():
+    if request.method == "POST":
+        code = request.form.get("code") or ""
+        subject = request.form.get("subject") or ""
+        part1 = request.form.get("part1") or ""
+        part2 = request.form.get("part1") or ""
+        letters = Letter.query.filter(Letter.code.ilike('%{}%'.format(code)),
+                  Letter.subject.ilike('%{}%'.format(subject)), Letter.part1.ilike('%{}%'.format(part1)),
+                  Letter.part2.ilike('%{}%'.format(part2))).all()
+    else:
+        id_list = json.loads(current_user.recent_letters)
+        letters = Letter.query.filter(Letter.id.in_(id_list))
+
+    return letters
+
+
+def get_letter(id):
+    id_list = json.loads(current_user.recent_letters)
+    if id not in id_list:
+        id_list.insert(0, id)
+        id_list.pop()
+        user = current_user
+        user.recent_letters = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
+
+    letter = Letter.query.join(Typeletter).join(Doc).with_entities(Letter.code, Letter.subject, Letter.part1,
+               Letter.part2, Letter.part3, Typeletter.ltypedet, Doc.code.label("doc_code")) \
+           .filter(Letter.id == id).one_or_none()
+
+    return letter
+
+
 def get_loan(id):
     loan = \
         Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
@@ -254,10 +290,7 @@ def getmaildata(rent_id, income_id, letter_id):
                     Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
                     ).filter(Rent.id == rent_id).one_or_none()
 
-    letterdata = Letter.query.with_entities(Letter.subject, Letter.part1, Letter.part2, Letter.part3,
-                        Letter.doc_id).filter(Letter.id == letter_id).one_or_none()
-
-    return incomedata, allocdata, bankdata, addressdata, letterdata
+    return incomedata, allocdata, bankdata, addressdata
 
 
 def get_moneyaccount(id):
