@@ -24,14 +24,6 @@ def get_agents():
     else:
         id_list = json.loads(current_user.recent_agents)
         agents = Agent.query.filter(Agent.id.in_(id_list))
-        # agents = Agent.query.filter(Agent.id == func.any(id_list))
-        # agents = db.session.query(Agent.agdetails).filter(Agent.id == func.any(id_list))
-
-        # sql_tmpl = "select * from Agent where id in :iddata"
-        # params = {
-        #     'iddata': (1, 2, 3, 4),
-        # }
-        # agents = db.session.execute(text(sql_tmpl), params)
     return agents
 
 

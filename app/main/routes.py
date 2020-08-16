@@ -1,6 +1,6 @@
 import sqlalchemy
 import datetime
-from flask import render_template, redirect, url_for, request, session
+from flask import render_template, redirect, url_for, request, session, jsonify
 from flask_login import current_user, login_required
 from app import db
 from app.main import bp
@@ -315,23 +315,32 @@ def loanstatement(id):
                                loancode=loancode, checksums=checksums)
 
 
-@bp.route('/mail/<int:id>', methods=["GET", "POST"])
+@bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
-def mail(id):
+def mail_dialog(id):
+    # if request.method == "POST":
+    #     print(request.form)
+    #     letter_id = int(request.form['goBtn'])
+    #
+    #     return redirect(url_for('main/mail_edit', id=id))
+    letters = get_letters()
+
+    return render_template('mail_dialog.html', letters=letters, rent_id = id)
+
+
+@bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
+@login_required
+def mail_edit(id):
     if request.method == "POST":
         mailaddr = request.form['mailaddr']
         print(request.form)
-        letter_id = int(request.form['goBtn'])
+        letter_id = id
         subject, part1, part2, part3, rentobj, letter, addressdata = writeMail(id, 0, letter_id)
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
                                rentobj=rentobj, letter=letter, addressdata=addressdata,
                                mailaddr=mailaddr)
-    else:
-        letters = get_letters()
-
-        return render_template('mail_dialog.html', letters=letters, rent_id = id)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -394,6 +403,16 @@ def money_item(id):
 
     return render_template('money_item.html', action=action, moneyitem=moneyitem, bankaccs=bankaccs,
                            cats=cats, cleareds=cleareds)
+
+
+@bp.route('/parse_data', methods=['GET', 'POST'])
+def parse_data():
+    if request.method == "POST":
+        letter_html = request.form['xinput']
+        rent_id = request.form['rent_id']
+        let_id = request.form['rent_id']
+
+    return redirect('/index')
 
 
 @bp.route('/payrequests', methods=['GET', 'POST'])

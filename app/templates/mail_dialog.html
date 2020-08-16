@@ -50,7 +50,7 @@
             <td style="width: 50.00%">{{ item.part1 }}</td>
             <td style="width: 25.00%"> {{ item.part2 }}</td>
             <td>
-                <button type="submit" class="btn btn-danger" name="goBtn" value="{{ item.id }}">Go</button>
+                <button type="submit" formaction="/mail_edit/{{ item.id }}" class="btn btn-danger">Go</button>
             </td>
         </tr>
         {% endfor %}
