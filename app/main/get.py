@@ -7,9 +7,9 @@ from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.models import Agent, Charge, Chargetype, Doc, Extmanager, Extrent, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Letter, Loan, Loan_statement, Manager, Money_category, Money_item, \
+    Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
-    Typeadvarr, Money_account, Typedeed, Typefreq, Typeletter, Typemailto, Typepayment, Typeprdelivery, \
+    Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \
     Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -194,37 +194,37 @@ def get_landlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
-def get_letters():
+def get_docs():
     if request.method == "POST":
         code = request.form.get("code") or ""
         subject = request.form.get("subject") or ""
         part1 = request.form.get("part1") or ""
         part2 = request.form.get("part1") or ""
-        letters = Letter.query.filter(Letter.code.ilike('%{}%'.format(code)),
-                  Letter.subject.ilike('%{}%'.format(subject)), Letter.part1.ilike('%{}%'.format(part1)),
-                  Letter.part2.ilike('%{}%'.format(part2))).all()
+        docs = Doc.query.filter(Doc.code.ilike('%{}%'.format(code)),
+                  Doc.subject.ilike('%{}%'.format(subject)), Doc.part1.ilike('%{}%'.format(part1)),
+                  Doc.part2.ilike('%{}%'.format(part2))).all()
     else:
-        id_list = json.loads(current_user.recent_letters)
-        letters = Letter.query.filter(Letter.id.in_(id_list))
+        id_list = json.loads(current_user.recent_docs)
+        docs = Doc.query.filter(Doc.id.in_(id_list))
 
-    return letters
+    return docs
 
 
-def get_letter(id):
-    id_list = json.loads(current_user.recent_letters)
+def get_doc(id):
+    id_list = json.loads(current_user.recent_docs)
     if id not in id_list:
         id_list.insert(0, id)
         id_list.pop()
         user = current_user
-        user.recent_letters = json.dumps(id_list)
+        user.recent_docs = json.dumps(id_list)
         db.session.add(user)
         db.session.commit()
 
-    letter = Letter.query.join(Typeletter).join(Doc).with_entities(Letter.code, Letter.subject, Letter.part1,
-               Letter.part2, Letter.part3, Typeletter.ltypedet, Doc.code.label("doc_code")) \
-           .filter(Letter.id == id).one_or_none()
+    doc = Doc.query.join(Typedoc).with_entities(Doc.code, Doc.subject, Doc.part1,
+               Doc.part2, Doc.part3, Typedoc.desc, Template.code.label("template")) \
+           .filter(Doc.id == id).one_or_none()
 
-    return letter
+    return doc
 
 
 def get_loan(id):
@@ -261,7 +261,7 @@ def get_loanstatement():
     return loanstatement
 
 
-def getmaildata(rent_id, income_id, letter_id):
+def getmaildata(rent_id, income_id):
     if income_id == 0:
         incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
                         Income.date.label("paydate"), Income.amount.label("payamount"), Typepayment.paytypedet) \

@@ -1,5 +1,4 @@
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 from hashlib import md5
 from time import time
 from flask import current_app
@@ -7,7 +6,6 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import db, login
-# from app.main.cached_data import getCached_data_querier
 
 
 class Agent(db.Model):
@@ -58,9 +56,24 @@ class Doc(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15))
-    desc = db.Column(db.String(60))
+    subject = db.Column(db.String(150))
+    part1 = db.Column(db.String(900))
+    part2 = db.Column(db.String(900))
+    part3 = db.Column(db.String(900))
+    type_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
+    template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
-    letter_doc = db.relationship('Letter', backref='doc', lazy='dynamic')
+    doc_out_doc = db.relationship('Doc_out', backref='doc', lazy='dynamic')
+
+
+class Doc_out(db.Model):
+    __tablename__ = 'doc_out'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    doc_id = db.Column(db.Integer, db.ForeignKey('doc.id'))
+    doc_date = db.Column(db.Date)
+    doc_text = db.Column(db.Text)
 
 
 class Emailaccount(db.Model):
@@ -235,31 +248,6 @@ class Lease_uplift_type(db.Model):
     value = db.Column(db.Numeric(8, 2))
 
 
-class Letter(db.Model):
-    __tablename__ = 'letter'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(15))
-    subject = db.Column(db.String(150))
-    part1 = db.Column(db.String(900))
-    part2 = db.Column(db.String(900))
-    part3 = db.Column(db.String(900))
-    type_id = db.Column(db.Integer, db.ForeignKey('typeletter.id'))
-    doc_id = db.Column(db.Integer, db.ForeignKey('doc.id'))
-
-    let_his_letter = db.relationship('Let_his', backref='letter', lazy='dynamic')
-
-
-class Let_his(db.Model):
-    __tablename__ = 'let_his'
-
-    id = db.Column(db.Integer, primary_key=True)
-    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    let_id = db.Column(db.Integer, db.ForeignKey('letter.id'))
-    let_date = db.Column(db.Date)
-    let_text = db.Column(db.Text)
-
-
 class Loan(db.Model):
     __tablename__ = 'loan'
 
@@ -415,42 +403,10 @@ class Rent(db.Model):
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
-    let_his_rent = db.relationship('Let_his', backref='rent', lazy='dynamic')
+    doc_out_rent = db.relationship('Doc_out', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
-
-    # @classmethod
-    # def next_date(self):
-    #     datesquerier = getCached_data_querier()
-    #     nextdate = None
-    #     if Rent.frequency == 1:
-    #         nextdate = Rent.lastrentdate + relativedelta(years=1)
-    #     elif Rent.frequency == 2:
-    #         dateF2 = datesquerier.getDateF2(Rent.datecode)
-    #         if Rent.lastrentdate.month == dateF2.date1.month and Rent.lastrentdate.day == dateF2.date1.day:
-    #             nextdate = date(Rent.lastrentdate.year, dateF2.date2.month, dateF2.date2.day)
-    #         elif Rent.lastrentdate.month == dateF2.date2.month and Rent.lastrentdate.day == dateF2.date2.day:
-    #             nextdate = date(Rent.lastrentdate.year + 1, dateF2.date1.month, dateF2.date1.day)
-    #     elif Rent.frequency == 4:
-    #         dateF4 = datesquerier.getDateF4(Rent.datecode)
-    #         if Rent.lastrentdate.month == dateF4.date1.month and Rent.lastrentdate.day == dateF4.date1.day:
-    #             nextdate = date(Rent.lastrentdate.year, dateF4.date2.month, dateF4.date2.day)
-    #
-    #         elif Rent.lastrentdate.month == dateF4.date2.month and Rent.lastrentdate.day == dateF4.date2.day:
-    #             nextdate = date(Rent.lastrentdate.year, dateF4.date3.month, dateF4.date3.day)
-    #
-    #         elif Rent.lastrentdate.month == dateF4.date3.month and Rent.lastrentdate.day == dateF4.date3.day:
-    #             nextdate = date(Rent.lastrentdate.year, dateF4.date4.month, dateF4.date4.day)
-    #
-    #         elif Rent.lastrentdate.month == dateF4.date4.month and Rent.lastrentdate.day == dateF4.date4.day:
-    #             nextdate = date(Rent.lastrentdate.year + 1, dateF4.date1.month, dateF4.date1.day)
-    #     return nextdate
-
-
-# @classmethod
-    # def totcharges(self):
-    #     return sum of charges for this rent - is this possible?
 
 
 class Rental(db.Model):
@@ -494,6 +450,16 @@ class Rental_trans(db.Model):
     rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'))
 
 
+class Template(db.Model):
+    __tablename__ = 'template'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(15))
+    desc = db.Column(db.String(60))
+
+    doc_template = db.relationship('Doc', backref='template', lazy='dynamic')
+
+
 class Typeactype(db.Model):
     __tablename__ = 'typeactype'
 
@@ -534,6 +500,15 @@ class Typedeed(db.Model):
     rent_typedeed = db.relationship('Rent', backref='typedeed', lazy='dynamic')
 
 
+class Typedoc(db.Model):
+    __tablename__ = 'typedoc'
+
+    id = db.Column(db.Integer, primary_key=True)
+    desc = db.Column(db.String(30))
+
+    doc_typedoc = db.relationship('Doc', backref='typedoc', lazy='dynamic')
+
+
 class Typefreq(db.Model):
     __tablename__ = 'typefreq'
 
@@ -545,15 +520,6 @@ class Typefreq(db.Model):
     rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
     
-class Typeletter(db.Model):
-    __tablename__ = 'typeletter'
-
-    id = db.Column(db.Integer, primary_key=True)
-    ltypedet = db.Column(db.String(45))
-
-    letter_typeletter = db.relationship('Letter', backref='typeletter', lazy='dynamic')
-
-
 class Typemailto(db.Model):
     __tablename__ = 'typemailto'
 
@@ -626,7 +592,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     recent_rents = db.Column(db.String(150))
     recent_agents = db.Column(db.String(150))
-    recent_letters = db.Column(db.String(150))
+    recent_docs = db.Column(db.String(150))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

@@ -3,8 +3,8 @@ from flask import redirect, request
 from app import db
 from app.main.functions import commit_to_database
 from app.models import Agent, Charge, Chargetype, Doc, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Letter, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, \
-    Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typeletter, \
+    Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
+    Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -39,6 +39,30 @@ def post_charge(id, action):
     db.session.commit()
     id_ = charge.id
 
+    return id_
+
+
+def post_doc(id, action):
+    if action == "edit":
+        doc = Doc.query.get(id)
+    else:
+        doc = Doc()
+    doc.code = request.form["code"]
+    doc.subject = request.form["subject"]
+    doc.part1 = request.form["part1"]
+    doc.part2 = request.form["part2"]
+    doc.part3 = request.form["part3"]
+    type = request.form["doc_type"]
+    doc.type_id = \
+        Typedoc.query.with_entities(Typedoc.id).filter \
+            (Typedoc.desc == type).one()[0]
+    template_code = request.form["template_code"]
+    doc.template_id = \
+        Template.query.with_entities(Template.id).filter \
+            (Template.code == template_code).one()[0]
+    db.session.add(doc)
+    db.session.commit()
+    id_ = doc.id
     return id_
 
 
@@ -162,30 +186,6 @@ def post_landlord(id, action):
     db.session.add(landlord)
     db.session.commit()
     id_ = landlord.id
-    return id_
-
-
-def post_letter(id, action):
-    if action == "edit":
-        letter = Letter.query.get(id)
-    else:
-        letter = Letter()
-    letter.code = request.form["code"]
-    letter.subject = request.form["subject"]
-    letter.part1 = request.form["part1"]
-    letter.part2 = request.form["part2"]
-    letter.part3 = request.form["part3"]
-    type = request.form["let_type"]
-    letter.type_id = \
-        Typeletter.query.with_entities(Typeletter.id).filter \
-            (Typeletter.ltypedet == type).one()[0]
-    doc_code = request.form["doc_code"]
-    letter.doc_id = \
-        Doc.query.with_entities(Doc.id).filter \
-            (Doc.code == doc_code).one()[0]
-    db.session.add(letter)
-    db.session.commit()
-    id_ = letter.id
     return id_
 
 

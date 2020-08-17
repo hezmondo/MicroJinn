@@ -1,15 +1,15 @@
 import datetime
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.get import get_letter, getmaildata, getrentobj_main
+from app.main.get import get_doc, getmaildata, getrentobj_main
 from app.main.functions import htmlSpecialMarkDown
 
-def writeMail(rent_id, income_id, letter_id):
-    # This function takes in rent details and outputs a mail item (letter/email)
+def writeMail(rent_id, income_id, doc_id):
+    # This function takes in rent details and outputs a mail item (letter/payrequest/account/email)
 
     rentobj, properties = getrentobj_main(rent_id)
-    incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id, letter_id)
-    letter = get_letter(letter_id)
+    incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
+    doc = get_doc(doc_id)
     arrears = rentobj.arrears or 0.00
     totcharges = rentobj.totcharges or 0.00
     totdue = arrears + totcharges or 0.00
@@ -43,17 +43,17 @@ def writeMail(rent_id, income_id, letter_id):
         '#today#': dateToStr(datetime.date.today())
     }
 
-    subject = letter.subject
-    part1 = letter.part1 if letter.part1 else ""
-    part2 = letter.part2 if letter.part2 else ""
-    part3 = letter.part3 if letter.part3 else ""
+    subject = doc.subject
+    part1 = doc.part1 if doc.part1 else ""
+    part2 = doc.part2 if doc.part2 else ""
+    part3 = doc.part3 if doc.part3 else ""
 
     subject = doReplace(word_variables, subject)
     part1 = doReplace(word_variables, part1)
     part2 = doReplace(word_variables, part2)
     part3 = doReplace(word_variables, part3)
 
-    return subject, part1, part2, part3, rentobj, letter, addressdata
+    return subject, part1, part2, part3, rentobj, doc, addressdata
 
 
 def doReplace(dict, clause):

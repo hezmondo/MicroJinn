@@ -1,4 +1,4 @@
-<!-- /templates/letters.html  -->
+<!-- /templates/docs.html  -->
 {% extends 'base.html' %}
 
 {% block app_content %}
@@ -30,7 +30,7 @@
             <button type="submit" class="btn btn-block btn-success">Search</button>
         </div>
         <div class="col-md-6">
-            <a href="/letter/0?action=new" class="btn btn-block btn-primary" role="button">Add letter</a>
+            <a href="/doc/0?action=new" class="btn btn-block btn-primary" role="button">Add doc</a>
         </div>
     </div>
     <div class="form-group row">
@@ -38,7 +38,7 @@
     <table class="table table-condensed">
         <thead>
         <tr>
-            <th style="width: 8.00%">Letter_code</th>
+            <th style="width: 8.00%">Doc_code</th>
             <th style="width: 40.00%">Part 1</th>
             <th style="width: 30.00%">Part 2</th>
             <th style="width: 13.00%">Part 3</th>
@@ -46,13 +46,13 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in letters %}
+        {% for item in docs %}
         <tr>
             <td style="width: 8.00%">{{ item.code }}</td>
             <td style="width: 40.00%">{{ item.part1 }}</td>
             <td style="width: 30.00%"> {{ item.part2 }}</td>
             <td style="width: 13.00%"> {{ item.part3 }}</td>
-            <td style="width: 9.00%"><a href="/letter/{{ item.id }}">View</a></td>
+            <td style="width: 9.00%"><a href="/doc/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>

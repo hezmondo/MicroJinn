@@ -50,8 +50,8 @@ select:-internal-list-box option:checked {
     background-color: rgb(206, 227, 227) !important;
     color: rgb(16, 16, 16) !important;
 }
-/* letters.css */
-/* standard CSS for letters */
+/* docs.css */
+/* standard CSS for docs */
 
 /* font family */
 /* body {
@@ -80,5 +80,5 @@ select:-internal-list-box option:checked {
     font-size: 9pt;
 }
 
-/* End of letters.css */
+/* End of docs.css */
 

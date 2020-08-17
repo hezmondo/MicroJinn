@@ -2,7 +2,7 @@
 
 {% block app_content %}
 <form method="POST" action="/parse_data">
-	<div id="letter_html" contenteditable="true">
+	<div id="doc_html" contenteditable="true">
 		<div class="font-size-large" align="center">
 			<b>{{ rentobj.managername }}</b>
 		</div>
@@ -60,7 +60,7 @@
             <input id="rent_id" name="rent_id" value = "{{ rentobj.id }}">
         </div>
 		<div class="col-md-3">
-            <input id="let_id" name="let_id" value = "{{ letter.id }}">
+            <input id="doc_id" name="doc_id" value = "{{ doc.id }}">
         </div>
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success">Save html</button>

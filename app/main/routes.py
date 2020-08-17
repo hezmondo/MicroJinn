@@ -1,23 +1,23 @@
 import sqlalchemy
 import datetime
 from flask import render_template, redirect, url_for, request, session, jsonify
-from flask_login import current_user, login_required
+from flask_login import login_required
 from app import db
 from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_emailaccount, get_emailaccounts, \
     get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
-    get_landlord, get_landlords, get_letter, get_letters, get_loan, get_loan_options, get_loans, get_loanstatement, \
+    get_landlord, get_landlords, get_doc, get_docs, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
-from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_letter, \
+from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_doc, \
     post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Doc, Emailaccount, Income, Incomealloc, Jstore, Landlord, Letter, Loan, \
+from app.models import Agent, Charge, Doc, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
-    Typeletter, Typemailto
+    Typedoc, Typemailto
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -240,25 +240,25 @@ def landlord(id):
                            bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
 
 
-@bp.route('/letters', methods=['GET'])
-def letters():
-    letters = get_letters()
+@bp.route('/docs', methods=['GET'])
+def docs():
+    docs = get_docs()
 
-    return render_template('letters.html', letters=letters)
+    return render_template('docs.html', docs=docs)
 
 
-@bp.route('/letter/<int:id>', methods=['GET', 'POST'])
+@bp.route('/doc/<int:id>', methods=['GET', 'POST'])
 @login_required
-def letter(id):
+def doc(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_letter(id, action)
-        return redirect('/letter/{}?action=view'.format(id_))
-    letter = get_letter(id)
-    session['let_types'] = [value for (value,) in Typeletter.query.with_entities(Typeletter.ltypedet).all()]
+        id_ = post_doc(id, action)
+        return redirect('/doc/{}?action=view'.format(id_))
+    doc = get_doc(id)
+    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     session['doc_codes'] = [value for (value,) in Doc.query.with_entities(Doc.code).all()]
 
-    return render_template('letter.html', action=action, letter=letter)
+    return render_template('doc.html', action=action, doc=doc)
 
 
 @bp.route('/loadquery', methods=['GET', 'POST'])
@@ -318,14 +318,9 @@ def loanstatement(id):
 @bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_dialog(id):
-    # if request.method == "POST":
-    #     print(request.form)
-    #     letter_id = int(request.form['goBtn'])
-    #
-    #     return redirect(url_for('main/mail_edit', id=id))
-    letters = get_letters()
+    docs = get_docs()
 
-    return render_template('mail_dialog.html', letters=letters, rent_id = id)
+    return render_template('mail_dialog.html', docs=docs, rent_id = id)
 
 
 @bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
@@ -334,12 +329,12 @@ def mail_edit(id):
     if request.method == "POST":
         mailaddr = request.form['mailaddr']
         print(request.form)
-        letter_id = id
-        subject, part1, part2, part3, rentobj, letter, addressdata = writeMail(id, 0, letter_id)
+        doc_id = id
+        subject, part1, part2, part3, rentobj, doc, addressdata = writeMail(id, 0, doc_id)
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
-                               rentobj=rentobj, letter=letter, addressdata=addressdata,
+                               rentobj=rentobj, doc=doc, addressdata=addressdata,
                                mailaddr=mailaddr)
 
 
@@ -408,9 +403,9 @@ def money_item(id):
 @bp.route('/parse_data', methods=['GET', 'POST'])
 def parse_data():
     if request.method == "POST":
-        letter_html = request.form['xinput']
+        doc_html = request.form['xinput']
         rent_id = request.form['rent_id']
-        let_id = request.form['rent_id']
+        doc_id = request.form['doc_id']
 
     return redirect('/index')
 

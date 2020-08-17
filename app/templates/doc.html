@@ -7,40 +7,40 @@
 		<div class="form-group row">
 			<div class="col-md-4">
 				<label for="code">Code:</label>
-				<input type="text" class="form-control" name="code" value="{{ letter.code }}">
+				<input type="text" class="form-control" name="code" value="{{ doc.code }}">
 			</div>
             <div class="col-md-4">
-                <label for="let_type">Type:</label>
-                {{ widgets.combobox(name="let_type", items=session['let_types'], item_selected=letter.ltypedet) }}
+                <label for="doc_type">Type:</label>
+                {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=doc.desc) }}
             </div>
             <div class="col-md-4">
-                <label for="doc_code">Doc code:</label>
-                {{ widgets.combobox(name="doc_code", items=session['doc_codes'], item_selected=letter.doc_code) }}
+                <label for="template_code">Doc code:</label>
+                {{ widgets.combobox(name="template_code", items=session['template_codes'], item_selected=doc.template_code) }}
             </div>
 		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="subject">Subject:</label>
-				<input type="text" class="form-control" name="subject" value="{{ letter.subject }}">
+				<input type="text" class="form-control" name="subject" value="{{ doc.subject }}">
 			</div>
 		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="part1">Part 1:</label>
-				<textarea class="form-control" rows="8" name="part1" >{{ letter.part1 }}</textarea>
+				<textarea class="form-control" rows="8" name="part1" >{{ doc.part1 }}</textarea>
 			</div>
 		</div>
 		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="part2">Part 2:</label>
-				<textarea class="form-control" rows="8" name="part2" >{{ letter.part2 }}</textarea>
+				<textarea class="form-control" rows="8" name="part2" >{{ doc.part2 }}</textarea>
 			</div>
 		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="part3">Part 3:</label>
-				<textarea class="form-control" rows="4" name="part3" >{{ letter.part3 }}</textarea>
+				<textarea class="form-control" rows="4" name="part3" >{{ doc.part3 }}</textarea>
 			</div>
 		</div>
     </form>

@@ -16,7 +16,7 @@ $(document).ready(function(){
         window.location = $(this).data("href");
     });
     $('#savehtml').click(function() {
-    var mysave = $('#letter_html').html();
+    var mysave = $('#doc_html').html();
     $('#xinput').val(mysave);
     });
 });
