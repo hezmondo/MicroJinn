@@ -208,7 +208,7 @@ def income_post(id):
 
 
 @bp.route('/', methods=['GET', 'POST'])
-@bp.route('/index', methods=['GET', 'POST'])
+@bp.route('/index/', methods=['GET', 'POST'])
 @login_required
 def index():
     action = request.args.get('action', "view", type=str)

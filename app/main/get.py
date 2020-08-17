@@ -31,7 +31,7 @@ def get_agent(id):
     id_list = json.loads(current_user.recent_agents)
     if id not in id_list:
         id_list.insert(0, id)
-        id_list.pop()
+        # id_list.pop()
         user = current_user
         user.recent_agents = json.dumps(id_list)
         db.session.add(user)
@@ -429,14 +429,16 @@ def get_rentalstatement():
 
 
 def get_rentobjects_basic(action):
+    qfilterbasic = []
+    if action == "view":
+        id_list = json.loads(current_user.recent_rents)
+        qfilterbasic.append(Rent.id.in_(id_list))
     agentdetails = request.form.get("agentdetails") or ""
     propaddr = request.form.get("propaddr") or ""
     rentcode = request.form.get("rentcode") or ""
     source = request.form.get("source") or ""
     tenantname = request.form.get("tenantname") or ""
     runsize = request.form.get("runsize") or 100
-    mylist = current_user.recent_rents
-    qfilterbasic = []
     if action == "external":
         if agentdetails and agentdetails != "":
             qfilterbasic.append(Extrent.agentdetails.ilike('%{}%'.format(agentdetails)))
@@ -460,8 +462,6 @@ def get_rentobjects_basic(action):
             qfilterbasic.append(Rent.source.ilike('%{}%'.format(source)))
         if tenantname and tenantname != "":
             qfilterbasic.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
-        # if action == "view":
-        #     qfilterbasic.append(Rent.id.in_(mylist))
         rentprops = getrentobjs_basic(qfilterbasic, runsize)
 
     return agentdetails, propaddr, rentcode, source, tenantname, rentprops
@@ -623,6 +623,14 @@ def getrentobjs_advanced(qfilter, runsize):
 
 
 def getrentobj_main(id):
+    id_list = json.loads(current_user.recent_rents)
+    if id not in id_list:
+        id_list.insert(0, id)
+        # id_list.pop()
+        user = current_user
+        user.recent_rents = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
     rentobj = \
         Rent.query \
             .join(Landlord) \

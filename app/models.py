@@ -247,6 +247,18 @@ class Letter(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('typeletter.id'))
     doc_id = db.Column(db.Integer, db.ForeignKey('doc.id'))
 
+    let_his_letter = db.relationship('Let_his', backref='letter', lazy='dynamic')
+
+
+class Let_his(db.Model):
+    __tablename__ = 'let_his'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    let_id = db.Column(db.Integer, db.ForeignKey('letter.id'))
+    let_date = db.Column(db.Date)
+    let_text = db.Column(db.Text)
+
 
 class Loan(db.Model):
     __tablename__ = 'loan'
@@ -403,6 +415,7 @@ class Rent(db.Model):
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
+    let_his_rent = db.relationship('Let_his', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
