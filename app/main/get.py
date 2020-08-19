@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.models import Agent, Charge, Chargetype, Doc, Extmanager, Extrent, Headrent, Income, \
+from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \
@@ -92,11 +92,35 @@ def get_doc(id):
         db.session.add(user)
         db.session.commit()
 
-    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.code, Doc.subject, Doc.part1,
+    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.id, Doc.code, Doc.subject, Doc.part1,
                Doc.part2, Doc.part3, Typedoc.desc, Template.desc.label("template")) \
            .filter(Doc.id == id).one_or_none()
 
     return doc
+
+
+def get_docs_out(id):
+    doc_out_filter = []
+    if request.method == "POST":
+        rcd = request.form.get("rentcode") or ""
+        dcd = request.form.get("doc_code") or ""
+        dcty = request.form.get("doc_type") or ""
+        dctx = request.form.get("doc_text") or ""
+        if rcd and rcd != "":
+            doc_out_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
+        if dcd and dcd != "":
+            doc_out_filter.append(Doc.code.ilike('%{}%'.format(dcd)))
+        if dcty and dcty != "":
+            doc_out_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
+        if dctx and dctx != "":
+            doc_out_filter.append(Doc_out.doc_text.ilike('%{}%'.format(dctx)))
+    if id > 0:
+        doc_out_filter.append(Doc_out.rent_id == id)
+
+    docs_out = Doc_out.query.join(Doc).join(Rent).join(Typedoc).with_entities(Doc_out.id, Doc_out.doc_date,
+                    Doc_out.doc_text, Typedoc.desc, Doc.code, Rent.rentcode).filter(*doc_out_filter).all()
+
+    return docs_out
 
 
 def get_emailaccounts():

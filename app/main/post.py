@@ -1,8 +1,8 @@
+import json
 from flask import redirect, request
-
 from app import db
 from app.main.functions import commit_to_database
-from app.models import Agent, Charge, Chargetype, Doc, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -364,3 +364,20 @@ def postrentobj(id):
         db.session.commit()
 
     return redirect('/rentobject/{}'.format(id))
+
+def post_html(action):
+    if action == "edit":
+        docout = Doc_out.query.get(id)
+    else:
+        docout = Doc_out()
+    # xhtml = request.form['xinput']
+    # docout.text = json.dumps(xhtml)
+    docout.doc_text = request.form['xinput']
+    docout.rent_id = request.form['rent_id']
+    docout.doc_id = request.form['doc_id']
+    docout.doc_date = request.form['doc_date']
+    db.session.add(docout)
+    db.session.commit()
+    id_ = docout.rent_id
+
+    return id_

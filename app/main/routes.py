@@ -4,18 +4,18 @@ from flask import render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required
 from app import db
 from app.main import bp
-from app.main.get import get_agent, get_agents, get_charge, get_charges, get_emailaccount, get_emailaccounts, \
-    get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
+from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docs_out, get_emailaccount, \
+    get_emailaccounts, get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
     get_landlord, get_landlords, get_doc, get_docs, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_doc, \
-    post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
+    post_html, post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Doc, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
+from app.models import Agent, Charge, Doc, Doc_out, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
     Template, Typedoc, Typemailto
 
@@ -152,6 +152,20 @@ def doc(id):
     return render_template('doc.html', action=action, doc=doc)
 
 
+@bp.route('/docs_out/<int:id>', methods=['GET'])
+def docs_out(id):
+    docs_out = get_docs_out(id)
+
+    return render_template('docs_out.html', docs_out=docs_out)
+
+
+@bp.route('/doc_out/<int:id>', methods=['GET'])
+def doc_out(id):
+    doc_out = Doc_out.query.filter(Doc_out.id == id).one_or_none()
+
+    return render_template('doc_out.html', doc_out=doc_out)
+
+
 @bp.route('/email_accounts', methods=['GET'])
 def email_accounts():
     emailaccs = get_emailaccounts()
@@ -172,7 +186,7 @@ def email_account(id):
 
 @bp.route('/external_rents', methods=['GET', 'POST'])
 def external_rents():
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects("external", "queryall")
+    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects_basic("external")
 
     return render_template('external_rents.html', agentdetails=agentdetails, propaddr=propaddr, rentcode=rentcode,
                            source=source, tenantname=tenantname, rentprops=rentprops)
@@ -400,16 +414,6 @@ def money_item(id):
                            cats=cats, cleareds=cleareds)
 
 
-@bp.route('/parse_data', methods=['GET', 'POST'])
-def parse_data():
-    if request.method == "POST":
-        doc_html = request.form['xinput']
-        rent_id = request.form['rent_id']
-        doc_id = request.form['doc_id']
-
-    return redirect('/index')
-
-
 @bp.route('/payrequests', methods=['GET', 'POST'])
 @login_required
 def payrequests():
@@ -509,6 +513,15 @@ def rentobject(id):
                        properties=properties, actypedets=actypedets, advarrdets=advarrdets,
                        deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
                        salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
+
+
+@bp.route('/save_html', methods=['GET', 'POST'])
+def save_html():
+    action = request.args.get('action', "new", type=str)
+    if request.method == "POST":
+        id = post_html(action)
+
+        return redirect('/rentobject/{}'.format(id))
 
 
 @bp.route('/utilities', methods=['GET'])
