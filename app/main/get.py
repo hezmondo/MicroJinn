@@ -66,6 +66,39 @@ def get_charge(id):
     return charge, chargedescs
 
 
+def get_docs():
+    if request.method == "POST":
+        code = request.form.get("code") or ""
+        subject = request.form.get("subject") or ""
+        part1 = request.form.get("part1") or ""
+        part2 = request.form.get("part1") or ""
+        docs = Doc.query.filter(Doc.code.ilike('%{}%'.format(code)),
+                  Doc.subject.ilike('%{}%'.format(subject)), Doc.part1.ilike('%{}%'.format(part1)),
+                  Doc.part2.ilike('%{}%'.format(part2))).all()
+    else:
+        id_list = json.loads(current_user.recent_docs)
+        docs = Doc.query.filter(Doc.id.in_(id_list))
+
+    return docs
+
+
+def get_doc(id):
+    id_list = json.loads(current_user.recent_docs)
+    if id not in id_list:
+        id_list.insert(0, id)
+        id_list.pop()
+        user = current_user
+        user.recent_docs = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
+
+    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.code, Doc.subject, Doc.part1,
+               Doc.part2, Doc.part3, Typedoc.desc, Template.desc.label("template")) \
+           .filter(Doc.id == id).one_or_none()
+
+    return doc
+
+
 def get_emailaccounts():
     emailaccs = Emailaccount.query.all()
 
@@ -192,39 +225,6 @@ def get_landlord(id):
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
 
     return landlord, managers, emailaccs, bankaccs
-
-
-def get_docs():
-    if request.method == "POST":
-        code = request.form.get("code") or ""
-        subject = request.form.get("subject") or ""
-        part1 = request.form.get("part1") or ""
-        part2 = request.form.get("part1") or ""
-        docs = Doc.query.filter(Doc.code.ilike('%{}%'.format(code)),
-                  Doc.subject.ilike('%{}%'.format(subject)), Doc.part1.ilike('%{}%'.format(part1)),
-                  Doc.part2.ilike('%{}%'.format(part2))).all()
-    else:
-        id_list = json.loads(current_user.recent_docs)
-        docs = Doc.query.filter(Doc.id.in_(id_list))
-
-    return docs
-
-
-def get_doc(id):
-    id_list = json.loads(current_user.recent_docs)
-    if id not in id_list:
-        id_list.insert(0, id)
-        id_list.pop()
-        user = current_user
-        user.recent_docs = json.dumps(id_list)
-        db.session.add(user)
-        db.session.commit()
-
-    doc = Doc.query.join(Typedoc).with_entities(Doc.code, Doc.subject, Doc.part1,
-               Doc.part2, Doc.part3, Typedoc.desc, Template.code.label("template")) \
-           .filter(Doc.id == id).one_or_none()
-
-    return doc
 
 
 def get_loan(id):

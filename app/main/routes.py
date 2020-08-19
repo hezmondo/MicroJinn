@@ -17,7 +17,7 @@ from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
 from app.models import Agent, Charge, Doc, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
-    Typedoc, Typemailto
+    Template, Typedoc, Typemailto
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -131,6 +131,27 @@ def delete_item(id):
         return redirect(url_for('main.index'))
 
 
+@bp.route('/docs', methods=['GET'])
+def docs():
+    docs = get_docs()
+
+    return render_template('docs.html', docs=docs)
+
+
+@bp.route('/doc/<int:id>', methods=['GET', 'POST'])
+@login_required
+def doc(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_doc(id, action)
+        return redirect('/doc/{}?action=view'.format(id_))
+    doc = get_doc(id)
+    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
+    session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
+
+    return render_template('doc.html', action=action, doc=doc)
+
+
 @bp.route('/email_accounts', methods=['GET'])
 def email_accounts():
     emailaccs = get_emailaccounts()
@@ -238,27 +259,6 @@ def landlord(id):
 
     return render_template('landlord.html', title='Landlord', action=action, landlord=landlord,
                            bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
-
-
-@bp.route('/docs', methods=['GET'])
-def docs():
-    docs = get_docs()
-
-    return render_template('docs.html', docs=docs)
-
-
-@bp.route('/doc/<int:id>', methods=['GET', 'POST'])
-@login_required
-def doc(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        id_ = post_doc(id, action)
-        return redirect('/doc/{}?action=view'.format(id_))
-    doc = get_doc(id)
-    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    session['doc_codes'] = [value for (value,) in Doc.query.with_entities(Doc.code).all()]
-
-    return render_template('doc.html', action=action, doc=doc)
 
 
 @bp.route('/loadquery', methods=['GET', 'POST'])

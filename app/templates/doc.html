@@ -14,8 +14,8 @@
                 {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=doc.desc) }}
             </div>
             <div class="col-md-4">
-                <label for="template_code">Doc code:</label>
-                {{ widgets.combobox(name="template_code", items=session['template_codes'], item_selected=doc.template_code) }}
+                <label for="template">Template:</label>
+                {{ widgets.combobox(name="template", items=session['templates'], item_selected=doc.template) }}
             </div>
 		</div>
 		<div class="form-group row">
@@ -30,7 +30,6 @@
 				<textarea class="form-control" rows="8" name="part1" >{{ doc.part1 }}</textarea>
 			</div>
 		</div>
-		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="part2">Part 2:</label>
@@ -42,6 +41,34 @@
 				<label for="part3">Part 3:</label>
 				<textarea class="form-control" rows="4" name="part3" >{{ doc.part3 }}</textarea>
 			</div>
+		</div>
+		<div class="form-group row">
+		</div>
+		<div class="form-group row">
+			{% if action == "view" %}
+			<div class="col-md-3">
+				<a href="/doc/{{ doc.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this doc</a>
+			</div>
+			<div class="col-md-3">
+				<a href="/doc/{{ doc.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this doc</a>
+			</div>
+			<div class="col-md-3">
+				<a href="/doc/0?action=new" class="btn btn-block btn-primary" role="button">Add new doc</a>
+			</div>
+			{% elif action == "edit" %}
+			<div class="col-md-3">
+				<a href="/delete_item/{{ doc.id }}?item=doc"
+				   onclick="return confirm('Are you sure you want to delete this doc?');"
+				   class="btn btn-block btn-warning" role="button">Delete this doc</a>
+			</div>
+			<div class="col-md-3">
+				<button type="submit" class="btn btn-block btn-success">Save changes</button>
+			</div>
+			{% else %}
+			<div class="col-md-3">
+				<button type="submit" class="btn btn-block btn-success">Save as new doc</button>
+			</div>
+			{% endif %}
 		</div>
     </form>
 {% endblock %}

@@ -56,10 +56,10 @@ def post_doc(id, action):
     doc.type_id = \
         Typedoc.query.with_entities(Typedoc.id).filter \
             (Typedoc.desc == type).one()[0]
-    template_code = request.form["template_code"]
+    template = request.form["template"]
     doc.template_id = \
         Template.query.with_entities(Template.id).filter \
-            (Template.code == template_code).one()[0]
+            (Template.code == template).one()[0]
     db.session.add(doc)
     db.session.commit()
     id_ = doc.id
