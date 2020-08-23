@@ -46,15 +46,27 @@ def writeMail(rent_id, income_id, doc_id):
         '#today#': dateToStr(datetime.date.today())
     }
 
-    subject = doc.subject.replace('\n', '<br>')
-    part1 = doc.part1.replace('\n', '<br>') if doc.part1 else ""
-    part2 = doc.part2.replace('\n', '<br>') if doc.part2 else ""
-    part3 = doc.part3.replace('\n', '<br>') if doc.part3 else ""
+    subjectp = doc.subject.split('\n')
+    part1p = doc.part1.split('\n') if doc.part1 else ""
+    part2p = doc.part2.split('\n') if doc.part2 else ""
+    part3p = doc.part3.split('\n') if doc.part3 else ""
 
-    subject = doReplace(word_variables, subject)
-    part1 = doReplace(word_variables, part1)
-    part2 = doReplace(word_variables, part2)
-    part3 = doReplace(word_variables, part3)
+    subject = []
+    for para in subjectp:
+        para = doReplace(word_variables, para)
+        subject.append(para)
+    part1 = []
+    for para in part1p:
+        para = doReplace(word_variables, para)
+        part1.append(para)
+    part2 = []
+    for para in part2p:
+        para = doReplace(word_variables, para)
+        part2.append(para)
+    part3 = []
+    for para in part3p:
+        para = doReplace(word_variables, para)
+        part3.append(para)
 
     return subject, part1, part2, part3, rentobj, doc, addressdata
 

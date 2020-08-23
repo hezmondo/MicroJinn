@@ -29,24 +29,24 @@
 			Dear {{ rentobj.tenantname }}
 			<br />
 			<br />
-			{% autoescape false %}
-			<b>{{ subject }}</b>
-			{% endautoescape %}
+			{% for para in subject %}
+				<p>{{para}}</p>
+			{% endfor %}
 			<br />
 			<br />
-			{% autoescape false %}
-			{{ part1 }}
-			{% endautoescape %}
+			{% for para in part1 %}
+				<p>{{para}}</p>
+			{% endfor %}
 			<br />
 			<br />
-			{% autoescape false %}
-			{{ part2 }}
-			{% endautoescape %}
+			{% for para in part2 %}
+				<p>{{para}}</p>
+			{% endfor %}
 			<br />
 			<br />
-			{% autoescape false %}
-			{{ part3 }}
-			{% endautoescape %}
+			{% for para in part3 %}
+				<p>{{para}}</p>
+			{% endfor %}
 			<br />
 			<br />
 			<br />
