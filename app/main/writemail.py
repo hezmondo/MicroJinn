@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.get import get_doc, getmaildata, getrentobj_main
@@ -10,20 +11,22 @@ def writeMail(rent_id, income_id, doc_id):
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
     doc = get_doc(doc_id)
-    arrears = rentobj.arrears or 0.00
-    totcharges = rentobj.totcharges or 0.00
-    totdue = arrears + totcharges or 0.00
+    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
+    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
+    totdue = arrears + totcharges
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "in elevence",
         '#accname#': bankdata.accname if bankdata else "some accname",
         '#accnum#': bankdata.accnum if bankdata else "some accnumber",
         '#sortcode#': bankdata.sortcode if bankdata else "some sortcode",
         '#bankname#': bankdata.bankname if bankdata else "some bankname",
-        '#arrears#': moneyToStr(arrears if rentobj else 1111.00, pound=True),
+        '#arrears#': moneyToStr(arrears, pound=True),
         '#hashcode#': hashCode(rentobj.rentcode) if rentobj else "some hashcode",
         '#landlordaddr#': addressdata.landlordaddr if addressdata else "some landlord address",
+        '#landlordname#': rentobj.landlordname if rentobj else "some landlord name",
         '#lastrentdate#': dateToStr(rentobj.lastrentdate) if rentobj else "11/11/2011",
         '#lessor#': "rent charge owner" if rentobj.tenuredet == "rent charge" else "ground rent owner",
+        '#managername#': rentobj.managername if rentobj else "some manager name",
         '#manageraddr#': addressdata.manageraddr if addressdata else "some manager address",
         '#manageraddr2#': addressdata.manageraddr2 if addressdata else "some manager address2",
         '#nextrentdate#': dateToStr(rentobj.nextrentdate) if rentobj else "11/11/2011",
@@ -38,15 +41,15 @@ def writeMail(rent_id, income_id, doc_id):
         '#rentpa#': moneyToStr(rentobj.rentpa if rentobj else 1111.00, pound=True),
         '#rent_type#': "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent",
         '#tenantname#': rentobj.tenantname if rentobj else "some tenant name",
-        '#totcharges#': moneyToStr(totcharges if rentobj else 1111.00, pound=True),
-        '#totdue#': moneyToStr(totdue if rentobj else 1111.00, pound=True),
+        '#totcharges#': moneyToStr(totcharges, pound=True),
+        '#totdue#': moneyToStr(totdue if totdue else 1111.00, pound=True),
         '#today#': dateToStr(datetime.date.today())
     }
 
-    subject = doc.subject
-    part1 = doc.part1 if doc.part1 else ""
-    part2 = doc.part2 if doc.part2 else ""
-    part3 = doc.part3 if doc.part3 else ""
+    subject = doc.subject.replace('\n', '<br>')
+    part1 = doc.part1.replace('\n', '<br>') if doc.part1 else ""
+    part2 = doc.part2.replace('\n', '<br>') if doc.part2 else ""
+    part3 = doc.part3.replace('\n', '<br>') if doc.part3 else ""
 
     subject = doReplace(word_variables, subject)
     part1 = doReplace(word_variables, part1)

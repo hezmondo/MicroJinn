@@ -15,7 +15,7 @@
 		<div class="font-size-medium" align="right">
 			Our Ref: {{ rentobj.rentcode }}
 			<br />
-			Date: {{ today_date }}
+			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 		</div>
 		<div class="font-size-medium" align="left">
 			{% for item in mailaddr %}
@@ -29,16 +29,24 @@
 			Dear {{ rentobj.tenantname }}
 			<br />
 			<br />
+			{% autoescape false %}
 			<b>{{ subject }}</b>
+			{% endautoescape %}
 			<br />
 			<br />
+			{% autoescape false %}
 			{{ part1 }}
+			{% endautoescape %}
 			<br />
 			<br />
+			{% autoescape false %}
 			{{ part2 }}
+			{% endautoescape %}
 			<br />
 			<br />
+			{% autoescape false %}
 			{{ part3 }}
+			{% endautoescape %}
 			<br />
 			<br />
 			<br />

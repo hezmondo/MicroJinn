@@ -1,7 +1,7 @@
 import json
 from flask import redirect, request
 from app import db
-from app.main.functions import commit_to_database
+from app.main.functions import commit_to_database, convert_html_to_pdf
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
@@ -367,17 +367,18 @@ def postrentobj(id):
 
 def post_html(action):
     if action == "edit":
-        docout = Doc_out.query.get(id)
+        doc_out = Doc_out.query.get(id)
     else:
-        docout = Doc_out()
-    # xhtml = request.form['xinput']
-    # docout.text = json.dumps(xhtml)
-    docout.doc_text = request.form['xinput']
-    docout.rent_id = request.form['rent_id']
-    docout.doc_id = request.form['doc_id']
-    docout.doc_date = request.form['doc_date']
-    db.session.add(docout)
+        doc_out = Doc_out()
+    doc_out.doc_text = request.form['xinput'].replace("£", "&pound;")
+    doc_out.rent_id = request.form['rent_id']
+    doc_out.doc_id = request.form['doc_id']
+    doc_out.doc_date = request.form['doc_date']
+    db.session.add(doc_out)
     db.session.commit()
-    id_ = docout.rent_id
+    id_ = doc_out.rent_id
+    source_html = doc_out.doc_text
+    output_filename = "testin.pdf"
+    convert_html_to_pdf(source_html, output_filename)
 
     return id_

@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
+from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
     Property, Rent, Rental, Rental_statement, Typeactype, \
@@ -121,6 +122,15 @@ def get_docs_out(id):
                     Doc_out.doc_text, Typedoc.desc, Doc.code, Rent.rentcode).filter(*doc_out_filter).all()
 
     return docs_out
+
+
+def get_doc_out(id):
+    doc_out = Doc_out.query.filter(Doc_out.id == id).one_or_none()
+    source_html = doc_out.doc_text
+    output_filename = "testout.pdf"
+    convert_html_to_pdf(source_html, output_filename)
+
+    return doc_out
 
 
 def get_emailaccounts():
@@ -649,8 +659,8 @@ def getrentobjs_advanced(qfilter, runsize):
 def getrentobj_main(id):
     id_list = json.loads(current_user.recent_rents)
     if id not in id_list:
-        id_list.insert(0, id)
-        # id_list.pop()
+        id_list.insert(0, int(id))
+        id_list.pop()
         user = current_user
         user.recent_rents = json.dumps(id_list)
         db.session.add(user)

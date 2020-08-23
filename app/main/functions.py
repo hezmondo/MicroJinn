@@ -8,6 +8,7 @@ from app import db
 from flask import abort
 from sqlalchemy import exc
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
+from xhtml2pdf import pisa             # import python module
 from app.main.exceptions import RentIntegerException
 
 
@@ -38,6 +39,19 @@ def commit_to_database():
     except Exception as err:
         db.session.rollback()
         abort(500, err)
+
+
+def convert_html_to_pdf(source_html, output_filename):
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+            source_html,                # the HTML to convert
+            dest=result_file)           # file handle to recieve result
+    # close output file
+    result_file.close()                 # close output file
+    # return False on success and True on errors
+    return pisa_status.err
 
 
 def update_agent_recent():

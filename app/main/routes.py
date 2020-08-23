@@ -7,8 +7,8 @@ from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docs_out, get_emailaccount, \
     get_emailaccounts, get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
     get_incomeitems, get_incomeoptions, get_incomeobjectoptions, \
-    get_landlord, get_landlords, get_doc, get_docs, get_loan, get_loan_options, get_loans, get_loanstatement, \
-    get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
+    get_landlord, get_landlords, get_doc, get_doc_out, get_docs, get_loan, get_loan_options, get_loans, \
+    get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
 from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_doc, \
@@ -161,7 +161,7 @@ def docs_out(id):
 
 @bp.route('/doc_out/<int:id>', methods=['GET'])
 def doc_out(id):
-    doc_out = Doc_out.query.filter(Doc_out.id == id).one_or_none()
+    doc_out = get_doc_out(id)
 
     return render_template('doc_out.html', doc_out=doc_out)
 
@@ -344,7 +344,8 @@ def mail_edit(id):
         mailaddr = request.form['mailaddr']
         print(request.form)
         doc_id = id
-        subject, part1, part2, part3, rentobj, doc, addressdata = writeMail(id, 0, doc_id)
+        rent_id = request.form['rent_id']
+        subject, part1, part2, part3, rentobj, doc, addressdata = writeMail(rent_id, 0, doc_id)
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
