@@ -41,3 +41,15 @@
 <!--{{ multiselect_as_select(name, items, items_selected) }}-->
 {{ multiselect_as_checkboxes(name, items, items_selected) }}
 {%- endmacro %}
+
+<!-- add a line break to the html where the text contains \n -->
+{% macro linebreaks_for_string( the_string ) -%}
+{% if the_string %}
+{% for line in the_string.split('\n') %}
+<br />
+{{ line }}
+{% endfor %}
+{% else %}
+{{ the_string }}
+{% endif %}
+{%- endmacro %}

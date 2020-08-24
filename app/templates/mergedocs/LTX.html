@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 <form method="POST" action="/save_html">
 	<div id="doc_html" contenteditable="true">
@@ -29,24 +31,16 @@
 			Dear {{ rentobj.tenantname }}
 			<br />
 			<br />
-			{% for para in subject %}
-				<p>{{para}}</p>
-			{% endfor %}
+			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
 			<br />
 			<br />
-			{% for para in part1 %}
-				<p>{{para}}</p>
-			{% endfor %}
+			{{ widgets.linebreaks_for_string(part1) }}
 			<br />
 			<br />
-			{% for para in part2 %}
-				<p>{{para}}</p>
-			{% endfor %}
+			{{ widgets.linebreaks_for_string(part2) }}
 			<br />
 			<br />
-			{% for para in part3 %}
-				<p>{{para}}</p>
-			{% endfor %}
+			{{ widgets.linebreaks_for_string(part3) }}
 			<br />
 			<br />
 			<br />
