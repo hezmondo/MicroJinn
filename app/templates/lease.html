@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentcode">Rentcode:</label>
+            <input type="text" class="form-control" name="rentcode" value="{{ landlord.rentcode }}">
+        </div>
+        <div class="col-md-2">
+            <label for="term">Term in years:</label>
+            <input type="text" class="form-control" name="term" value="{{ landlord.term }}">
+        </div>
+        <div class="col-md-2">
+            <label for="startdate">Rentcode:</label>
+            <input type="text" class="form-control" name="startdate" value="{{ landlord.startdate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="startrent">Start date:</label>
+            <input type="text" class="form-control" name="startrent" value="{{ landlord.startrent }}">
+        </div>
+        <div class="col-md-2">
+            <label for="upliftdate">Uplift date:</label>
+            <input type="text" class="form-control" name="upliftdate" value="{{ landlord.upliftdate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="uplift_type">Uplift type:</label>
+            {{ widgets.combobox(name="uplift_type", items=uplift_types, item_selected=landlord.uplift_type) }}
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="impvaluek">Improved value £K:</label>
+            <input type="text" class="form-control" name="impvaluek" value="{{ landlord.impvaluek }}">
+        </div>
+        <div class="col-md-6">
+            <label for="info">Start date:</label>
+            <input type="text" class="form-control" name="info" value="{{ landlord.info }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentcap">Rent capped at:</label>
+            <input type="text" class="form-control" name="rentcap" value="{{ landlord.rentcap }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="lastvaluedate">Last valuation date:</label>
+            <input type="text" class="form-control" name="lastvaluedate" value="{{ landlord.lastvaluedate }}">
+        </div>
+        <div class="col-md-2">
+            <label for="lastvalue">Last valuation £:</label>
+            <input type="text" class="form-control" name="lastvalue" value="{{ landlord.lastvalue }}">
+        </div>
+    </div>
+    <div class="form-group row">
+        {% if action == "view" %}
+        <div class="col-md-3">
+            <a href="/lease/{{ lease.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this lease</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/lease/{{ lease.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this lease</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/lease/0?action=new" class="btn btn-block btn-primary" role="button">New lease</a>
+        </div>
+        {% elif action == "edit" %}
+        <div class="col-md-3">
+            <a href="/delete_item/{{ lease.id }}?item=lease"
+               onclick="return confirm('Are you sure you want to delete this lease?');"
+               class="btn btn-block btn-warning" role="button">Delete this lease</a>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save changes</button>
+        </div>
+        {% else %}
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success">Save as new lease</button>
+        </div>
+        {% endif %}
+        <div class="col-md-3">
+            <a href="/rent_object/{{ lease.rent_id }}" class="btn btn-block btn-success" role="button">Back to rent</a>
+        </div>
+    </div>
+</form>
+{% endblock %}
+

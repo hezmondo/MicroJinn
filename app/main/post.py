@@ -3,7 +3,7 @@ from flask import redirect, request
 from app import db
 from app.main.functions import commit_to_database, convert_html_to_pdf
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
+    Landlord, Lease, Lease_uplift_type, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
@@ -186,6 +186,32 @@ def post_landlord(id, action):
     db.session.add(landlord)
     db.session.commit()
     id_ = landlord.id
+    return id_
+
+
+def post_lease(id, action):
+    if action == "edit":
+        lease =Lease.query.get(id)
+    else:
+        lease = Lease()
+    lease.term = request.form["term"]
+    lease.startdate = request.form["startdate"]
+    lease.startrent = request.form["startrent"]
+    lease.info = request.form["info"]
+    lease.upliftdate = request.form["upliftdate"]
+    lease.impvaluek = request.form["impvaluek"]
+    lease.rentcap = request.form["rentcap"]
+    lease.lastvalue = request.form["lastvalue"]
+    lease.last_value_date = request.form["lastvaluedate"]
+    lease.rent_id = request.form["rent_id"]
+    uplift_type = request.form["uplift_type"]
+    lease.uplift_type_id = \
+        Lease_uplift_type.query.with_entities(Lease_uplift_type.id).filter \
+            (Lease_uplift_type.uplift_type == uplift_type).one()[0]
+    db.session.add(lease)
+    db.session.commit()
+    id_ = lease.id
+
     return id_
 
 

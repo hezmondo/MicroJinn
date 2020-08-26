@@ -275,6 +275,21 @@ def landlord(id):
                            bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
 
 
+@bp.route('/lease/<int:id>', methods=['GET', 'POST'])
+@login_required
+def lease(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_lease(id, action)
+        return redirect('/lease/{}?action=view'.format(id_))
+    else:
+        pass
+    landlord, managers, emailaccs, bankaccs = get_landlord(id)
+
+    return render_template('landlord.html', title='Landlord', action=action, landlord=landlord,
+                           bankaccs=bankaccs, managers=managers, emailaccs=emailaccs)
+
+
 @bp.route('/loadquery', methods=['GET', 'POST'])
 def loadquery():
     if request.method == "POST":

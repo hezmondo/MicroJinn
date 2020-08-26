@@ -208,18 +208,17 @@ class Lease(db.Model):
     __tablename__ = 'lease'
 
     id = db.Column(db.Integer, primary_key=True)
-    rentcode = db.Column(db.String(15))
     term = db.Column(db.Integer)
     startdate = db.Column(db.Date)
     startrent = db.Column(db.Numeric(8, 2))
     info = db.Column(db.String(180))
     upliftdate = db.Column(db.Date)
     impvaluek = db.Column(db.Numeric(10, 2))
-    uplift_type = db.Column(db.String(15))
+    uplift_type_id = db.Column(db.Integer, db.ForeignKey('lease_uplift_type.id'))
     rentcap = db.Column(db.Numeric(8, 2))
     lastvalue = db.Column(db.Numeric(8, 2))
     last_value_date = db.Column(db.Date)
-    # rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
 
 class Lease_extension(db.Model):
@@ -247,6 +246,8 @@ class Lease_uplift_type(db.Model):
     years = db.Column(db.Integer)
     method = db.Column(db.String(15))
     uplift_value = db.Column(db.Numeric(8, 2))
+
+    lease_uplift_type = db.relationship('Lease', backref='Lease_uplift_type', lazy='dynamic')
 
 
 class Loan(db.Model):
@@ -405,7 +406,7 @@ class Rent(db.Model):
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     doc_out_rent = db.relationship('Doc_out', backref='rent', lazy='dynamic')
-    # lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
+    lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
