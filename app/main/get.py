@@ -8,8 +8,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Loan, Loan_statement, Manager, Money_category, Money_item, \
-    Property, Rent, Rental, Rental_statement, Typeactype, \
+    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, Loan, Loan_statement, Manager, Money_category, \
+    Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \
     Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
@@ -259,6 +259,18 @@ def get_landlord(id):
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
 
     return landlord, managers, emailaccs, bankaccs
+
+
+def get_lease(id):
+    lease = \
+        Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
+             Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
+             Lease.last_value_date, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
+            .filter(Lease.rent_id == id).one_or_none()
+
+    uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
+
+    return lease, uplift_types
 
 
 def get_loan(id):

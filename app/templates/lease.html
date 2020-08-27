@@ -7,79 +7,79 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">Rentcode:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ landlord.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" value="{{ lease.rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="term">Term in years:</label>
-            <input type="text" class="form-control" name="term" value="{{ landlord.term }}">
+            <input type="text" class="form-control" name="term" value="{{ lease.term }}">
         </div>
         <div class="col-md-2">
-            <label for="startdate">Rentcode:</label>
-            <input type="text" class="form-control" name="startdate" value="{{ landlord.startdate }}">
+            <label for="startdate">Start date:</label>
+            <input type="text" class="form-control" name="startdate" value="{{ lease.startdate }}">
         </div>
         <div class="col-md-2">
-            <label for="startrent">Start date:</label>
-            <input type="text" class="form-control" name="startrent" value="{{ landlord.startrent }}">
+            <label for="startrent">Start rent:</label>
+            <input type="text" class="form-control" name="startrent" value="{{ lease.startrent }}">
         </div>
         <div class="col-md-2">
             <label for="upliftdate">Uplift date:</label>
-            <input type="text" class="form-control" name="upliftdate" value="{{ landlord.upliftdate }}">
+            <input type="text" class="form-control" name="upliftdate" value="{{ lease.upliftdate }}">
         </div>
         <div class="col-md-2">
             <label for="uplift_type">Uplift type:</label>
-            {{ widgets.combobox(name="uplift_type", items=uplift_types, item_selected=landlord.uplift_type) }}
+            {{ widgets.combobox(name="uplift_type", items=uplift_types, item_selected=lease.uplift_type) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="impvaluek">Improved value £K:</label>
-            <input type="text" class="form-control" name="impvaluek" value="{{ landlord.impvaluek }}">
+            <input type="text" class="form-control" name="impvaluek" value="{{ lease.impvaluek }}">
         </div>
         <div class="col-md-6">
-            <label for="info">Start date:</label>
-            <input type="text" class="form-control" name="info" value="{{ landlord.info }}">
+            <label for="info">Info:</label>
+            <input type="text" class="form-control" name="info" value="{{ lease.info }}">
         </div>
         <div class="col-md-2">
             <label for="rentcap">Rent capped at:</label>
-            <input type="text" class="form-control" name="rentcap" value="{{ landlord.rentcap }}">
+            <input type="text" class="form-control" name="rentcap" value="{{ lease.rentcap }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="lastvaluedate">Last valuation date:</label>
-            <input type="text" class="form-control" name="lastvaluedate" value="{{ landlord.lastvaluedate }}">
+            <input type="text" class="form-control" name="lastvaluedate" value="{{ lease.lastvaluedate }}">
         </div>
         <div class="col-md-2">
             <label for="lastvalue">Last valuation £:</label>
-            <input type="text" class="form-control" name="lastvalue" value="{{ landlord.lastvalue }}">
+            <input type="text" class="form-control" name="lastvalue" value="{{ lease.lastvalue }}">
         </div>
     </div>
     <div class="form-group row">
         {% if action == "view" %}
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/lease/{{ lease.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this lease</a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/lease/{{ lease.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this lease</a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/lease/0?action=new" class="btn btn-block btn-primary" role="button">New lease</a>
         </div>
         {% elif action == "edit" %}
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/delete_item/{{ lease.id }}?item=lease"
                onclick="return confirm('Are you sure you want to delete this lease?');"
                class="btn btn-block btn-warning" role="button">Delete this lease</a>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">Save changes</button>
         </div>
         {% else %}
-        <div class="col-md-3">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">Save as new lease</button>
         </div>
         {% endif %}
-        <div class="col-md-3">
+        <div class="col-md-2">
             <a href="/rent_object/{{ lease.rent_id }}" class="btn btn-block btn-success" role="button">Back to rent</a>
         </div>
     </div>

@@ -10,6 +10,7 @@ def writeMail(rent_id, income_id, doc_id):
 
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
+    leasedata = get_leasedata(rent_id)
     doc = get_doc(doc_id)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)

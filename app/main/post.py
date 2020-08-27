@@ -389,7 +389,7 @@ def postrentobj(id):
     else:
         db.session.commit()
 
-    return redirect('/rentobject/{}'.format(id))
+    return redirect('/rent_object/{}'.format(id))
 
 def post_html(action):
     if action == "edit":

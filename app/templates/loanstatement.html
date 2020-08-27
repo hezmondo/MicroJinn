@@ -1,4 +1,4 @@
-<!-- /templates/loanstatement.html  -->
+<!-- /templates/loan_statement.html  -->
 {% extends 'base.html' %}
 
 {% block app_content %}
@@ -10,7 +10,7 @@
     </div>
 </div>
 <div class="table-fixed">
-    <table class="table" id="loanstatement">
+    <table class="table" id="loan_statement">
         <thead>
         <tr>
             <th style="width: 10.00%">id</th>
@@ -24,7 +24,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in loanstatement %}
+        {% for item in loan_statement %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 10.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
