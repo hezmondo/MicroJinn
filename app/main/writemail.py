@@ -2,15 +2,13 @@ import datetime
 from decimal import Decimal
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.get import get_doc, getmaildata, getrentobj_main
+from app.main.get import get_doc, get_leasedata, getmaildata, getrentobj_main
 from app.main.functions import htmlSpecialMarkDown
 
-def writeMail(rent_id, income_id, doc_id):
+def writeMail(rent_id, income_id, doc_id, type):
     # Get rent/prop/income details and output mail (letter/payrequest/account/email/invoice/rem adv)
-
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
-    leasedata = get_leasedata(rent_id)
     doc = get_doc(doc_id)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
@@ -46,6 +44,21 @@ def writeMail(rent_id, income_id, doc_id):
         '#totdue#': moneyToStr(totdue if totdue else 1111.00, pound=True),
         '#today#': dateToStr(datetime.date.today())
     }
+    if type == "lease":
+        leasedata = get_leasedata(rent_id)
+        lease_variables = {'#unexpired#': leasedata.unexpired if leasedata else "11.11",
+                '#impvaluek#': moneyToStr(leasedata.impvalk if leasedata else 555.55, pound=True),
+                '#leq99a#': moneyToStr(leasedata.leq99a if leasedata else 55555.55, pound=True),
+                '#grnewa#': moneyToStr(leasedata.grnewa if leasedata else 555.55, pound=True),
+                '#grnewb#': moneyToStr(leasedata.grnewb if leasedata else 555.55, pound=True),
+                '#leq125a#': moneyToStr(leasedata.leq125a if leasedata else 55555.55, pound=True),
+                '#leq175a#': moneyToStr(leasedata.leq175a if leasedata else 55555.55, pound=True),
+                '#leq175f#': moneyToStr(leasedata.leq175f if leasedata else 55555.55, pound=True),
+                '#leq175p#': moneyToStr(leasedata.leq175p if leasedata else 55555.55, pound=True),
+                           }
+        word_variables = dict(word_variables.items() + lease_variables.items())
+    else:
+        leasedata = None
 
     subject = doc.subject
     part1 = doc.part1 if doc.part1 else ""
@@ -57,7 +70,7 @@ def writeMail(rent_id, income_id, doc_id):
     part2 = doReplace(word_variables, part2)
     part3 = doReplace(word_variables, part3)
 
-    return subject, part1, part2, part3, rentobj, doc, addressdata
+    return subject, part1, part2, part3, rentobj, doc, addressdata, leasedata
 
 
 def doReplace(dict, clause):

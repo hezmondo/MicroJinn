@@ -57,7 +57,7 @@ class Doc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
     subject = db.Column(db.String(150))
-    part1 = db.Column(db.String(1200))
+    part1 = db.Column(db.String(1500))
     part2 = db.Column(db.String(900))
     part3 = db.Column(db.String(900))
     type_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))

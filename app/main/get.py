@@ -1,4 +1,5 @@
 import json
+import sqlalchemy
 from app import db
 import datetime
 from datetime import date
@@ -67,7 +68,7 @@ def get_charge(id):
     return charge, chargedescs
 
 
-def get_docs():
+def get_docs(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
         subject = request.form.get("subject") or ""
@@ -76,6 +77,8 @@ def get_docs():
         docs = Doc.query.filter(Doc.code.ilike('%{}%'.format(code)),
                   Doc.subject.ilike('%{}%'.format(subject)), Doc.part1.ilike('%{}%'.format(part1)),
                   Doc.part2.ilike('%{}%'.format(part2))).all()
+    elif action == "lease":
+        docs = Doc.query.filter(Doc.code.ilike('LEQ-%'))
     else:
         id_list = json.loads(current_user.recent_docs)
         docs = Doc.query.filter(Doc.id.in_(id_list))
@@ -272,6 +275,16 @@ def get_lease(id):
 
     return lease, uplift_types
 
+
+def get_leasedata(id):
+    rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"), params={"x": id, "y": stat_date})
+    checksums = rproxy.fetchall()
+    db.session.commit()
+    loanstatement = get_loanstatement()
+    loan = Loan.query.get(id)
+    loancode = loan.code
+    leasedata = None
+    return leasedata
 
 def get_loan(id):
     loan = \

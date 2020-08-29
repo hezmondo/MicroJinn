@@ -287,25 +287,30 @@ def loan_statement(id):
 @bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_dialog(id):
-    docs = get_docs()
+    action = request.args.get('action', "normal", type=str)
+    docs = get_docs(action)
 
-    return render_template('mail_dialog.html', docs=docs, rent_id = id)
+    return render_template('mail_dialog.html', action=action, docs=docs, rent_id = id)
 
 
 @bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_edit(id):
+    action = request.args.get('action', "normal", type=str)
+    method = request.args.get('method', "email", type=str)
     if request.method == "POST":
         mailaddr = request.form['mailaddr']
+        mailaddr = mailaddr.split(", ")
         print(request.form)
         doc_id = id
         rent_id = request.form['rent_id']
-        subject, part1, part2, part3, rentobj, doc, addressdata = writeMail(rent_id, 0, doc_id)
-        mailaddr = mailaddr.split(", ")
-
-        return render_template('mergedocs/LTX.html', subject=subject, part1=part1, part2=part2, part3=part3,
-                               rentobj=rentobj, doc=doc, addressdata=addressdata,
-                               mailaddr=mailaddr)
+        subject, part1, part2, part3, rentobj, doc, addressdata, leasedata = writeMail(rent_id, 0, doc_id, action)
+        if method == "email":
+            return render_template('mergedocs/EMX.html', action=action, subject=subject, part1=part1, part2=part2,
+                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata, mailaddr=mailaddr)
+        else:
+            return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, part2=part2,
+                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata, mailaddr=mailaddr)
 
 
 @bp.route('/money', methods=['GET', 'POST'])

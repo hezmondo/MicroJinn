@@ -65,6 +65,9 @@
         <div class="col-md-2">
             <a href="/lease/0?action=new" class="btn btn-block btn-primary" role="button">New lease</a>
         </div>
+        <div class="col-md-2">
+            <a href="/mail_dialog/{{ lease.rent_id }}?action=lease" class="btn btn-block btn-primary" role="button">Lex quotation</a>
+        </div>
         {% elif action == "edit" %}
         <div class="col-md-2">
             <a href="/delete_item/{{ lease.id }}?item=lease"
