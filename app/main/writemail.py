@@ -1,4 +1,5 @@
 import datetime
+from flask import request
 from decimal import Decimal
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
@@ -45,18 +46,27 @@ def writeMail(rent_id, income_id, doc_id, type):
         '#today#': dateToStr(datetime.date.today())
     }
     if type == "lease":
-        leasedata = get_leasedata(rent_id)
-        lease_variables = {'#unexpired#': leasedata.unexpired if leasedata else "11.11",
-                '#impvaluek#': moneyToStr(leasedata.impvalk if leasedata else 555.55, pound=True),
-                '#leq99a#': moneyToStr(leasedata.leq99a if leasedata else 55555.55, pound=True),
-                '#grnewa#': moneyToStr(leasedata.grnewa if leasedata else 555.55, pound=True),
-                '#grnewb#': moneyToStr(leasedata.grnewb if leasedata else 555.55, pound=True),
-                '#leq125a#': moneyToStr(leasedata.leq125a if leasedata else 55555.55, pound=True),
-                '#leq175a#': moneyToStr(leasedata.leq175a if leasedata else 55555.55, pound=True),
-                '#leq175f#': moneyToStr(leasedata.leq175f if leasedata else 55555.55, pound=True),
-                '#leq175p#': moneyToStr(leasedata.leq175p if leasedata else 55555.55, pound=True),
+        fh_rate = request.form['fh_rate']
+        gr_rate = request.form['gr_rate']
+        new_gr_a = request.form['new_gr_a']
+        new_gr_b = request.form['new_gr_b']
+        yp_low = request.form['yp_low']
+        yp_high = request.form['yp_high']
+
+        leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
+        print(leasedata)
+        print(leasedata["unexpired"])
+        lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
+                '#impvaluek#': moneyToStr(leasedata["impvalk"] if leasedata else 555.55, pound=True),
+                '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
+                '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
+                '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),
+                '#leq125a#': moneyToStr(leasedata["leq125a"] if leasedata else 55555.55, pound=True),
+                '#leq175a#': moneyToStr(leasedata["leq175a"] if leasedata else 55555.55, pound=True),
+                '#leq175f#': moneyToStr(leasedata["leq175f"] if leasedata else 55555.55, pound=True),
+                '#leq175p#': moneyToStr(leasedata["leq175p"] if leasedata else 55555.55, pound=True),
                            }
-        word_variables = dict(word_variables.items() + lease_variables.items())
+        word_variables.update(lease_variables)
     else:
         leasedata = None
 

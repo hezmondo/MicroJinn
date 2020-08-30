@@ -305,12 +305,10 @@ def mail_edit(id):
         doc_id = id
         rent_id = request.form['rent_id']
         subject, part1, part2, part3, rentobj, doc, addressdata, leasedata = writeMail(rent_id, 0, doc_id, action)
-        if method == "email":
-            return render_template('mergedocs/EMX.html', action=action, subject=subject, part1=part1, part2=part2,
-                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata, mailaddr=mailaddr)
-        else:
-            return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, part2=part2,
-                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata, mailaddr=mailaddr)
+
+        return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, part2=part2,
+                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata,
+                                   leasedata=leasedata, mailaddr=mailaddr, method=method)
 
 
 @bp.route('/money', methods=['GET', 'POST'])

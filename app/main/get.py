@@ -9,7 +9,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, Loan, Loan_statement, Manager, Money_category, \
+    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, Lease_valuation, \
+    Loan, Loan_statement, Manager, Money_category, \
     Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \
     Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -276,14 +277,11 @@ def get_lease(id):
     return lease, uplift_types
 
 
-def get_leasedata(id):
-    rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"), params={"x": id, "y": stat_date})
-    checksums = rproxy.fetchall()
+def get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high):
+    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e, :f, :g)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": new_gr_a, "e": new_gr_b, "f": yp_low, "g": yp_high})
+    leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
     db.session.commit()
-    loanstatement = get_loanstatement()
-    loan = Loan.query.get(id)
-    loancode = loan.code
-    leasedata = None
+
     return leasedata
 
 def get_loan(id):

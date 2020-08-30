@@ -5,6 +5,8 @@
 {% block app_content %}
 <form method="POST" action="/save_html">
 	<div id="doc_html" contenteditable="true">
+		<br />
+	    {% if method == "letter" %}
 		<div class="font-size-large" align="center">
 			<b>{{ rentobj.managername }}</b>
 		</div>
@@ -26,10 +28,20 @@
 			{% endfor %}
 			<br />
 			<br />
+			Dear {{ rentobj.tenantname }}
+		</div>
+	    {% else %}
+		<div class="font-size-medium" align="left">
+			<br />
+			Our Ref: {{ rentobj.rentcode }}
+			<br />
+			Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
 			<br />
 			<br />
 			Dear {{ rentobj.tenantname }}
-			<br />
+		</div>
+		{% endif %}
+		<div class="font-size-medium" align="left">
 			<br />
 			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
 			<br />
