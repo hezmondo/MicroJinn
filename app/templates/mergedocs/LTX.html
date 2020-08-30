@@ -35,6 +35,7 @@
 			<br />
 			Our Ref: {{ rentobj.rentcode }}
 			<br />
+			<br />
 			Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
 			<br />
 			<br />
@@ -42,23 +43,16 @@
 		</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
-			<br />
 			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
-			<br />
 			<br />
 			{{ widgets.linebreaks_for_string(part1) }}
 			<br />
-			<br />
 			{{ widgets.linebreaks_for_string(part2) }}
-			<br />
-			<br />
+				<br />
 			{{ widgets.linebreaks_for_string(part3) }}
 			<br />
 			<br />
-			<br />
-			<br />
 			Yours sincerely
-			<br />
 			<br />
 			<br />
 			<br />

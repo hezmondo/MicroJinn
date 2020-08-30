@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
 from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, Lease_valuation, \
+    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
     Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \

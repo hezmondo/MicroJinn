@@ -54,10 +54,14 @@ def writeMail(rent_id, income_id, doc_id, type):
         yp_high = request.form['yp_high']
 
         leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
-        print(leasedata)
-        print(leasedata["unexpired"])
+        impval = leasedata["impvalk"] * 1000
+        unimpval = leasedata["impvalk"] * leasedata["realty"] * 10
         lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
-                '#impvaluek#': moneyToStr(leasedata["impvalk"] if leasedata else 555.55, pound=True),
+                '#rent_code#': leasedata["rent_code"] if leasedata else "some rentcode",
+                '#relativity#': str(leasedata["realty"]) if leasedata else "some rentcode",
+                '#totval#': str(leasedata["totval"]) if leasedata else "some rentcode",
+                '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
+                '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
                 '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
                 '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
                 '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),

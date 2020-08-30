@@ -77,7 +77,7 @@ def delete_item(id):
 
 @bp.route('/docs', methods=['GET'])
 def docs():
-    docs = get_docs()
+    docs = get_docs("normal")
 
     return render_template('docs.html', docs=docs)
 
