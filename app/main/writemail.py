@@ -1,6 +1,7 @@
 import datetime
 from flask import request
 from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.get import get_doc, get_leasedata, getmaildata, getrentobj_main
@@ -12,8 +13,13 @@ def writeMail(rent_id, income_id, doc_id, type):
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
     doc = get_doc(doc_id)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
+    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
+    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
+        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
+    rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     totdue = arrears + totcharges
+    arrears_end_date = rentobj.lastrentdate
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "in elevence",
         '#accname#': bankdata.accname if bankdata else "some accname",
@@ -38,8 +44,10 @@ def writeMail(rent_id, income_id, doc_id, type):
         '#periodly#': rentobj.freqdet if rentobj else "eleventhly",
         '#propaddr#': rentobj.propaddr if rentobj else "some property address",
         '#rentcode#': rentobj.rentcode if rentobj else "some rentcode",
+        '#arrears_start_date#': arrears_start_date,
+        '#arrears_end_date#': arrears_end_date,
         '#rentpa#': moneyToStr(rentobj.rentpa if rentobj else 1111.00, pound=True),
-        '#rent_type#': "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent",
+        '#rent_type#': rent_type,
         '#tenantname#': rentobj.tenantname if rentobj else "some tenant name",
         '#totcharges#': moneyToStr(totcharges, pound=True),
         '#totdue#': moneyToStr(totdue if totdue else 1111.00, pound=True),

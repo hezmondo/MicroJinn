@@ -51,8 +51,8 @@ def backup():
 
 @bp.route('/charges', methods=['GET', 'POST'])
 def charges():
-    rentcode = request.args.get('rentcode', "", type=str)
-    charges = get_charges(rentcode)
+    rentid = request.args.get('rentid', "", type=str)
+    charges = get_charges(rentid)
 
     return render_template('charges.html', charges=charges)
 
@@ -458,6 +458,8 @@ def rent_object(id):
         pass
 
     rentobj, properties = getrentobj_main(id)
+    charges = get_charges(id)
+    # owingstat = owingstat(rentobj, charges)
 
     actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, \
         statusdets, tenuredets = getrentobj_combos(id)
@@ -469,7 +471,7 @@ def rent_object(id):
     session['tenantname'] = rentobj.tenantname
 
     return render_template('rent_object.html', action=action, rentobj=rentobj,
-                       properties=properties, actypedets=actypedets, advarrdets=advarrdets,
+                       properties=properties, actypedets=actypedets, advarrdets=advarrdets, charges=charges,
                        deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
                        salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
 

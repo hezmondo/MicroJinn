@@ -45,16 +45,19 @@ def get_agent(id):
     return agent
 
 
-def get_charges(rentcode):
-    if request.method == "POST":
+def get_charges(rentid):
+    qfilter = []
+    if rentid == "":
         rcd = request.form.get("rentcode") or ""
         cdt = request.form.get("chargedetails") or ""
+        qfilter.append(Rent.rentcode.startswith([rcd]))
+        qfilter.append(Charge.chargedetails.ilike('%{}%'.format(cdt)))
     else:
-        rcd = rentcode if rentcode else ""
-        cdt = ""
+        qfilter.append(Charge.rent_id == rentid)
+
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
                      Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(Rent.rentcode.startswith([rcd]), Charge.chargedetails.ilike('%{}%'.format(cdt))).all()
+            .filter(*qfilter).all()
 
     return charges
 
