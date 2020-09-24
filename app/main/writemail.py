@@ -19,7 +19,6 @@ def writeMail(rent_id, income_id, doc_id, type):
     rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     totdue = arrears + totcharges
-    arrears_end_date = rentobj.lastrentdate
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "in elevence",
         '#accname#': bankdata.accname if bankdata else "some accname",
