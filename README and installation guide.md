@@ -1,14 +1,15 @@
 ### Basic start up guide for installing mjinn - last updated 24 Sep 2020
 
 ### It is assumed that you have already installed MySql Server and MySql Workbench using my separate guide and that
-### you have already installed Python 3.7 or 3.8 (you will already have this installed in Ubuntu 20.04 or Mint 20)
+### you have already installed Python 3.7 or 3.8 (already installed in Ubuntu 20.04 or Mint 20)
 
+### It is very easy (10 minutes) to install flask and other dependencies using a terminal in Linux or Powershell in Windows:
 
-### It is very easy (10 minutes) to install flask etc using a terminal in Linux or Powershell in Windows:
-
-In Linux, simplest may be to install pip3 and use that:
+In Linux, simplest may be to install pip3 
 
 	sudo apt install python3-pip
+
+and then use pip3 to install these dependencies:
 	
 	pip3 install flask
 	
@@ -32,39 +33,17 @@ In Linux, simplest may be to install pip3 and use that:
 	
 	pip3 install xhtml2pdf
 
+In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3
 
-In Windows, pip is already installed, so exactly the same but use pip instead of pip3
-
-	pip install flask
-	
-	pip install flask-sqlalchemy
-	
-	pip install flask-migrate
-	
-	pip install flask-login
-	
-	pip install flask-mail
-	
-	pip install flask-pymysql
-	
-	pip install flask-bootstrap
-	
-	pip install flask-wtf
-	
-	pip install email_validator
-	
-	pip install PyJWT (requirements already satisfied)
-	
-	pip install xhtml2pdf
-	
 	
 ### Download the whole of the repo maintaining the directory structure.  
 
-### Edit file named samplemyconfig.py to insert your user name and password setup details, then alter file name to myconfig.py
+### Edit the file named samplemyconfig.py to insert your mysql user name and password setup details, then alter the file name to myconfig.py
 
-### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms):
 
-File > Open ..., select Fitness directory.  That loads it as a project.
+### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
+
+File > Open ..., select mjinn directory.  That loads it as a project.
 
 Run > Edit Configurations ....  Find the Before launch near bottom of tab, click the green "+" beneath it.
 
