@@ -2,48 +2,51 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<form method="POST" id="target">
+<form method="POST" id="money_form">
     <div class="form-group row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <input class="form-control form-control-lg" type="text" placeholder="Showing all accounts" readonly>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <a href="/money_account/0?action=new" class="btn btn-block btn-danger" role="button">Add new account</a>
         </div>
-        <div class="col-md-4">
-            <a href="/money_items/0?action=allaccs" class="btn btn-block btn-danger" role="button">Show all account transactions</a>
+        <div class="col-md-3">
+            <a href="/money_items/0?action=allaccs" class="btn btn-block btn-danger" role="button">Show all transactions</a>
         </div>
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="money">
+    <table class="table" id="money_table">
         <thead>
         <tr>
             <th style="width: 10.00%">Account id</th>
-            <th style="width: 50.00%">Account description</th>
+            <th style="width: 30.00%">Account description</th>
+            <th style="width: 15.00%">Action</th>
             <th style="width: 15.00%">Cleared balance</th>
             <th style="width: 15.00%">Uncleared balance</th>
-            <th style="width: 10.00%">Action</th>
+            <th style="width: 15.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in moneydets %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
-            <td style="width: 50.00%"> {{ item.accdesc }}</td>
+            <td style="width: 30.00%"> {{ item.accdesc }}</td>
+            <td style="width: 15.00%"><a href="/money_account/{{ item.id }}?action=edit">Edit account</a></td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
-            <td style="width: 10.00%"><a href="/money_items/{{ item.id }}?action=account">View</a></td>
+            <td style="width: 15.00%"><a href="/money_items/{{ item.id }}?action=account">View transactions</a></td>
         </tr>
         {% endfor %}
         <tr>
         </tr>
         <tr>
             <td style="width: 10%"></td>
-            <td style="width: 50.00%">Total for all accounts</td>
+            <td style="width: 30.00%">Total for all accounts</td>
+            <td style="width: 15.00%"></td>
             <td style="width: 15.00%"> {{ accsums.cleared }}</td>
             <td style="width: 15.00%"> {{ accsums.uncleared }}</td>
-            <td style="width: 10.00%"></td>
+            <td style="width: 15.00%"></td>
         </tr>
         </tbody>
     </table>

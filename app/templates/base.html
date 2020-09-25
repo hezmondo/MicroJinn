@@ -41,15 +41,24 @@
                     <a class="nav-link" href="{{ url_for('main.payrequests') }}">Payrequests</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.queries') }}">Queries</a>
-                  </li>
-                  <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('main.rentals') }}">Rentals</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.utilities') }}">Utilities</a>
+                   <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarUtilities" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Utilities
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarUtilities">
+                      <a class="dropdown-item" href="/backup">backup or restore mjinn</a>
+                      <a class="dropdown-item" href="/charges">charges</a>
+                      <a class="dropdown-item" href="/docs">docs</a>
+                      <a class="dropdown-item" href="/docs_out/0">docs out</a>
+                      <a class="dropdown-item" href="/email_accounts">email accounts</a>
+                      <a class="dropdown-item" href="/external_rents">external rents</a>
+                      <a class="dropdown-item" href="/landlords">landlords</a>
+                      <a class="dropdown-item" href="/properties">properties</a>
+                    </div>
                   </li>
-                  {% if current_user.is_anonymous %}
+                 {% if current_user.is_anonymous %}
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                   </li>

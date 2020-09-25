@@ -318,13 +318,6 @@ def money():
     return render_template('money.html', moneydets=moneydets, accsums=accsums)
 
 
-@bp.route('/money_accounts', methods=['GET', 'POST'])
-def money_accounts():
-    moneyaccs = Money_account.query.all()
-
-    return render_template('money_accounts.html', moneyaccs=moneyaccs)
-
-
 @bp.route('/money_account/<int:id>', methods=['GET', 'POST'])
 @login_required
 def money_account(id):
@@ -483,9 +476,3 @@ def save_html():
         id = post_html(action)
 
         return redirect('/rent_object/{}'.format(id))
-
-
-@bp.route('/utilities', methods=['GET'])
-def utilities():
-
-    return render_template('utilities.html')
