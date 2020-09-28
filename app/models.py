@@ -56,6 +56,7 @@ class Doc(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
+    summary = db.Column(db.String(60))
     subject = db.Column(db.String(150))
     part1 = db.Column(db.String(1800))
     part2 = db.Column(db.String(1200))

@@ -11,7 +11,7 @@
         </div>
         <div class="col-md-5">
             <label for="landlord">Landlord:</label>
-            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rentobj.name) }}
+            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rentobj.landlordname) }}
         </div>
         <div class="col-md-5">
             <label for="tenant">Tenant name:</label>
@@ -131,30 +131,26 @@
     {% if action == "view" %}
     <div class="form-group row">
         <div class="col-md-2">
-            <a href="/rent_object/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit rent/prop</a>
+            <a href="/rent_object/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rent</a>
         </div>
         <div class="col-md-2">
-            <a href="/rent_object/{{ rentobj.id }}?action=clone" class="btn btn-block btn-primary" role="button">Clone rent/prop</a>
+            <a href="/mail_dialog/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">Mail this rent</a>
         </div>
-        <div class="col-md-2">
-            <a href="/income_post/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">Post income</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/mail_dialog/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">Mail</a>
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-2">
-            <a href="/rent_object/0?action=new" class="btn btn-block btn-primary" role="button">New rent/property</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/charges?rentid={{ rentobj.id }}" class="btn btn-block btn-primary" role="button">View charges</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/docs_out/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">View docs out</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/lease/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">View lease info</a>
+        <div class="col-md-3">
+            <div class="btn-group">
+              <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Other actions for this rent
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">Post income for this rent</a>
+                <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">View income for this rent</a>
+                <a class="dropdown-item" href="/rent_object/0?action=new">Add a new rent and property</a>
+                <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">View charges for this rent</a>
+                <a class="dropdown-item" href="/docs_out/{{ rentobj.id }}">View docs out for this rent</a>
+                <a class="dropdown-item" href="/lease/{{ rentobj.id }}">View lease info for this rent</a>
+                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">Produce doc for this rent</a>
+              </div>
+            </div>
         </div>
     </div>
     {% else %}

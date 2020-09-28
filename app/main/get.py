@@ -100,7 +100,7 @@ def get_doc(id):
         db.session.add(user)
         db.session.commit()
 
-    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.id, Doc.code, Doc.subject, Doc.part1,
+    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.id, Doc.code, Doc.summary, Doc.subject, Doc.part1,
                Doc.part2, Doc.part3, Typedoc.desc, Template.desc.label("template")) \
            .filter(Doc.id == id).one_or_none()
 

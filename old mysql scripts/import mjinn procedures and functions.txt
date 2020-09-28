@@ -1,0 +1,528 @@
+/*!50003 DROP FUNCTION IF EXISTS `acc_balance` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `acc_balance`(id integer, cvalue integer, todate date) RETURNS decimal(10,2)
+    DETERMINISTIC
+BEGIN
+	DECLARE transtotal decimal(10,2);
+	DECLARE bacstotal decimal(10,2);
+    SELECT SUM(amount) FROM money_item WHERE bankacc_id = id AND date <= todate AND cleared = cvalue INTO transtotal;
+    SELECT SUM(amount) FROM income  WHERE bankacc_id = id AND date <= todate AND paytype_id = 2 INTO bacstotal;
+    IF cvalue = 1 THEN
+		RETURN IFNULL(transtotal, 0) + IFNULL(bacstotal, 0);
+	ELSE
+		RETURN IFNULL(transtotal, 0);
+	END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `acc_total` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `acc_total`(cvalue integer) RETURNS decimal(10,2)
+    DETERMINISTIC
+BEGIN
+	DECLARE transtotal decimal(10,2);
+	DECLARE bacstotal decimal(10,2);
+    SELECT SUM(amount) FROM money_item WHERE cleared = cvalue INTO transtotal;
+	IF cvalue = 0 THEN
+		RETURN IFNULL(transtotal, 0);
+	ELSE
+		SELECT SUM(amount) FROM income  WHERE paytype_id = 2 INTO bacstotal;
+		RETURN IFNULL(transtotal, 0) + IFNULL(bacstotal, 0);
+	END IF;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `calc_int` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `calc_int`(
+intrate decimal(8,2), balance decimal(8,2), enddate date, startdate date
+) RETURNS decimal(8,2)
+BEGIN
+	RETURN DATEDIFF(enddate, startdate)*balance*intrate/36525;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP FUNCTION IF EXISTS `next_date` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` FUNCTION `next_date`(last_date date, frequency int, periods int) RETURNS date
+    DETERMINISTIC
+BEGIN
+	DECLARE CUSTOM_EXCEPTION CONDITION FOR SQLSTATE '45000';
+
+    CASE frequency
+
+    WHEN 1 THEN
+        RETURN DATE_ADD(last_date, INTERVAL periods YEAR);
+
+    WHEN 2 THEN
+        RETURN DATE_ADD(last_date, INTERVAL 6*periods MONTH);
+
+    WHEN 4 THEN
+        RETURN DATE_ADD(last_date, INTERVAL 3*periods MONTH);
+
+    WHEN 12 THEN
+        RETURN DATE_ADD(last_date, INTERVAL 1*periods MONTH);
+
+    WHEN 13 THEN
+        RETURN DATE_ADD(last_date, INTERVAL 4*periods WEEK);
+
+    END CASE;
+
+    SIGNAL CUSTOM_EXCEPTION
+        SET MESSAGE_TEXT = 'Bad Frequency in loans table';
+
+    RETURN NULL; 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `get_lt_trans` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_lt_trans`(
+ in loanid INT
+)
+BEGIN
+  DECLARE done BOOLEAN DEFAULT FALSE;
+  DECLARE lt_id INT;
+  DECLARE lt_date DATE;
+  DECLARE lt_amount DECIMAL(8,2);
+  DECLARE lt_memo VARCHAR(60);
+  DECLARE cur CURSOR FOR SELECT id, date, amount, memo FROM loan_trans WHERE loan_id = loanid;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
+
+  OPEN cur;
+
+  testLoop: LOOP
+    FETCH cur INTO lt_id, lt_date, lt_amount, lt_memo;
+    IF done THEN
+      LEAVE testLoop;
+    END IF;
+  
+	INSERT into loan_prep
+	SELECT 0, lt_id, lt_date, lt_memo, lt_amount, 0, 0, 0;
+
+  END LOOP testLoop;
+
+  CLOSE cur;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `get_period_vals` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_period_vals`(
+ in loanid INT
+)
+BEGIN
+  DECLARE freq, periods INT;
+  DECLARE startdate DATE;
+  DECLARE var_amount DECIMAL(8,2);
+  DECLARE var_memo, freq_det VARCHAR(60);
+
+  SELECT frequency FROM loan
+  WHERE id = loanid
+  INTO freq;
+
+  SELECT MIN(date) FROM loan_trans
+  WHERE loan_id = loanid
+  INTO startdate;
+
+  SELECT freqdet FROM typefreq
+  WHERE id = freq
+  INTO freq_det;
+
+  SET periods = 1;
+  SET var_memo = CONCAT("interest added ", freq_det);
+
+  WHILE next_date(startdate, freq, periods) < CURDATE() DO
+	INSERT into loan_prep
+	SELECT 0, 0, next_date(startdate, freq, periods), var_memo, 0, 0, 1, 0;
+    SET periods = periods + 1;
+  END WHILE;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `get_uplifts` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_uplifts`(
+ in loanid INT
+)
+BEGIN
+  DECLARE num INT;
+  DECLARE startdate, vardate DATE;
+  DECLARE int_rate DECIMAL(8,2);
+  DECLARE var_memo VARCHAR(60);
+
+  SELECT COUNT(*) 
+  FROM loan_uplift
+  WHERE loan_id = loanid
+  AND datestarts < CURDATE()
+  INTO num ;
+
+  SET vardate = "1990-01-01";
+  
+  WHILE num > 0 DO
+
+    SELECT intrate, datestarts FROM loan_uplift
+    WHERE loan_id = loanid
+    AND datestarts > vardate 
+    ORDER BY datestarts
+    LIMIT 1
+    INTO int_rate, startdate;
+
+    SET var_memo = CONCAT("change interest rate to ", int_rate);
+
+	INSERT into loan_prep
+	SELECT 0, 0, startdate, var_memo, 0, int_rate, 0, 0;
+    
+    SET vardate = startdate;
+    SET num = num - 1;
+
+  END WHILE;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `pop_loan_statement` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `pop_loan_statement`(
+IN loanid INT
+)
+BEGIN
+  DECLARE lt_id, num, freq, periods, add_int INT;
+  DECLARE ltdate, startdate, start_date, vardate, enddate, upliftdate DATE;
+  DECLARE lt_amount, int_rate, new_rate, balance, pool, intpart, sumadvances, sumpayments, suminterest, interest_pa DECIMAL(8,2);
+  DECLARE lt_memo, var_memo, freq_det, ltmemo, add_interest VARCHAR(60);
+  DECLARE done BOOLEAN DEFAULT FALSE;
+  DECLARE cur CURSOR FOR SELECT ltid, lsdate, memo, ltamount, newrate, addint FROM loan_prep ORDER BY lsdate;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done := TRUE;
+
+DROP TABLE IF EXISTS `loan_statement`;
+CREATE TABLE `loan_statement` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ltid` int(11) NOT NULL DEFAULT 0,
+  `date` date,
+  `memo` varchar(60) DEFAULT NULL,
+  `transaction` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `rate` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `interest` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `add_interest` varchar(10) NOT NULL DEFAULT 'No',
+  `balance` decimal(8,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `loan_prep`;
+CREATE TEMPORARY TABLE `loan_prep` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `ltid` int(11) NOT NULL DEFAULT 0,
+  `lsdate` date,
+  `memo` varchar(60) DEFAULT NULL,
+  `ltamount` decimal(8,2) DEFAULT 0.00,
+  `newrate` decimal(8,2) DEFAULT 0.00,
+  `addint` int(11) NOT NULL DEFAULT 0,
+  `balance` decimal(8,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
+);
+
+  INSERT INTO loan_prep
+  SELECT 0, id, date, memo, amount, 0, 0, 0
+  FROM loan_trans WHERE loan_id = loanid
+  ORDER BY date;
+
+  SELECT frequency FROM loan
+  WHERE id = loanid
+  INTO freq;
+
+  SELECT MIN(date) FROM loan_trans
+  WHERE loan_id = loanid
+  INTO startdate;
+
+  SELECT intrate FROM loan_interest_rate
+  WHERE loan_id = loanid AND datestarts = startdate
+  INTO int_rate;
+  
+  UPDATE loan_prep
+  SET newrate = int_rate
+  WHERE memo LIKE "initial%"
+  AND lsdate = startdate;
+
+  SELECT freqdet FROM typefreq
+  WHERE id = freq
+  INTO freq_det;
+
+  SET periods = 1;
+  SET var_memo = CONCAT("interest added ", freq_det);
+
+  WHILE next_date(startdate, freq, periods) < CURDATE() DO
+	INSERT into loan_prep
+	SELECT 0, 0, next_date(startdate, freq, periods), var_memo, 0, 0, 1, 0;
+    SET periods = periods + 1;
+  END WHILE;
+
+  SELECT COUNT(*) 
+  FROM loan_interest_rate
+  WHERE loan_id = loanid
+  AND datestarts < CURDATE()
+  AND datestarts > startdate
+  INTO num ;
+
+  SET vardate = startdate;
+  
+  WHILE num > 0 DO
+    SELECT intrate, datestarts FROM loan_interest_rate
+    WHERE loan_id = loanid
+    AND datestarts > vardate 
+    ORDER BY datestarts
+    LIMIT 1
+    INTO int_rate, start_date;
+
+    SET var_memo = CONCAT("change interest rate to ", int_rate);
+
+	INSERT into loan_prep
+	SELECT 0, 0, start_date, var_memo, 0, int_rate, 0, 0;
+    
+    SET vardate = start_date;
+    SET num = num - 1;
+  END WHILE;
+
+  INSERT into loan_prep
+  SELECT 0, 0, CURDATE(), "calculate for redemption today", 0, int_rate, 1, 0;
+
+  SET pool = 0;
+  SET balance = 0;
+  
+  OPEN cur;
+
+  testLoop: LOOP
+    FETCH cur INTO lt_id, ltdate, ltmemo, lt_amount, new_rate, add_int;
+
+    IF done THEN
+      LEAVE testLoop;
+    END IF;
+
+	SET enddate = ltdate;
+    SET intpart = calc_int(int_rate, balance, enddate, startdate);
+
+	IF add_int = 0 THEN
+		SET pool = pool + intpart;
+        SET balance = balance + lt_amount;
+        SET add_interest = "No";
+	ELSE
+		SET balance = balance + intpart + pool;
+        SET add_interest = "Yes";
+        SET pool = 0;
+	END IF;
+
+	INSERT into loan_statement
+	SELECT 0, lt_id, enddate, ltmemo, lt_amount, int_rate, intpart, add_interest, balance;
+
+    IF new_rate > 0 THEN
+		SET int_rate = new_rate;
+	END IF;
+
+    SET startdate = enddate;
+  END LOOP testLoop;
+  
+  CLOSE cur;
+  
+  SET interest_pa = balance*int_rate/100;
+
+  UPDATE loan
+  SET interest_rate = int_rate, val_date = CURDATE(), valuation = balance, interestpa = interest_pa
+  WHERE id = loanid;
+  
+  SELECT SUM(transaction) FROM loan_statement WHERE memo LIKE "%advance%"
+  INTO sumadvances;
+
+  SELECT SUM(interest) FROM loan_statement
+  INTO suminterest;
+  
+  SELECT SUM(transaction) FROM loan_statement WHERE transaction < 0 
+  INTO sumpayments;
+  
+  SELECT "checksum total advances" AS memo, sumadvances AS amount
+  UNION ALL
+  SELECT "checksum total interest" AS memo, suminterest AS amount
+  UNION ALL
+  SELECT "checksum total repayments" AS memo, sumpayments AS amount
+  UNION ALL
+  SELECT "checksum calculated balance" AS memo, sumadvances + suminterest + IFNULL(sumpayments, 0) AS amount
+  UNION ALL
+  SELECT "checksum annual interest" AS memo, interest_pa AS amount;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `pop_rental_statement` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `pop_rental_statement`(
+ in rentalid INT
+)
+BEGIN
+  DECLARE num, freq INT;
+  DECLARE start_rent_date, vardate DATE;
+  DECLARE rent DECIMAL(8,2);
+  DECLARE var_memo, freq_det VARCHAR(60);
+
+DROP TABLE IF EXISTS `rental_statement`;
+CREATE TABLE `rental_statement` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date,
+  `memo` varchar(60) DEFAULT NULL,
+  `amount` decimal(8,2) DEFAULT 0.00,
+  `payer` varchar(60) DEFAULT NULL,
+  `balance` decimal(8,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
+);
+
+DROP TABLE IF EXISTS `temp_statement`;
+CREATE TEMPORARY TABLE `temp_statement` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date,
+  `memo` varchar(60) DEFAULT NULL,
+  `amount` decimal(8,2) DEFAULT 0.00,
+  `payer` varchar(60) DEFAULT NULL,
+  `balance` decimal(8,2) DEFAULT 0.00,
+  PRIMARY KEY (`id`)
+);
+
+  SELECT freq_id, rentpa, startrentdate FROM rental
+  WHERE id = rentalid
+  INTO freq, rent, start_rent_date;
+
+  SELECT freqdet FROM typefreq
+  WHERE id = freq
+  INTO freq_det;
+
+  SET var_memo = CONCAT("rent due ", freq_det);
+  SET vardate = start_rent_date;
+  
+  INSERT into temp_statement
+  SELECT 0, vardate, var_memo, -rent/freq, "", 0;
+
+  WHILE next_date(vardate, freq, 1) < CURDATE() DO
+	INSERT into temp_statement
+	SELECT 0, next_date(vardate, freq, 1), var_memo, -rent/freq, "", 0;
+    SET vardate = next_date(vardate, freq, 1);
+  END WHILE;
+  
+  INSERT into temp_statement
+  SELECT 0, date, memo, amount, payer, 0 FROM rental_trans 
+  WHERE rental_id = rentalid AND date >= start_rent_date;
+  
+
+  SET @tot := 0;
+
+  INSERT into rental_statement
+  SELECT 0, date, memo, amount, payer, (@tot := @tot + amount) as balance 
+  FROM temp_statement
+  ORDER BY date, id;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;

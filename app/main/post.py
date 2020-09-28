@@ -48,6 +48,7 @@ def post_doc(id, action):
     else:
         doc = Doc()
     doc.code = request.form["code"]
+    doc.summary = request.form["summary"]
     doc.subject = request.form["subject"]
     doc.part1 = request.form["part1"]
     doc.part2 = request.form["part2"]

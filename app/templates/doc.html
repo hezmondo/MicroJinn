@@ -5,15 +5,19 @@
 {% block app_content %}
     <form method="POST" id="target">
 		<div class="form-group row">
-			<div class="col-md-4">
+			<div class="col-md-2">
 				<label for="code">Code:</label>
 				<input type="text" class="form-control" name="code" value="{{ doc.code }}">
 			</div>
-            <div class="col-md-4">
+			<div class="col-md-6">
+				<label for="summary">Summary:</label>
+				<input type="text" class="form-control" name="summary" value="{{ doc.summary }}">
+			</div>
+            <div class="col-md-2">
                 <label for="doc_type">Type:</label>
                 {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=doc.desc) }}
             </div>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <label for="template">Template:</label>
                 {{ widgets.combobox(name="template", items=session['templates'], item_selected=doc.template) }}
             </div>

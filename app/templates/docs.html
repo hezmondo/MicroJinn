@@ -35,21 +35,19 @@
     <table class="table table-condensed">
         <thead>
         <tr>
-            <th style="width: 8.00%">Doc_code</th>
-            <th style="width: 40.00%">Part 1</th>
-            <th style="width: 30.00%">Part 2</th>
-            <th style="width: 13.00%">Part 3</th>
-            <th style="width: 9.00%">Action</th>
+            <th style="width: 10.00%">Doc_code</th>
+            <th style="width: 70.00%">Summary</th>
+            <th style="width: 10.00%">Action</th>
+            <th style="width: 10.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in docs %}
         <tr>
-            <td style="width: 8.00%">{{ item.code }}</td>
-            <td style="width: 40.00%">{{ item.part1 }}</td>
-            <td style="width: 30.00%"> {{ item.part2 }}</td>
-            <td style="width: 13.00%"> {{ item.part3 }}</td>
-            <td style="width: 9.00%"><a href="/doc/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%">{{ item.code }}</td>
+            <td style="width: 70.00%">{{ item.summary }}</td>
+            <td style="width: 10.00%"><a href="/doc/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="/doc/{{ item.id }}">View</a></td>
         </tr>
         {% endfor %}
         </tbody>
