@@ -4,6 +4,10 @@
 #xalloc {
     display: none;
 }
+#doc_html {
+    background-color: 	#EDEDED !important;
+    padding: 10px;
+}
 .btn-danger
 {
   background-color: hsl(351, 68%, 11%) !important;

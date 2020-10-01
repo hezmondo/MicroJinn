@@ -4,10 +4,10 @@ from flask import render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required
 from app import db
 from app.main import bp
-from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docs_out, get_emailaccount, \
-    get_emailaccounts, get_externalrent, get_headrents, get_incomeobject, get_incomepost, \
-    get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
-    get_landlords, get_lease, get_doc, get_doc_out, get_docs, get_loan, get_loan_options, get_loans, \
+from app.main.get import get_agent, get_agents, get_charge, get_charges, get_doc, get_doc_in, get_doc_out, \
+    get_docs, get_docs_in, get_docs_out, get_emailaccount, get_emailaccounts, get_externalrent, get_headrents, \
+    get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
+    get_landlords, get_lease, get_loan, get_loan_options, get_loans, \
     get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
@@ -90,24 +90,51 @@ def doc(id):
         id_ = post_doc(id, action)
         return redirect('/doc/{}?action=view'.format(id_))
     doc = get_doc(id)
-    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
+    if not session['doc_types']:
+        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
+    if not session['templates']:
+        session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
 
     return render_template('doc.html', action=action, doc=doc)
+
+
+@bp.route('/doc_in/<string:rentcode>', methods=['GET', 'POST'])
+def doc_in(rentcode):
+    if not session['doc_types']:
+        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
+    rent_code = rentcode
+
+    return render_template('mergedocs/doc_in.html', rent_code=rent_code)
+
+
+@bp.route('/doc_in_view/<int:id>', methods=['GET'])
+def doc_in_view(id):
+    rentid = int(request.args.get('rentid', "1", type=str))
+    doc_in = get_doc_in(id)
+
+    return render_template('doc_in_view.html', doc_in=doc_in, rentid=rentid)
+
+
+@bp.route('/docs_in/<int:id>', methods=['GET'])
+def docs_in(id):
+    docs_in = get_docs_in(id)
+
+    return render_template('docs_in.html', docs_in=docs_in, rentid=id)
 
 
 @bp.route('/docs_out/<int:id>', methods=['GET'])
 def docs_out(id):
     docs_out = get_docs_out(id)
 
-    return render_template('docs_out.html', docs_out=docs_out)
+    return render_template('docs_out.html', docs_out=docs_out, rentid=id)
 
 
 @bp.route('/doc_out/<int:id>', methods=['GET'])
 def doc_out(id):
+    rentid = int(request.args.get('rentid', "1", type=str))
     doc_out = get_doc_out(id)
 
-    return render_template('doc_out.html', doc_out=doc_out)
+    return render_template('doc_out.html', doc_out=doc_out, rentid=rentid)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -457,7 +484,8 @@ def rent_object(id):
     actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, \
         statusdets, tenuredets = getrentobj_combos(id)
 
-    session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    if not session['mailtodets']:
+        session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
     session['propaddr'] = rentobj.propaddr
@@ -471,8 +499,8 @@ def rent_object(id):
 
 @bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
-    action = request.args.get('action', "new", type=str)
+    item = request.args.get('item', "doc_out", type=str)
     if request.method == "POST":
-        id = post_html(action)
+        id = post_html(item)
 
         return redirect('/rent_object/{}'.format(id))

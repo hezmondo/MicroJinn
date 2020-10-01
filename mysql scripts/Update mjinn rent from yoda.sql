@@ -8,7 +8,7 @@ ON m.rentcode = c.RentCode
 SET m.tenantname = y.TenantName, m.rentpa = y.Rent, m.arrears = y.Arrears, 
 m.lastrentdate = y.LastRentDate, m.datecode = y.DateCode, m.source = y.Source,
 m.price = y.Price, m.email = c.Email, m.note = c.Notes, 
-landlord_id =
+m.landlord_id =
 CASE
 	WHEN Landlord = 1 THEN 1
 	WHEN Landlord = 2 THEN 2
@@ -22,7 +22,7 @@ CASE
 ELSE 10
 END,
 #agent
-actype =
+m.actype_id =
 CASE
 	WHEN `AcType` = 'A' THEN 1
 	WHEN `AcType` = 'N' THEN 2
@@ -30,27 +30,27 @@ CASE
 	WHEN `AcType` = 'R' THEN 4
 	WHEN `AcType` = 'S' THEN 5
 END,
-advarr =
+m.advarr_id =
 CASE
 	WHEN `AdvArr` = 'R' THEN 1
 	ELSE 2
 END,
 #deed_id
 m.freq_id = y.Frequency,
-mailto_id =
+m.mailto_id =
 CASE
 	WHEN `MailTo` = 'A' THEN 1
 	WHEN `MailTo` = 'C' THEN 2
 	WHEN `MailTo` = 'N' THEN 3
 	WHEN `MailTo` = 'O' THEN 4
 END,
-prdelivery_id =
+m.prdelivery_id =
 CASE
 	WHEN `PrDelivery` = 'E' THEN 1
 	WHEN `PrDelivery` = 'M' THEN 2
 END,
 m.salegrade_id = y.TitleGrade,
-status_id =
+m.status_id =
 CASE
 	WHEN `Status` = 'A' THEN 1
 	WHEN `Status` = 'C' THEN 2
@@ -60,7 +60,7 @@ CASE
 	WHEN `Status` = 'T' THEN 6
 	WHEN `Status` = 'X' THEN 7
 END,
-tenure_id =
+m.tenure_id =
 CASE
 	WHEN `Tenure` = 'F' THEN 1
 	WHEN `Tenure` = 'L' THEN 2

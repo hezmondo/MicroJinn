@@ -139,6 +139,19 @@
         <div class="col-md-3">
             <div class="btn-group">
               <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Mail and docs for this rent
+              </button>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/docs_out/{{ rentobj.id }}">View docs out for this rent</a>
+                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">Produce doc_out for this rent</a>
+                <a class="dropdown-item" href="/docs_in/{{ rentobj.id }}">View docs in for this rent</a>
+                <a class="dropdown-item" href="/doc_in/{{ rentobj.rentcode }}">Save doc_in for this rent</a>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="btn-group">
+              <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Other actions for this rent
               </button>
               <div class="dropdown-menu">
@@ -146,9 +159,7 @@
                 <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">View income for this rent</a>
                 <a class="dropdown-item" href="/rent_object/0?action=new">Add a new rent and property</a>
                 <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">View charges for this rent</a>
-                <a class="dropdown-item" href="/docs_out/{{ rentobj.id }}">View docs out for this rent</a>
                 <a class="dropdown-item" href="/lease/{{ rentobj.id }}">View lease info for this rent</a>
-                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">Produce doc for this rent</a>
               </div>
             </div>
         </div>

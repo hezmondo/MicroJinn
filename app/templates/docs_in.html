@@ -8,9 +8,6 @@
             <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="doc_code" placeholder="Doc code">
-        </div>
-        <div class="col-md-2">
             <input type="text" class="form-control" name="doc_type" placeholder="Doc type">
         </div>
         <div class="col-md-2">
@@ -24,26 +21,24 @@
   <div class="form-group row">
     </div>
     <div class="table-fixed">
-        <table class="table" id="docs_out">
+        <table class="table" id="docs_in">
             <thead>
             <tr>
-                <th style="width: 10.00%">Doc_out id</th>
+                <th style="width: 10.00%">Doc_in id</th>
                 <th style="width: 10.00%">Doc date</th>
                 <th style="width: 10.00%">Rentcode</th>
-                <th style="width: 10.00%">Doc code</th>
                 <th style="width: 10.00%">Doc type</th>
                 <th style="width: 10.00%">action</th>
             </tr>
             </thead>
             <tbody>
-            {% for item in docs_out %}
+            {% for item in docs_in %}
             <tr id="{{ item.id }}">
                 <td style="width: 10.00%"> {{ item.id }}</td>
                 <td style="width: 10.00%"> {{ item.doc_date }}</td>
                 <td style="width: 10.00%"> {{ item.rentcode }}</td>
-                <td style="width: 10.00%"> {{ item.code }}</td>
                 <td style="width: 10.00%"> {{ item.desc }}</td>
-                <td style="width: 10.00%"><a href="/doc_out/{{ item.id }}?rentid={{ rentid }}">View</a></td>
+                <td style="width: 10.00%"><a href="/doc_in_view/{{ item.id }}?rentid={{ rentid }}">View</a></td>
             </tr>
             {% endfor %}
             </tbody>

@@ -3,7 +3,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="/save_html">
+<form method="POST" action="/save_html?item=doc_out">
 	<div id="doc_html" contenteditable="true">
 		<br />
 	    {% if method == "letter" %}

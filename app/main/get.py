@@ -8,7 +8,7 @@ from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
-from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Headrent, Income, \
+from app.models import Agent, Charge, Chargetype, Doc, Doc_in, Doc_out, Extmanager, Extrent, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
     Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
@@ -107,6 +107,36 @@ def get_doc(id):
     return doc
 
 
+def get_docs_in(id):
+    doc_in_filter = []
+    if request.method == "POST":
+        rcd = request.form.get("rentcode") or ""
+        dcty = request.form.get("doc_type") or ""
+        dctx = request.form.get("doc_text") or ""
+        if rcd and rcd != "":
+            doc_in_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
+        if dcty and dcty != "":
+            doc_in_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
+        if dctx and dctx != "":
+            doc_in_filter.append(Doc_in.doc_text.ilike('%{}%'.format(dctx)))
+    if id > 0:
+        doc_in_filter.append(Doc_in.rent_id == id)
+
+    docs_in = Doc_in.query.join(Rent).join(Typedoc).with_entities(Doc_in.id, Doc_in.doc_date,
+                    Doc_in.doc_text, Typedoc.desc, Rent.rentcode).filter(*doc_in_filter).all()
+
+    return docs_in
+
+
+def get_doc_in(id):
+    doc_in = Doc_in.query.filter(Doc_in.id == id).one_or_none()
+    # source_html = doc_in.doc_text
+    # output_filename = "doc_in_view.pdf"
+    # convert_html_to_pdf(source_html, output_filename)
+
+    return doc_in
+
+
 def get_docs_out(id):
     doc_out_filter = []
     if request.method == "POST":
@@ -133,9 +163,9 @@ def get_docs_out(id):
 
 def get_doc_out(id):
     doc_out = Doc_out.query.filter(Doc_out.id == id).one_or_none()
-    source_html = doc_out.doc_text
-    output_filename = "testout.pdf"
-    convert_html_to_pdf(source_html, output_filename)
+    # source_html = doc_out.doc_text
+    # output_filename = "doc_out_view.pdf"
+    # convert_html_to_pdf(source_html, output_filename)
 
     return doc_out
 

@@ -61,10 +61,20 @@ class Doc(db.Model):
     part1 = db.Column(db.String(1800))
     part2 = db.Column(db.String(1200))
     part3 = db.Column(db.String(900))
-    type_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
     doc_out_doc = db.relationship('Doc_out', backref='doc', lazy='dynamic')
+
+
+class Doc_in(db.Model):
+    __tablename__ = 'doc_in'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
+    doc_date = db.Column(db.Date)
+    doc_text = db.Column(db.Text)
 
 
 class Doc_out(db.Model):
@@ -511,6 +521,7 @@ class Typedoc(db.Model):
     desc = db.Column(db.String(30))
 
     doc_typedoc = db.relationship('Doc', backref='typedoc', lazy='dynamic')
+    doc_in_typedoc = db.relationship('Doc_in', backref='typedoc', lazy='dynamic')
 
 
 class Typefreq(db.Model):

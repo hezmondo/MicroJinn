@@ -2,7 +2,7 @@ import json
 from flask import redirect, request
 from app import db
 from app.main.functions import commit_to_database, convert_html_to_pdf
-from app.models import Agent, Charge, Chargetype, Doc, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Chargetype, Doc, Doc_in, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
     Landlord, Lease, Lease_uplift_type, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -54,7 +54,7 @@ def post_doc(id, action):
     doc.part2 = request.form["part2"]
     doc.part3 = request.form["part3"]
     type = request.form["doc_type"]
-    doc.type_id = \
+    doc.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter \
             (Typedoc.desc == type).one()[0]
     template = request.form["template"]
@@ -392,20 +392,34 @@ def postrentobj(id):
 
     return redirect('/rent_object/{}'.format(id))
 
-def post_html(action):
-    if action == "edit":
-        doc_out = Doc_out.query.get(id)
+def post_html(item):
+    if item == "doc_in":
+        doc_in = Doc_in()
+        doc_in.doc_text = request.form['xinput'].replace("£", "&pound;")
+        rentcode = request.form['rentcode']
+        doc_in.rent_id = \
+            Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
+        doc_in.doc_date = request.form['doc_date']
+        doc_type = request.form['doc_type']
+        doc_in.doctype_id = \
+            Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doc_type).one()[0]
+        db.session.add(doc_in)
+        db.session.commit()
+        id_ = doc_in.rent_id
+        source_html = doc_in.doc_text
+        output_filename = "doc_in.pdf"
+        convert_html_to_pdf(source_html, output_filename)
     else:
         doc_out = Doc_out()
-    doc_out.doc_text = request.form['xinput'].replace("£", "&pound;")
-    doc_out.rent_id = request.form['rent_id']
-    doc_out.doc_id = request.form['doc_id']
-    doc_out.doc_date = request.form['doc_date']
-    db.session.add(doc_out)
-    db.session.commit()
-    id_ = doc_out.rent_id
-    source_html = doc_out.doc_text
-    output_filename = "testin.pdf"
-    convert_html_to_pdf(source_html, output_filename)
+        doc_out.doc_text = request.form['xinput'].replace("£", "&pound;")
+        doc_out.rent_id = request.form['rent_id']
+        doc_out.doc_id = request.form['doc_id']
+        doc_out.doc_date = request.form['doc_date']
+        db.session.add(doc_out)
+        db.session.commit()
+        id_ = doc_out.rent_id
+        source_html = doc_out.doc_text
+        output_filename = "doc_out.pdf"
+        convert_html_to_pdf(source_html, output_filename)
 
     return id_
