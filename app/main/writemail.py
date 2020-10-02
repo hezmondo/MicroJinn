@@ -4,14 +4,14 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.get import get_doc, get_leasedata, getmaildata, getrentobj_main
+from app.main.get import get_formletter, get_leasedata, getmaildata, getrentobj_main
 from app.main.functions import htmlSpecialMarkDown
 
-def writeMail(rent_id, income_id, doc_id, type):
+def writeMail(rent_id, income_id, formletter_id, type):
     # Get rent/prop/income details and output mail (letter/payrequest/account/email/invoice/rem adv)
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
-    doc = get_doc(doc_id)
+    formletter = get_formletter(formletter_id)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
     arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
@@ -81,17 +81,17 @@ def writeMail(rent_id, income_id, doc_id, type):
     else:
         leasedata = None
 
-    subject = doc.subject
-    part1 = doc.part1 if doc.part1 else ""
-    part2 = doc.part2 if doc.part2 else ""
-    part3 = doc.part3 if doc.part3 else ""
+    subject = formletter.subject
+    part1 = formletter.part1 if formletter.part1 else ""
+    block = formletter.block if formletter.block else ""
+    bold = formletter.bold if formletter.bold else ""
 
     subject = doReplace(word_variables, subject)
     part1 = doReplace(word_variables, part1)
-    part2 = doReplace(word_variables, part2)
-    part3 = doReplace(word_variables, part3)
+    block = doReplace(word_variables, block)
+    bold = doReplace(word_variables, bold)
 
-    return subject, part1, part2, part3, rentobj, doc, addressdata, leasedata
+    return subject, part1, block, bold, rentobj, formletter, addressdata, leasedata
 
 
 def doReplace(dict, clause):

@@ -51,40 +51,17 @@ class Dates(db.Model):
     day = db.Column(db.Integer)
 
 
-class Doc(db.Model):
-    __tablename__ = 'doc'
+class Docfile(db.Model):
+    __tablename__ = 'docfile'
 
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    summary = db.Column(db.String(60))
-    subject = db.Column(db.String(150))
-    part1 = db.Column(db.String(1800))
-    part2 = db.Column(db.String(1200))
-    part3 = db.Column(db.String(900))
-    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
-    template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
-
-    doc_out_doc = db.relationship('Doc_out', backref='doc', lazy='dynamic')
-
-
-class Doc_in(db.Model):
-    __tablename__ = 'doc_in'
-
-    id = db.Column(db.Integer, primary_key=True)
-    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     doc_date = db.Column(db.Date)
+    summary = db.Column(db.String(90))
     doc_text = db.Column(db.Text)
-
-
-class Doc_out(db.Model):
-    __tablename__ = 'doc_out'
-
-    id = db.Column(db.Integer, primary_key=True)
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    doc_id = db.Column(db.Integer, db.ForeignKey('doc.id'))
-    doc_date = db.Column(db.Date)
-    doc_text = db.Column(db.Text)
+    out_in = db.Column(db.Boolean, nullable=False)
+    digidoc = db.Column(db.LargeBinary, nullable=True)
 
 
 class Emailaccount(db.Model):
@@ -144,6 +121,21 @@ class Extrent(db.Model):
         return '<Extrent {}>'.format(self.rentcode)
         
         
+class Formletter(db.Model):
+    __tablename__ = 'formletter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(30))
+    summary = db.Column(db.String(60))
+    subject = db.Column(db.String(150))
+    part1 = db.Column(db.String(3000))
+    block = db.Column(db.String(4500))
+    bold = db.Column(db.String(900))
+    # block = db.Column(db.Text)
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
+    template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
+
+
 class Headrent(db.Model):
     __tablename__ = 'headrent'
 
@@ -416,7 +408,7 @@ class Rent(db.Model):
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
-    doc_out_rent = db.relationship('Doc_out', backref='rent', lazy='dynamic')
+    doc_out_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
 
     def __repr__(self):
@@ -471,7 +463,7 @@ class Template(db.Model):
     code = db.Column(db.String(15))
     desc = db.Column(db.String(60))
 
-    doc_template = db.relationship('Doc', backref='template', lazy='dynamic')
+    formletter_template = db.relationship('Formletter', backref='template', lazy='dynamic')
 
 
 class Typeactype(db.Model):
@@ -520,8 +512,8 @@ class Typedoc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(30))
 
-    doc_typedoc = db.relationship('Doc', backref='typedoc', lazy='dynamic')
-    doc_in_typedoc = db.relationship('Doc_in', backref='typedoc', lazy='dynamic')
+    formletter_typedoc = db.relationship('Formletter', backref='typedoc', lazy='dynamic')
+    docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
 
 
 class Typefreq(db.Model):
@@ -607,7 +599,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     recent_rents = db.Column(db.String(150))
     recent_agents = db.Column(db.String(150))
-    recent_docs = db.Column(db.String(150))
+    recent_formletters = db.Column(db.String(150))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

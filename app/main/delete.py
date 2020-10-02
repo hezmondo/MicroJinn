@@ -1,7 +1,7 @@
 from flask import redirect, url_for
 from app import db
 from app.main.functions import commit_to_database
-from app.models import Agent, Charge, Doc_out, Extmanager, Extrent, Income, Incomealloc, \
+from app.models import Agent, Charge, Docfile, Extmanager, Extrent, Formletter, Income, Incomealloc, \
     Landlord, Lease, Loan, Manager, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
@@ -31,6 +31,12 @@ def delete_record(id, item):
             db.session.delete(d_emailacc)
             db.session.commit()
             return redirect('/emailaccs')
+    elif item == "formletter":
+        d_formletter = Formletter.query.get(id)
+        if d_formletter:
+            db.session.delete(d_formletter)
+            db.session.commit()
+            return redirect('/formletters')
     elif item == "incomealloc":
         d_alloc = Incomealloc.query.get(id)
         if d_alloc:

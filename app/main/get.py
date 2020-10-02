@@ -8,7 +8,7 @@ from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
-from app.models import Agent, Charge, Chargetype, Doc, Doc_in, Doc_out, Extmanager, Extrent, Headrent, Income, \
+from app.models import Agent, Charge, Chargetype, Docfile, Extmanager, Extrent, Formletter, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
     Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
@@ -72,102 +72,35 @@ def get_charge(id):
     return charge, chargedescs
 
 
-def get_docs(action):
-    if request.method == "POST":
-        code = request.form.get("code") or ""
-        subject = request.form.get("subject") or ""
-        part1 = request.form.get("part1") or ""
-        part2 = request.form.get("part1") or ""
-        docs = Doc.query.filter(Doc.code.ilike('%{}%'.format(code)),
-                  Doc.subject.ilike('%{}%'.format(subject)), Doc.part1.ilike('%{}%'.format(part1)),
-                  Doc.part2.ilike('%{}%'.format(part2))).all()
-    elif action == "lease":
-        docs = Doc.query.filter(Doc.code.ilike('LEQ-%'))
-    else:
-        id_list = json.loads(current_user.recent_docs)
-        docs = Doc.query.filter(Doc.id.in_(id_list))
+def get_docfile(id):
+    docfile = Docfile.query.filter(Docfile.id == id).one_or_none()
 
-    return docs
+    return docfile
 
 
-def get_doc(id):
-    id_list = json.loads(current_user.recent_docs)
-    if id not in id_list:
-        id_list.insert(0, id)
-        id_list.pop()
-        user = current_user
-        user.recent_docs = json.dumps(id_list)
-        db.session.add(user)
-        db.session.commit()
-
-    doc = Doc.query.join(Typedoc).join(Template).with_entities(Doc.id, Doc.code, Doc.summary, Doc.subject, Doc.part1,
-               Doc.part2, Doc.part3, Typedoc.desc, Template.desc.label("template")) \
-           .filter(Doc.id == id).one_or_none()
-
-    return doc
-
-
-def get_docs_in(id):
-    doc_in_filter = []
-    if request.method == "POST":
-        rcd = request.form.get("rentcode") or ""
-        dcty = request.form.get("doc_type") or ""
-        dctx = request.form.get("doc_text") or ""
-        if rcd and rcd != "":
-            doc_in_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
-        if dcty and dcty != "":
-            doc_in_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
-        if dctx and dctx != "":
-            doc_in_filter.append(Doc_in.doc_text.ilike('%{}%'.format(dctx)))
-    if id > 0:
-        doc_in_filter.append(Doc_in.rent_id == id)
-
-    docs_in = Doc_in.query.join(Rent).join(Typedoc).with_entities(Doc_in.id, Doc_in.doc_date,
-                    Doc_in.doc_text, Typedoc.desc, Rent.rentcode).filter(*doc_in_filter).all()
-
-    return docs_in
-
-
-def get_doc_in(id):
-    doc_in = Doc_in.query.filter(Doc_in.id == id).one_or_none()
-    # source_html = doc_in.doc_text
-    # output_filename = "doc_in_view.pdf"
-    # convert_html_to_pdf(source_html, output_filename)
-
-    return doc_in
-
-
-def get_docs_out(id):
-    doc_out_filter = []
+def get_docfiles(rentid):
+    docfile_filter = []
     if request.method == "POST":
         rcd = request.form.get("rentcode") or ""
         dcd = request.form.get("doc_code") or ""
         dcty = request.form.get("doc_type") or ""
         dctx = request.form.get("doc_text") or ""
+        dcout = request.form.get("doc_out") or ""
         if rcd and rcd != "":
-            doc_out_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
+            docfile_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
         if dcd and dcd != "":
-            doc_out_filter.append(Doc.code.ilike('%{}%'.format(dcd)))
+            docfile_filter.append(Formletter.code.ilike('%{}%'.format(dcd)))
         if dcty and dcty != "":
-            doc_out_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
+            docfile_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
         if dctx and dctx != "":
-            doc_out_filter.append(Doc_out.doc_text.ilike('%{}%'.format(dctx)))
-    if id > 0:
-        doc_out_filter.append(Doc_out.rent_id == id)
+            docfile_filter.append(Docfile.doc_text.ilike('%{}%'.format(dctx)))
+    if rentid > 0:
+        docfile_filter.append(Docfile.rent_id == id)
 
-    docs_out = Doc_out.query.join(Doc).join(Rent).join(Typedoc).with_entities(Doc_out.id, Doc_out.doc_date,
-                    Doc_out.doc_text, Typedoc.desc, Doc.code, Rent.rentcode).filter(*doc_out_filter).all()
+    docfiles = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.doc_date,
+                Docfile.doc_text, Typedoc.desc, Rent.rentcode).filter(*docfile_filter).all()
 
-    return docs_out
-
-
-def get_doc_out(id):
-    doc_out = Doc_out.query.filter(Doc_out.id == id).one_or_none()
-    # source_html = doc_out.doc_text
-    # output_filename = "doc_out_view.pdf"
-    # convert_html_to_pdf(source_html, output_filename)
-
-    return doc_out
+    return docfiles
 
 
 def get_emailaccounts():
@@ -189,6 +122,44 @@ def get_externalrent(id):
         .filter(Extrent.id == id).one_or_none()
 
     return externalrent
+
+
+def get_formletter(id):
+    id_list = json.loads(current_user.recent_formletters)
+    if id not in id_list:
+        id_list.insert(0, id)
+        id_list.pop()
+        user = current_user
+        user.recent_formletters = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
+
+    formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code, Formletter.summary, Formletter.subject, Formletter.part1,
+                                                                      Formletter.block, Formletter.bold, Typedoc.desc, Template.desc.label("template")) \
+           .filter(Formletter.id == id).one_or_none()
+
+    return formletter
+
+
+def get_formletters(action):
+    if request.method == "POST":
+        code = request.form.get("code") or ""
+        summary = request.form.get("summary") or ""
+        subject = request.form.get("subject") or ""
+        part1 = request.form.get("part1") or ""
+        block = request.form.get("block") or ""
+        formletters = Formletter.query.filter(Formletter.code.ilike('%{}%'.format(code)),
+                               Formletter.subject.ilike('%{}%'.format(summary)),
+                               Formletter.subject.ilike('%{}%'.format(subject)),
+                               Formletter.part1.ilike('%{}%'.format(part1)),
+                                       Formletter.block.ilike('%{}%'.format(block))).all()
+    elif action == "lease":
+        formletters = Formletter.query.filter(Formletter.code.ilike('LEQ-%'))
+    else:
+        id_list = json.loads(current_user.recent_formletters)
+        formletters = Formletter.query.filter(Formletter.id.in_(id_list))
+
+    return formletters
 
 
 def get_headrents():

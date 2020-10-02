@@ -4,19 +4,19 @@ from flask import render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required
 from app import db
 from app.main import bp
-from app.main.get import get_agent, get_agents, get_charge, get_charges, get_doc, get_doc_in, get_doc_out, \
-    get_docs, get_docs_in, get_docs_out, get_emailaccount, get_emailaccounts, get_externalrent, get_headrents, \
+from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docfile, get_docfiles, \
+    get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, get_formletters, get_headrents, \
     get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
     get_landlords, get_lease, get_loan, get_loan_options, get_loans, \
     get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
 from app.main.delete import delete_record
-from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_doc, \
-    post_html, post_lease, post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
+from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_formletter, \
+    post_docfile, post_lease, post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Doc, Doc_out, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
+from app.models import Agent, Charge, Formletter, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
     Template, Typedoc, Typemailto
 
@@ -75,66 +75,28 @@ def delete_item(id):
     delete_record(id, item)
 
 
-@bp.route('/docs', methods=['GET'])
-def docs():
-    docs = get_docs("normal")
+@bp.route('/docfiles/<int:id>', methods=['GET'])
+def docfiles(rentid):
+    docfiles = get_docfiles(rentid)
 
-    return render_template('docs.html', docs=docs)
-
-
-@bp.route('/doc/<int:id>', methods=['GET', 'POST'])
-@login_required
-def doc(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        id_ = post_doc(id, action)
-        return redirect('/doc/{}?action=view'.format(id_))
-    doc = get_doc(id)
-    if not session['doc_types']:
-        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    if not session['templates']:
-        session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
-
-    return render_template('doc.html', action=action, doc=doc)
+    return render_template('docfiles.html', docfiles=docfiles)
 
 
-@bp.route('/doc_in/<string:rentcode>', methods=['GET', 'POST'])
-def doc_in(rentcode):
+@bp.route('/docfile_save/<string:rentcode>', methods=['GET', 'POST'])
+def docfile_save(rentcode):
     if not session['doc_types']:
         session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     rent_code = rentcode
 
-    return render_template('mergedocs/doc_in.html', rent_code=rent_code)
+    return render_template('mergedocs/docfile_save.html', rent_code=rent_code)
 
 
-@bp.route('/doc_in_view/<int:id>', methods=['GET'])
-def doc_in_view(id):
+@bp.route('/docfile_view/<int:id>', methods=['GET'])
+def docfile_view(id):
     rentid = int(request.args.get('rentid', "1", type=str))
-    doc_in = get_doc_in(id)
+    docfile = get_docfile(id)
 
-    return render_template('doc_in_view.html', doc_in=doc_in, rentid=rentid)
-
-
-@bp.route('/docs_in/<int:id>', methods=['GET'])
-def docs_in(id):
-    docs_in = get_docs_in(id)
-
-    return render_template('docs_in.html', docs_in=docs_in, rentid=id)
-
-
-@bp.route('/docs_out/<int:id>', methods=['GET'])
-def docs_out(id):
-    docs_out = get_docs_out(id)
-
-    return render_template('docs_out.html', docs_out=docs_out, rentid=id)
-
-
-@bp.route('/doc_out/<int:id>', methods=['GET'])
-def doc_out(id):
-    rentid = int(request.args.get('rentid', "1", type=str))
-    doc_out = get_doc_out(id)
-
-    return render_template('doc_out.html', doc_out=doc_out, rentid=rentid)
+    return render_template('docfile_view.html', docfile=docfile, rentid=rentid)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -169,6 +131,29 @@ def external_rent(id):
     externalrent = get_externalrent(id)
 
     return render_template('external_rent.html', externalrent=externalrent)
+
+
+@bp.route('/formletter/<int:id>', methods=['GET', 'POST'])
+@login_required
+def formletter(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_formletter(id, action)
+        return redirect('/formletter/{}?action=view'.format(id_))
+    formletter = get_formletter(id)
+    if not session['doc_types']:
+        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
+    if not session['templates']:
+        session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
+
+    return render_template('formletter.html', action=action, formletter=formletter)
+
+
+@bp.route('/formletters', methods=['GET'])
+def formletters():
+    formletters = get_formletters("normal")
+
+    return render_template('formletters.html', formletters=formletters)
 
 
 @bp.route('/headrents', methods=['GET', 'POST'])
@@ -315,9 +300,9 @@ def loan_statement(id):
 @login_required
 def mail_dialog(id):
     action = request.args.get('action', "normal", type=str)
-    docs = get_docs(action)
+    formletters = get_formletters(action)
 
-    return render_template('mail_dialog.html', action=action, docs=docs, rent_id = id)
+    return render_template('mail_dialog.html', action=action, formletters=formletters, rent_id = id)
 
 
 @bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
@@ -329,12 +314,12 @@ def mail_edit(id):
         mailaddr = request.form['mailaddr']
         mailaddr = mailaddr.split(", ")
         print(request.form)
-        doc_id = id
+        formletter_id = id
         rent_id = request.form['rent_id']
-        subject, part1, part2, part3, rentobj, doc, addressdata, leasedata = writeMail(rent_id, 0, doc_id, action)
+        subject, part1, block, bold, rentobj, formletter, addressdata, leasedata = writeMail(rent_id, 0, formletter_id, action)
 
-        return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, part2=part2,
-                                   part3=part3, rentobj=rentobj, doc=doc, addressdata=addressdata,
+        return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, block=block,
+                                   bold=bold, rentobj=rentobj, formletter=formletter, addressdata=addressdata,
                                    leasedata=leasedata, mailaddr=mailaddr, method=method)
 
 
@@ -501,6 +486,6 @@ def rent_object(id):
 def save_html():
     item = request.args.get('item', "doc_out", type=str)
     if request.method == "POST":
-        id = post_html(item)
+        id = post_docfile(item)
 
         return redirect('/rent_object/{}'.format(id))
