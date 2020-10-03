@@ -42,21 +42,27 @@ def post_charge(id, action):
     return id_
 
 
-def post_docfile(item):
-    docfile = Docfile()
+def post_docfile(id):
+    if id == 0:
+        docfile = Docfile()
+    else:
+        docfile = Docfile.query.get(id)
     if request.form['rentcode'] and request.form['rentcode'] != "":
         rentcode = request.form['rentcode']
         docfile.rent_id = \
             Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
-    docfile.doc_date = request.form['doc_date']
-    doc_type = request.form['doc_type']
+    docfile.docfile_date = request.form.get('docfile_date')
+    docfile.summary = request.form.get('summary')
+    docfile.docfile_text = request.form['xinput'].replace("£", "&pound;")
+    doctype = request.form.get('doc_type')
     docfile.doctype_id = \
-        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doc_type).one()[0]
+        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
+    docfile.out_in = 0 if request.form.get('out_in') == "in" else 1
     db.session.add(docfile)
     db.session.commit()
-    id_ = docfile.rent_id
-    source_html = docfile.doc_text
-    output_filename = "docfile-{}.pdf".format(str(request.form['doc_date']))
+    id_ = docfile.id
+    source_html = docfile.docfile_text
+    output_filename = "docfile-{}.pdf".format(str(request.form['docfile_date']))
     convert_html_to_pdf(source_html, output_filename)
 
     return id_
@@ -70,18 +76,20 @@ def post_formletter(id, action):
     formletter.code = request.form["code"]
     formletter.summary = request.form["summary"]
     formletter.subject = request.form["subject"]
-    formletter.part1 = request.form["block"]
-    type = request.form["doc_type"]
+    formletter.block = request.form["block"]
+    formletter.bold = request.form["bold"]
+    doctype = request.form.get("doc_type")
     formletter.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter \
-            (Typedoc.desc == type).one()[0]
-    template = request.form["template"]
+            (Typedoc.desc == doctype).one()[0]
+    template = request.form.get("template")
     formletter.template_id = \
         Template.query.with_entities(Template.id).filter \
             (Template.code == template).one()[0]
     db.session.add(formletter)
     db.session.commit()
     id_ = formletter.id
+
     return id_
 
 

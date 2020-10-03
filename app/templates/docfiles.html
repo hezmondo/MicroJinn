@@ -1,50 +1,61 @@
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 <form method="POST" id="target">
-    {% if action == "view" %}
     <div class="form-group row">
+    {% if rentid == 0 %}
         <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
+            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="doc_code" placeholder="Formletter code">
+            <input type="text" class="form-control" name="summary" placeholder="summary">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="doc_type" placeholder="Formletter type">
+            <input type="text" class="form-control" name="docfile_text" placeholder="docfile text">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="doc_text" placeholder="Formletter text">
+            {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=session['doc_types'][0]) }}
+        </div>
+        <div class="col-md-2">
+            {{ widgets.combobox(name="out_in", items=outins, item_selected=dfoutin) }}
         </div>
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-primary">Search</button>
         </div>
-    </div>
+  {% else %}
+        <div class="col-md-3">
+            <a href="/rent_object/{{ rentid }}" class="btn btn-block btn-primary" role="button">return to rent</a>
+        </div>
+        <div class="col-md-3">
+            <a href="/docfiles/0" class="btn btn-block btn-primary" role="button">view docfiles for all rents</a>
+        </div>
   {% endif %}
+    </div>
   <div class="form-group row">
     </div>
     <div class="table-fixed">
-        <table class="table" id="docs_out">
+        <table class="table" id="docfiles">
             <thead>
             <tr>
-                <th style="width: 10.00%">Docfile id</th>
-                <th style="width: 10.00%">Date</th>
-                <th style="width: 20.00%">Summary</th>
-                <th style="width: 10.00%">Rentcode</th>
-                <th style="width: 10.00%">Doctype</th>
+                <th style="width: 10.00%">date</th>
+                <th style="width: 10.00%">rentcode</th>
+                <th style="width: 50.00%">summary</th>
+                <th style="width: 10.00%">doctype</th>
+                <th style="width: 10.00%">out or in</th>
                 <th style="width: 10.00%">action</th>
             </tr>
             </thead>
             <tbody>
-            {% for item in docs_out %}
+            {% for item in docfiles %}
             <tr id="{{ item.id }}">
-                <td style="width: 10.00%"> {{ item.id }}</td>
-                <td style="width: 10.00%"> {{ item.doc_date }}</td>
-                <td style="width: 10.00%"> {{ item.summary }}</td>
+                <td style="width: 10.00%"> {{ item.docfile_date }}</td>
                 <td style="width: 10.00%"> {{ item.rentcode }}</td>
-                <td style="width: 10.00%"> {{ item. }}</td>
+                <td style="width: 50.00%"> {{ item.summary }}</td>
                 <td style="width: 10.00%"> {{ item.desc }}</td>
-                <td style="width: 10.00%"><a href="/doc_out/{{ item.id }}?rentid={{ rentid }}">View</a></td>
+                <td style="width: 10.00%"> {{ item.out_in }}</td>
+                <td style="width: 10.00%"><a href="/docfile/{{ item.id }}?action=view">view</a></td>
             </tr>
             {% endfor %}
             </tbody>

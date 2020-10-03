@@ -55,12 +55,12 @@ class Docfile(db.Model):
     __tablename__ = 'docfile'
 
     id = db.Column(db.Integer, primary_key=True)
-    doc_date = db.Column(db.Date)
+    docfile_date = db.Column(db.Date)
     summary = db.Column(db.String(90))
-    doc_text = db.Column(db.Text)
+    docfile_text = db.Column(db.Text)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    out_in = db.Column(db.Boolean, nullable=False)
+    out_in = db.Column(db.Integer, nullable=False)
     digidoc = db.Column(db.LargeBinary, nullable=True)
 
 
@@ -128,10 +128,9 @@ class Formletter(db.Model):
     code = db.Column(db.String(30))
     summary = db.Column(db.String(60))
     subject = db.Column(db.String(150))
-    part1 = db.Column(db.String(3000))
-    block = db.Column(db.String(4500))
+    # block = db.Column(db.String(4500))
+    block = db.Column(db.Text, nullable=True)
     bold = db.Column(db.String(900))
-    # block = db.Column(db.Text)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
@@ -408,7 +407,7 @@ class Rent(db.Model):
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
-    doc_out_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
+    docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
 
     def __repr__(self):

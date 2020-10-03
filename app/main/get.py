@@ -72,35 +72,57 @@ def get_charge(id):
     return charge, chargedescs
 
 
-def get_docfile(id):
-    docfile = Docfile.query.filter(Docfile.id == id).one_or_none()
+def get_docfile(id, action):
+    if action == "new":
+        rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == id).one()[0]
+        docfile = {
+            'id': 0,
+            'rentid': id,
+            'rentcode': rentcode,
+            'desc': "Letter",
+            'summary': "letter in",
+            'out_in': 0
+        }
+        dfoutin = "in"
+    else:
+        docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
+                       Docfile.docfile_text, Docfile.docfile_date, Rent.rentcode, Rent.id.label("rentid"),
+                                                                       Typedoc.desc) \
+                    .filter(Docfile.id == id).one_or_none()
+        dfoutin = "out" if docfile.out_in == 1 else 0
 
-    return docfile
+    return docfile, dfoutin
 
 
 def get_docfiles(rentid):
     docfile_filter = []
+    dfoutin = "all"
     if request.method == "POST":
         rcd = request.form.get("rentcode") or ""
-        dcd = request.form.get("doc_code") or ""
-        dcty = request.form.get("doc_type") or ""
-        dctx = request.form.get("doc_text") or ""
-        dcout = request.form.get("doc_out") or ""
+        dfsum = request.form.get("summary") or ""
+        dftx = request.form.get("docfile_text") or ""
+        dfty = request.form.get("doc_type") or ""
+        dfoutin = request.form.get("out_in") or ""
         if rcd and rcd != "":
             docfile_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
-        if dcd and dcd != "":
-            docfile_filter.append(Formletter.code.ilike('%{}%'.format(dcd)))
-        if dcty and dcty != "":
-            docfile_filter.append(Typedoc.desc.ilike('%{}%'.format(dcty)))
-        if dctx and dctx != "":
-            docfile_filter.append(Docfile.doc_text.ilike('%{}%'.format(dctx)))
+        if dfsum and dfsum != "":
+            docfile_filter.append(Docfile.summary.ilike('%{}%'.format(dfsum)))
+        if dftx and dftx != "":
+            docfile_filter.append(Docfile.docfile_text.ilike('%{}%'.format(dftx)))
+        if dfty and dfty != "":
+            docfile_filter.append(Typedoc.desc.ilike('%{}%'.format(dfty)))
+        if dfoutin == "out":
+            docfile_filter.append(Docfile.out_in == 1)
+        elif dfoutin == "in":
+            docfile_filter.append(Docfile.out_in == 0)
     if rentid > 0:
-        docfile_filter.append(Docfile.rent_id == id)
+        docfile_filter.append(Docfile.rent_id == rentid)
 
-    docfiles = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.doc_date,
-                Docfile.doc_text, Typedoc.desc, Rent.rentcode).filter(*docfile_filter).all()
+    docfiles = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.docfile_date,
+                Docfile.summary, Docfile.docfile_text, Typedoc.desc, Docfile.out_in, Rent.rentcode) \
+        .filter(*docfile_filter).all()
 
-    return docfiles
+    return docfiles, dfoutin
 
 
 def get_emailaccounts():
@@ -134,8 +156,9 @@ def get_formletter(id):
         db.session.add(user)
         db.session.commit()
 
-    formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code, Formletter.summary, Formletter.subject, Formletter.part1,
-                                                                      Formletter.block, Formletter.bold, Typedoc.desc, Template.desc.label("template")) \
+    formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code,
+                                 Formletter.summary, Formletter.subject, Formletter.block, Formletter.bold,
+                                 Typedoc.desc, Template.desc.label("template")) \
            .filter(Formletter.id == id).one_or_none()
 
     return formletter

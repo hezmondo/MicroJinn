@@ -1,6 +1,17 @@
 /* import the necessary Bootstrap files
 @import "bootstrap";
  */
+.navbar-nav li:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown:hover>.dropdown-menu {
+  display: block;
+}
+
+.dropdown>.dropdown-toggle:active {
+  /*Without this, clicking will make it sticky*/
+    pointer-events: none;
+}
 #xalloc {
     display: none;
 }

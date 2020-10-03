@@ -81,17 +81,17 @@ def writeMail(rent_id, income_id, formletter_id, type):
     else:
         leasedata = None
 
+    summary = formletter.summary
     subject = formletter.subject
-    part1 = formletter.part1 if formletter.part1 else ""
     block = formletter.block if formletter.block else ""
     bold = formletter.bold if formletter.bold else ""
 
     subject = doReplace(word_variables, subject)
-    part1 = doReplace(word_variables, part1)
+    summary = doReplace(word_variables, summary)
     block = doReplace(word_variables, block)
     bold = doReplace(word_variables, bold)
 
-    return subject, part1, block, bold, rentobj, formletter, addressdata, leasedata
+    return summary, subject, block, bold, rentobj, formletter, addressdata, leasedata
 
 
 def doReplace(dict, clause):

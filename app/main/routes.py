@@ -34,7 +34,7 @@ def agent(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id = post_agent(id, action)
-        return redirect('/agent/{}'.format(id))
+        action = "view"
     agent = get_agent(id)
 
     return render_template('agent.html', action=action, agent=agent)
@@ -75,28 +75,25 @@ def delete_item(id):
     delete_record(id, item)
 
 
-@bp.route('/docfiles/<int:id>', methods=['GET'])
+@bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
+@login_required
+def docfile(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_docfile(id)
+        return redirect('/docfile/{}?action=view'.format(id_))
+
+    docfile, dfoutin = get_docfile(id, action)
+
+    return render_template('docfile.html', action=action, docfile=docfile, dfoutin=dfoutin)
+
+
+@bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
 def docfiles(rentid):
-    docfiles = get_docfiles(rentid)
+    docfiles, dfoutin = get_docfiles(rentid)
+    outins = ["all", "out", "in"]
 
-    return render_template('docfiles.html', docfiles=docfiles)
-
-
-@bp.route('/docfile_save/<string:rentcode>', methods=['GET', 'POST'])
-def docfile_save(rentcode):
-    if not session['doc_types']:
-        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    rent_code = rentcode
-
-    return render_template('mergedocs/docfile_save.html', rent_code=rent_code)
-
-
-@bp.route('/docfile_view/<int:id>', methods=['GET'])
-def docfile_view(id):
-    rentid = int(request.args.get('rentid', "1", type=str))
-    docfile = get_docfile(id)
-
-    return render_template('docfile_view.html', docfile=docfile, rentid=rentid)
+    return render_template('docfiles.html', rentid=rentid, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -141,12 +138,9 @@ def formletter(id):
         id_ = post_formletter(id, action)
         return redirect('/formletter/{}?action=view'.format(id_))
     formletter = get_formletter(id)
-    if not session['doc_types']:
-        session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    if not session['templates']:
-        session['templates'] = [value for (value,) in Template.query.with_entities(Template.code).all()]
+    templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
 
-    return render_template('formletter.html', action=action, formletter=formletter)
+    return render_template('formletter.html', action=action, formletter=formletter, templates=templates)
 
 
 @bp.route('/formletters', methods=['GET'])
@@ -202,8 +196,10 @@ def income_post(id):
 @bp.route('/index/', methods=['GET', 'POST'])
 @login_required
 def index():
+    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     action = request.args.get('action', "view", type=str)
     agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects_basic(action)
+
 
     return render_template('home.html', agentdetails=agentdetails, propaddr=propaddr,
                            rentcode=rentcode, source=source, tenantname=tenantname, rentprops=rentprops)
@@ -222,6 +218,7 @@ def landlord(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id_ = post_landlord(id, action)
+
         return redirect('/landlord/{}?action=view'.format(id_))
 
     landlord, managers, emailaccs, bankaccs = get_landlord(id)
@@ -236,6 +233,7 @@ def lease(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id_ = post_lease(id, action)
+
         return redirect('/lease/{}?action=view'.format(id_))
 
     lease, uplift_types = get_lease(id)
@@ -247,6 +245,7 @@ def lease(id):
 def load_query():
     if request.method == "POST":
         jqname = request.form["jqname"]
+
         return redirect("/queries/?name={}".format(jqname))
 
     jqueries = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
@@ -318,7 +317,7 @@ def mail_edit(id):
         rent_id = request.form['rent_id']
         subject, part1, block, bold, rentobj, formletter, addressdata, leasedata = writeMail(rent_id, 0, formletter_id, action)
 
-        return render_template('mergedocs/LTX.html', action=action, subject=subject, part1=part1, block=block,
+        return render_template('mergedocs/LTS.html', action=action, subject=subject, part1=part1, block=block,
                                    bold=bold, rentobj=rentobj, formletter=formletter, addressdata=addressdata,
                                    leasedata=leasedata, mailaddr=mailaddr, method=method)
 
@@ -484,7 +483,7 @@ def rent_object(id):
 
 @bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
-    item = request.args.get('item', "doc_out", type=str)
+    item = request.args.get('item', "docfile_out", type=str)
     if request.method == "POST":
         id = post_docfile(item)
 

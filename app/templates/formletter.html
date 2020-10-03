@@ -19,28 +19,24 @@
             </div>
             <div class="col-md-2">
                 <label for="template">Template:</label>
-                {{ widgets.combobox(name="template", items=session['templates'], item_selected=formletter.template) }}
+                {{ widgets.combobox(name="template", items=templates, item_selected=formletter.template) }}
             </div>
 		</div>
 		<div class="form-group row">
-			<div class="col-md-12">
+			<div class="col-md-6">
 				<label for="subject">Subject:</label>
 				<input type="text" class="form-control" name="subject" value="{{ formletter.subject }}">
+			</div>
+			<div class="col-md-6">
+				<label for="bold">bold:</label>
+				<input type="text" class="form-control" name="bold" >{{ formletter.bold }}</textarea>
 			</div>
 		</div>
 		<div class="form-group row">
 			<div class="col-md-12">
 				<label for="block">Block:</label>
-				<textarea class="form-control" rows="16" name="block" >{{ formletter.block }}</textarea>
+				<textarea class="form-control" rows="24" name="block" >{{ formletter.block }}</textarea>
 			</div>
-		</div>
-		<div class="form-group row">
-			<div class="col-md-12">
-				<label for="part1">Part 1:</label>
-				<textarea class="form-control" rows="8" name="part1" >{{ formletter.part1 }}</textarea>
-			</div>
-		</div>
-		<div class="form-group row">
 		</div>
 		<div class="form-group row">
 		</div>
