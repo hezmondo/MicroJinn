@@ -42,7 +42,7 @@
             <input type="text" class="form-control" name="rentcode" value = "{{ docfile.rentcode }}">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control" name="summary" value="{{ docfile.summary }}">
+            <input type="text" class="form-control" name="dfsummary" value="{{ docfile.summary }}">
         </div>
 		<div class="col-md-2">
 			{{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=docfile.desc) }}

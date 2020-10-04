@@ -1,54 +1,47 @@
 <!-- /templates/leases.html  -->
 {% extends 'base.html' %}
 
-{% import 'widgets.html' as widgets %}
-
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="rentcode">
-        </div>
-            <div class="col-md-2">
-                {{ widgets.combobox(name="doc_type", items=uplift_types, item_selected=session['uplift_types'][0]) }}
-            </div>
-        <div class="col-md-2">
-            <label for="upliftdate">uplift date:</label>
-            <input type="text" class="form-control" name="upliftdate" value="{{ leases.upliftdate }}">
-        </div>
-    </div>
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">search</button>
-        </div>
-        <div class="col-md-2">
-            <a href="/lease/0?action=new" class="btn btn-block btn-primary" role="button">add new lease</a>
-        </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-block btn-success">Search</button>
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="rentcode" value="{{ rcd }}">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="uplift_type" value="{{ ult }}">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" name="upliftdays" value="{{ uld }}">
+            </div>
+            <div class="col-md-4">
+                enter number of days ahead to filter for uplift date:
+            </div>
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="agents">
+    <table class="table" id="leases">
         <thead>
-        <tr>
-            <th style="width: 10.00%">rentcode</th>
-            <th style="width: 10.00%">uplift date</th>
-            <th style="width: 10.00%">unexpired term</th>
-            <th style="width: 50.00%">info</th>
-            <th style="width: 10.00%">spare</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
+            <tr>
+                <th style="width: 10.00%">rentcode</th>
+                <th style="width: 12.00%">uplift date</th>
+                <th style="width: 10.00%">unexpired</th>
+                <th style="width: 60.00%">info</th>
+                <th style="width: 8.00%">action</th>
+            </tr>
         </thead>
         <tbody>
-        {% for item in leases %}
-        <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.rentcode }}</td>
-            <td style="width: 10.00%">{{ item.uplift_date }}</td>
-            <td style="width: 10.00%"> {{ item.unexpired }}</td>
-            <td style="width: 50.00%"> {{ item.info }}</td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 10.00%"><a href="/lease/{{ item.id }}">view</a></td>
-        </tr>
-        {% endfor %}
+            {% for item in leases %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 10.00%">{{ item.rentcode }}</td>
+                    <td style="width: 12.00%">{{ item.upliftdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 10.00%"> {{ item.unexpired }}</td>
+                    <td style="width: 60.00%"> {{ item.info }}</td>
+                    <td style="width: 8.00%"><a href="/lease/{{ item.id }}">view</a></td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>

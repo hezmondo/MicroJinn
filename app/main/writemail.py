@@ -7,7 +7,7 @@ from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.get import get_formletter, get_leasedata, getmaildata, getrentobj_main
 from app.main.functions import htmlSpecialMarkDown
 
-def writeMail(rent_id, income_id, formletter_id, type):
+def writeMail(rent_id, income_id, formletter_id, action):
     # Get rent/prop/income details and output mail (letter/payrequest/account/email/invoice/rem adv)
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
@@ -52,7 +52,7 @@ def writeMail(rent_id, income_id, formletter_id, type):
         '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
         '#today#': dateToStr(datetime.date.today())
     }
-    if type == "lease":
+    if action == "lease":
         fh_rate = request.form['fh_rate']
         gr_rate = request.form['gr_rate']
         new_gr_a = request.form['new_gr_a']
@@ -81,17 +81,17 @@ def writeMail(rent_id, income_id, formletter_id, type):
     else:
         leasedata = None
 
-    summary = formletter.summary
     subject = formletter.subject
     block = formletter.block if formletter.block else ""
     bold = formletter.bold if formletter.bold else ""
+    doctype = formletter.desc
+    dcode = formletter.code
 
     subject = doReplace(word_variables, subject)
-    summary = doReplace(word_variables, summary)
     block = doReplace(word_variables, block)
     bold = doReplace(word_variables, bold)
 
-    return summary, subject, block, bold, rentobj, formletter, addressdata, leasedata
+    return addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode
 
 
 def doReplace(dict, clause):

@@ -47,15 +47,15 @@ def post_docfile(id):
         # new docfile:
         docfile = Docfile()
     else:
-        # new docfile:
+        # existing docfile:
         docfile = Docfile.query.get(id)
-    if request.form['rentcode'] and request.form['rentcode'] != "":
-        rentcode = request.form['rentcode']
+    if request.form.get('rentcode') and request.form.get('rentcode') != "":
+        rentcode = request.form.get('rentcode')
         docfile.rent_id = \
             Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
     docfile.docfile_date = request.form.get('docfile_date')
-    docfile.summary = request.form.get('summary')
-    docfile.docfile_text = request.form['xinput'].replace("£", "&pound;")
+    docfile.summary = request.form.get('dfsummary')
+    docfile.docfile_text = request.form.get('xinput').replace("£", "&pound;")
     doctype = request.form.get('doc_type')
     docfile.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]

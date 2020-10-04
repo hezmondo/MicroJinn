@@ -3,53 +3,52 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="/save_html?item=docfile_out">
+<form method="POST" action="/save_html">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <button id="savehtml" class="btn btn-block btn-success">save html</button>
+        </div>
+    </div>
 	<div id="doc_html" contenteditable="true">
-		<br />
 	    {% if method == "letter" %}
-		<div class="font-size-large" align="center">
-			<b>{{ rentobj.managername }}</b>
-		</div>
-		<div class="font-size-small" align="center">
-			{{ addressdata.manageraddr }}
-			<br />
-			{{ addressdata.manageraddr2 }}
-			<br />
-		</div>
-		<div class="font-size-medium" align="right">
-			Our Ref: {{ rentobj.rentcode }}
-			<br />
-			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
-		</div>
-		<div class="font-size-medium" align="left">
-			{% for item in mailaddr %}
-				{{ item }}
+			<div class="font-size-large" align="center">
+				<b>{{ rentobj.managername }}</b>
+			</div>
+			<div class="font-size-small" align="center">
+				{{ addressdata.manageraddr }}
 				<br />
-			{% endfor %}
-			<br />
-			<br />
-			Dear {{ rentobj.tenantname }}
-		</div>
+				{{ addressdata.manageraddr2 }}
+				<br />
+			</div>
+			<div class="font-size-medium" align="right">
+				Our Ref: {{ rentobj.rentcode }}
+				<br />
+				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
+			</div>
+			<div class="font-size-medium" align="left">
+				{% for item in mailaddr %}
+					{{ item }}
+					<br />
+				{% endfor %}
+				<br />
+				<br />
+				Dear {{ rentobj.tenantname }}
+			</div>
 	    {% else %}
-		<div class="font-size-medium" align="left">
-			<br />
-			Our Ref: {{ rentobj.rentcode }}
-			<br />
-			<br />
-			Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
-			<br />
-			<br />
-			Dear {{ rentobj.tenantname }}
-		</div>
+			<div class="font-size-medium" align="left">
+				Our Ref: {{ rentobj.rentcode }}
+				<br />
+				<br />
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
+				<br />
+				<br />
+				Dear {{ rentobj.tenantname }}
+			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
 			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
 			<br />
-			{{ widgets.linebreaks_for_string(part1) }}
-			<br />
-			{{ widgets.linebreaks_for_string(part2) }}
-				<br />
-			{{ widgets.linebreaks_for_string(part3) }}
+			{{ widgets.linebreaks_for_string(block) }}
 			<br />
 			<br />
 			Yours sincerely
@@ -66,17 +65,20 @@
         </div>
     </div>
     <div class="form-group row">
-		<div class="col-md-3">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rentobj.id }}">
+		<div class="col-md-2">
+            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rentobj.rentcode }}">
         </div>
-		<div class="col-md-3">
-            <input type="hidden" id="doc_id" name="doc_id" value = "{{ doc.id }}">
+		<div class="col-md-2">
+            <input type="hidden" id="docfile_date" name="docfile_date" value = "{{ today_date }}">
         </div>
-		<div class="col-md-3">
-            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
+		<div class="col-md-2">
+            <input type="hidden" id="dfsummary" name="dfsummary" value = "{{ dfsummary }}">
         </div>
-        <div class="col-md-3">
-            <button id="savehtml" class="btn btn-block btn-success">Save html</button>
+		<div class="col-md-2">
+            <input type="hidden" id="doc_type" name="doc_type" value = "{{ doctype }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="out_in" name="out_in" value = "out">
         </div>
     </div>
 </form>

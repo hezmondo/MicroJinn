@@ -1,26 +1,20 @@
+<!-- /templates/charges.html  -->
 {% extends 'base.html' %}
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
+    <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="Rent code">
+            <button type="submit" class="btn btn-block btn-primary">search</button>
         </div>
         <div class="col-md-4">
             <input type="text" class="form-control" name="chargedetails" placeholder="Charge details">
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-primary">Search</button>
+            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
         </div>
     </div>
 </form>
-<div class="container">
-    <div class="row voffset2">
-        <div class="col-lg-12">
-            <h4 class="text-center">Charges:</h4>
-        </div>
-    </div>
-</div>
 <div class="table-fixed">
     <table class="table" id="charges">
         <thead>
@@ -42,7 +36,7 @@
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
             <td style="width: 25.00%"> {{ charge.chargedetails }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
-            <td style="width: 5.00%"><a href="/charge/{{ charge.id }}">View</a></td>
+            <td style="width: 5.00%"><a href="/charge/{{ charge.id }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

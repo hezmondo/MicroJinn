@@ -7,7 +7,7 @@ from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docfile, get_docfiles, \
     get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, get_formletters, get_headrents, \
     get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
-    get_landlords, get_lease, get_loan, get_loan_options, get_loans, \
+    get_landlords, get_lease, get_loan, get_leases, get_loan_options, get_loans, \
     get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
     get_rentobjects_advanced, get_rentobjects_basic
@@ -207,13 +207,6 @@ def index():
                            rentcode=rentcode, source=source, tenantname=tenantname, rentprops=rentprops)
 
 
-@bp.route('/landlords', methods=['GET'])
-def landlords():
-    landlords = get_landlords()
-
-    return render_template('landlords.html', landlords=landlords)
-
-
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
 @login_required
 def landlord(id):
@@ -229,6 +222,13 @@ def landlord(id):
                            managers=managers, emailaccs=emailaccs)
 
 
+@bp.route('/landlords', methods=['GET'])
+def landlords():
+    landlords = get_landlords()
+
+    return render_template('landlords.html', landlords=landlords)
+
+
 @bp.route('/lease/<int:id>', methods=['GET', 'POST'])
 @login_required
 def lease(id):
@@ -241,6 +241,13 @@ def lease(id):
     lease, uplift_types = get_lease(id)
 
     return render_template('lease.html', action=action, lease=lease, uplift_types=uplift_types)
+
+
+@bp.route('/leases', methods=['GET', 'POST'])
+def leases():
+    leases, uplift_types, rcd, uld, ult = get_leases()
+
+    return render_template('leases.html', leases=leases, uplift_types=uplift_types, rcd=rcd, uld=uld, ult=ult)
 
 
 @bp.route('/load_query', methods=['GET', 'POST'])
@@ -309,19 +316,20 @@ def mail_dialog(id):
 @bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_edit(id):
-    action = request.args.get('action', "normal", type=str)
     method = request.args.get('method', "email", type=str)
+    action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
-        mailaddr = request.form['mailaddr']
-        mailaddr = mailaddr.split(", ")
-        print(request.form)
+        # print(request.form)
         formletter_id = id
         rent_id = request.form['rent_id']
-        subject, part1, block, bold, rentobj, formletter, addressdata, leasedata = writeMail(rent_id, 0, formletter_id, action)
+        addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
+        mailaddr = request.form.get('mailaddr')
+        dfsummary = dcode + "-" + method + "-" + mailaddr[0:25]
+        mailaddr = mailaddr.split(", ")
 
-        return render_template('mergedocs/LTS.html', action=action, subject=subject, part1=part1, block=block,
-                                   bold=bold, rentobj=rentobj, formletter=formletter, addressdata=addressdata,
-                                   leasedata=leasedata, mailaddr=mailaddr, method=method)
+        return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
+                               dfsummary=dfsummary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                               method=method, rentobj=rentobj, subject=subject)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -485,8 +493,7 @@ def rent_object(id):
 
 @bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
-    item = request.args.get('item', "docfile_out", type=str)
     if request.method == "POST":
-        id = post_docfile(item)
+        id_ = post_docfile(0)
 
-        return redirect('/rent_object/{}'.format(id))
+        return redirect('/docfile/{}?action=view'.format(id_))
