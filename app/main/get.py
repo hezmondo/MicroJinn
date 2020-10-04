@@ -74,6 +74,7 @@ def get_charge(id):
 
 def get_docfile(id, action):
     if action == "new":
+        # new docfile has to be attached to an existing rent, so incoming id in this case is rent id:
         rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == id).one()[0]
         docfile = {
             'id': 0,
@@ -85,10 +86,12 @@ def get_docfile(id, action):
         }
         dfoutin = "in"
     else:
+        # existing docfile, so incoming id is docfile id:
         docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
                        Docfile.docfile_text, Docfile.docfile_date, Rent.rentcode, Rent.id.label("rentid"),
                                                                        Typedoc.desc) \
                     .filter(Docfile.id == id).one_or_none()
+        # messy - must be better solution:
         dfoutin = "out" if docfile.out_in == 1 else 0
 
     return docfile, dfoutin

@@ -78,12 +78,14 @@ def delete_item(id):
 @bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
 @login_required
 def docfile(id):
+    # incoming id is docfile id for existing docfile and rent id for new docfile! -see guide
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id_ = post_docfile(id)
         return redirect('/docfile/{}?action=view'.format(id_))
 
     docfile, dfoutin = get_docfile(id, action)
+    # this id is docfile id for existing docfile and rent id for new docfile!
 
     return render_template('docfile.html', action=action, docfile=docfile, dfoutin=dfoutin)
 

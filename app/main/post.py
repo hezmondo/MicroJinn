@@ -44,8 +44,10 @@ def post_charge(id, action):
 
 def post_docfile(id):
     if id == 0:
+        # new docfile:
         docfile = Docfile()
     else:
+        # new docfile:
         docfile = Docfile.query.get(id)
     if request.form['rentcode'] and request.form['rentcode'] != "":
         rentcode = request.form['rentcode']
@@ -355,9 +357,11 @@ def post_rental(id, action):
 
 def postrentobj(id):
     if id > 0:
+        # existing rent:
         rent = Rent.query.get(id)
         agent = Agent.query.filter(Agent.id == rent.agent_id).one_or_none()
     else:
+        # new rent:
         rent = Rent()
         agent = Agent()
 
@@ -369,7 +373,7 @@ def postrentobj(id):
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
     rent.arrears = request.form["arrears"]
 
-    # we will write code later to generate datecode from lastrentdate!:
+    # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form["datecode"]
 
     deedtype = request.form["deedtype"]

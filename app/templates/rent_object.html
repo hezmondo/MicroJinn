@@ -1,3 +1,4 @@
+<!-- /templates/rent_object.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -6,15 +7,15 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rentcode">Rent code:</label>
+            <label for="rentcode">rent code:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ rentobj.rentcode }}">
         </div>
         <div class="col-md-5">
-            <label for="landlord">Landlord:</label>
+            <label for="landlord">landlord:</label>
             {{ widgets.combobox(name="landlord", items=landlords, item_selected=rentobj.landlordname) }}
         </div>
         <div class="col-md-5">
-            <label for="tenant">Tenant name:</label>
+            <label for="tenant">tenant name:</label>
             <input type="text" class="form-control" name="tenantname" value="{{ rentobj.tenantname }}">
         </div>
     </div>
@@ -22,9 +23,9 @@
         <table class="table" id="properties">
             <thead>
             <tr>
-                <th style="width: 75.00%">Property</th>
-                <th style="width: 15.00%">Property type</th>
-                <th style="width: 10.00%">Action</th>
+                <th style="width: 75.00%">property</th>
+                <th style="width: 15.00%">property type</th>
+                <th style="width: 10.00%">action</th>
             </tr>
             </thead>
             <tbody>
@@ -32,9 +33,9 @@
             <tr id="{{ item.id }}">
                 <td style="width: 75.00%">{{ item.propaddr }}</td>
                 <td style="width: 15.00%"> {{ item.proptypedet }}</td>
-                <td style="width: 10.00%"><a href="/property/{{ item.id }}?action=edit">Edit</a></td>
+                <td style="width: 10.00%"><a href="/property/{{ item.id }}?action=edit">view</a></td>
             </tr>
-            {% endfor %}
+        {% endfor %}
             </tbody>
         </table>
     </div>
@@ -42,116 +43,101 @@
     </div>
     <div class="form-group row">
         <div class="col-md-8">
-            <label for="note">Notes:</label>
+            <label for="note">notes:</label>
             <input type="text" class="form-control" name="note" value="{{ rentobj.note }}">
         </div>
         <div class="col-md-4">
-            <label for="email">Email:</label>
+            <label for="email">email:</label>
             <input type="text" class="form-control" name="email" value="{{ rentobj.email }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
-            <label for="mailto">Mail to:</label>
+            <label for="mailto">mail to:</label>
             {{ widgets.combobox(name="mailto", items=mailtodets, item_selected=rentobj.mailtodet) }}
         </div>
         <div class="col-md-8">
-            <label for="agent">Agent:</label>
+            <label for="agent">agent:</label>
             <input type="text" class="form-control" name="agent" value="{{ rentobj.agdetails }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rentpa">Rent pa:</label>
+            <label for="rentpa">rent pa:</label>
             <input type="text" class="form-control" name="rentpa" value="{{ rentobj.rentpa }}">
         </div>
         <div class="col-md-2">
-            <label for="arrears">Rent arrears:</label>
+            <label for="arrears">rent arrears:</label>
             <input type="text" class="form-control" name="arrears" value="{{ rentobj.arrears }}">
         </div>
         <div class="col-md-2">
-            <label for="totcharges">Total charges:</label>
+            <label for="totcharges">total charges:</label>
             <input type="text" class="form-control" name="totcharges" value="{{ rentobj.totcharges }}">
         </div>
         <div class="col-md-3">
-            <label for="lastrentdate">Last rent date:</label>
+            <label for="lastrentdate">last rent date:</label>
             <input type="date" class="form-control" name="lastrentdate"
                    value="{{ rentobj.lastrentdate }}">
         </div>
         <div class="col-md-3">
-            <label for="nextrentdate">Next rent date:</label>
+            <label for="nextrentdate">next rent date:</label>
             <input type="date" class="form-control" name="nextrentdate"
                    value="{{ rentobj.nextrentdate }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="frequency">Frequency:</label>
+            <label for="frequency">frequency:</label>
             {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rentobj.freqdet) }}
         </div>
         <div class="form-group col-md-2">
-            <label for="actype">Actype:</label>
+            <label for="actype">account type:</label>
             {{ widgets.combobox(name="actype", items=actypedets, item_selected=rentobj.actypedet) }}
         </div>
         <div class="col-md-3">
-            <label for="advarr">Advance/Arrears:</label>
+            <label for="advarr">advance or arrears:</label>
             {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rentobj.advarrdet) }}
         </div>
         <div class="form-group col-md-3">
-            <label for="datecode">DateCode:</label>
+            <label for="datecode">date code:</label>
             <input type="text" class="form-control" name="datecode" value="{{ rentobj.datecode }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="tenure">Tenure:</label>
+            <label for="tenure">tenure:</label>
             {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=rentobj.tenuredet) }}
         </div>
         <div class="col-md-2">
-            <label for="source">Source:</label>
+            <label for="source">source:</label>
             <input type="text" class="form-control" name="source" value="{{ rentobj.source }}">
         </div>
         <div class="col-md-2">
-            <label for="deedtype">Deed type:</label>
+            <label for="deedtype">deed type:</label>
             {{ widgets.combobox(name="deedtype", items=deedcodes, item_selected=rentobj.deedcode) }}
         </div>
         <div class="col-md-2">
-            <label for="salegrade">Sale grade:</label>
+            <label for="salegrade">sale grade:</label>
             {{ widgets.combobox(name="salegrade", items=salegradedets, item_selected=rentobj.salegradedet) }}
         </div>
         <div class="col-md-2">
-            <label for="price">Price:</label>
+            <label for="price">price:</label>
             <input type="text" class="form-control" name="price" value="{{ rentobj.price }}">
         </div>
         <div class="col-md-2">
-            <label for="status">Status:</label>
+            <label for="status">status:</label>
             {{ widgets.combobox(name="status", items=statusdets, item_selected=rentobj.statusdet) }}
         </div>
     </div>
     {% if action == "view" %}
     <div class="form-group row">
         <div class="col-md-2">
-            <a href="/rent_object/{{ rentobj.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this rent</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/mail_dialog/{{ rentobj.id }}" class="btn btn-block btn-primary" role="button">Mail this rent</a>
+            <a href="/rent_object/{{ rentobj.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit rent</a>
         </div>
         <div class="col-md-2">
             <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="docfilesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                docfiles for this rent
-              </button>
-              <div class="dropdown-menu" aria-labelledby="docfilesMenuButton">
-                <a class="dropdown-item" href="/docfiles/{{ rentobj.id }}">View docfiles for this rent</a>
-                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new mail out for this rent</a>
-                <a class="dropdown-item" href="/docfile/{{ rentobj.id }}?action=new">new docfile in for this rent</a>
-              </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="incomeMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                income for this rent
+              <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="incomeMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                income
               </button>
               <div class="dropdown-menu" aria-labelledby="incomeMenuButton">
                 <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">post income for this rent</a>
@@ -161,26 +147,63 @@
         </div>
         <div class="col-md-2">
             <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle" type="button" id="otherMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                other actions for this rent
+              <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="docfilesMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                docfiles
+              </button>
+              <div class="dropdown-menu" aria-labelledby="docfilesMenuButton">
+                <a class="dropdown-item" href="/docfiles/{{ rentobj.id }}">view docfiles for this rent</a>
+                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new docfile out for this rent</a>
+                <a class="dropdown-item" href="/docfile/{{ rentobj.id }}?action=new">new docfile in for this rent</a>
+                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new payrequest for this rent</a>
+                <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new s166 for this rent</a>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown" style="width:100%">
+              <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="chargeMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                charges
+              </button>
+              <div class="dropdown-menu" aria-labelledby="chargeMenuButton">
+                <a class="dropdown-item" href="/charges/{{ rentobj.id }}">view charges for this rent</a>
+                <a class="dropdown-item" href="/charge/{{ rentobj.id }}">add new charge for this rent</a>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="statementsMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                statements
+              </button>
+              <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
+                <a class="dropdown-item" href="/rent_object/0?action=new">new statement for this rent</a>
+                <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">new account for this rent</a>
+              </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="otherMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                other actions
               </button>
               <div class="dropdown-menu" aria-labelledby="otherMenuButton">
-                <a class="dropdown-item" href="/rent_object/0?action=new">Add a new rent and property</a>
-                <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">View charges for this rent</a>
-                <a class="dropdown-item" href="/lease/{{ rentobj.id }}">View lease info for this rent</a>
+                <a class="dropdown-item" href="/rent_object/0?action=new">add a new rent and property</a>
+                <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">view charges for this rent</a>
+                <a class="dropdown-item" href="/lease/{{ rentobj.id }}">view lease info for this rent</a>
               </div>
             </div>
         </div>
     </div>
-    {% else %}
+    {% elif action == "edit" %}
     <div class="form-group row">
         <div class="col-md-2">
             <a href="/deleteitem/{{ rentobj.id }}?item=rentprop"
                onclick="return confirm('Are you sure you want to delete this rent and property?');"
-               class="btn btn-block btn-warning" role="button">Delete rent/prop</a>
+               class="btn btn-block btn-warning" role="button">delete rent/prop</a>
         </div>
+    {% elif action != "view" %}
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Save changes</button>
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
     </div>
     {% endif %}
