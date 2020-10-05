@@ -331,7 +331,7 @@ def get_leases():
     leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
               func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
               Lease.term, Lease.upliftdate, Lease_uplift_type.uplift_type) \
-        .filter(*lease_filter).all()
+        .filter(*lease_filter).limit(60).all()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")
