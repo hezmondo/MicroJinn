@@ -232,13 +232,15 @@ def landlords():
 @bp.route('/lease/<int:id>', methods=['GET', 'POST'])
 @login_required
 def lease(id):
+    # incoming id is lease id for existing lease and rent id for new lease -see guide
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id_ = post_lease(id, action)
 
         return redirect('/lease/{}?action=view'.format(id_))
 
-    lease, uplift_types = get_lease(id)
+    # as stated, id is docfile id for existing docfile and rent id for new docfile
+    lease, uplift_types = get_lease(id, action)
 
     return render_template('lease.html', action=action, lease=lease, uplift_types=uplift_types)
 

@@ -13,9 +13,9 @@ def post_agent(id, action):
         agent = Agent.query.get(id)
     else:
         agent = Agent()
-    agent.agdetails = request.form["address"]
-    agent.agemail = request.form["email"]
-    agent.agnotes = request.form["notes"]
+    agent.agdetails = request.form.get("address")
+    agent.agemail = request.form.get("email")
+    agent.agnotes = request.form.get("notes")
     db.session.add(agent)
     commit_to_database()
     id_ = agent.id
@@ -30,11 +30,11 @@ def post_charge(id, action):
         charge = Charge()
     charge.chargetype_id = \
         Chargetype.query.with_entities(Chargetype.id).filter(
-            Chargetype.chargedesc == request.form["chargedesc"]).one()[0]
-    charge.chargestartdate = request.form["chargestartdate"]
-    charge.chargetotal = request.form["chargetotal"]
-    charge.chargedetails = request.form["chargedetails"]
-    charge.chargebalance = request.form["chargebalance"]
+            Chargetype.chargedesc == request.form.get("chargedesc")).one()[0]
+    charge.chargestartdate = request.form.get("chargestartdate")
+    charge.chargetotal = request.form.get("chargetotal")
+    charge.chargedetails = request.form.get("chargedetails")
+    charge.chargebalance = request.form.get("chargebalance")
     db.session.add(charge)
     db.session.commit()
     id_ = charge.id
@@ -64,7 +64,7 @@ def post_docfile(id):
     db.session.commit()
     id_ = docfile.id
     source_html = docfile.docfile_text
-    output_filename = "docfile-{}.pdf".format(str(request.form['docfile_date']))
+    output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.docfile_date))
     convert_html_to_pdf(source_html, output_filename)
 
     return id_
@@ -75,11 +75,11 @@ def post_formletter(id, action):
         formletter = Formletter.query.get(id)
     else:
         formletter = Formletter()
-    formletter.code = request.form["code"]
-    formletter.summary = request.form["summary"]
-    formletter.subject = request.form["subject"]
-    formletter.block = request.form["block"]
-    formletter.bold = request.form["bold"]
+    formletter.code = request.form.get("code")
+    formletter.summary = request.form.get("summary")
+    formletter.subject = request.form.get("subject")
+    formletter.block = request.form.get("block")
+    formletter.bold = request.form.get("bold")
     doctype = request.form.get("doc_type")
     formletter.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter \
@@ -100,21 +100,21 @@ def post_emailaccount(id, action):
         emailacc = Emailaccount.query.get(id)
     else:
         emailacc = Emailaccount()
-    emailacc.smtp_server = request.form["smtp_server"]
-    emailacc.smtp_port = request.form["smtp_port"]
-    emailacc.smtp_timeout = request.form["smtp_timeout"]
-    emailacc.smtp_debug = request.form["smtp_debug"]
-    emailacc.smtp_tls = request.form["smtp_tls"]
-    emailacc.smtp_user = request.form["smtp_user"]
-    emailacc.smtp_password = request.form["smtp_password"]
-    emailacc.smtp_sendfrom = request.form["smtp_sendfrom"]
-    emailacc.imap_server = request.form["imap_server"]
-    emailacc.imap_port = request.form["imap_port"]
-    emailacc.imap_tls = request.form["imap_tls"]
-    emailacc.imap_user = request.form["imap_user"]
-    emailacc.imap_password = request.form["imap_password"]
-    emailacc.imap_sentfolder = request.form["imap_sentfolder"]
-    emailacc.imap_draftfolder = request.form["imap_draftfolder"]
+    emailacc.smtp_server = request.form.get("smtp_server")
+    emailacc.smtp_port = request.form.get("smtp_port")
+    emailacc.smtp_timeout = request.form.get("smtp_timeout")
+    emailacc.smtp_debug = request.form.get("smtp_debug")
+    emailacc.smtp_tls = request.form.get("smtp_tls")
+    emailacc.smtp_user = request.form.get("smtp_user")
+    emailacc.smtp_password = request.form.get("smtp_password")
+    emailacc.smtp_sendfrom = request.form.get("smtp_sendfrom")
+    emailacc.imap_server = request.form.get("imap_server")
+    emailacc.imap_port = request.form.get("imap_port")
+    emailacc.imap_tls = request.form.get("imap_tls")
+    emailacc.imap_user = request.form.get("imap_user")
+    emailacc.imap_password = request.form.get("imap_password")
+    emailacc.imap_sentfolder = request.form.get("imap_sentfolder")
+    emailacc.imap_draftfolder = request.form.get("imap_draftfolder")
     db.session.add(emailacc)
     db.session.commit()
     id_ = emailacc.id
@@ -197,18 +197,18 @@ def post_landlord(id, action):
         landlord = Landlord.query.get(id)
     else:
         landlord = Landlord()
-    landlord.landlordname = request.form["name"]
-    landlord.landlordaddr = request.form["address"]
-    landlord.taxdate = request.form["taxdate"]
-    emailacc = request.form["emailacc"]
+    landlord.landlordname = request.form.get("name")
+    landlord.landlordaddr = request.form.get("address")
+    landlord.taxdate = request.form.get("taxdate")
+    emailacc = request.form.get("emailacc")
     landlord.emailacc_id = \
         Emailaccount.query.with_entities(Emailaccount.id).filter \
             (Emailaccount.smtp_server == emailacc).one()[0]
-    bankacc = request.form["bankacc"]
+    bankacc = request.form.get("bankacc")
     landlord.bankacc_id = \
         Money_account.query.with_entities(Money_account.id).filter \
             (Money_account.accdesc == bankacc).one()[0]
-    manager = request.form["manager"]
+    manager = request.form.get("manager")
     landlord.manager_id = \
         Manager.query.with_entities(Manager.id).filter \
             (Manager.managername == manager).one()[0]
@@ -219,21 +219,22 @@ def post_landlord(id, action):
 
 
 def post_lease(id, action):
-    if action == "edit":
-        lease =Lease.query.get(id)
-    else:
+    if action == "new":
+        # new lease:
         lease = Lease()
-    lease.term = request.form["term"]
-    lease.startdate = request.form["startdate"]
-    lease.startrent = request.form["startrent"]
-    lease.info = request.form["info"]
-    lease.upliftdate = request.form["upliftdate"]
-    lease.impvaluek = request.form["impvaluek"]
-    lease.rentcap = request.form["rentcap"]
-    lease.lastvalue = request.form["lastvalue"]
-    lease.last_value_date = request.form["lastvaluedate"]
-    lease.rent_id = request.form["rent_id"]
-    uplift_type = request.form["uplift_type"]
+    else:
+        lease = Lease.query.get(id)
+    lease.term = request.form.get("term")
+    lease.startdate = request.form.get("startdate")
+    lease.startrent = request.form.get("startrent")
+    lease.info = request.form.get("info")
+    lease.upliftdate = request.form.get("upliftdate")
+    lease.impvaluek = request.form.get("impvaluek")
+    lease.rentcap = request.form.get("rentcap")
+    lease.lastvalue = request.form.get("lastvalue")
+    lease.last_value_date = request.form.get("lastvaluedate")
+    lease.rent_id = request.form.get("rent_id")
+    uplift_type = request.form.get("uplift_type")
     lease.uplift_type_id = \
         Lease_uplift_type.query.with_entities(Lease_uplift_type.id).filter \
             (Lease_uplift_type.uplift_type == uplift_type).one()[0]
@@ -249,20 +250,20 @@ def post_loan(id, action):
         loan = Loan.query.get(id)
     else:
         loan = Loan()
-    loan.code = request.form["loancode"]
-    loan.start_intrate = request.form["start_intrate"]
-    loan.end_date = request.form["end_date"]
-    frequency = request.form["frequency"]
+    loan.code = request.form.get("loancode")
+    loan.start_intrate = request.form.get("start_intrate")
+    loan.end_date = request.form.get("end_date")
+    frequency = request.form.get("frequency")
     loan.freq_id = \
         Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
-    advarr = request.form["advarr"]
+    advarr = request.form.get("advarr")
     loan.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
-    loan.lender = request.form["lender"]
-    loan.borrower = request.form["borrower"]
-    loan.notes = request.form["notes"]
-    loan.val_date = request.form["val_date"]
-    loan.valuation = request.form["valuation"]
+    loan.lender = request.form.get("lender")
+    loan.borrower = request.form.get("borrower")
+    loan.notes = request.form.get("notes")
+    loan.val_date = request.form.get("val_date")
+    loan.valuation = request.form.get("valuation")
     db.session.commit()
     id_ = loan.id
 
@@ -274,11 +275,11 @@ def post_moneyaccount(id, action):
         moneyacc = Money_account.query.get(id)
     else:
         moneyacc = Money_account()
-    moneyacc.bankname = request.form["bankname"]
-    moneyacc.accname = request.form["accname"]
-    moneyacc.sortcode = request.form["sortcode"]
-    moneyacc.accnum = request.form["accnum"]
-    moneyacc.accdesc = request.form["accdesc"]
+    moneyacc.bankname = request.form.get("bankname")
+    moneyacc.accname = request.form.get("accname")
+    moneyacc.sortcode = request.form.get("sortcode")
+    moneyacc.accnum = request.form.get("accnum")
+    moneyacc.accdesc = request.form.get("accdesc")
     db.session.add(moneyacc)
     db.session.commit()
     id_ = moneyacc.id
@@ -291,17 +292,17 @@ def post_moneyitem(id, action):
         bankitem = Money_item.query.get(id)
     else:
         bankitem = Money_item()
-    bankitem.num = request.form["num"]
-    bankitem.date = request.form["date"]
-    bankitem.amount = request.form["amount"]
-    bankitem.payer = request.form["payer"]
-    accdesc = request.form["accdesc"]
+    bankitem.num = request.form.get("num")
+    bankitem.date = request.form.get("date")
+    bankitem.amount = request.form.get("amount")
+    bankitem.payer = request.form.get("payer")
+    accdesc = request.form.get("accdesc")
     bankitem.bankacc_id = \
         Money_account.query.with_entities(Money_account.id).filter \
             (Money_account.accdesc == accdesc).one()[0]
-    cleared = request.form["cleared"]
+    cleared = request.form.get("cleared")
     bankitem.cleared = 1 if cleared == "cleared" else 0
-    cat = request.form["category"]
+    cat = request.form.get("category")
     bankitem.cat_name = \
         Money_category.query.with_entities(Money_category.id).filter \
             (Money_category.cat_name == cat).one()[0]
@@ -317,8 +318,8 @@ def post_property(id, action):
         property = Property.query.get(id)
     else:
         property = Property()
-    property.propaddr = request.form["propaddr"]
-    proptypedet = request.form["proptypedet"]
+    property.propaddr = request.form.get("propaddr")
+    proptypedet = request.form.get("proptypedet")
     property.typeprop_id = \
         Typeproperty.query.with_entities(Typeproperty.id).filter \
             (Typeproperty.proptypedet == proptypedet).one()[0]
@@ -334,19 +335,19 @@ def post_rental(id, action):
         rental = Rental.query.get(id)
     else:
         rental = Rental()
-    rental.propaddr = request.form["propaddr"]
-    rental.tenantname = request.form["tenantname"]
-    rental.rentpa = request.form["rentpa"]
-    rental.arrears = request.form["arrears"]
-    rental.startrentdate = request.form["startrentdate"]
+    rental.propaddr = request.form.get("propaddr")
+    rental.tenantname = request.form.get("tenantname")
+    rental.rentpa = request.form.get("rentpa")
+    rental.arrears = request.form.get("arrears")
+    rental.startrentdate = request.form.get("startrentdate")
     if rental.astdate:
-        rental.astdate = request.form["astdate"]
-    rental.lastgastest = request.form["lastgastest"]
-    rental.note = request.form["note"]
-    frequency = request.form["frequency"]
+        rental.astdate = request.form.get("astdate")
+    rental.lastgastest = request.form.get("lastgastest")
+    rental.note = request.form.get("note")
+    frequency = request.form.get("frequency")
     rental.freq_id = \
         Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
-    advarr = request.form["advarr"]
+    advarr = request.form.get("advarr")
     rental.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
     db.session.add(rental)
@@ -365,47 +366,47 @@ def postrentobj(id):
         rent = Rent()
         agent = Agent()
 
-    actype = request.form["actype"]
+    actype = request.form.get("actype")
     rent.actype_id = \
         Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).one()[0]
-    advarr = request.form["advarr"]
+    advarr = request.form.get("advarr")
     rent.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
-    rent.arrears = request.form["arrears"]
+    rent.arrears = request.form.get("arrears")
 
     # we may write code later to generate datecode from lastrentdate!:
-    rent.datecode = request.form["datecode"]
+    rent.datecode = request.form.get("datecode")
 
-    deedtype = request.form["deedtype"]
+    deedtype = request.form.get("deedtype")
     rent.deed_id = \
         Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).one()[0]
-    rent.email = request.form["email"]
-    frequency = request.form["frequency"]
+    rent.email = request.form.get("email")
+    frequency = request.form.get("frequency")
     rent.freq_id = \
         Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
-    landlord = request.form["landlord"]
+    landlord = request.form.get("landlord")
     rent.landlord_id = \
         Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == landlord).one()[0]
-    rent.lastrentdate = request.form["lastrentdate"]
-    mailto = request.form["mailto"]
+    rent.lastrentdate = request.form.get("lastrentdate")
+    mailto = request.form.get("mailto")
     rent.mailto_id = \
         Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).one()[0]
-    rent.note = request.form["note"]
-    rent.price = request.form["price"]
-    rent.rentpa = request.form["rentpa"]
-    salegrade = request.form["salegrade"]
+    rent.note = request.form.get("note")
+    rent.price = request.form.get("price")
+    rent.rentpa = request.form.get("rentpa")
+    salegrade = request.form.get("salegrade")
     rent.salegrade_id = \
         Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).one()[0]
-    rent.source = request.form["source"]
-    status = request.form["status"]
+    rent.source = request.form.get("source")
+    status = request.form.get("status")
     rent.status_id = \
         Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).one()[0]
-    rent.tenantname = request.form["tenantname"]
-    tenure = request.form["tenure"]
+    rent.tenantname = request.form.get("tenantname")
+    tenure = request.form.get("tenure")
     rent.tenure_id = \
         Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).one()[0]
 
-    agdetails = request.form["agent"]
+    agdetails = request.form.get("agent")
     if agdetails and agdetails != "None":
         if not agent:
             agent = Agent()
@@ -415,7 +416,7 @@ def postrentobj(id):
         else:
             agent.agdetails = agdetails
     if id < 1:
-        rent.rentcode = request.form["rentcode"]
+        rent.rentcode = request.form.get("rentcode")
         id = rent.id
     else:
         db.session.commit()

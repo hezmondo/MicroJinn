@@ -295,12 +295,20 @@ def get_landlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
-def get_lease(id):
-    lease = \
-        Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
-             Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
-             Lease.last_value_date, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
-            .filter(Lease.rent_id == id).one_or_none()
+def get_lease(id, action):
+    if action == "new":
+        # new lease has to be attached to an existing rent, so incoming id in this case is rent id:
+        lease = {
+            'id': 0,
+            'rent_id': id
+        }
+    else:
+        # existing lease, so incoming id is lease id:
+        lease = \
+            Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
+                 Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
+                 Lease.last_value_date, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
+                .filter(Lease.id == id).one_or_none()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
 
