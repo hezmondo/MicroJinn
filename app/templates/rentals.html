@@ -3,12 +3,9 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-9">
-            <input class="form-control form-control-lg" type="text" placeholder="Showing all rentals" readonly>
-        </div>
-        <div class="col-md-3">
-            <a href="/rental/0?action=new" class="btn btn-block btn-danger" role="button">Add new rental</a>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="/rental/0?action=new" class="btn btn-block btn-primary" role="button">add new rental</a>
         </div>
     </div>
 </form>
@@ -17,13 +14,13 @@
         <thead>
         <tr>
             <th style="width: 5.00%">id</th>
-            <th style="width: 8.00%">Code</th>
-            <th style="width: 22.00%">Address</th>
-            <th style="width: 19.00%">Name</th>
-            <th style="width: 12.00%">Annual rent</th>
+            <th style="width: 8.00%">code</th>
+            <th style="width: 22.00%">address</th>
+            <th style="width: 19.00%">name</th>
+            <th style="width: 12.00%">annual rent</th>
             <th style="width: 12.00%">AST date</th>
-            <th style="width: 12.00%">Gas safe</th>
-            <th style="width: 10.00%">Action</th>
+            <th style="width: 12.00%">gas safe</th>
+            <th style="width: 10.00%">action</th>
         </tr>
         </thead>
         <tbody>
@@ -36,7 +33,7 @@
             <td style="width: 12.00%"> {{ item.rentpa }}</td>
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
             <td style="width: 12.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 10.00%"><a href="/rental/{{ item.id }}?action=edit">View</a></td>
+            <td style="width: 10.00%"><a href="/rental/{{ item.id }}?action=view">view</a></td>
         </tr>
         {% endfor %}
         <tr>
@@ -44,7 +41,7 @@
         <tr class="warning">
             <td style="width: 6.00%"></td>
             <td style="width: 8.00%"></td>
-            <td style="width: 22.00%">Total for all rents</td>
+            <td style="width: 22.00%">total for all rents</td>
             <td style="width: 18.00%"></td>
             <td style="width: 10.00%"> {{ rentsum }}</td>
             <td style="width: 10.00%"></td>

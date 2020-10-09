@@ -793,7 +793,7 @@ def getrentobj_main(id):
 
 
 def getrentobj_combos(id):
-    # This method returns the list values for various comboboxes, all to be shown in rent_object.html,
+    # This function returns the list values for various comboboxes, all to be shown in rent_object.html,
     # allowing editing an existing rent
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]

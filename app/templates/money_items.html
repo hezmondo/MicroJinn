@@ -46,7 +46,7 @@
         <thead>
         <tr>
             <th style="width: 8.00%">id</th>
-            <th style="width: 8.00%">num</th>
+            <th style="width: 8.00%">cleared</th>
             <th style="width: 12.00%">date</th>
             <th style="width: 14.00%">payer</th>
             <th style="width: 10.00%">amount</th>
@@ -60,7 +60,7 @@
         {% for item in moneyitems %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%"> {{ item.id }}</td>
-            <td style="width: 8.00%"> {{ item.num }}</td>
+            <td style="width: 8.00%"> {{ item.cleared }}</td>
             <td style="width: 12.00%"> {{ item.date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 14.00%"> {{ item.payer }}</td>
             <td style="width: 10.00%"> {{ item.amount }}</td>

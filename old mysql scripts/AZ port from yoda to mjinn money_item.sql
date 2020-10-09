@@ -6,5 +6,5 @@ CASE
 END,
 Account
 FROM yoda.bank_transaction
-WHERE ID > 35111
+WHERE ID > 35217
 AND Cat != 34

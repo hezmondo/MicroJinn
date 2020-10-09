@@ -30,6 +30,8 @@ and then use pip3 to install these dependencies:
 	
 	pip3 install PyJWT (requirements already satisfied)
 	
+	pip3 install cryptography
+	
 	pip3 install xhtml2pdf
 
 In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3
@@ -38,7 +40,16 @@ In Windows, pip is already installed, so just do the same pip installs as above 
 
 ### Edit the file named samplemyconfig.py to insert your mysql user name and password details, then rename as myconfig.py
 
+Starting the flask server can be done by executing python mjinn.py in windows or python3 mjinn.py in Linux
 
+The app will only start if:
+
+1. The mjinn schema exists in mysql
+2. myconfig.py is properly configured with a valid mysql username and password
+3. all dependencies have been installed
+4. the mjinn schema has been populated sufficiently - please see the new mjinn user guide
+
+ 
 ### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
 
 File > Open ..., select mjinn directory.  That loads it as a project.
