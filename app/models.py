@@ -444,17 +444,6 @@ class Rental_statement(db.Model):
     balance = db.Column(db.Numeric(8, 2))
 
 
-class Rental_trans(db.Model):
-    __tablename__ = 'rental_trans'
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
-    amount = db.Column(db.Numeric(8, 2))
-    payer = db.Column(db.String(60))
-    memo = db.Column(db.String(60))
-    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'))
-
-
 class Template(db.Model):
     __tablename__ = 'template'
 
