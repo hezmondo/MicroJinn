@@ -66,7 +66,7 @@
         <div class="col-md-2">
             <a href="/leases" class="btn btn-block btn-primary" role="button">back to leases</a>
         </div>
-        {% if action == "view" %}
+        {% if action == "view" or "rentview" %}
             <div class="col-md-2">
                 <a href="/lease/{{ lease.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit this lease</a>
             </div>

@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.main.functions import commit_to_database, convert_html_to_pdf, htmlEntitize
+from app.main.functions import commit_to_database, get_idlist_recent, pop_idlist_recent
 from app.models import Agent, Charge, Chargetype, Docfile, Extmanager, Extrent, Formletter, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
@@ -25,21 +25,13 @@ def get_agents():
         agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
                         Agent.agnotes.ilike('%{}%'.format(agn))).all()
     else:
-        id_list = json.loads(current_user.recent_agents)
+        id_list = get_idlist_recent("agent")
         agents = Agent.query.filter(Agent.id.in_(id_list))
     return agents
 
 
 def get_agent(id):
-    id_list = json.loads(current_user.recent_agents)
-    if id not in id_list:
-        id_list.insert(0, id)
-        # id_list.pop()
-        user = current_user
-        user.recent_agents = json.dumps(id_list)
-        db.session.add(user)
-        db.session.commit()
-
+    pop_idlist_recent("agent", id)
     agent = Agent.query.filter(Agent.id == id).one_or_none()
 
     return agent
@@ -150,14 +142,6 @@ def get_externalrent(id):
 
 
 def get_formletter(id):
-    id_list = json.loads(current_user.recent_formletters)
-    if id not in id_list:
-        id_list.insert(0, id)
-        id_list.pop()
-        user = current_user
-        user.recent_formletters = json.dumps(id_list)
-        db.session.add(user)
-        db.session.commit()
 
     formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code,
                                  Formletter.summary, Formletter.subject, Formletter.block, Formletter.bold,
@@ -303,12 +287,18 @@ def get_lease(id, action):
             'rent_id': id
         }
     else:
-        # existing lease, so incoming id is lease id:
+        lease_filter = []
+        if action == "rentview":
+            # function is being called from rentobject page, so incoming id in this case is rent id:
+            lease_filter.append(Rent.id == id)
+        else:
+            # existing lease, so incoming id is lease id:
+            lease_filter.append(Lease.id == id)
         lease = \
             Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
                  Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
                  Lease.last_value_date, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
-                .filter(Lease.id == id).one_or_none()
+                .filter(*lease_filter).one_or_none()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
 
@@ -551,7 +541,7 @@ def get_rentalstatement():
 def get_rentobjects_basic(action):
     qfilterbasic = []
     if action == "view":
-        id_list = json.loads(current_user.recent_rents)
+        id_list = get_idlist_recent("rent")
         qfilterbasic.append(Rent.id.in_(id_list))
     agentdetails = request.form.get("agentdetails") or ""
     propaddr = request.form.get("propaddr") or ""
@@ -743,14 +733,7 @@ def getrentobjs_advanced(qfilter, runsize):
 
 
 def getrentobj_main(id):
-    id_list = json.loads(current_user.recent_rents)
-    if id not in id_list:
-        id_list.insert(0, int(id))
-        id_list.pop()
-        user = current_user
-        user.recent_rents = json.dumps(id_list)
-        db.session.add(user)
-        db.session.commit()
+    pop_idlist_recent("rent", id)
     rentobj = \
         Rent.query \
             .join(Landlord) \

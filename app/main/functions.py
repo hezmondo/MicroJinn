@@ -4,8 +4,10 @@ import hashlib
 import datetime
 import typing
 import decimal
+import json
 from app import db
 from flask import abort
+from flask_login import current_user, login_required
 from sqlalchemy import exc
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
 from xhtml2pdf import pisa             # import python module
@@ -53,10 +55,39 @@ def convert_html_to_pdf(source_html, output_filename):
     # return False on success and True on errors
     return pisa_status.err
 
+def id_default_list():
+    defaultlist = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
 
-def update_agent_recent():
-    # mylist = curr.recent_agents
-    return
+    return defaultlist
+
+
+def get_idlist_recent(type):
+    id_list = id_default_list()
+    if type == "agent":
+        id_list = json.loads(current_user.recent_agents) if current_user.recent_agents else id_list
+    elif type == "rent":
+        id_list = json.loads(current_user.recent_rents) if current_user.recent_rents else id_list
+
+    return id_list
+
+
+def pop_idlist_recent(type, id):
+    id_list = id_default_list()
+    if type == "agent":
+        id_list = json.loads(current_user.recent_agents) if current_user.recent_agents else id_list
+    elif type == "rent":
+        id_list = json.loads(current_user.recent_rents) if current_user.recent_rents else id_list
+    if id not in id_list:
+        id_list.insert(0, id)
+        if len(id_list) > 30:
+            id_list.pop()
+        user = current_user
+        if type == "agent":
+            user.recent_agents = json.dumps(id_list)
+        elif type == "rent":
+            user.recent_rents = json.dumps(id_list)
+        db.session.add(user)
+        db.session.commit()
 
 
 def hashCode(rentcode):

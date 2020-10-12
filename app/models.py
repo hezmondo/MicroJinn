@@ -87,6 +87,15 @@ class Emailaccount(db.Model):
     landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
 
 
+class Event(db.Model):
+    __tablename__ = 'event'
+
+    id = db.Column(db.Integer, primary_key=True)
+    event_date = db.Column(db.Date)
+    summary = db.Column(db.String(90))
+    eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
+
+
 class Extmanager(db.Model):
     __tablename__ = 'extmanager'
 
@@ -430,8 +439,6 @@ class Rental(db.Model):
     astdate = db.Column(db.Date)
     lastgastest = db.Column(db.Date)
 
-    rental_trans_rental = db.relationship('Rental_trans', backref='rental', lazy='dynamic')
-
 
 class Rental_statement(db.Model):
     __tablename__ = 'rental_statement'
@@ -502,6 +509,15 @@ class Typedoc(db.Model):
 
     formletter_typedoc = db.relationship('Formletter', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
+
+
+class Typeevent(db.Model):
+    __tablename__ = 'typeevent'
+
+    id = db.Column(db.Integer, primary_key=True)
+    desc = db.Column(db.String(30))
+
+    event_typedoc = db.relationship('Event', backref='typeevent', lazy='dynamic')
 
 
 class Typefreq(db.Model):
@@ -587,7 +603,6 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     recent_rents = db.Column(db.String(150))
     recent_agents = db.Column(db.String(150))
-    recent_formletters = db.Column(db.String(150))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
