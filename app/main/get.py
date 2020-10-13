@@ -25,13 +25,13 @@ def get_agents():
         agents = Agent.query.filter(Agent.agdetails.ilike('%{}%'.format(agd)), Agent.agemail.ilike('%{}%'.format(age)),
                         Agent.agnotes.ilike('%{}%'.format(agn))).all()
     else:
-        id_list = get_idlist_recent("agent")
+        id_list = get_idlist_recent("recent_agents")
         agents = Agent.query.filter(Agent.id.in_(id_list))
     return agents
 
 
 def get_agent(id):
-    pop_idlist_recent("agent", id)
+    pop_idlist_recent("recent_agents", id)
     agent = Agent.query.filter(Agent.id == id).one_or_none()
 
     return agent
@@ -541,7 +541,7 @@ def get_rentalstatement():
 def get_rentobjects_basic(action):
     qfilterbasic = []
     if action == "view":
-        id_list = get_idlist_recent("rent")
+        id_list = get_idlist_recent("recent_rents")
         qfilterbasic.append(Rent.id.in_(id_list))
     agentdetails = request.form.get("agentdetails") or ""
     propaddr = request.form.get("propaddr") or ""
@@ -733,7 +733,7 @@ def getrentobjs_advanced(qfilter, runsize):
 
 
 def getrentobj_main(id):
-    pop_idlist_recent("rent", id)
+    pop_idlist_recent("recent_rents", id)
     rentobj = \
         Rent.query \
             .join(Landlord) \
