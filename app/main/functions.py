@@ -4,7 +4,6 @@ import hashlib
 import datetime
 import typing
 import decimal
-import json
 
 from app import db
 from flask import abort
@@ -55,22 +54,6 @@ def convert_html_to_pdf(source_html, output_filename):
     result_file.close()                 # close output file
     # return False on success and True on errors
     return pisa_status.err
-
-def get_idlist_recent(recent_field):
-    id_list = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
-    id_list = json.loads(getattr(current_user, recent_field)) if getattr(current_user, recent_field) else id_list
-
-    return id_list
-
-
-def pop_idlist_recent(recent_field, id):
-    id_list = json.loads(getattr(current_user, recent_field))
-    if id not in id_list:
-        id_list.insert(0, id)
-        if len(id_list) > 30:
-            id_list.pop()
-        setattr(current_user, recent_field, json.dumps(id_list))
-        db.session.commit()
 
 
 def hashCode(rentcode):

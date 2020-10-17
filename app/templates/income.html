@@ -55,7 +55,7 @@
         <tbody>
         {% for item in incomeitems %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.date }}</td>
+            <td style="width: 10.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 15.00%"> {{ item.payer }}</td>
             <td style="width: 10.00%"> {{ item.amount }}</td>
             <td style="width: 10.00%"> {{ item.rentcode }}</td>

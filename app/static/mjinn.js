@@ -19,4 +19,5 @@ $(document).ready(function(){
     var mysave = $('#doc_html').html();
     $('#xinput').val(mysave);
     });
+    $('#rentobjview').find(':input').attr('disabled', 'disabled');
 });

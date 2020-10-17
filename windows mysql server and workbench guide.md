@@ -1,49 +1,32 @@
-### Install mysql Server
+### Installing mysql server and workbench in windows
 
-**Ubuntu 20.04**
+**mysql server**
 
-Open a terminal on the desktop, in the home folder or anywhere and execute these commands:
- 
-	sudo apt-get install mysql-server 
-	
-	sudo mysql_secure_installation
+Go to the Oracle MySQL download website:	https://dev.mysql.com/downloads You may need to register, but this is simple and free.
 
-You may be asked to set a password for root.  **If so, use a reasonable password for root and write it down - eg Pete123456P** 
+I chose the small web based MSI this time - mysql-installer-web-community-8.0.21.0.msi this app allows you to install mysql server and workbench.
 
-You will be asked a series of questions: I said no to validate passwords and yes to everything else
-
-**Windows**
-
-The basic mysql server installation is now pretty straightforward. Go to the Oracle MySQL download website:	https://dev.mysql.com/downloads/mysql/ You may need to register, but 
-this is simple and free.
-
-Download the small web based msi app suggested by Oracle and open it. 
-
-I clicked to install just Myql Server (Community Server 8.0.21) X64 and the installation was incredibly quick and simple.
+Open the mysql msi app and install just myql server (Community Server 8.0.21) X64 - incredibly quick and simple.
   
 I chose development machine to use the least of the PC resources and accepted the splash creen with localhost 3306.
 
 You will be asked to set a password for root.  **If so, use a reasonable password for root and write it down - eg Pete123456P!** 
 
-At this point, I opted to set up a user (say peter) with typical DB admin privileges and to set a strong password simple and quick!
+At this point, I opted to set up a non-root user (say peter) with typical DB admin privileges and to set a strong password - simple and quick.
 
-### Install mysql workbench
+You will use this non-root user and password for mjinn in the essential start up file myconfig.py 
 
-**Ubuntu 20.04**
+**mysql workbench**
 
-Workbench is now available to install using the Ubuntu software app
+Open (or continue to use) the same mysql msi app and now add workbench from applications/workbench latest X64 and install it - quick and easy.
 
-After workbench is installed, start workbench by clicking the **show applications** button at bottom left and search for **work..**.
+When starting workbench, you can either edited the offered root connection to use your non-root username, or create a second connection to use that. 
+In either case, click to test the connection **without putting the password in first** and then put your password in and click to save it.  
+Bingo - very easy and quick, so I will now remove all the stuff about how hard this used to be.
 
-**Windows**
+### Problems in importing mysql functions and procedures from another installation
 
-using the same small web based mysql msi app, choose applications/workbench latest X64 and install it - quick and easy.
-
-When starting workbench, I edited the offered root connection to use my username. You might wish to have two connections. Click to test the connection without putting the password in and then put your password in and click t save it.  Bingo very easy and quick, so I will now remove all the stuff about how hard this is!
-
-### Problems in importing mysql functions and procedures from one installation to another
-
-You will likely get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error when it gets to procedures and functions:
+Currently, you may get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error, when it gets to procedures and functions:
 
 1.  ERROR 1231 (42000) at line 1454: Variable 'sql_mode' can't be set to the value of 'NO_AUTO_CREATE_USER'
 
@@ -51,12 +34,10 @@ You will likely get some or all of these errors, but **NB:- all the tables will 
 
 3.  ERROR because MySQL dumps functions containing text such as this: SET TIME ZONE =
 
-It is simple to get around this:
+To get around this, first use Notepad++ or any text editor to replace the text strings in your extracted mjinn dump file as follows:
 
-In linux, run these commands in a terminal opened in the folder containing your sql dump file eg "mydump.sql" - this will replace the problem text with ""
-  
-	sed -i 's/NO_AUTO_CREATE_USER//' mydump.sql 
-	sed -i 's/DEFINER=`root`@`localhost`//' mydump.sql 
+replace DEFINER=`root`@`localhost` with "" 
+replace NO_AUTO_CREATE_USER with ""
 
 Now remove these problem lines from the very end of your sql dump file:
 
@@ -69,35 +50,21 @@ Now remove these problem lines from the very end of your sql dump file:
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-Now login to the mysql console (see instructions above and below) and run this command:
+if you get an error mentioning log_bin_trust_function_creators, open a query window in workbench and run this query:
 
-    set log_bin_trust_function_creators = 1; 
+    set log_bin_trust_function_creators = 1;
 
+Call Hez if you are struggling.  One workaround: 
 
-In windows, use Notepad++ or any text editor to replace the text strings in your extracted mjinn dump file
+Create two sql dump files, one being just all the tables, named TablesDump, and the other being just the teeny user table along with the functions and procedures, named UserFuncProcDump
 
-DEFINER=`root`@`localhost` with "" 
-NO_AUTO_CREATE_USER with ""
+The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
 
-Now remove these problem lines from the very end of your sql dump file:
-
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
-
-Call Hez if you are struggling.
-
-Hez simple solution: dump just one small table and all functions and procedures, manually edit the sql dump file to remove the offending text and then do data import in workbench.  Dirty but job done and works fine. 
+Dirty but job done and works fine. 
     
-All that follows is just here in case we ever need it
+All that follows is just here in case you might ever need it
 
-### Basic localhost mysql commands in the terminal and mysql console
+### Basic localhost mysql commands in the mysql console
 
 Login to the mysql server from the command line with the following command:
 

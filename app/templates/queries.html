@@ -59,19 +59,19 @@
         </div>
         <div class="col-md-2">
             <label for="tenure">Tenure:</label>
-            {{ widgets.multiselect_as_select(name="tenure", items=tenures, items_selected=tenure or tenures) }}
+            {{ widgets.multiselect_as_select(name="tenure", items=tenuredets, items_selected=tenure or tenuredets) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">Sale grade:</label>
-            {{ widgets.multiselect_as_select(name="salegrade", items=salegrades, items_selected=salegrade or salegrades) }}
+            {{ widgets.multiselect_as_select(name="salegrade", items=salegradedets, items_selected=salegrade or salegradedets) }}
         </div>
         <div class="col-md-2">
             <label for="status">Status:</label>
-            {{ widgets.multiselect_as_select(name="status", items=statuses, items_selected=status or statuses) }}
+            {{ widgets.multiselect_as_select(name="status", items=statusdets, items_selected=status or statusdets) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">Actype:</label>
-            {{ widgets.multiselect_as_select(name="actype", items=actypes, items_selected=actype or actypes) }}
+            {{ widgets.multiselect_as_select(name="actype", items=actypedets, items_selected=actype or actypedets) }}
         </div>
     </div>
     <div class="form-group row">

@@ -1,4 +1,4 @@
-# Linux mysql installation guide - updated by Hez 24th September 2020:
+# Linux mysql installation guide - updated by Hez 17th October 2020:
 
 ### Install Linux (Ubuntu):	
 
@@ -46,7 +46,7 @@ After workbench is installed, start workbench by clicking the **show application
 
 You should now be able to connect from workbench to the mysql server as root, using your new password
 
-I read somewhere that you should **not really use root to connect to MySQL server**. It is good practice to create a new user (such as hez or roger) with typical DBA privileges and a suitable password, to use to connect from Jinn and into workbench.
+I understand that you should **not really use root to connect to MySQL server**. It is good practice to create a new user (such as hez or roger) with typical DBA privileges and a suitable password, to use to connect from Jinn and into workbench.
 
 You can create a new user and set privileges in workbench, or see my separate mysql shell guide.
 
@@ -56,7 +56,7 @@ Run this query to create the empty mjinn schema:
 
 Refresh the **schemas** area on left in the schemas tab to see your new empty database mjinn.	
 
-There are a few issues in importing mysql 5.7 sql dump files into mysql 8.  My favoured solution is to create two sql dump files from 5.7, one being just all the tables named TablesDump and the other being the user table along with the functions and procedures named UserFuncProc
+There are issues in importing mysql sql dump files from one installation to another using mysql 8.  My favoured solution is to create two sql dump files, one being just all the tables named TablesDump and the other being the user table along with the functions and procedures named UserFuncProc
 
 The TablesDump sql dump file should import fine as it is.  The UserFuncProc dump file will need editing in a text editor such as Notepad++ so as to:
 

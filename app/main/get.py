@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.main.functions import commit_to_database, get_idlist_recent, pop_idlist_recent
+from app.main.functions import commit_to_database
 from app.models import Agent, Charge, Chargetype, Docfile, Extmanager, Extrent, Formletter, Headrent, Income, \
     Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
@@ -16,7 +16,7 @@ from app.models import Agent, Charge, Chargetype, Docfile, Extmanager, Extrent, 
     Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
-# functions listed in alphabetical order
+# agents
 def get_agents():
     if request.method == "POST":
         agd = request.form.get("address") or ""
@@ -37,6 +37,7 @@ def get_agent(id):
     return agent
 
 
+# charges
 def get_charges(rentid):
     qfilter = []
     if rentid == "":
@@ -64,6 +65,7 @@ def get_charge(id):
     return charge, chargedescs
 
 
+# docfiles
 def get_docfile(id, action):
     if action == "new":
         # new docfile has to be attached to an existing rent, so incoming id in this case is rent id:
@@ -119,7 +121,7 @@ def get_docfiles(rentid):
 
     return docfiles, dfoutin
 
-
+# email accounts
 def get_emailaccounts():
     emailaccs = Emailaccount.query.all()
 
@@ -132,6 +134,7 @@ def get_emailaccount(id):
     return emailacc
 
 
+# external rents
 def get_externalrent(id):
     externalrent = Extrent.query.join(Extmanager).with_entities(Extrent.rentcode, Extrent.propaddr,
                     Extrent.tenantname, Extrent.owner, Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate,
@@ -141,6 +144,7 @@ def get_externalrent(id):
     return externalrent
 
 
+# formletters
 def get_formletter(id):
 
     formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code,
@@ -172,18 +176,39 @@ def get_formletters(action):
     return formletters
 
 
+# head rents
 def get_headrents():
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    statuses.insert(0, "all statuses")
-    # tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    # tenures.insert(0, "all tenures")
-    headrents = Headrent.query.join(Typestatus).outerjoin(Agent).with_entities(Agent.agdetails, Headrent.hrcode,
-                Headrent.rentpa, Headrent.arrears, Headrent.freq_id, Headrent.lastrentdate, Headrent.propaddr,
+    statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    statusdets.insert(0, "all statuses")
+    headrents = Headrent.query.join(Typestatus).outerjoin(Agent).with_entities(Agent.agdetails, Headrent.id,
+                Headrent.hrcode, Headrent.rentpa, Headrent.arrears, Headrent.freq_id, Headrent.lastrentdate,
+                Headrent.propaddr,
                 func.mjinn.next_date(Headrent.lastrentdate, Headrent.freq_id, 1).label('nextrentdate'),
                 Typestatus.statusdet).limit(100).all()
-    return headrents, statuses
+    return headrents, statusdets
 
 
+def get_headrent(id):
+    headrent = \
+        Headrent.query \
+            .join(Landlord) \
+            .outerjoin(Agent) \
+            .join(Typeadvarr) \
+            .join(Typefreq) \
+            .join(Typestatus) \
+            .join(Typetenure) \
+            .with_entities(Headrent.id, Headrent.hrcode, Headrent.arrears, Headrent.datecode, Headrent.lastrentdate,
+                           Headrent.propaddr, Headrent.rentpa, Headrent.reference, Headrent.note, Headrent.source,
+                           Landlord.landlordname, Agent.agdetails, Typeadvarr.advarrdet, Typefreq.freqdet,
+                           Typestatus.statusdet, Typetenure.tenuredet,
+        # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+            func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
+        .filter(Headrent.id == id) \
+            .one_or_none()
+
+    return headrent
+
+# income
 def get_incomeitems():
     qfilter = []
     payer = request.form.get("payer") or ""
@@ -260,6 +285,7 @@ def get_incomepost(id):
     return allocs, post, post_tot, today
 
 
+# landlords
 def get_landlords():
     landlords = Landlord.query.join(Manager).with_entities(Landlord.id, Landlord.landlordname, Landlord.landlordaddr,
                    Landlord.taxdate, Manager.managername).all()
@@ -279,6 +305,7 @@ def get_landlord(id):
     return landlord, managers, emailaccs, bankaccs
 
 
+# leases
 def get_lease(id, action):
     if action == "new":
         # new lease has to be attached to an existing rent, so incoming id in this case is rent id:
@@ -337,6 +364,7 @@ def get_leases():
     return leases, uplift_types, rcd, uld, ult
 
 
+# loans
 def get_loan(id):
     loan = \
         Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
@@ -371,6 +399,7 @@ def get_loanstatement():
     return loanstatement
 
 
+# mail
 def getmaildata(rent_id, income_id):
     if income_id == 0:
         incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
@@ -395,6 +424,7 @@ def getmaildata(rent_id, income_id):
     return incomedata, allocdata, bankdata, addressdata
 
 
+# money
 def get_moneyaccount(id):
     moneyacc = Money_account.query.filter(Money_account.id == id).one_or_none()
 
@@ -488,6 +518,7 @@ def get_money_options():
     return bankaccs, cats, cleareds
 
 
+# properties
 def get_property(id):
     property = Property.query.join(Typeproperty).with_entities(Property.id, Property.propaddr,
                    Typeproperty.proptypedet).filter(Property.id == id).one_or_none()
@@ -496,25 +527,7 @@ def get_property(id):
     return property, proptypedets
 
 
-def get_queryoptions():
-    # return options for each multiple choice control in home page and queries page
-    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
-    actypes.insert(0, "all actypes")
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    landlords.insert(0, "all landlords")
-    floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-    salegrades.insert(0, "all salegrades")
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    statuses.insert(0, "all statuses")
-    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    tenures.insert(0, "all tenures")
-    options = ("Include", "Exclude", "Only")
-
-    return actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures
-
-
+# rentals
 def get_rental(id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
     rental = Rental.query.join(Typeadvarr).join(Typefreq).with_entities(Rental.id, Rental.rentalcode, Rental.arrears,
@@ -538,6 +551,7 @@ def get_rentalstatement():
     return rentalstatem
 
 
+# rent object and associated queries
 def get_rentobjects_basic(action):
     qfilterbasic = []
     if action == "view":
@@ -597,7 +611,8 @@ def get_rentobjects_advanced(action, name):
         qfilter.append(Rent.source.ilike('%{}%'.format(source)))
     if tenantname and tenantname != "":
         qfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
-    actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures = get_queryoptions()
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
     if request.method == "POST":
         jname = request.form.get("jname")
         actype = request.form.getlist("actype")
@@ -627,7 +642,7 @@ def get_rentobjects_advanced(action, name):
         source = returns["soc"]
         tenantname = returns["tna"]
         tenure = returns["ten"]
-    if actype and actype != actypes and actype[0] != "all actypes":
+    if actype and actype != actypedets and actype[0] != "all actypes":
         qfilter.append(Typeactype.actypedet.in_(actype))
     if arrears and arrears != "":
         qfilter.append(text("Rent.arrears {}".format(arrears)))
@@ -639,11 +654,11 @@ def get_rentobjects_advanced(action, name):
         qfilter.append(text("Rent.rentpa {}".format(rentpa)))
     if rentperiods and rentperiods != "":
         qfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
-    if salegrade and salegrade != salegrades and salegrade[0] != "all salegrades":
+    if salegrade and salegrade != salegradedets and salegrade[0] != "all salegrades":
         qfilter.append(Typesalegrade.salegradedet.in_(salegrade))
-    if status and status != statuses and status[0] != "all statuses":
+    if status and status != statusdets and status[0] != "all statuses":
         qfilter.append(Typestatus.statusdet.in_(status))
-    if tenure and tenure != tenures and tenure[0] != "all tenures":
+    if tenure and tenure != tenuredets and tenure[0] != "all tenures":
         qfilter.append(Typetenure.tenuredet.in_(tenure))
     if action == "save":
         store = {}
@@ -677,8 +692,7 @@ def get_rentobjects_advanced(action, name):
         db.session.commit()
     rentprops = getrentobjs_advanced(qfilter, runsize)
 
-    return actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures, \
-           actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, \
+    return actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, \
            rentperiods, runsize, salegrade, source, status, tenantname, tenure, rentprops
 
 def getrentobjs_basic(qfilter, runsize):
@@ -687,7 +701,8 @@ def getrentobjs_basic(qfilter, runsize):
             .join(Rent) \
             .outerjoin(Agent) \
             .with_entities(Rent.id, Agent.agdetails, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-                           func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
+                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
             .filter(*qfilter) \
             .limit(runsize).all()
@@ -721,7 +736,8 @@ def getrentobjs_advanced(qfilter, runsize):
             .join(Typesalegrade) \
             .join(Typetenure) \
             .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
-                           func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
+                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                            Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
@@ -748,7 +764,8 @@ def getrentobj_main(id):
             .join(Typestatus) \
             .join(Typetenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           func.mjinn.next_rent_date(Rent.id, 1).label('nextrentdate'),
+                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
@@ -775,17 +792,63 @@ def getrentobj_main(id):
     return rentobj, properties
 
 
-def getrentobj_combos(id):
-    # This function returns the list values for various comboboxes, all to be shown in rent_object.html,
-    # allowing editing an existing rent
-    actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+# common functions
+def get_combos_common():
+    # This function returns values for comboboxes used by rents, queries and headrents
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    mailtodets = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
-    salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
 
-    return actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, statusdets, tenuredets
+    return advarrdets, freqdets, landlords, statusdets, tenuredets
+
+
+def get_combos_rentonly():
+    # This function returns the list values for various comboboxes used only by rents
+    actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
+    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
+    mailtodets = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+
+    return actypedets, deedcodes, mailtodets, salegradedets
+
+
+def get_queryoptions_common():
+    # return options for common multiple choice controls in home page and queries page
+    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
+    landlords.insert(0, "all landlords")
+    statusdets.insert(0, "all statuses")
+    tenuredets.insert(0, "all tenures")
+
+    return landlords, statusdets, tenuredets
+
+def get_queryoptions_advanced():
+    # return options for advanced multiple choice controls in home page and queries page
+    actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
+    salegradedets.insert(0, "all salegrades")
+    actypedets.insert(0, "all actypes")
+    floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
+    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
+    options = ("Include", "Exclude", "Only")
+
+    return actypedets, floads, options, prdeliveries, salegradedets
+
+
+def get_idlist_recent(recent_field):
+    id_list = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
+    id_list = json.loads(getattr(current_user, recent_field)) if getattr(current_user, recent_field) else id_list
+
+    return id_list
+
+
+def pop_idlist_recent(recent_field, id):
+    id_list = json.loads(getattr(current_user, recent_field))
+    if id not in id_list:
+        id_list.insert(0, id)
+        if len(id_list) > 30:
+            id_list.pop()
+        setattr(current_user, recent_field, json.dumps(id_list))
+        db.session.commit()
+
+

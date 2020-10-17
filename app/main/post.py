@@ -2,9 +2,9 @@ import json
 from flask import redirect, request
 from app import db
 from app.main.functions import commit_to_database, convert_html_to_pdf
-from app.models import Agent, Charge, Chargetype, Formletter, Docfile, Extmanager, Extrent, Income, Incomealloc, \
-    Landlord, Lease, Lease_uplift_type, Loan, Manager, Money_category, Money_item, Property, Rent, Rental, Template, \
-    Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
+from app.models import Agent, Charge, Chargetype, Formletter, Docfile, Extmanager, Extrent, Headrent, Income, \
+    Incomealloc, Landlord, Lease, Lease_uplift_type, Loan, Manager, Money_category, Money_item, Property, Rent, \
+    Rental, Template, Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
@@ -118,6 +118,19 @@ def post_emailaccount(id, action):
     db.session.add(emailacc)
     db.session.commit()
     id_ = emailacc.id
+
+    return id_
+
+
+def post_headrent(id, action):
+    if action == "edit":
+        headrent = Headrent.query.get(id)
+    else:
+        headrent = Agent()
+    headrent.agdetails = request.form.get("agdetails")
+    db.session.add(headrent)
+    commit_to_database()
+    id_ = headrent.id
 
     return id_
 

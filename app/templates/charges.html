@@ -32,7 +32,7 @@
         <tr id="{{ charge.id }}">
             <td style="width: 10.00%"> {{ charge.rentcode }}</td>
             <td style="width: 25.00%"> {{ charge.chargedesc }}</td>
-            <td style="width: 10.00%"> {{ charge.chargestartdate }}</td>
+            <td style="width: 10.00%"> {{ charge.chargestartdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
             <td style="width: 25.00%"> {{ charge.chargedetails }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>

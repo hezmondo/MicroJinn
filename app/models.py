@@ -18,6 +18,7 @@ class Agent(db.Model):
     code = db.Column(db.String(15))
 
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
+    headrent_agent = db.relationship('Headrent', backref='agent', lazy='dynamic')
 
 
 class Charge(db.Model):
@@ -93,6 +94,7 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_date = db.Column(db.Date)
     summary = db.Column(db.String(90))
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
 
 
@@ -210,6 +212,7 @@ class Landlord(db.Model):
     emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
+    headrent_landlord = db.relationship('Headrent', backref='landlord', lazy='dynamic')
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
@@ -413,11 +416,12 @@ class Rent(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
-    prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
-    incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
+    event_rent = db.relationship('Event', backref='rent', lazy='dynamic')
+    incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
+    prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
@@ -477,6 +481,7 @@ class Typeadvarr(db.Model):
     advarrdet = db.Column(db.String(45))
 
     rent_typeadvarr = db.relationship('Rent', backref='typeadvarr', lazy='dynamic')
+    headrent_typeadvarr = db.relationship('Headrent', backref='typeadvarr', lazy='dynamic')
     loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
 
@@ -527,6 +532,7 @@ class Typefreq(db.Model):
     freqdet = db.Column(db.String(45))
 
     rent_typefreq = db.relationship('Rent', backref='typefreq', lazy='dynamic')
+    headrent_typefreq = db.relationship('Headrent', backref='typefreq', lazy='dynamic')
     loan_typefreq = db.relationship('Loan', backref='typefreq', lazy='dynamic')
     rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
@@ -583,6 +589,7 @@ class Typestatus(db.Model):
     statusdet = db.Column(db.String(45))
 
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
+    headrent_typestatus = db.relationship('Headrent', backref='typestatus', lazy='dynamic')
 
 
 class Typetenure(db.Model):
@@ -592,6 +599,7 @@ class Typetenure(db.Model):
     tenuredet = db.Column(db.String(15))
 
     rent_typetenure = db.relationship('Rent', backref='typetenure', lazy='dynamic')
+    headrent_typetenure = db.relationship('Headrent', backref='typetenure', lazy='dynamic')
 
                 
 class User(UserMixin, db.Model):
@@ -601,8 +609,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     about_me = db.Column(db.String(90))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-    recent_rents = db.Column(db.String(150))
-    recent_agents = db.Column(db.String(150))
+    recent_rents = db.Column(db.String(300))
+    recent_agents = db.Column(db.String(300))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

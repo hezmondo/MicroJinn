@@ -4,16 +4,18 @@ from flask import render_template, redirect, url_for, request, session, jsonify
 from flask_login import login_required
 from app import db
 from app.main import bp
-from app.main.get import get_agent, get_agents, get_charge, get_charges, get_docfile, get_docfiles, \
-    get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, get_formletters, get_headrents, \
+from app.main.get import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
+    get_docfile, get_docfiles, get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
+    get_formletters, get_headrent, get_headrents, \
     get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
     get_landlords, get_lease, get_loan, get_leases, get_loan_options, get_loans, \
     get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
-    get_property, get_rental, getrentals, get_rentalstatement, getrentobj_combos, getrentobj_main, \
-    get_rentobjects_advanced, get_rentobjects_basic
+    get_property, get_queryoptions_common, get_queryoptions_advanced, get_rental, getrentals, get_rentalstatement, \
+    getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic
 from app.main.delete import delete_record
-from app.main.post import post_agent, post_charge, post_emailaccount, post_incomeobject, post_landlord, post_formletter, \
-    post_docfile, post_lease, post_loan, post_moneyaccount, post_moneyitem, post_property, post_rental, postrentobj
+from app.main.post import post_agent, post_charge, post_emailaccount, post_headrent, post_incomeobject, \
+    post_landlord, post_formletter, post_docfile, post_lease, post_loan, post_moneyaccount, post_moneyitem, \
+    post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
 from app.models import Agent, Charge, Formletter, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
@@ -154,9 +156,23 @@ def formletters():
 
 @bp.route('/headrents', methods=['GET', 'POST'])
 def headrents():
-    headrents, statuses = get_headrents()
+    headrents, statusdets = get_headrents()
 
-    return render_template('headrents.html', headrents=headrents, statuses=statuses)
+    return render_template('headrents.html', headrents=headrents, statusdets=statusdets)
+
+
+@bp.route('/headrent/<int:id>', methods=["GET", "POST"])
+@login_required
+def headrent(id):
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id = post_headrent(id, action)
+        action = "view"
+    headrent = get_headrent(id)
+    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
+
+    return render_template('headrent.html', action=action, advarrdets=advarrdets, freqdets=freqdets,
+                           landlords=landlords, statusdets=statusdets, tenuredets=tenuredets, headrent=headrent)
 
 
 @bp.route('/income', methods=['GET', 'POST'])
@@ -420,13 +436,15 @@ def property(id):
 def queries():
     action = request.args.get('action', "view", type=str)
     name = request.args.get('name', "queryall", type=str)
-    actypes, floads, landlords, options, prdeliveries, salegrades, statuses, tenures, \
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+
     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
     runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjects_advanced(action, name)
 
-    return render_template('queries.html', action=action, actypes=actypes, floads=floads,
-                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegrades=salegrades,
-                           statuses=statuses, tenures=tenures, actype=actype, agentdetails=agentdetails,
+    return render_template('queries.html', action=action, actypedets=actypedets, floads=floads,
+                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
+                           statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
                            propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
                            runsize=runsize, salegrade=salegrade, source=source, status=status,
@@ -478,8 +496,8 @@ def rent_object(id):
     charges = get_charges(id)
     # owingstat = owingstat(rentobj, charges)
 
-    actypedets, advarrdets, deedcodes, freqdets, landlords, mailtodets, salegradedets, \
-        statusdets, tenuredets = getrentobj_combos(id)
+    actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
+    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
 
     if not session['mailtodets']:
         session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
