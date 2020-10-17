@@ -1,10 +1,12 @@
-### Basic start up guide for installing mjinn - last updated 24 Sep 2020
+### Basic start up guide for installing mjinn - last updated 17 Oct 2020
 
-### It is assumed that you have already installed MySql Server and MySql Workbench using my separate guide and that you have already installed Python 3.7 or 3.8 (already installed in Ubuntu 20.04 or Mint 20)
+### Please install MySql Server and MySql Workbench using my new mysql server and workbench installation guide
+ 
+**Now install Python 3.7, 3.8 or 3.9 (already in Linux). Easy and quick to install in Windows - https://www.python.org/downloads/**
 
-### It is very easy (10 minutes) to install flask and other dependencies using a terminal in Linux or Powershell in Windows:
+It is then very easy (10 minutes) to install flask and other dependencies using a terminal in Linux or Powershell in Windows:
 
-In Linux, simplest may be to install pip3 
+**In Linux, simplest may be to install pip3** 
 
 	sudo apt install python3-pip
 
@@ -34,7 +36,7 @@ and then use pip3 to install these dependencies:
 	
 	pip3 install xhtml2pdf
 
-In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3
+**In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3**
 	
 ### Now download the mjinn code from the github repo, maintaining the directory structure.  
 
@@ -47,7 +49,7 @@ The app will only start if:
 1. The mjinn schema exists in mysql
 2. myconfig.py is properly configured with a valid mysql username and password
 3. all dependencies have been installed
-4. the mjinn schema has been populated sufficiently - please see the new mjinn user guide
+4. the mjinn schema has been populated sufficiently - please see the new mjinn user guide and my new mysql server and workbench installation guide
 
  
 ### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
