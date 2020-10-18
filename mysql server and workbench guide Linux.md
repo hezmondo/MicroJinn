@@ -19,12 +19,29 @@ After workbench is installed, start workbench by clicking the **show application
 When starting workbench, you can either edit the offered root connection to your non-root username, or create a second connection to use that. 
 In either case, click to test the connection **without putting the password in first** and then put your password in and click to save it.  
 
-**if you cannot get into MySQL 8.0 as root (password unknown or not recognised) see my new mysql console guide and maria notes**
+### I had problems connecting to mysql server and to workbench using the correct root password I set at installation, so here is how to get into MySQL server as root if you do not know your password:
 
+	sudo mysql -u root
+	
+	=> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Hez654321H!';
+	
+	sudo service mysql restart
+
+You should now be able to connect from workbench to the mysql server as root, using your new password
+
+I understand that you should **not really use root to connect to MySQL server**. It is good practice to create a new user (such as hez or roger) with typical DBA privileges and a suitable password, to use to connect from Jinn and into workbench.
+
+You can create a new user and set privileges in workbench, or see my separate mysql console guide.
+
+Run this query to create the empty mjinn schema:
+
+	CREATE SCHEMA mjinn 
+
+Refresh the **schemas** area on left in the schemas tab to see your new empty database mjinn.	
 
 ### Problems in importing mysql functions and procedures from one installation to another
 
-You will likely get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error when it gets to procedures and functions:
+You may get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error when it gets to procedures and functions:
 
 1.  ERROR 1231 (42000) at line 1454: Variable 'sql_mode' can't be set to the value of 'NO_AUTO_CREATE_USER'
 
@@ -62,6 +79,6 @@ Create two sql dump files, one being just all the tables, named TablesDump, and 
 
 The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
 
-Dirty but job done and works fine. 
+So, after refreshing, you should now see all the tables and all the functions and procedures.
     
 **Feel free to check out my new mysql console guide and maria notes**

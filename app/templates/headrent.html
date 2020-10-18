@@ -14,23 +14,33 @@
             <label for="hrcode">hr code:</label>
             <input type="text" class="form-control" name="hrcode" value="{{ headrent.hrcode }}">
         </div>
-        <div class="col-md-5">
+        <div class="col-md-6">
             <label for="landlord">landlord:</label>
             {{ widgets.combobox(name="landlord", items=landlords, item_selected=headrent.landlordname) }}
         </div>
-        <div class="col-md-5">
+        <div class="col-md-2">
+            <label for="tenure">tenure:</label>
+            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=headrent.tenuredet) }}
+        </div>
+        <div class="col-md-2">
+            <label for="source">source:</label>
+            <input type="text" class="form-control" name="source" value="{{ headrent.source }}">
+        </div>
+    </div>
+    <div class="form-group row">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-8">
+            <label for="note">notes:</label>
+            <input type="text" class="form-control" name="note" value="{{ headrent.note }}">
+        </div>
+        <div class="col-md-4">
             <label for="reference">reference:</label>
             <input type="text" class="form-control" name="reference" value="{{ headrent.reference }}">
         </div>
     </div>
     <div class="form-group row">
-    </div>
-    <div class="form-group row">
-        <div class="col-md-6">
-            <label for="note">notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ headrent.note }}">
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-8">
             <label for="agent">agent:</label>
             <input type="text" class="form-control" name="agent" value="{{ headrent.agdetails }}">
         </div>
@@ -65,16 +75,6 @@
         <div class="form-group col-md-3">
             <label for="datecode">date code:</label>
             <input type="text" class="form-control" name="datecode" value="{{ headrent.datecode }}">
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="tenure">tenure:</label>
-            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=headrent.tenuredet) }}
-        </div>
-        <div class="col-md-2">
-            <label for="source">source:</label>
-            <input type="text" class="form-control" name="source" value="{{ headrent.source }}">
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>

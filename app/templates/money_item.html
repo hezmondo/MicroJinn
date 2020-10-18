@@ -5,7 +5,7 @@
 {% block app_content %}
 <form method="POST" id="money_item">
     <div class="form-group row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="paydate">Payment date:</label>
             <input type="date" class="form-control" name="paydate" value="{{ moneyitem.date }}">
         </div>
@@ -13,7 +13,7 @@
             <label for="amount">total:</label>
             <input type="text" class="form-control" name="amount" value="{{ moneyitem.amount }}">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <label for="payer">payer:</label>
             <input type="text" class="form-control" name="payer" value="{{ moneyitem.payer }}">
         </div>
