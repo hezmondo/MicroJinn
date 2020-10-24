@@ -1,3 +1,4 @@
+import imghdr
 import logging
 import re
 import hashlib
@@ -41,6 +42,16 @@ def commit_to_database():
     except Exception as err:
         db.session.rollback()
         abort(500, err)
+
+
+def validate_image(stream):
+    header = stream.read(512)
+    stream.seek(0)
+    format = imghdr.what(None, header)
+    if not format:
+        return None
+    return '.' + (format if format != 'jpeg' else 'jpg')
+
 
 
 def convert_html_to_pdf(source_html, output_filename):

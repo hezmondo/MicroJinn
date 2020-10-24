@@ -51,7 +51,7 @@
             <tbody>
             {% for item in docfiles %}
             <tr id="{{ item.id }}">
-                <td style="width: 10.00%"> {{ item.docfile_date.strftime('%d-%b-%Y') }}</td>
+                <td style="width: 10.00%"> {{ item.docfile_date.strftime('%d-%b-%Y') if item.docfile_date else 'none' }}</td>
                 <td style="width: 10.00%"> {{ item.rentcode }}</td>
                 <td style="width: 50.00%"> {{ item.summary }}</td>
                 <td style="width: 10.00%"> {{ item.desc }}</td>

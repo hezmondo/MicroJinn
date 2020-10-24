@@ -21,6 +21,9 @@ bootstrap = Bootstrap()
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    # app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+    # app.config['UPLOAD_EXTENSIONS'] = ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']
+    # app.config['UPLOAD_PATH'] = 'uploads'
 
     db.init_app(app)
     migrate.init_app(app, db)

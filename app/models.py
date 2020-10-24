@@ -17,8 +17,9 @@ class Agent(db.Model):
     agnotes = db.Column(db.String(60))
     code = db.Column(db.String(15))
 
-    rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
+    emailad_agent = db.relationship('Emailad', backref='agent', lazy='dynamic')
     headrent_agent = db.relationship('Headrent', backref='agent', lazy='dynamic')
+    rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
 
 class Charge(db.Model):
@@ -52,6 +53,18 @@ class Dates(db.Model):
     day = db.Column(db.Integer)
 
 
+class Digfile(db.Model):
+    __tablename__ = 'digfile'
+
+    id = db.Column(db.Integer, primary_key=True)
+    digfile_date = db.Column(db.Date)
+    summary = db.Column(db.String(90))
+    digdata = db.Column(db.LargeBinary, nullable=True)
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    out_in = db.Column(db.Integer, nullable=False)
+
+
 class Docfile(db.Model):
     __tablename__ = 'docfile'
 
@@ -62,7 +75,6 @@ class Docfile(db.Model):
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     out_in = db.Column(db.Integer, nullable=False)
-    digidoc = db.Column(db.LargeBinary, nullable=True)
 
 
 class Emailaccount(db.Model):
@@ -86,6 +98,15 @@ class Emailaccount(db.Model):
     imap_draftfolder = db.Column(db.String(60))
 
     landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
+
+
+class Emailad(db.Model):
+    __tablename__ = 'emailad'
+
+    id = db.Column(db.Integer, primary_key=True)
+    emailaddr = db.Column(db.String(90))
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
 
 
 class Event(db.Model):
@@ -139,7 +160,6 @@ class Formletter(db.Model):
     code = db.Column(db.String(30))
     summary = db.Column(db.String(60))
     subject = db.Column(db.String(150))
-    # block = db.Column(db.String(4500))
     block = db.Column(db.Text, nullable=True)
     bold = db.Column(db.String(900))
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
@@ -417,7 +437,9 @@ class Rent(db.Model):
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
+    digfile_rent = db.relationship('Digfile', backref='rent', lazy='dynamic')
     docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
+    emailad_rent = db.relationship('Emailad', backref='rent', lazy='dynamic')
     event_rent = db.relationship('Event', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
@@ -513,6 +535,7 @@ class Typedoc(db.Model):
     desc = db.Column(db.String(30))
 
     formletter_typedoc = db.relationship('Formletter', backref='typedoc', lazy='dynamic')
+    digfile_typedoc = db.relationship('Digfile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
 
 

@@ -8,8 +8,8 @@ from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database
-from app.models import Agent, Charge, Chargetype, Docfile, Extmanager, Extrent, Formletter, Headrent, Income, \
-    Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
+from app.models import Agent, Charge, Chargetype, Digfile, Docfile, Extmanager, Extrent, Formletter, Headrent, \
+    Income, Incomealloc, Jstore, Landlord, Lease, Lease_uplift_type, \
     Loan, Loan_statement, Manager, Money_category, \
     Money_item, Property, Rent, Rental, Rental_statement, Typeactype, \
     Typeadvarr, Money_account, Template, Typedeed, Typefreq, Typedoc, Typemailto, Typepayment, Typeprdelivery, \
@@ -66,6 +66,30 @@ def get_charge(id):
 
 
 # docfiles
+def get_digfile(id, action):
+    if action == "new":
+        # new digfile has to be attached to an existing rent, so incoming id in this case is rent id:
+        rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == id).one()[0]
+        digfile = {
+            'id': 0,
+            'rentid': id,
+            'rentcode': rentcode,
+            'desc': "Letter",
+            'summary': "letter in",
+            'out_in': 0
+        }
+        dgf_outin = "in"
+    else:
+        # existing digfile, so incoming id is digfile id:
+        digfile = Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.summary, Digfile.out_in,
+                       Digfile.digfile_date, Rent.rentcode, Rent.id.label("rentid"), Typedoc.desc) \
+                    .filter(Digfile.id == id).one_or_none()
+        # messy - must be better solution:
+        dgf_outin = "out" if digfile.out_in == 1 else 0
+
+    return digfile, dgf_outin
+
+
 def get_docfile(id, action):
     if action == "new":
         # new docfile has to be attached to an existing rent, so incoming id in this case is rent id:
@@ -78,7 +102,7 @@ def get_docfile(id, action):
             'summary': "letter in",
             'out_in': 0
         }
-        dfoutin = "in"
+        dcf_outin = "in"
     else:
         # existing docfile, so incoming id is docfile id:
         docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
@@ -86,9 +110,9 @@ def get_docfile(id, action):
                                                                        Typedoc.desc) \
                     .filter(Docfile.id == id).one_or_none()
         # messy - must be better solution:
-        dfoutin = "out" if docfile.out_in == 1 else 0
+        dcf_outin = "out" if docfile.out_in == 1 else 0
 
-    return docfile, dfoutin
+    return docfile, dcf_outin
 
 
 def get_docfiles(rentid):
@@ -170,8 +194,7 @@ def get_formletters(action):
     elif action == "lease":
         formletters = Formletter.query.filter(Formletter.code.ilike('LEQ-%'))
     else:
-        id_list = json.loads(current_user.recent_formletters)
-        formletters = Formletter.query.filter(Formletter.id.in_(id_list))
+        formletters = Formletter.query.all()
 
     return formletters
 
@@ -382,11 +405,19 @@ def get_loan_options():
 
     return advarrdets, freqdets
 
-def get_loans():
-    loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                           Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa).all()
-    loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
-                        func.sum(Loan.interestpa).label('totint')).filter().first()
+def get_loans(action):
+    if action == "Nick":
+        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
+                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa) \
+            .filter(Loan.lender.ilike('%NJL%')).all()
+        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
+                                           func.sum(Loan.interestpa).label('totint')) \
+            .filter(Loan.lender.ilike('%NJL%')).first()
+    else:
+        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
+                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa).all()
+        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
+                            func.sum(Loan.interestpa).label('totint')).filter().first()
 
     return loans, loansum
 

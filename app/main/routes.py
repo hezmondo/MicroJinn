@@ -1,11 +1,11 @@
 import sqlalchemy
 import datetime
-from flask import render_template, redirect, url_for, request, session, jsonify
+from flask import flash, jsonify, redirect, render_template, request, send_from_directory, session, url_for
 from flask_login import login_required
-from app import db
+from app import db, Config
 from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
-    get_docfile, get_docfiles, get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
+     get_digfile, get_docfile, get_docfiles, get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
     get_formletters, get_headrent, get_headrents, \
     get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
     get_landlords, get_lease, get_loan, get_leases, get_loan_options, get_loans, \
@@ -13,9 +13,9 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_com
     get_property, get_queryoptions_common, get_queryoptions_advanced, get_rental, getrentals, get_rentalstatement, \
     getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic
 from app.main.delete import delete_record
-from app.main.post import post_agent, post_charge, post_emailaccount, post_headrent, post_incomeobject, \
-    post_landlord, post_formletter, post_docfile, post_lease, post_loan, post_moneyaccount, post_moneyitem, \
-    post_property, post_rental, postrentobj
+from app.main.post import post_agent, post_charge, post_digfile, post_docfile, post_emailaccount, post_formletter, \
+    post_headrent, post_incomeobject, post_landlord, post_lease, post_loan, post_moneyaccount, post_moneyitem, \
+    post_property, post_rental, postrentobj, post_upload
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
 from app.models import Agent, Charge, Formletter, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
@@ -77,6 +77,21 @@ def delete_item(id):
     delete_record(id, item)
 
 
+@bp.route('/digfile/<int:id>', methods=['GET', 'POST'])
+@login_required
+def digfile(id):
+    # incoming id is digfile id for existing digfile and rent id for new digfile! -see guide
+    action = request.args.get('action', "view", type=str)
+    if request.method == "POST":
+        id_ = post_digfile(id)
+        return redirect('/digfile/{}?action=view'.format(id_))
+
+    digfile, dgf_outin = get_digfile(id, action)
+    # this id is docfile id for existing docfile and rent id for new docfile!
+
+    return render_template('docfile.html', action=action, docfile=docfile, dgf_outin=dgf_outin)
+
+
 @bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
 @login_required
 def docfile(id):
@@ -86,10 +101,10 @@ def docfile(id):
         id_ = post_docfile(id)
         return redirect('/docfile/{}?action=view'.format(id_))
 
-    docfile, dfoutin = get_docfile(id, action)
+    docfile, dcf_outin = get_docfile(id, action)
     # this id is docfile id for existing docfile and rent id for new docfile!
 
-    return render_template('docfile.html', action=action, docfile=docfile, dfoutin=dfoutin)
+    return render_template('docfile.html', action=action, docfile=docfile, dcf_outin=dcf_outin)
 
 
 @bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
@@ -287,7 +302,7 @@ def loan(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id = post_loan(id, action)
-
+        action = "view"
     loan = get_loan(id)
     advarrdets, freqdets = get_loan_options()
 
@@ -296,7 +311,8 @@ def loan(id):
 
 @bp.route('/loans', methods=['GET', 'POST'])
 def loans():
-    loans, loansum = get_loans()
+    action = request.args.get('action', "view", type=str)
+    loans, loansum = get_loans(action)
 
     return render_template('loans.html', loans=loans, loansum=loansum)
 
@@ -499,8 +515,8 @@ def rent_object(id):
     actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
     advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
 
-    if not session['mailtodets']:
-        session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    # if session.get('mailtodets') == False:
+    #     session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
     session['propaddr'] = rentobj.propaddr
@@ -518,3 +534,23 @@ def save_html():
         id_ = post_docfile(0)
 
         return redirect('/docfile/{}?action=view'.format(id_))
+
+
+@bp.route('/upload_dialog/<int:id>', methods=["GET", "POST"])
+@login_required
+def upload_dialog(id):
+    rentcode = request.args.get('rentcode', "dummy", type=str)
+
+    return render_template('upload_dialog.html', rentcode=rentcode, rent_id = id)
+
+
+@bp.route('/upload_file', methods=["POST"])
+@login_required
+def upload_file():
+    post_upload()
+
+    return redirect("{{ url_for('main.index' }}")
+
+# @bp.route('/uploads/<filename>')
+# def upload(filename):
+#     return send_from_directory(app.config['UPLOAD_PATH'], filename)

@@ -3,9 +3,9 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-9">
-            <input class="form-control form-control-lg" type="text" placeholder="Showing all loans" readonly>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <a href="/loans?action=Nick" class="btn btn-block btn-primary" role="button">Show only Nick loans</a>
         </div>
         <div class="col-md-3">
             <a href="/loan/0?action=new" class="btn btn-block btn-danger" role="button">Add new loan</a>
@@ -16,30 +16,28 @@
     <table class="table" id="loans">
         <thead>
         <tr>
-            <th style="width: 6.00%">id</th>
-            <th style="width: 10.00%">Code</th>
-            <th style="width: 14.00%">Borrower</th>
-            <th style="width: 10.00%">Int rate</th>
-            <th style="width: 12.00%">Lender</th>
-            <th style="width: 10.00%">Notes</th>
-            <th style="width: 10.00%">Valuation date</th>
+            <th style="width: 10.00%">code</th>
+            <th style="width: 14.00%">borrower</th>
+            <th style="width: 10.00%">int rate</th>
+            <th style="width: 12.00%">lender</th>
+            <th style="width: 12.00%">end date</th>
+            <th style="width: 12.00%">Notes</th>
+            <th style="width: 12.00%">Valuation date</th>
             <th style="width: 10.00%">Valuation</th>
-            <th style="width: 10.00%">Interest pa</th>
             <th style="width: 8.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in loans %}
         <tr id="{{ item.id }}">
-            <td style="width: 6.00%">{{ item.id }}</td>
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 14.00%"> {{ item.borrower }}</td>
             <td style="width: 10.00%"> {{ item.interest_rate }}</td>
             <td style="width: 12.00%"> {{ item.lender }}</td>
-            <td style="width: 10.00%"> {{ item.notes }}</td>
-            <td style="width: 10.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
+            <td style="width: 12.00%"> {{ item.end_date.strftime('%d-%b-%Y') if item.end_date else 'none'  }}</td>
+            <td style="width: 12.00%"> {{ item.notes }}</td>
+            <td style="width: 12.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 10.00%"> {{ item.valuation }}</td>
-            <td style="width: 10.00%"> {{ item.interestpa }}</td>
             <td style="width: 8.00%"><a href="/loan/{{ item.id }}?action=view">View</a></td>
         </tr>
         {% endfor %}
