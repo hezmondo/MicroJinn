@@ -17,7 +17,7 @@
                 <input type="text" class="form-control" name="summary" placeholder="summary">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" name="docfile_text" placeholder="docfile text">
+                <input type="text" class="form-control" name="doc_text" placeholder="doc text">
             </div>
             <div class="col-md-2">
                 {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=session['doc_types'][0]) }}
@@ -42,8 +42,9 @@
             <tr>
                 <th style="width: 10.00%">date</th>
                 <th style="width: 10.00%">rentcode</th>
-                <th style="width: 50.00%">summary</th>
+                <th style="width: 40.00%">summary</th>
                 <th style="width: 10.00%">doctype</th>
+                <th style="width: 10.00%">doc or dig</th>
                 <th style="width: 10.00%">out or in</th>
                 <th style="width: 10.00%">action</th>
             </tr>
@@ -51,12 +52,13 @@
             <tbody>
             {% for item in docfiles %}
             <tr id="{{ item.id }}">
-                <td style="width: 10.00%"> {{ item.docfile_date.strftime('%d-%b-%Y') if item.docfile_date else 'none' }}</td>
+                <td style="width: 10.00%"> {{ item.doc_date.strftime('%d-%b-%Y') if item.doc_date else 'none' }}</td>
                 <td style="width: 10.00%"> {{ item.rentcode }}</td>
-                <td style="width: 50.00%"> {{ item.summary }}</td>
+                <td style="width: 40.00%"> {{ item.summary }}</td>
                 <td style="width: 10.00%"> {{ item.desc }}</td>
+                <td style="width: 10.00%"> {{ item.doc_dig }}</td>
                 <td style="width: 10.00%"> {{ item.out_in }}</td>
-                <td style="width: 10.00%"><a href="/docfile/{{ item.id }}?action=view">view</a></td>
+                <td style="width: 10.00%"><a href="/docfile/{{ item.id }}?doc_dig={{ item.doc_dig }}">view</a></td>
             </tr>
             {% endfor %}
             </tbody>

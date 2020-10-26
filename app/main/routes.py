@@ -1,11 +1,12 @@
 import sqlalchemy
 import datetime
-from flask import flash, jsonify, redirect, render_template, request, send_from_directory, session, url_for
+from flask import flash, jsonify, redirect, render_template, request, send_from_directory, send_file, session, url_for
 from flask_login import login_required
+from io import BytesIO
 from app import db, Config
 from app.main import bp
 from app.main.get import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
-     get_digfile, get_docfile, get_docfiles, get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
+     get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
     get_formletters, get_headrent, get_headrents, \
     get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
     get_landlords, get_lease, get_loan, get_leases, get_loan_options, get_loans, \
@@ -13,12 +14,13 @@ from app.main.get import get_agent, get_agents, get_charge, get_charges, get_com
     get_property, get_queryoptions_common, get_queryoptions_advanced, get_rental, getrentals, get_rentalstatement, \
     getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic
 from app.main.delete import delete_record
-from app.main.post import post_agent, post_charge, post_digfile, post_docfile, post_emailaccount, post_formletter, \
+from app.main.docfiles import get_docfile, get_docfiles, post_docfile, post_upload
+from app.main.post import post_agent, post_charge, post_emailaccount, post_formletter, \
     post_headrent, post_incomeobject, post_landlord, post_lease, post_loan, post_moneyaccount, post_moneyitem, \
-    post_property, post_rental, postrentobj, post_upload
+    post_property, post_rental, postrentobj
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Formletter, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
+from app.models import Agent, Charge, Formletter, Digfile, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
     Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
     Template, Typedoc, Typemailto
 
@@ -77,34 +79,33 @@ def delete_item(id):
     delete_record(id, item)
 
 
-@bp.route('/digfile/<int:id>', methods=['GET', 'POST'])
-@login_required
-def digfile(id):
-    # incoming id is digfile id for existing digfile and rent id for new digfile! -see guide
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        id_ = post_digfile(id)
-        return redirect('/digfile/{}?action=view'.format(id_))
-
-    digfile, dgf_outin = get_digfile(id, action)
-    # this id is docfile id for existing docfile and rent id for new docfile!
-
-    return render_template('docfile.html', action=action, docfile=docfile, dgf_outin=dgf_outin)
-
-
+# @bp.route('/digfile/<int:id>', methods=['GET', 'POST'])
+# @login_required
+# def digfile(id):
+#     # incoming id is digfile id for existing digfile and rent id for new digfile! -see guide
+#     action = request.args.get('action', "view", type=str)
+#     if request.method == "POST":
+#         id_ = post_digfile(id)
+#         return redirect('/digfile/{}?action=view'.format(id_))
+#
+#     digfile, dgf_outin = get_digfile(id, action)
+#     # this id is docfile id for existing docfile and rent id for new docfile!
+#
+#     return render_template('docfile.html', action=action, docfile=docfile, dgf_outin=dgf_outin)
+#
+#
 @bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
 @login_required
 def docfile(id):
-    # incoming id is docfile id for existing docfile and rent id for new docfile! -see guide
-    action = request.args.get('action', "view", type=str)
+    doc_dig = request.args.get('doc_dig', "doc", type=str)
+    rentid = request.args.get('rentid', "0", type=str)
     if request.method == "POST":
         id_ = post_docfile(id)
-        return redirect('/docfile/{}?action=view'.format(id_))
+        return redirect('/docfile/{}?doc_dig={}'.format(id_, doc_dig))
 
-    docfile, dcf_outin = get_docfile(id, action)
-    # this id is docfile id for existing docfile and rent id for new docfile!
+    docfile, outin = get_docfile(id, doc_dig, rentid)
 
-    return render_template('docfile.html', action=action, docfile=docfile, dcf_outin=dcf_outin)
+    return render_template('docfile.html', doc_dig=doc_dig, docfile=docfile, outin=outin)
 
 
 @bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
@@ -113,6 +114,13 @@ def docfiles(rentid):
     outins = ["all", "out", "in"]
 
     return render_template('docfiles.html', rentid=rentid, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
+
+
+@bp.route('/download/<int:id>')
+@login_required
+def download(id):
+    digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
+    return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -287,7 +295,7 @@ def leases():
 @bp.route('/load_query', methods=['GET', 'POST'])
 def load_query():
     if request.method == "POST":
-        jqname = request.form["jqname"]
+        jqname = request.form.get("jqname")
 
         return redirect("/queries/?name={}".format(jqname))
 
@@ -327,7 +335,7 @@ def loanstat_dialog(id):
 @login_required
 def loan_statement(id):
     if request.method == "POST":
-        stat_date = request.form["statdate"]
+        stat_date = request.form.get("statdate")
         rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"), params={"x": id, "y": stat_date})
         checksums = rproxy.fetchall()
         db.session.commit()
@@ -356,14 +364,14 @@ def mail_edit(id):
     if request.method == "POST":
         # print(request.form)
         formletter_id = id
-        rent_id = request.form['rent_id']
+        rent_id = request.form.get('rent_id')
         addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
         mailaddr = request.form.get('mailaddr')
-        dfsummary = dcode + "-" + method + "-" + mailaddr[0:25]
+        summary = dcode + "-" + method + "-" + mailaddr[0:25]
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
-                               dfsummary=dfsummary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                               summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
                                method=method, rentobj=rentobj, subject=subject)
 
 
@@ -549,7 +557,7 @@ def upload_dialog(id):
 def upload_file():
     post_upload()
 
-    return redirect("{{ url_for('main.index' }}")
+    return '', 204
 
 # @bp.route('/uploads/<filename>')
 # def upload(filename):

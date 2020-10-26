@@ -14,14 +14,14 @@
                 <a href="/rent_object/{{ digfile.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-2">
-                <a href="/digfile/{{ digfile.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit this digfile</a>
+                <a href="/docfile/{{ digfile.id }}?action=dig" class="btn btn-block btn-danger" role="button">edit this digfile</a>
             </div>
             <div class="col-md-2">
-                <a href="/docfile/{{ digfile.rentid }}?action=new" class="btn btn-block btn-primary" role="button">new digfile</a>
+                <a href="/docfile/0?action=dig&rentid={{ digfile.rentid }}" class="btn btn-block btn-primary" role="button">new digfile</a>
             </div>
         {% else %}
             <div class="col-md-2">
-                <button id="savedigfile" class="btn btn-block btn-success">save changes</button>
+                <button type="submit" class="btn btn-block btn-success">save changes</button>
             </div>
             {% if action == "edit" %}
                 <div class="col-md-2">
@@ -34,7 +34,7 @@
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <input type="date" class="form-control" name="digfile_date" value="{{ today_date }}">
+            <input type="date" class="form-control" name="dig_date" value="{{ today_date }}">
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="rentcode" value = "{{ digfile.rentcode }}">

@@ -2,7 +2,6 @@ import os
 import json
 import datetime
 from flask import flash, redirect, request
-from werkzeug.utils import secure_filename
 from app import db
 from app.main.functions import commit_to_database, convert_html_to_pdf, validate_image
 from app.models import Agent, Charge, Chargetype, Formletter, Digfile, Docfile, Extmanager, Extrent, Headrent, Income, \
@@ -41,58 +40,6 @@ def post_charge(id, action):
     db.session.add(charge)
     db.session.commit()
     id_ = charge.id
-
-    return id_
-
-
-def post_digfile(id):
-    if id == 0:
-        # new docfile:
-        newdigfile = Digfile()
-    else:
-        # existing docfile:
-        newdigfile = Docfile.query.get(id)
-    if request.form.get('rentcode') and request.form.get('rentcode') != "":
-        rentcode = request.form.get('rentcode')
-        newdigfile.rent_id = \
-            Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
-    newdigfile.digfile_date = request.form.get('digfile_date')
-    newdigfile.summary = request.form.get('dgf_summary')
-    doctype = request.form.get('doc_type')
-    newdigfile.doctype_id = \
-        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-    newdigfile.out_in = 1 if request.form.get('out_in') == "in" else 0
-    db.session.add(newdigfile)
-    db.session.commit()
-    id_ = newdigfile.id
-
-    return id_
-
-
-def post_docfile(id):
-    if id == 0:
-        # new docfile:
-        docfile = Docfile()
-    else:
-        # existing docfile:
-        docfile = Docfile.query.get(id)
-    if request.form.get('rentcode') and request.form.get('rentcode') != "":
-        rentcode = request.form.get('rentcode')
-        docfile.rent_id = \
-            Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
-    docfile.docfile_date = request.form.get('docfile_date')
-    docfile.summary = request.form.get('dfsummary')
-    docfile.docfile_text = request.form.get('xinput').replace("£", "&pound;")
-    doctype = request.form.get('doc_type')
-    docfile.doctype_id = \
-        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-    docfile.out_in = 0 if request.form.get('out_in') == "in" else 1
-    db.session.add(docfile)
-    db.session.commit()
-    id_ = docfile.id
-    source_html = docfile.docfile_text
-    output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.docfile_date))
-    convert_html_to_pdf(source_html, output_filename)
 
     return id_
 
@@ -463,37 +410,3 @@ def postrentobj(id):
         db.session.commit()
 
     return redirect('/rent_object/{}'.format(id))
-
-
-def post_upload():
-    print(request.form)
-    print(request.files)
-    rentid = request.form.get("rentid")
-    rentcode = request.form.get("rentcode")
-    doctype = request.form.get("doc_type")
-    digdate = request.form.get("dig_date")
-    outin = request.form.get("out_in")
-    uploaded_file = request.files.get('file')
-    filename = secure_filename(uploaded_file.filename)
-    if filename != '':
-        file_ext = os.path.splitext(filename)[1]
-        if file_ext not in ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']:
-            return "Invalid file suffix", 400
-        elif file_ext in ['.jpg', '.png', '.gif'] and file_ext != validate_image(uploaded_file.stream):
-            return "Invalid image", 400
-        uploaded_file.save(os.path.join('uploads', filename))
-        newdigfile = Digfile()
-        newdigfile.doctype_id = \
-            Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-        newdigfile.digfile_date = digdate
-        newdigfile.summary = rentcode + '-' + filename
-        newdigfile.rent_id = rentid
-        newdigfile.out_in = 0 if outin == "out" else 1
-        newdigfile.digdata = uploaded_file.read()
-        db.session.add(newdigfile)
-        db.session.commit()
-        return '', 204
-    else:
-        flash('No filename!')
-        return redirect(request.url)
-

@@ -157,7 +157,8 @@
                   <div class="dropdown-menu" aria-labelledby="docfilesMenuButton">
                     <a class="dropdown-item" href="/docfiles/{{ rentobj.id }}">view docfiles for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new docfile out for this rent</a>
-                    <a class="dropdown-item" href="/docfile/{{ rentobj.id }}?action=new">new docfile in for this rent</a>
+                    <a class="dropdown-item" href="/docfile/0?doc_dig=doc&rentid={{ rentobj.id }}">new doc file in for this rent</a>
+                    <a class="dropdown-item" href="/docfile/0?doc_dig=dig&rentid={{ rentobj.id }}">new dig file in for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new payrequest for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new s166 for this rent</a>
                     <a class="dropdown-item" href="/upload_dialog/{{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">upload files for this rent</a>

@@ -65,86 +65,6 @@ def get_charge(id):
     return charge, chargedescs
 
 
-# docfiles
-def get_digfile(id, action):
-    if action == "new":
-        # new digfile has to be attached to an existing rent, so incoming id in this case is rent id:
-        rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == id).one()[0]
-        digfile = {
-            'id': 0,
-            'rentid': id,
-            'rentcode': rentcode,
-            'desc': "Letter",
-            'summary': "letter in",
-            'out_in': 0
-        }
-        dgf_outin = "in"
-    else:
-        # existing digfile, so incoming id is digfile id:
-        digfile = Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.summary, Digfile.out_in,
-                       Digfile.digfile_date, Rent.rentcode, Rent.id.label("rentid"), Typedoc.desc) \
-                    .filter(Digfile.id == id).one_or_none()
-        # messy - must be better solution:
-        dgf_outin = "out" if digfile.out_in == 1 else 0
-
-    return digfile, dgf_outin
-
-
-def get_docfile(id, action):
-    if action == "new":
-        # new docfile has to be attached to an existing rent, so incoming id in this case is rent id:
-        rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == id).one()[0]
-        docfile = {
-            'id': 0,
-            'rentid': id,
-            'rentcode': rentcode,
-            'desc': "Letter",
-            'summary': "letter in",
-            'out_in': 0
-        }
-        dcf_outin = "in"
-    else:
-        # existing docfile, so incoming id is docfile id:
-        docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
-                       Docfile.docfile_text, Docfile.docfile_date, Rent.rentcode, Rent.id.label("rentid"),
-                                                                       Typedoc.desc) \
-                    .filter(Docfile.id == id).one_or_none()
-        # messy - must be better solution:
-        dcf_outin = "out" if docfile.out_in == 1 else 0
-
-    return docfile, dcf_outin
-
-
-def get_docfiles(rentid):
-    docfile_filter = []
-    dfoutin = "all"
-    if request.method == "POST":
-        rcd = request.form.get("rentcode") or ""
-        dfsum = request.form.get("summary") or ""
-        dftx = request.form.get("docfile_text") or ""
-        dfty = request.form.get("doc_type") or ""
-        dfoutin = request.form.get("out_in") or ""
-        if rcd and rcd != "":
-            docfile_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
-        if dfsum and dfsum != "":
-            docfile_filter.append(Docfile.summary.ilike('%{}%'.format(dfsum)))
-        if dftx and dftx != "":
-            docfile_filter.append(Docfile.docfile_text.ilike('%{}%'.format(dftx)))
-        if dfty and dfty != "":
-            docfile_filter.append(Typedoc.desc.ilike('%{}%'.format(dfty)))
-        if dfoutin == "out":
-            docfile_filter.append(Docfile.out_in == 1)
-        elif dfoutin == "in":
-            docfile_filter.append(Docfile.out_in == 0)
-    if rentid > 0:
-        docfile_filter.append(Docfile.rent_id == rentid)
-
-    docfiles = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.docfile_date,
-                Docfile.summary, Docfile.docfile_text, Typedoc.desc, Docfile.out_in, Rent.rentcode) \
-        .filter(*docfile_filter).all()
-
-    return docfiles, dfoutin
-
 # email accounts
 def get_emailaccounts():
     emailaccs = Emailaccount.query.all()
@@ -241,7 +161,7 @@ def get_incomeitems():
     if rentcode and rentcode != "":
         qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
     accountdesc = request.form.get("accountdesc") if request.method == "POST" else ""
-    paymtype = request.form["paymtype"] if request.method == "POST" else ""
+    paymtype = request.form.get("paymtype") if request.method == "POST" else ""
     if accountdesc and accountdesc != "" and accountdesc != "all accounts":
         qfilter.append(Money_account.accdesc == accountdesc)
     if paymtype and paymtype != ""and paymtype != "all payment types":

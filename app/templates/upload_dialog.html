@@ -9,23 +9,23 @@
         <h1></h1>
     </div>
         <form action="{{ url_for('main.upload_file') }}" class="dropzone">
-        <div class="form-group row">
-            <div class="col-md-3">
-                <input type="date" class="form-control" name="dig_date" value="{{ today_date }}">
+            <div class="form-group row">
+                <div class="col-md-3">
+                    <input type="date" class="form-control" name="dig_date" value="{{ today_date }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="rentid" value = "{{ rent_id }}" readonly="readonly">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" name="rentcode" value = "{{ rentcode }}" readonly="readonly">
+                </div>
+                <div class="col-md-2">
+                    {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=session['doc_types'][0]) }}
+                </div>
+                <div class="col-md-2">
+                    {{ widgets.combobox(name="out_in", items=["out", "in"], item_selected="in") }}
+                </div>
             </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="rentid" value = "{{ rent_id }}" readonly="readonly">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="rentcode" value = "{{ rentcode }}" readonly="readonly">
-            </div>
-            <div class="col-md-2">
-                {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=session['doc_types'][0]) }}
-            </div>
-            <div class="col-md-2">
-                {{ widgets.combobox(name="out_in", items=["out", "in"], item_selected="in") }}
-            </div>
-        </div>
         </form>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
 {% endblock %}

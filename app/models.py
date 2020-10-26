@@ -57,9 +57,9 @@ class Digfile(db.Model):
     __tablename__ = 'digfile'
 
     id = db.Column(db.Integer, primary_key=True)
-    digfile_date = db.Column(db.Date)
+    dig_date = db.Column(db.Date)
     summary = db.Column(db.String(90))
-    digdata = db.Column(db.LargeBinary, nullable=True)
+    dig_data = db.Column(db.LargeBinary, nullable=True)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     out_in = db.Column(db.Integer, nullable=False)
@@ -69,9 +69,9 @@ class Docfile(db.Model):
     __tablename__ = 'docfile'
 
     id = db.Column(db.Integer, primary_key=True)
-    docfile_date = db.Column(db.Date)
+    doc_date = db.Column(db.Date)
     summary = db.Column(db.String(90))
-    docfile_text = db.Column(db.Text)
+    doc_text = db.Column(db.Text)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     out_in = db.Column(db.Integer, nullable=False)

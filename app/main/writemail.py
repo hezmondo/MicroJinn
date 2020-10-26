@@ -53,12 +53,12 @@ def writeMail(rent_id, income_id, formletter_id, action):
         '#today#': dateToStr(datetime.date.today())
     }
     if action == "lease":
-        fh_rate = request.form['fh_rate']
-        gr_rate = request.form['gr_rate']
-        new_gr_a = request.form['new_gr_a']
-        new_gr_b = request.form['new_gr_b']
-        yp_low = request.form['yp_low']
-        yp_high = request.form['yp_high']
+        fh_rate = request.form.get('fh_rate')
+        gr_rate = request.form.get('gr_rate')
+        new_gr_a = request.form.get('new_gr_a')
+        new_gr_b = request.form.get('new_gr_b')
+        yp_low = request.form.get('yp_low')
+        yp_high = request.form.get('yp_high')
 
         leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
         impval = leasedata["impvalk"] * 1000
