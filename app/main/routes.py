@@ -1,5 +1,7 @@
 import sqlalchemy
 import datetime
+import base64
+from base64 import b64encode
 from flask import flash, jsonify, redirect, render_template, request, send_from_directory, send_file, session, url_for
 from flask_login import login_required
 from io import BytesIO
@@ -120,7 +122,17 @@ def docfiles(rentid):
 @login_required
 def download(id):
     digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
-    return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True)
+    # image = b64encode(digfile.dig_data).decode("utf-8")
+    return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True, mimetype='application/pdf')
+    # return render_template("testing.html", image=image)
+
+
+# @bp.route("/testing", methods=["GET"])
+# def get_test_file():
+#     with open("source.pdf", "rb") as data_file:
+#         data = data_file.read()
+#     encoded_data = base64.b64encode(data).decode('utf-8')
+#     return render_template("testing.html", encoded_data=encoded_data)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -544,20 +556,24 @@ def save_html():
         return redirect('/docfile/{}?action=view'.format(id_))
 
 
-@bp.route('/upload_dialog/<int:id>', methods=["GET", "POST"])
+@bp.route('/upload_file/<int:id>', methods=["GET", "POST"])
 @login_required
-def upload_dialog(id):
+def upload_file(id):
     rentcode = request.args.get('rentcode', "dummy", type=str)
+    if request.method == "POST":
+        id_ = post_upload()
+
+        return redirect('/docfile/{}?doc_dig=dig'.format(id_))
 
     return render_template('upload_dialog.html', rentcode=rentcode, rent_id = id)
 
 
-@bp.route('/upload_file', methods=["POST"])
-@login_required
-def upload_file():
-    post_upload()
-
-    return '', 204
+# @bp.route('/upload_file', methods=["POST"])
+# @login_required
+# def upload_file():
+#     post_upload()
+#
+#     return '', 204
 
 # @bp.route('/uploads/<filename>')
 # def upload(filename):

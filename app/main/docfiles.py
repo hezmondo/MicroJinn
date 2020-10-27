@@ -175,7 +175,7 @@ def post_upload():
     doctype = request.form.get("doc_type")
     dig_date = request.form.get("dig_date")
     outin = request.form.get("out_in")
-    uploaded_file = request.files.get('file')
+    uploaded_file = request.files.get('uploadfile')
     filename = secure_filename(uploaded_file.filename)
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
@@ -194,6 +194,9 @@ def post_upload():
         newdigfile.dig_data = uploaded_file.read()
         db.session.add(newdigfile)
         db.session.commit()
+        id_ = newdigfile.id
+
+        return id_
     # else:
     #     flash('No filename!')
     #     return redirect(request.url)

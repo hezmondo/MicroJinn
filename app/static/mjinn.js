@@ -15,6 +15,10 @@ $(document).ready(function(){
        alert($(this).data("href"));
         window.location = $(this).data("href");
     });
+    $(".custom-file-input").on("change", function() {
+      var fileName = $(this).val().split("\\").pop();
+      $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
     $('#savehtml').click(function() {
     var mysave = $('#doc_html').html();
     $('#xinput').val(mysave);
