@@ -35,7 +35,7 @@
             <input type="hidden" id="xinput" name="xinput" value = "xyz">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" class="form-control" name="rentid" value = "{{ docfile.rentid }}">
+            <input type="hidden" class="form-control" name="rentid" value = "{{ docfile.rent_id }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="doc_dig" value = "{{ doc_dig }}">
@@ -55,7 +55,7 @@
 			{{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=docfile.desc) }}
 		</div>
         <div class="col-md-2">
-            {{ widgets.combobox(name="out_in", items=["all", "out", "in"], item_selected=outin) }}
+            {{ widgets.combobox(name="out_in", items=["all", "out", "in"], item_selected="in") }}
         </div>
 	</div>
     {% if doc_dig == "doc" %}

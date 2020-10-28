@@ -81,33 +81,16 @@ def delete_item(id):
     delete_record(id, item)
 
 
-# @bp.route('/digfile/<int:id>', methods=['GET', 'POST'])
-# @login_required
-# def digfile(id):
-#     # incoming id is digfile id for existing digfile and rent id for new digfile! -see guide
-#     action = request.args.get('action', "view", type=str)
-#     if request.method == "POST":
-#         id_ = post_digfile(id)
-#         return redirect('/digfile/{}?action=view'.format(id_))
-#
-#     digfile, dgf_outin = get_digfile(id, action)
-#     # this id is docfile id for existing docfile and rent id for new docfile!
-#
-#     return render_template('docfile.html', action=action, docfile=docfile, dgf_outin=dgf_outin)
-#
-#
 @bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
 @login_required
 def docfile(id):
-    doc_dig = request.args.get('doc_dig', "doc", type=str)
-    rentid = request.args.get('rentid', "0", type=str)
     if request.method == "POST":
-        id_ = post_docfile(id)
-        return redirect('/docfile/{}?doc_dig={}'.format(id_, doc_dig))
+        rentid = post_docfile(id)
+        return redirect('/rent_object/{}'.format(rentid))
 
-    docfile, outin = get_docfile(id, doc_dig, rentid)
+    docfile, doc_dig = get_docfile(id)
 
-    return render_template('docfile.html', doc_dig=doc_dig, docfile=docfile, outin=outin)
+    return render_template('docfile.html', docfile=docfile, doc_dig=doc_dig)
 
 
 @bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
@@ -122,17 +105,7 @@ def docfiles(rentid):
 @login_required
 def download(id):
     digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
-    # image = b64encode(digfile.dig_data).decode("utf-8")
     return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True, mimetype='application/pdf')
-    # return render_template("testing.html", image=image)
-
-
-# @bp.route("/testing", methods=["GET"])
-# def get_test_file():
-#     with open("source.pdf", "rb") as data_file:
-#         data = data_file.read()
-#     encoded_data = base64.b64encode(data).decode('utf-8')
-#     return render_template("testing.html", encoded_data=encoded_data)
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -553,7 +526,7 @@ def save_html():
     if request.method == "POST":
         id_ = post_docfile(0)
 
-        return redirect('/docfile/{}?action=view'.format(id_))
+        return redirect('/docfile/{}?doc_dig_doc'.format(id_))
 
 
 @bp.route('/upload_file/<int:id>', methods=["GET", "POST"])

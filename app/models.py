@@ -57,7 +57,7 @@ class Digfile(db.Model):
     __tablename__ = 'digfile'
 
     id = db.Column(db.Integer, primary_key=True)
-    dig_date = db.Column(db.Date)
+    doc_date = db.Column(db.Date)
     summary = db.Column(db.String(90))
     dig_data = db.Column(db.LargeBinary, nullable=True)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))

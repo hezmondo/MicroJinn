@@ -1,3 +1,4 @@
+import binascii
 import os
 import json
 import sqlalchemy
@@ -12,38 +13,31 @@ from app.main.functions import commit_to_database, convert_html_to_pdf, validate
 from app.models import Digfile, Docfile, Rent, Typedoc
 
 
-def get_docfile(id, doc_dig, rentid):
-    if int(id) == 0:
-        # new doc or dig file has to be attached to the incoming rent id:
-        rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == rentid).one()[0]
-        docfile = {
-            'id': 0,
-            'rentid': id,
-            'rentcode': rentcode,
-            'desc': "Letter",
-            'summary': "letter in",
-            'out_in': 1
-        }
+def get_docfile(id):
+    doc_dig = request.args.get('doc_dig', "doc", type=str)
+    rentid = int(request.args.get('rentid', "0", type=str))
+    if id == 0:
+        docfile = Docfile() if doc_dig == "doc" else Digfile()
+        docfile.id = 0
+        docfile.rent_id = int(rentid)
+        docfile.out_in = 1
+        docfile.rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == rentid).one()[0]
+        docfile.summary = "email in"
+        docfile.doc_text = ""
+        docfile.doctype_id = 1
     else:
-        # existing doc or dig file:
         if doc_dig == "doc":
             docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
-                           Docfile.doc_text, Docfile.doc_date.label('docdate'),
-                               Rent.rentcode, Rent.id.label("rentid"), Typedoc.desc) \
+                           Docfile.doc_text, Docfile.doc_date, literal("doc").label('doc_dig'),
+                               Rent.rentcode, Rent.id.label("rent_id"), Typedoc.desc) \
                         .filter(Docfile.id == id).one_or_none()
         else:
             docfile = Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.summary, Digfile.out_in,
-                           Digfile.dig_date.label('docdate'),
-                               Rent.rentcode, Rent.id.label("rentid"), Typedoc.desc) \
+                           Digfile.doc_date, literal("dig").label('doc_dig'),
+                               Rent.rentcode, Rent.id.label("rent_id"), Typedoc.desc) \
                         .filter(Digfile.id == id).one_or_none()
 
-        # messy - must be better solution:
-    if docfile.out_in == 1:
-        out_in = "in"
-    else:
-        out_in = "in"
-
-    return docfile, out_in
+    return docfile, doc_dig
 
 
 def get_docfiles(rentid):
@@ -78,41 +72,17 @@ def get_docfiles(rentid):
         docfile_filter.append(Docfile.rent_id == rentid)
 
     docfiles = \
-        Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.doc_date.label('docdate'),
+        Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.doc_date,
                     Docfile.summary, literal("doc").label('doc_dig'), Docfile.doc_text.label('doctext'),
                      Typedoc.desc, Docfile.out_in, Rent.rentcode) \
             .filter(*docfile_filter).union\
-        (Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.dig_date.label('docdate'),
+        (Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.doc_date,
                     Digfile.summary, literal("dig").label('doc_dig'),
                       literal("Digitext").label('doctext'), Typedoc.desc, Digfile.out_in, Rent.rentcode) \
             .filter(*digfile_filter)) \
-            .order_by(desc(Docfile.doc_date), desc(Docfile.doc_date)).limit(100)
+            .order_by(desc(Docfile.doc_date), desc(Digfile.doc_date)).limit(100)
 
     return docfiles, dfoutin
-
-
-def post_digfile(id):
-    if id == 0:
-        # new docfile:
-        newdigfile = Digfile()
-    else:
-        # existing docfile:
-        newdigfile = Docfile.query.get(id)
-    if request.form.get('rentcode') and request.form.get('rentcode') != "":
-        rentcode = request.form.get('rentcode')
-        newdigfile.rent_id = \
-            Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
-    newdigfile.dig_date = request.form.get('dig_date')
-    newdigfile.summary = request.form.get('dgf_summary')
-    doctype = request.form.get('doc_type')
-    newdigfile.doctype_id = \
-        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-    newdigfile.out_in = 1 if request.form.get('out_in') == "in" else 0
-    db.session.add(newdigfile)
-    db.session.commit()
-    id_ = newdigfile.id
-
-    return id_
 
 
 def post_docfile(id):
@@ -120,51 +90,30 @@ def post_docfile(id):
     #     rentcode = request.form.get('rentcode')
     #     docfile.rent_id = \
     #         Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
-    rentid = request.form.get('rentid')
+    rentid = int(request.form.get('rentid'))
     doc_dig = request.form.get('doc_dig')
-    if doc_dig == "doc":
-        # new docfile for id 0:
-        if id == 0:
-            docfile = {
-                'id': 0,
-                'rentid': rentid,
-            }
-        else:
-            docfile = Docfile.query.get(id)
-        docfile.doc_date = request.form.get('doc_date')
-        docfile.summary = request.form.get('summary')
-        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
-        doctype = request.form.get('doc_type')
-        docfile.doctype_id = \
-            Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-        docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
-        db.session.add(docfile)
-        db.session.commit()
-        id_ = docfile.id
-        source_html = docfile.doc_text
-        output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
-        convert_html_to_pdf(source_html, output_filename)
+    # new doc or dig file for id 0 or existing dig or doc file:
+    if id == 0:
+        docfile = Docfile() if doc_dig == "doc" else Digfile()
+        docfile.id = 0
+        docfile.rent_id = rentid
     else:
-        # new digfile for id 0:
-        if id == 0:
-            digfile = {
-                'id': 0,
-                'rentid': rentid,
-            }
-        else:
-            digfile = Docfile.query.get(id)
-        digfile.dig_date = request.form.get('doc_date')
-        digfile.summary = request.form.get('summary')
-        doctype = request.form.get('doc_type')
-        digfile.doctype_id = \
-            Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-        digfile.out_in = 0 if request.form.get('out_in') == "out" else 1
-        db.session.add(digfile)
-        db.session.commit()
-        id_ = digfile.id
-
-
-    return id_
+        docfile = Docfile.query.get(id) if doc_dig == "doc" else Digfile.query.get(id)
+        docfile.rent_id = rentid
+    docfile.doc_date = request.form.get('doc_date')
+    docfile.summary = request.form.get('summary')
+    if doc_dig == "doc":
+        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
+        # source_html = docfile.doc_text
+        # output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
+        # convert_html_to_pdf(source_html, output_filename)
+    doctype = request.form.get('doc_type')
+    docfile.doctype_id = \
+        Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
+    docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
+    db.session.add(docfile)
+    db.session.commit()
+    return rentid
 
 
 def post_upload():
@@ -183,7 +132,6 @@ def post_upload():
             return "Invalid file suffix", 400
         elif file_ext in ['.jpg', '.png', '.gif'] and file_ext != validate_image(uploaded_file.stream):
             return "Invalid image", 400
-        uploaded_file.save(os.path.join('uploads', filename))
         newdigfile = Digfile()
         newdigfile.doctype_id = \
             Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
