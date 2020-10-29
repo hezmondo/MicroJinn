@@ -1,4 +1,3 @@
-import imghdr
 import logging
 import re
 import hashlib
@@ -8,10 +7,8 @@ import decimal
 
 from app import db
 from flask import abort
-from flask_login import current_user, login_required
 from sqlalchemy import exc
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
-from xhtml2pdf import pisa             # import python module
 from app.main.exceptions import RentIntegerException
 
 
@@ -42,29 +39,6 @@ def commit_to_database():
     except Exception as err:
         db.session.rollback()
         abort(500, err)
-
-
-def validate_image(stream):
-    header = stream.read(512)
-    stream.seek(0)
-    format = imghdr.what(None, header)
-    if not format:
-        return None
-    return '.' + (format if format != 'jpeg' else 'jpg')
-
-
-
-def convert_html_to_pdf(source_html, output_filename):
-    # open output file for writing (truncated binary)
-    result_file = open(output_filename, "w+b")
-    # convert HTML to PDF
-    pisa_status = pisa.CreatePDF(
-            source_html,                # the HTML to convert
-            dest=result_file)           # file handle to recieve result
-    # close output file
-    result_file.close()                 # close output file
-    # return False on success and True on errors
-    return pisa_status.err
 
 
 def hashCode(rentcode):

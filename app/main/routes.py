@@ -1,30 +1,26 @@
 import sqlalchemy
 import datetime
-import base64
-from base64 import b64encode
 from flask import flash, jsonify, redirect, render_template, request, send_from_directory, send_file, session, url_for
 from flask_login import login_required
 from io import BytesIO
-from app import db, Config
+from app import db
 from app.main import bp
-from app.main.get import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
-     get_emailaccount, get_emailaccounts, get_externalrent, get_formletter, \
-    get_formletters, get_headrent, get_headrents, \
-    get_incomeobject, get_incomepost, get_incomeitems, get_incomeoptions, get_incomeobjectoptions, get_landlord, \
-    get_landlords, get_lease, get_loan, get_leases, get_loan_options, get_loans, \
-    get_loanstatement, get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
-    get_property, get_queryoptions_common, get_queryoptions_advanced, get_rental, getrentals, get_rentalstatement, \
-    getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic
+from app.main.income import get_incomepost, get_incomeitems, get_incomeobject, get_incomeobjectoptions, \
+        get_incomeoptions, post_incomeobject
+from app.main.rentobj import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
+        get_externalrent, get_landlord, get_landlords, get_lease, get_leases, get_property, get_queryoptions_common, \
+        get_queryoptions_advanced, getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic, \
+        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
+from app.main.get import get_combos_common, get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
+        get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, get_moneyaccount, \
+        get_moneydets, get_moneyitem, get_moneyitems, get_money_options, get_rental, getrentals, get_rentalstatement
 from app.main.delete import delete_record
 from app.main.docfiles import get_docfile, get_docfiles, post_docfile, post_upload
-from app.main.post import post_agent, post_charge, post_emailaccount, post_formletter, \
-    post_headrent, post_incomeobject, post_landlord, post_lease, post_loan, post_moneyaccount, post_moneyitem, \
-    post_property, post_rental, postrentobj
+from app.main.post import post_emailaccount, post_formletter, post_headrent, post_loan, \
+        post_moneyaccount, post_moneyitem, post_rental
 from app.main.writemail import writeMail
 from app.main.functions import backup_database, dateToStr, strToDate
-from app.models import Agent, Charge, Formletter, Digfile, Docfile, Emailaccount, Income, Incomealloc, Jstore, Landlord, Loan, \
-    Money_account, Money_category, Money_item, Loan_interest_rate, Loan_trans, Property, Rent, Rental, \
-    Template, Typedoc, Typemailto
+from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -66,9 +62,12 @@ def charges():
 @bp.route('/charge/<int:id>', methods=["GET", "POST"])
 @login_required
 def charge(id):
-    action = request.args.get('action', "view", type=str)
+    action = request.args.get('action', "view", type=str) if id != 0 else "edit"
     if request.method == "POST":
-        id = post_charge(id, action)
+        rentid = post_charge(id)
+
+        return redirect('/rent_object/{}'.format(rentid))
+
     charge, chargedescs = get_charge(id)
 
     return render_template('charge.html', action=action, charge=charge, chargedescs=chargedescs)
@@ -86,6 +85,7 @@ def delete_item(id):
 def docfile(id):
     if request.method == "POST":
         rentid = post_docfile(id)
+
         return redirect('/rent_object/{}'.format(rentid))
 
     docfile, doc_dig = get_docfile(id)
@@ -529,24 +529,17 @@ def save_html():
         return redirect('/docfile/{}?doc_dig_doc'.format(id_))
 
 
-@bp.route('/upload_file/<int:id>', methods=["GET", "POST"])
+@bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])
 @login_required
-def upload_file(id):
+def upload_file(rentid):
     rentcode = request.args.get('rentcode', "dummy", type=str)
     if request.method == "POST":
-        id_ = post_upload()
+        post_upload()
 
-        return redirect('/docfile/{}?doc_dig=dig'.format(id_))
+        return redirect('/rent_object/{}'.format(rentid))
 
-    return render_template('upload_dialog.html', rentcode=rentcode, rent_id = id)
+    return render_template('upload_dialog.html', rentcode=rentcode, rent_id = rentid)
 
-
-# @bp.route('/upload_file', methods=["POST"])
-# @login_required
-# def upload_file():
-#     post_upload()
-#
-#     return '', 204
 
 # @bp.route('/uploads/<filename>')
 # def upload(filename):

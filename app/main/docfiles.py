@@ -1,23 +1,20 @@
-import binascii
+import imghdr
 import os
-import json
-import sqlalchemy
+from xhtml2pdf import pisa
 from app import db
-import datetime
-from datetime import date
-from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
-from app.main.functions import commit_to_database, convert_html_to_pdf, validate_image
+from app.main.functions import commit_to_database
 from app.models import Digfile, Docfile, Rent, Typedoc
 
 
 def get_docfile(id):
     doc_dig = request.args.get('doc_dig', "doc", type=str)
     rentid = int(request.args.get('rentid', "0", type=str))
+    # new file has to be doc as new digital file uses upload function
     if id == 0:
-        docfile = Docfile() if doc_dig == "doc" else Digfile()
+        docfile = Docfile()
         docfile.id = 0
         docfile.rent_id = int(rentid)
         docfile.out_in = 1
@@ -86,15 +83,12 @@ def get_docfiles(rentid):
 
 
 def post_docfile(id):
-    # if request.form.get('rentcode') and request.form.get('rentcode') != "":
-    #     rentcode = request.form.get('rentcode')
-    #     docfile.rent_id = \
-    #         Rent.query.with_entities(Rent.id).filter(Rent.rentcode == rentcode).one()[0]
     rentid = int(request.form.get('rentid'))
     doc_dig = request.form.get('doc_dig')
-    # new doc or dig file for id 0 or existing dig or doc file:
+    # new file for id 0, otherwise existing dig or doc file:
     if id == 0:
-        docfile = Docfile() if doc_dig == "doc" else Digfile()
+        # new file has to be doc as new digital file uses upload function
+        docfile = Docfile()
         docfile.id = 0
         docfile.rent_id = rentid
     else:
@@ -117,35 +111,59 @@ def post_docfile(id):
 
 
 def post_upload():
-    print(request.form)
-    print(request.files)
-    rentid = request.form.get("rentid")
+    # new digital file uses upload function
+    rentid = int(request.form.get("rentid"))
     rentcode = request.form.get("rentcode")
     doctype = request.form.get("doc_type")
-    dig_date = request.form.get("dig_date")
+    doc_date = request.form.get("doc_date")
     outin = request.form.get("out_in")
     uploaded_file = request.files.get('uploadfile')
-    filename = secure_filename(uploaded_file.filename)
+    filename = secure_filename(uploaded_file.filename).lower()
     if filename != '':
         file_ext = os.path.splitext(filename)[1]
-        if file_ext not in ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']:
+        if file_ext not in allowed_filetypes():
             return "Invalid file suffix", 400
         elif file_ext in ['.jpg', '.png', '.gif'] and file_ext != validate_image(uploaded_file.stream):
             return "Invalid image", 400
-        newdigfile = Digfile()
-        newdigfile.doctype_id = \
+        digfile = Digfile()
+        digfile.id = 0
+        digfile.doc_date = doc_date
+        digfile.summary = rentcode + '-' + filename
+        digfile.dig_data = uploaded_file.read()
+        digfile.doctype_id = \
             Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-        newdigfile.dig_date = dig_date
-        newdigfile.summary = rentcode + '-' + filename
-        newdigfile.rent_id = rentid
-        newdigfile.out_in = 0 if outin == "out" else 1
-        newdigfile.dig_data = uploaded_file.read()
-        db.session.add(newdigfile)
+        digfile.rent_id = rentid
+        digfile.out_in = 0 if outin == "out" else 1
+        db.session.add(digfile)
         db.session.commit()
-        id_ = newdigfile.id
-
-        return id_
     # else:
     #     flash('No filename!')
     #     return redirect(request.url)
+
+
+def validate_image(stream):
+    header = stream.read(512)
+    stream.seek(0)
+    format = imghdr.what(None, header)
+    if not format:
+        return None
+    return '.' + (format if format != 'jpeg' else 'jpg')
+
+
+def allowed_filetypes():
+    return ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']
+
+
+def convert_html_to_pdf(source_html, output_filename):
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+            source_html,                # the HTML to convert
+            dest=result_file)           # file handle to recieve result
+    # close output file
+    result_file.close()                 # close output file
+    # return False on success and True on errors
+    return pisa_status.err
+
 

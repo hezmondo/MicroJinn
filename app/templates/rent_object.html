@@ -158,10 +158,9 @@
                     <a class="dropdown-item" href="/docfiles/{{ rentobj.id }}">view docfiles for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new docfile out for this rent</a>
                     <a class="dropdown-item" href="/docfile/0?doc_dig=doc&rentid={{ rentobj.id }}">new doc file in for this rent</a>
-                    <a class="dropdown-item" href="/docfile/0?doc_dig=dig&rentid={{ rentobj.id }}">new dig file in for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new payrequest for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new s166 for this rent</a>
-                    <a class="dropdown-item" href="/upload_file/{{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">upload file for this rent</a>
+                    <a class="dropdown-item" href="/upload_file/{{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">upload dig file for this rent</a>
                   </div>
                 </div>
             </div>
@@ -171,8 +170,8 @@
                     charges
                   </button>
                   <div class="dropdown-menu" aria-labelledby="chargeMenuButton">
-                    <a class="dropdown-item" href="/charges/{{ rentobj.id }}">view charges for this rent</a>
-                    <a class="dropdown-item" href="/charge/{{ rentobj.id }}">add new charge for this rent</a>
+                    <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">view charges for this rent</a>
+                    <a class="dropdown-item" href="/charge/0?rentid={{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">add new charge for this rent</a>
                   </div>
                 </div>
             </div>
