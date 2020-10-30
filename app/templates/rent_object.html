@@ -139,15 +139,10 @@
                 <a href="/rent_object/{{ rentobj.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit rent</a>
             </div>
             <div class="col-md-2">
-                <div class="dropdown">
-                  <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="incomeMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    income
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="incomeMenuButton">
-                    <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">post income for this rent</a>
-                    <a class="dropdown-item" href="/income_post/{{ rentobj.id }}">view income for this rent</a>
-                  </div>
-                </div>
+                <a href="/charges?rentid={{ rentobj.id }}" class="btn btn-block btn-primary" role="button">charges</a>
+            </div>
+            <div class="col-md-2">
+                <a href="/income?rentid={{ rentobj.id }}" class="btn btn-block btn-primary" role="button">income</a>
             </div>
             <div class="col-md-2">
                 <div class="dropdown">
@@ -158,31 +153,20 @@
                     <a class="dropdown-item" href="/docfiles/{{ rentobj.id }}">view docfiles for this rent</a>
                     <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new docfile out for this rent</a>
                     <a class="dropdown-item" href="/docfile/0?doc_dig=doc&rentid={{ rentobj.id }}">new doc file in for this rent</a>
-                    <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new payrequest for this rent</a>
-                    <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new s166 for this rent</a>
                     <a class="dropdown-item" href="/upload_file/{{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">upload dig file for this rent</a>
-                  </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="dropdown" style="width:100%">
-                  <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="chargeMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    charges
-                  </button>
-                  <div class="dropdown-menu" aria-labelledby="chargeMenuButton">
-                    <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">view charges for this rent</a>
-                    <a class="dropdown-item" href="/charge/0?rentid={{ rentobj.id }}?rentcode={{ rentobj.rentcode }}">add new charge for this rent</a>
                   </div>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="dropdown">
                   <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="statementsMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    statements
+                    pay requests
                   </button>
                   <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
                     <a class="dropdown-item" href="/rent_object/0?action=new">new statement for this rent</a>
                     <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">new account for this rent</a>
+                    <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new payrequest for this rent</a>
+                    <a class="dropdown-item" href="/mail_dialog/{{ rentobj.id }}">new s166 for this rent</a>
                   </div>
                 </div>
             </div>

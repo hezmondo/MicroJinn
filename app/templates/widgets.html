@@ -13,6 +13,16 @@
 </select>
 {%- endmacro %}
 
+<!-- combobox_id(): implement a single choice select via <select> element passing id -->
+{% macro combobox_id(idc, name, items, item_selected=None) -%}
+<select class="form-control" id="{{ idc }}" name="{{ name }}">
+    {% for item in items %}
+    {% set selected = 'selected' if item == item_selected else '' %}
+    <option value="{{item}}" {{selected}}>{{item}}</option>
+    {% endfor %}
+</select>
+{%- endmacro %}
+
 <!-- multiselect_as_select(): implement a multiple choice select via <select> element -->
 {% macro multiselect_as_select(name, items, items_selected=None) -%}
 <select multiple class="form-control" name="{{ name }}">

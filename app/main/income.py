@@ -6,7 +6,7 @@ from app.main.functions import commit_to_database
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment
 
 
-def get_incomeitems():
+def get_incomeitems(rentid):
     qfilter = []
     payer = request.form.get("payer") or ""
     if payer and payer != "":
@@ -20,13 +20,15 @@ def get_incomeitems():
         qfilter.append(Money_account.accdesc == accountdesc)
     if paymtype and paymtype != ""and paymtype != "all payment types":
         qfilter.append(Typepayment.paytypedet == paymtype)
+    if rentid > 0:
+        qfilter.append(Incomealloc.rent_id == rentid)
 
-    incomeitems = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
+    incomes = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
             .with_entities(Income.id, Income.date, Incomealloc.rentcode, Income.amount, Income.payer,
                            Money_account.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
             .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
 
-    return incomeitems
+    return incomes
 
 
 def get_incomeoptions():

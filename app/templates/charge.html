@@ -15,32 +15,35 @@
         </div>
         <div class="col-md-6">
             <label for="chargedesc">Charge type:</label>
-            {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=charge.chargedesc) }}
+            {{ widgets.combobox_id(idc="chargedesc", name="chargedesc", items=chargedescs, item_selected=charge.chargedesc) }}
         </div>
         <div class="col-md-2">
             <label for="chargestartdate">Charge start date:</label>
-            <input type="date" class="form-control" name="chargestartdate" value="{{ charge.chargestartdate }}">
+            <input type="date" class="form-control" id="date" name="chargestartdate" value="{{ charge.chargestartdate }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="chargetotal">Charge total:</label>
-            <input type="text" class="form-control" name="chargetotal" value="{{ charge.chargetotal }}">
+            <label for="chargetotal">charge total:</label>
+            <input type="text" class="form-control" id="chargetotal" name="chargetotal" value="{{ charge.chargetotal }}">
         </div>
         <div class="col-md-4">
-            <label for="chargedetails">Charge details:</label>
-            <input type="text" class="form-control" name="chargedetails" value="{{ charge.chargedetails }}">
+            <label for="chargedetails">charge details:</label>
+            <input type="text" class="form-control" id="chargedetails" name="chargedetails" value="{{ charge.chargedetails }}">
         </div>
         <div class="col-md-2">
-            <label for="chargebalance">Charge balance:</label>
-            <input type="text" class="form-control" name="chargebalance" value="{{ charge.chargebalance }}">
+            <label for="chargebalance">charge balance:</label>
+            <input type="text" class="form-control" id="chargebalance" name="chargebalance" value="{{ charge.chargebalance }}">
         </div>
         <div class="col-md-2">
-            <label for="rentid">Charge balance:</label>
+            <label for="rentid">rent id:</label>
             <input type="text" class="form-control" name="rentid" value="{{ charge.rentid }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="/rent_object/{{ charge.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+        </div>
         <div class="col-md-2">
             <a href="/charges" class="btn btn-block btn-primary" role="button">back to charges</a>
         </div>
@@ -65,5 +68,16 @@
         {% endif %}
     </div>
 </form>
+<script type="text/javascript">
+  var input1 = document.getElementById('chargedesc');
+  var input2 = document.getElementById('chargetotal');
+  var input3 = document.getElementById('chargedetails');
+  var input4 = document.getElementById('chargebalance');
+
+  input2.addEventListener('change', function() {
+    input3.value = input1.value + " £" + input2.value ;
+    input4.value = input2.value ;
+  });
+</script>
 {% endblock %}
 

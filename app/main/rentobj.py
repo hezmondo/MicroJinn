@@ -35,6 +35,31 @@ def get_agent(id):
 
 
 # charges
+def get_charge(id):
+    action = request.args.get('action', "view", type=str)
+    rentcode = request.args.get('rentcode', "DUMMY" , type=str)
+    rentid = int(request.args.get('rentid', "0", type=str))
+    # new charge has id = 0
+    if id == 0:
+        charge = {
+            'id': 0,
+            'rentid': rentid,
+            'rentcode': rentcode,
+            'chargedesc': "notice fee",
+            'chargestartdate': date.today()
+        }
+        action = "edit"
+    else:
+        charge = \
+            Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.id.label("rentid"), Rent.rentcode,
+                   Chargetype.chargedesc, Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails,
+                       Charge.chargebalance) \
+                    .filter(Charge.id == id).one_or_none()
+    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+
+    return action, charge, chargedescs
+
+
 def get_charges(rentid):
     qfilter = []
     if rentid == "":
@@ -50,29 +75,6 @@ def get_charges(rentid):
             .filter(*qfilter).all()
 
     return charges
-
-
-def get_charge(id):
-    rentcode = request.args.get('rentcode', "DUMMY" , type=str)
-    rentid = int(request.args.get('rentid', "0", type=str))
-    # new charge has id = 0
-    if id == 0:
-        charge = {
-            'id': 0,
-            'rentid': rentid,
-            'rentcode': rentcode,
-            'chargedesc': "notice fee",
-            'chargestartdate': date.today()
-        }
-    else:
-        charge = \
-            Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.id.label("rentid"), Rent.rentcode,
-                   Chargetype.chargedesc, Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails,
-                       Charge.chargebalance) \
-                    .filter(Charge.id == id).one_or_none()
-    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-
-    return charge, chargedescs
 
 
 # external rents

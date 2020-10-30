@@ -51,26 +51,25 @@ def backup():
     return render_template('backup.html')
 
 
+@bp.route('/charge/<int:id>', methods=["GET", "POST"])
+@login_required
+def charge(id):
+    if request.method == "POST":
+        rentid = post_charge(id)
+
+        return redirect('/rent_object/{}'.format(rentid))
+
+    action, charge, chargedescs = get_charge(id)
+
+    return render_template('charge.html', action=action, charge=charge, chargedescs=chargedescs)
+
+
 @bp.route('/charges', methods=['GET', 'POST'])
 def charges():
     rentid = request.args.get('rentid', "", type=str)
     charges = get_charges(rentid)
 
     return render_template('charges.html', charges=charges)
-
-
-@bp.route('/charge/<int:id>', methods=["GET", "POST"])
-@login_required
-def charge(id):
-    action = request.args.get('action', "view", type=str) if id != 0 else "edit"
-    if request.method == "POST":
-        rentid = post_charge(id)
-
-        return redirect('/rent_object/{}'.format(rentid))
-
-    charge, chargedescs = get_charge(id)
-
-    return render_template('charge.html', action=action, charge=charge, chargedescs=chargedescs)
 
 
 @bp.route('/delete_item/<int:id>')
@@ -185,10 +184,11 @@ def headrent(id):
 
 @bp.route('/income', methods=['GET', 'POST'])
 def income():
-    incomeitems = get_incomeitems()
+    rentid = int(request.args.get('rentid', "0", type=str))
+    incomes = get_incomeitems(rentid)
     bankaccs, paytypes = get_incomeoptions()
 
-    return render_template('income.html', bankaccs=bankaccs, paytypes=paytypes, incomeitems=incomeitems)
+    return render_template('income.html', rentid=rentid, bankaccs=bankaccs, paytypes=paytypes, incomes=incomes)
 
 
 @bp.route('/income_object/<int:id>', methods=['GET', 'POST'])
