@@ -5,17 +5,17 @@ from flask_login import login_required
 from io import BytesIO
 from app import db
 from app.main import bp
-from app.main.income import get_incomepost, get_incomeitems, get_incomeobject, get_incomeobjectoptions, \
-        get_incomeoptions, post_incomeobject
-from app.main.rentobj import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
+from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
+        get_inc_options, post_inc_obj
+from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
         get_externalrent, get_landlord, get_landlords, get_lease, get_leases, get_property, get_queryoptions_common, \
-        get_queryoptions_advanced, getrentobj_main, get_rentobjects_advanced, get_rentobjects_basic, \
+        get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
         post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.get import get_combos_common, get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
         get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, get_moneyaccount, \
         get_moneydets, get_moneyitem, get_moneyitems, get_money_options, get_rental, getrentals, get_rentalstatement
 from app.main.delete import delete_record
-from app.main.docfiles import get_docfile, get_docfiles, post_docfile, post_upload
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
 from app.main.post import post_emailaccount, post_formletter, post_headrent, post_loan, \
         post_moneyaccount, post_moneyitem, post_rental
 from app.main.writemail import writeMail
@@ -66,10 +66,11 @@ def charge(id):
 
 @bp.route('/charges', methods=['GET', 'POST'])
 def charges():
-    rentid = request.args.get('rentid', "", type=str)
+    rentid = request.args.get('rentid', "0", type=str)
+    rentcode = request.args.get('rentcode', "", type=str)
     charges = get_charges(rentid)
 
-    return render_template('charges.html', charges=charges)
+    return render_template('charges.html', charges=charges, rentid=rentid, rentcode=rentcode)
 
 
 @bp.route('/delete_item/<int:id>')
@@ -127,7 +128,7 @@ def email_account(id):
 
 @bp.route('/external_rents', methods=['GET', 'POST'])
 def external_rents():
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects_basic("external")
+    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs_basic("external")
 
     return render_template('external_rents.html', agentdetails=agentdetails, propaddr=propaddr, rentcode=rentcode,
                            source=source, tenantname=tenantname, rentprops=rentprops)
@@ -185,8 +186,8 @@ def headrent(id):
 @bp.route('/income', methods=['GET', 'POST'])
 def income():
     rentid = int(request.args.get('rentid', "0", type=str))
-    incomes = get_incomeitems(rentid)
-    bankaccs, paytypes = get_incomeoptions()
+    incomes = get_incomes(rentid)
+    bankaccs, paytypes = get_inc_options()
 
     return render_template('income.html', rentid=rentid, bankaccs=bankaccs, paytypes=paytypes, incomes=incomes)
 
@@ -196,10 +197,10 @@ def income():
 def income_object(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_incomeobject(id, action)
+        id = post_inc_obj(id, action)
 
-    bankaccs, chargedescs, landlords, paytypes = get_incomeobjectoptions()
-    income, incomeallocs = get_incomeobject(id)
+    bankaccs, chargedescs, landlords, paytypes = get_incobj_options()
+    income, incomeallocs = get_incobj(id)
 
     return render_template('income_object.html', action=action, bankaccs=bankaccs, chargedescs=chargedescs,
                            income=income, incomeallocs=incomeallocs, landlords=landlords, paytypes=paytypes)
@@ -209,10 +210,10 @@ def income_object(id):
 @login_required
 def income_post(id):
     if request.method == "POST":
-        post_incomeobject(id, "new")
+        post_inc_obj(id, "new")
 
-    bankaccs, chargedescs, landlords, paytypes = get_incomeobjectoptions()
-    allocs, post, post_tot, today = get_incomepost(id)
+    bankaccs, chargedescs, landlords, paytypes = get_incobj_options()
+    allocs, post, post_tot, today = get_incobj_post(id)
 
     return render_template('income_post.html', allocs=allocs, bankaccs=bankaccs, chargedescs=chargedescs,
                            paytypes=paytypes, post=post, post_tot=post_tot, today=today)
@@ -224,7 +225,7 @@ def income_post(id):
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     action = request.args.get('action', "view", type=str)
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjects_basic(action)
+    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs_basic(action)
 
 
     return render_template('home.html', agentdetails=agentdetails, propaddr=propaddr,
@@ -256,16 +257,13 @@ def landlords():
 @bp.route('/lease/<int:id>', methods=['GET', 'POST'])
 @login_required
 def lease(id):
-    # incoming id is lease id for existing lease if coming from leases page,
-    # rent id if coming from rentobject page and rent id for new lease -see guide
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_lease(id, action)
+        rentid = post_lease(id)
 
-        return redirect('/lease/{}?action=view'.format(id_))
+        return redirect('/rent_object/{}'.format(rentid))
 
-    # as stated, id is lease id for existing lease and rent id for new lease
-    lease, uplift_types = get_lease(id, action)
+    lease, uplift_types = get_lease(id)
 
     return render_template('lease.html', action=action, lease=lease, uplift_types=uplift_types)
 
@@ -449,7 +447,7 @@ def queries():
     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
 
     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjects_advanced(action, name)
+    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
 
     return render_template('queries.html', action=action, actypedets=actypedets, floads=floads,
                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,

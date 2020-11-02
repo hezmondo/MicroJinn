@@ -4,10 +4,18 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
+        {% if rentid != "0" %}
+            <div class="col-md-2">
+                <a href="/rent_object/{{ rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            </div>
+            <div class="col-md-3">
+                <a href="/charge/0?rentid={{ rentid }}&?rentcode={{ rentcode }}" class="btn btn-block btn-danger" role="button">new charge for this rent</a>
+            </div>
+        {% endif %}
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-primary">search</button>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input type="text" class="form-control" name="chargedetails" placeholder="Charge details">
         </div>
         <div class="col-md-2">

@@ -4,7 +4,7 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.rentobj import get_leasedata, getrentobj_main
+from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.get import get_formletter, getmaildata
 from app.main.functions import htmlSpecialMarkDown
 

@@ -52,7 +52,7 @@
             <a href="/charge/{{ charge.id }}?action=edit" class="btn btn-block btn-primary" role="button">edit this charge</a>
         </div>
         <div class="col-md-3">
-            <a href="/charge/0?rentid={{ charge.rentid }}?rentcode={{ charge.rentcode }}" class="btn btn-block btn-danger" role="button">add new charge for this rent</a>
+            <a href="/charge/0?rentid={{ charge.rentid }}&?rentcode={{ charge.rentcode }}" class="btn btn-block btn-danger" role="button">add new charge for this rent</a>
         </div>
         {% else %}
             <div class="col-md-2">

@@ -6,7 +6,7 @@ from app.main.functions import commit_to_database
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment
 
 
-def get_incomeitems(rentid):
+def get_incomes(rentid):
     qfilter = []
     payer = request.form.get("payer") or ""
     if payer and payer != "":
@@ -31,7 +31,7 @@ def get_incomeitems(rentid):
     return incomes
 
 
-def get_incomeoptions():
+def get_inc_options():
     # return options for multiple choice controls in income
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     bankaccs.insert(0, "all accounts")
@@ -41,7 +41,7 @@ def get_incomeoptions():
     return bankaccs, paytypes
 
 
-def get_incomeobject(id):
+def get_incobj(id):
     income = Income.query.join(Money_account).join(Typepayment).with_entities(Income.id, Income.date, Income.amount,
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
@@ -52,7 +52,7 @@ def get_incomeobject(id):
     return income, incomeallocs
 
 
-def get_incomeobjectoptions():
+def get_incobj_options():
     # return options for multiple choice controls in income_object
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
@@ -62,7 +62,7 @@ def get_incomeobjectoptions():
     return bankaccs, chargedescs, landlords, paytypes
 
 
-def get_incomepost(id):
+def get_incobj_post(id):
     post = Rent.query.join(Landlord).join(Money_account).join(Charge).with_entities(Rent.rentcode,
                 Rent.arrears, Rent.datecode, Rent.lastrentdate, Rent.landlord_id,
                 func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
@@ -84,7 +84,7 @@ def get_incomepost(id):
     return allocs, post, post_tot, today
 
 
-def post_incomeobject(id, action):
+def post_inc_obj(id, action):
     # this object comprises 1 income record plus 1 or more incomealloc records. First, we do the income record
     if action == "edit":
         income = Income.query.get(id)

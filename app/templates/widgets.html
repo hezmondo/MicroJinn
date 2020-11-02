@@ -1,7 +1,4 @@
-<!-- widgets.html -->
-
-<!-- Common macro definitions to be used from other templates -->
-
+<!-- widgets.html -- common macro definitions to be used by other templates -->
 
 <!-- combobox(): implement a single choice select via <select> element -->
 {% macro combobox(name, items, item_selected=None) -%}
@@ -13,7 +10,7 @@
 </select>
 {%- endmacro %}
 
-<!-- combobox_id(): implement a single choice select via <select> element passing id -->
+<!-- combobox_id(): implement a single choice select via <select> element passing id (for js getElementbyID)-->
 {% macro combobox_id(idc, name, items, item_selected=None) -%}
 <select class="form-control" id="{{ idc }}" name="{{ name }}">
     {% for item in items %}

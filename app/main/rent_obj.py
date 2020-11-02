@@ -62,12 +62,12 @@ def get_charge(id):
 
 def get_charges(rentid):
     qfilter = []
-    if rentid == "":
+    if request.method == "POST":
         rcd = request.form.get("rentcode") or ""
         cdt = request.form.get("chargedetails") or ""
         qfilter.append(Rent.rentcode.startswith([rcd]))
         qfilter.append(Charge.chargedetails.ilike('%{}%'.format(cdt)))
-    else:
+    elif rentid != "0":
         qfilter.append(Charge.rent_id == rentid)
 
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
@@ -108,26 +108,22 @@ def get_landlord(id):
 
 
 # leases
-def get_lease(id, action):
-    if action == "new":
+def get_lease(id):
+    rentcode = request.args.get('rentcode', "DUMMY" , type=str)
+    rentid = int(request.args.get('rentid', "0", type=str))
+    if id == 0:
         # new lease has to be attached to an existing rent, so incoming id in this case is rent id:
         lease = {
             'id': 0,
-            'rent_id': id
+            'rent_id': rentid,
+            'rentcode': rentcode
         }
     else:
-        lease_filter = []
-        if action == "rentview":
-            # function is being called from rentobject page, so incoming id in this case is rent id:
-            lease_filter.append(Rent.id == id)
-        else:
-            # existing lease, so incoming id is lease id:
-            lease_filter.append(Lease.id == id)
         lease = \
             Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
                  Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
                  Lease.last_value_date, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
-                .filter(*lease_filter).one_or_none()
+                .filter(Lease.rent_id == rentid).one_or_none()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
 
@@ -176,7 +172,7 @@ def get_property(id):
 
 
 # rent object and associated queries
-def get_rentobjects_basic(action):
+def get_rentobjs_basic(action):
     qfilterbasic = []
     if action == "view":
         id_list = get_idlist_recent("recent_rents")
@@ -215,7 +211,7 @@ def get_rentobjects_basic(action):
     return agentdetails, propaddr, rentcode, source, tenantname, rentprops
 
 
-def get_rentobjects_advanced(action, name):
+def get_rentobjs_plus(action, name):
     jname = name
     agentdetails = request.form.get("agentdetails") or ""
     propaddr = request.form.get("propaddr") or ""
@@ -539,10 +535,13 @@ def post_landlord(id, action):
     return id_
 
 
-def post_lease(id, action):
-    if action == "new":
-        # new lease:
+def post_lease(id):
+    rentid = int(request.form.get("rent_id"))
+    # new lease for id 0, otherwise existing lease:
+    if id == 0:
         lease = Lease()
+        lease.id = 0
+        lease.rent_id = rentid
     else:
         lease = Lease.query.get(id)
     lease.term = request.form.get("term")
@@ -554,16 +553,15 @@ def post_lease(id, action):
     lease.rentcap = request.form.get("rentcap")
     lease.lastvalue = request.form.get("lastvalue")
     lease.last_value_date = request.form.get("lastvaluedate")
-    lease.rent_id = request.form.get("rent_id")
+    lease.rent_id = rentid
     uplift_type = request.form.get("uplift_type")
     lease.uplift_type_id = \
         Lease_uplift_type.query.with_entities(Lease_uplift_type.id).filter \
             (Lease_uplift_type.uplift_type == uplift_type).one()[0]
     db.session.add(lease)
     db.session.commit()
-    id_ = lease.id
 
-    return id_
+    return rentid
 
 
 def post_property(id, action):
