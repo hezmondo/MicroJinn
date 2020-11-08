@@ -257,13 +257,13 @@ def landlords():
 @bp.route('/lease/<int:id>', methods=['GET', 'POST'])
 @login_required
 def lease(id):
-    action = request.args.get('action', "view", type=str)
+    # id can be actual lease id or 0 (for new lease or for id unknown as coming from rent)
     if request.method == "POST":
         rentid = post_lease(id)
 
         return redirect('/rent_object/{}'.format(rentid))
 
-    lease, uplift_types = get_lease(id)
+    action, lease, uplift_types = get_lease(id)
 
     return render_template('lease.html', action=action, lease=lease, uplift_types=uplift_types)
 

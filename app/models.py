@@ -251,7 +251,7 @@ class Lease(db.Model):
     uplift_type_id = db.Column(db.Integer, db.ForeignKey('lease_uplift_type.id'))
     rentcap = db.Column(db.Numeric(8, 2))
     lastvalue = db.Column(db.Numeric(8, 2))
-    last_value_date = db.Column(db.Date)
+    lastvaluedate = db.Column(db.Date)
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
 

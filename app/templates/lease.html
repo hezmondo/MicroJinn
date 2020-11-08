@@ -6,29 +6,39 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="rentcode">rentcode:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ lease.rentcode }}">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="term">term in years:</label>
             <input type="text" class="form-control" name="term" value="{{ lease.term }}">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="startdate">start date:</label>
-            <input type="text" class="form-control" name="startdate" value="{{ lease.startdate }}">
+            <input type="date" class="form-control" name="startdate" value="{{ lease.startdate }}">
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label for="startrent">start rent:</label>
             <input type="text" class="form-control" name="startrent" value="{{ lease.startrent }}">
         </div>
-        <div class="col-md-2">
-            <label for="upliftdate">uplift date:</label>
-            <input type="text" class="form-control" name="upliftdate" value="{{ lease.upliftdate }}">
-        </div>
-        <div class="col-md-2">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
             <label for="uplift_type">uplift type:</label>
             {{ widgets.combobox(name="uplift_type", items=uplift_types, item_selected=lease.uplift_type) }}
+        </div>
+        <div class="col-md-3">
+            <label for="upliftdate">uplift date:</label>
+            <input type="date" class="form-control" name="upliftdate" value="{{ lease.upliftdate }}">
+        </div>
+        <div class="col-md-3">
+            <label for="lastvaluedate">last valuation date:</label>
+            <input type="date" class="form-control" name="lastvaluedate" value="{{ lease.lastvaluedate }}">
+        </div>
+        <div class="col-md-3">
+            <label for="lastvalue">last valuation £:</label>
+            <input type="text" class="form-control" name="lastvalue" value="{{ lease.lastvalue }}">
         </div>
     </div>
     <div class="form-group row">
@@ -40,38 +50,24 @@
             <label for="rentcap">rent capped at:</label>
             <input type="text" class="form-control" name="rentcap" value="{{ lease.rentcap }}">
         </div>
-        <div class="col-md-4">
-            <label for="info">info:</label>
-            <input type="text" class="form-control" name="info" value="{{ lease.info }}">
-        </div>
-        <div class="col-md-2">
-            <label for="lastvaluedate">last valuation date:</label>
-            <input type="text" class="form-control" name="lastvaluedate" value="{{ lease.lastvaluedate }}">
-        </div>
-        <div class="col-md-2">
-            <label for="lastvalue">last valuation £:</label>
-            <input type="text" class="form-control" name="lastvalue" value="{{ lease.lastvalue }}">
-        </div>
-    </div>
-    <div class="form-group row">
-		<div class="col-md-2">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ lease.rent_id }}">
-        </div>
         <div class="col-md-8">
             <label for="info">info:</label>
             <input type="text" class="form-control" name="info" value="{{ lease.info }}">
         </div>
+		<div class="col-md-2">
+            <input type="hidden" id="rent_id" name="rent_id" value = "{{ lease.rent_id }}">
+        </div>
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
+            <a href="/rent_object/{{ lease.rent_id  }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+        </div>
+        <div class="col-md-2">
             <a href="/leases" class="btn btn-block btn-primary" role="button">back to leases</a>
         </div>
-        {% if action == "view" or "rentview" %}
+        {% if action == "view" %}
             <div class="col-md-2">
                 <a href="/lease/{{ lease.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit this lease</a>
-            </div>
-            <div class="col-md-2">
-                <a href="/lease/{{ lease.id }}?action=clone" class="btn btn-block btn-danger" role="button">clone this lease</a>
             </div>
             <div class="col-md-2">
                 <a href="/mail_dialog/{{ lease.rent_id }}?action=lease" class="btn btn-block btn-primary" role="button">lex quotation</a>
