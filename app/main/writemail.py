@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
-from app.main.get import get_formletter, getmaildata
+from app.main.other import get_formletter, getmaildata
 from app.main.functions import htmlSpecialMarkDown
 
 def writeMail(rent_id, income_id, formletter_id, action):

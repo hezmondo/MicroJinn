@@ -40,31 +40,29 @@
             {{ widgets.combobox(name="bankaccount", items=bankaccs, item_selected=moneyitem.accdesc) }}
         </div>
     </div>
-    <div class="form-group row">
-        {% if action == "view" %}
-        <div class="col-md-3">
-            <a href="/landlord/{{ moneyitem.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this transaction</a>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="/money_items?rentid={{ charge.rentid }}" class="btn btn-block btn-primary" role="button">back to items</a>
         </div>
-        <div class="col-md-3">
-            <a href="/money_item/{{ moneyitem.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this transaction</a>
+        <div class="col-md-2">
+            <a href="/money_item/0?action=new" class="btn btn-block btn-primary" role="button">new item</a>
         </div>
-        <div class="col-md-3">
-            <a href="/money_item/0?action=new" class="btn btn-block btn-primary" role="button">Add new transaction</a>
+        <div class="col-md-2">
+            <a href="/money_item/{{ moneyitem.id }}?action=clone" class="btn btn-block btn-danger" role="button">clone item</a>
         </div>
-        {% elif action == "edit" %}
-        <div class="col-md-3">
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete" >
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
+        </div>
+        <div class="col-md-2">
             <a href="/delete_item/{{ moneyitem.id }}?item=moneyitem"
                onclick="return confirm('Are you sure you want to delete this transaction?');"
-               class="btn btn-block btn-warning" role="button">Delete this transaction</a>
+               class="btn btn-block btn-warning" role="button">delete item</a>
         </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success">Save changes</button>
-        </div>
-        {% else %}
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success">Save as new transaction</button>
-        </div>
-        {% endif %}
     </div>
 </form>
 {% endblock %}

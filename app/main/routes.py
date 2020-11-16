@@ -5,21 +5,23 @@ from flask_login import login_required
 from io import BytesIO
 from app import db
 from app.main import bp
-from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
-        get_inc_options, post_inc_obj
-from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_common, get_combos_rentonly, \
-        get_externalrent, get_landlord, get_landlords, get_lease, get_leases, get_property, get_queryoptions_common, \
-        get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
-        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
-from app.main.get import get_combos_common, get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
-        get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, get_moneyaccount, \
-        get_moneydets, get_moneyitem, get_moneyitems, get_money_options, get_rental, getrentals, get_rentalstatement
+from app.main.common import get_combos_common
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
-from app.main.post import post_emailaccount, post_formletter, post_headrent, post_loan, \
-        post_moneyaccount, post_moneyitem, post_rental
+from app.main.functions import backup_database
+from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
+        get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
+        get_rental, getrentals, get_rentalstatement, \
+        post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
+from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
+        get_inc_options, post_inc_obj
+from app.main.money import  get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
+        post_moneyaccount, post_moneyitem
+from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_rentonly, \
+        get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
+        get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
+        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.writemail import writeMail
-from app.main.functions import backup_database, dateToStr, strToDate
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -33,13 +35,12 @@ def agents():
 @bp.route('/agent/<int:id>', methods=["GET", "POST"])
 @login_required
 def agent(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_agent(id, action)
-        action = "view"
-    agent = get_agent(id)
+        agent = post_agent(id)
+    else:
+        agent = get_agent(id)
 
-    return render_template('agent.html', action=action, agent=agent)
+    return render_template('agent.html', agent=agent)
 
 
 @bp.route('/backup', methods=['GET', 'POST'])
@@ -59,9 +60,9 @@ def charge(id):
 
         return redirect('/rent_object/{}'.format(rentid))
 
-    action, charge, chargedescs = get_charge(id)
+    charge, chargedescs = get_charge(id)
 
-    return render_template('charge.html', action=action, charge=charge, chargedescs=chargedescs)
+    return render_template('charge.html', charge=charge, chargedescs=chargedescs)
 
 
 @bp.route('/charges', methods=['GET', 'POST'])
@@ -76,8 +77,11 @@ def charges():
 @bp.route('/delete_item/<int:id>')
 @login_required
 def delete_item(id):
-    item = request.args.get('item', "view", type=str)
-    delete_record(id, item)
+    rentid = delete_record(id)
+    if rentid != 0:
+        return redirect('/rent_object/{}'.format(rentid))
+
+    return redirect(url_for('main.index'))
 
 
 @bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
@@ -235,15 +239,14 @@ def index():
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
 @login_required
 def landlord(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_landlord(id, action)
+        landlord = post_landlord(id)
+    else:
+        landlord = get_landlord(id)
 
-        return redirect('/landlord/{}?action=view'.format(id_))
+    managers, emailaccs, bankaccs = get_landlord_extras()
 
-    landlord, managers, emailaccs, bankaccs = get_landlord(id)
-
-    return render_template('landlord.html', action=action, landlord=landlord, bankaccs=bankaccs,
+    return render_template('landlord.html', landlord=landlord, bankaccs=bankaccs,
                            managers=managers, emailaccs=emailaccs)
 
 
@@ -368,13 +371,12 @@ def money():
 @bp.route('/money_account/<int:id>', methods=['GET', 'POST'])
 @login_required
 def money_account(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_moneyaccount(id, action)
-        return redirect('/money_account/{}?action=view'.format(id_))
+        id_ = post_moneyaccount(id)
+        return redirect('/money_account/{}'.format(id_))
     moneyacc = get_moneyaccount(id)
 
-    return render_template('money_account.html', action=action, moneyacc=moneyacc)
+    return render_template('money_account.html', moneyacc=moneyacc)
 
 
 @bp.route('/money_deduce/<int:id>', methods=['GET', 'POST'])
@@ -389,11 +391,10 @@ def money_deduce(id):
 @bp.route('/money_items/<int:id>', methods=["GET", "POST"])
 @login_required
 def money_items(id):
-    action = request.args.get('action', "account", type=str)
     bankaccs, cats, cleareds = get_money_options()
-    accsums, moneyitems, values = get_moneyitems(id, action)
+    accsums, moneyitems, values = get_moneyitems(id)
 
-    return render_template('money_items.html', action=action, moneyitems=moneyitems, values=values,
+    return render_template('money_items.html', moneyitems=moneyitems, values=values,
                            bankaccs=bankaccs, accsums=accsums, cats=cats, cleareds=cleareds)
 
 

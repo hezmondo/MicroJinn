@@ -33,46 +33,86 @@
         </div>
     </div>
     {% if action == "edit" %}
+        <div class="form-group row">
+            <div class="col-md-12">
+                <h4 class="text-center">Allocated as follows:</h4>
+            </div>
+        </div>
+        {% for item in incomeallocs %}
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <label for="incall_id">Id:</label>
+                    <input type="text" class="form-control" name="incall_id" value="{{ item.id }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="income_id">Income id:</label>
+                    <input type="text" class="form-control" name="income_id" value="{{ item.income_id }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="rentcode">Rent code:</label>
+                    <input type="text" class="form-control" name="rentcode" value="{{ item.rentcode }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="alloctot">Amount:</label>
+                    <input type="text" class="form-control" name="alloctot" value="{{ item.alloctot }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="chargedesc">Charge type:</label>
+                    {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=item.chargedesc) }}
+                </div>
+                <div class="col-md-2 d-flex flex-column">
+                    <a href="/delete_item/{{ item.id }}?item=incomealloc"
+                       onclick="return confirm('Are you sure you want to delete this allocation?');"
+                       class="btn btn-block btn-warning mt-auto" role="button" >Delete alloc</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="table-fixed">
+            <table class="table" id="incomeallocs">
+                <thead>
+                <tr>
+                    <th style="width: 12.00%">Id</th>
+                    <th style="width: 12.00%">Income id</th>
+                    <th style="width: 12.00%">Rentcode</th>
+                    <th style="width: 12.00%">Amount</th>
+                    <th style="width: 26.00%">Income type</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in incomeallocs %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 12.00%">{{ item.id }}</td>
+                        <td style="width: 12.00%">{{ item.income_id }}</td>
+                        <td style="width: 12.00%"> {{ item.rentcode }}</td>
+                        <td style="width: 12.00%"> {{ item.alloctot }}</td>
+                        <td style="width: 26.00%"> {{ item.chargedesc }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
     <div class="form-group row">
-        <div class="col-md-12">
-            <h4 class="text-center">Allocated as follows:</h4>
-        </div>
+        {% if action == "view" %}
+            <div class="col-md-3">
+                <a href="/income_object/{{ income.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this posting</a>
+            </div>
+        {% else %}
+            <div class="col-md-3">
+                <button type="button" id="show-xalloc" class="btn btn-block btn-primary">Hide extra allocation</button>
+            </div>
+            <div class="col-md-3">
+                <a href="/delete_item/{{ income.id }}?item=income"
+                   onclick="return confirm('Are you sure you want to delete this income?');"
+                   class="btn btn-block btn-warning" role="button">Delete this posting</a>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-block btn-success">Save changes</button>
+            </div>
+        {% endif %}
     </div>
-    {% for item in incomeallocs %}
-    <div class="form-group row">
-        <div class="col-md-2">
-            <label for="incall_id">Id:</label>
-            <input type="text" class="form-control" name="incall_id" value="{{ item.id }}">
-        </div>
-        <div class="col-md-2">
-            <label for="income_id">Income id:</label>
-            <input type="text" class="form-control" name="income_id" value="{{ item.income_id }}">
-        </div>
-        <div class="col-md-2">
-            <label for="rentcode">Rent code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ item.rentcode }}">
-        </div>
-        <div class="col-md-2">
-            <label for="alloctot">Amount:</label>
-            <input type="text" class="form-control" name="alloctot" value="{{ item.alloctot }}">
-        </div>
-        <div class="col-md-2">
-            <label for="chargedesc">Charge type:</label>
-            {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=item.chargedesc) }}
-        </div>
-        <div class="col-md-2 d-flex flex-column">
-            <a href="/delete_item/{{ item.id }}?item=incomealloc"
-               onclick="return confirm('Are you sure you want to delete this allocation?');"
-               class="btn btn-block btn-warning mt-auto" role="button" >Delete alloc</a>
-        </div>
-    </div>
-    {% endfor %}
-    <div class="form-group row">
-        <div class="col-md-3">
-            <button class="btn btn-block btn-primary"  id="show-xalloc">Add allocation</button>
-        </div>
-    </div>
-    <div id="xalloc">
+    <div id="xalloc" class="form-group row align-items-end">
         <div class="col-md-2">
             <label for="incall_id">Id:</label>
             <input type="text" class="form-control" name="incall_id" value="0">
@@ -93,66 +133,10 @@
             <label for="chargedesc">Charge type:</label>
             {{ widgets.combobox(name="chargedesc", items=chargedescs, item_selected=chargedescs[0]) }}
         </div>
-        <div class="form-group row">
-            <div class="col-md-3">
-                <button id="add-alloc" type="button">Add allocation</button>
+            <div class="col-md-2">
+                <button  type="button" id="add-alloc" class="btn btn-block btn-primary">Add allocation</button>
             </div>
         </div>
-    </div>
-    <div id="newalloc"></div>
-<!--</form>-->
-    {% else %}
-<!--<form>-->
-    <div class="table-fixed">
-        <table class="table" id="incomeallocs">
-            <thead>
-            <tr>
-                <th style="width: 12.00%">Id</th>
-                <th style="width: 12.00%">Income id</th>
-                <th style="width: 12.00%">Rentcode</th>
-                <th style="width: 12.00%">Amount</th>
-                <th style="width: 26.00%">Income type</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in incomeallocs %}
-            <tr id="{{ item.id }}">
-                <td style="width: 12.00%">{{ item.id }}</td>
-                <td style="width: 12.00%">{{ item.income_id }}</td>
-                <td style="width: 12.00%"> {{ item.rentcode }}</td>
-                <td style="width: 12.00%"> {{ item.alloctot }}</td>
-                <td style="width: 26.00%"> {{ item.chargedesc }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
-    <div class="form-group row">
-        {% if action == "view" %}
-        <div class="col-md-3">
-            <a href="/income_object/{{ income.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this posting</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/income_object/{{ income.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this posting</a>
-        </div>
-        <div class="col-md-3">
-            <a href="/income_object/0?action=new" class="btn btn-block btn-primary" role="button">Add new posting</a>
-        </div>
-        {% elif action == "edit" %}
-        <div class="col-md-3">
-            <a href="/delete_item/{{ income.id }}?item=income"
-               onclick="return confirm('Are you sure you want to delete this income?');"
-               class="btn btn-block btn-warning" role="button">Delete this posting</a>
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success">Save changes</button>
-        </div>
-        {% else %}
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success">Save as new posting</button>
-        </div>
-        {% endif %}
-    </div>
+    <div id="newalloc" class="form-group row"></div>
 </form>
 {% endblock %}

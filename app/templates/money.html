@@ -8,10 +8,10 @@
             <input class="form-control form-control-lg" type="text" placeholder="Showing all accounts" readonly>
         </div>
         <div class="col-md-3">
-            <a href="/money_account/0?action=new" class="btn btn-block btn-danger" role="button">Add new account</a>
+            <a href="/money_account/0" class="btn btn-block btn-danger" role="button">new account</a>
         </div>
         <div class="col-md-3">
-            <a href="/money_items/0?action=allaccs" class="btn btn-block btn-danger" role="button">Show all transactions</a>
+            <a href="/money_items/0" class="btn btn-block btn-danger" role="button">all transactions</a>
         </div>
     </div>
 </form>
@@ -32,10 +32,10 @@
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 30.00%"> {{ item.accdesc }}</td>
-            <td style="width: 15.00%"><a href="/money_account/{{ item.id }}?action=edit">Edit account</a></td>
+            <td style="width: 15.00%"><a href="/money_account/{{ item.id }}">view account</a></td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
-            <td style="width: 15.00%"><a href="/money_items/{{ item.id }}?action=account">View transactions</a></td>
+            <td style="width: 15.00%"><a href="/money_items/{{ item.id }}">view transactions</a></td>
         </tr>
         {% endfor %}
         <tr>

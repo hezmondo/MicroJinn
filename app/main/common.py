@@ -1,6 +1,19 @@
 # common.py - attempt to put all commonly used stuff here
-
 import os
+from app.models import Landlord, Typeadvarr, Typefreq, Typestatus, Typetenure\
+
+
+# common functions
+def get_combos_common():
+    # This function returns values for comboboxes used by rents, queries and headrents
+    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
+    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
+    statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+
+    return advarrdets, freqdets, landlords, statusdets, tenuredets
+
 
 def preferredEncoding() -> str:
     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()

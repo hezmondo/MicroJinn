@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
+from app.main.common import get_combos_common
 from app.main.functions import commit_to_database, dateToStr, strToDate, strToDec
 
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Jstore, Landlord, Lease, Lease_uplift_type, \
@@ -28,16 +29,20 @@ def get_agents():
 
 
 def get_agent(id):
-    pop_idlist_recent("recent_agents", id)
-    agent = Agent.query.filter(Agent.id == id).one_or_none()
+
+    if id == 0:
+        agent = Agent()
+        agent.id = 0
+    else:
+        agent = Agent.query.get(id)
+        pop_idlist_recent("recent_agents", id)
 
     return agent
 
 
 # charges
 def get_charge(id):
-    action = request.args.get('action', "view", type=str)
-    rentcode = request.args.get('rentcode', "DUMMY" , type=str)
+    rentcode = request.args.get('rentcode', "XNEWX" , type=str)
     rentid = int(request.args.get('rentid', "0", type=str))
     # new charge has id = 0
     if id == 0:
@@ -48,7 +53,6 @@ def get_charge(id):
             'chargedesc': "notice fee",
             'chargestartdate': date.today()
         }
-        action = "edit"
     else:
         charge = \
             Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.id.label("rentid"), Rent.rentcode,
@@ -57,7 +61,7 @@ def get_charge(id):
                     .filter(Charge.id == id).one_or_none()
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
 
-    return action, charge, chargedescs
+    return charge, chargedescs
 
 
 def get_charges(rentid):
@@ -96,15 +100,21 @@ def get_landlords():
 
 
 def get_landlord(id):
-    landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
-                 Landlord.landlordname, Landlord.landlordaddr, Landlord.taxdate, Manager.managername,
-                     Emailaccount.smtp_server, Money_account.accdesc).filter(Landlord.id == id).one_or_none()
+    if id == 0:
+        landlord = Landlord()
+        landlord.id = 0
+    else:
+        landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
+                     Landlord.landlordname, Landlord.landlordaddr, Landlord.taxdate, Manager.managername,
+                         Emailaccount.smtp_server, Money_account.accdesc).filter(Landlord.id == id).one_or_none()
+    return landlord
 
+def get_landlord_extras():
     managers = [value for (value,) in Manager.query.with_entities(Manager.managername).all()]
     emailaccs = [value for (value,) in Emailaccount.query.with_entities(Emailaccount.smtp_server).all()]
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
 
-    return landlord, managers, emailaccs, bankaccs
+    return managers, emailaccs, bankaccs
 
 
 # leases
@@ -418,18 +428,6 @@ def getrentobj_main(id):
     return rentobj, properties
 
 
-# common functions
-def get_combos_common():
-    # This function returns values for comboboxes used by rents, queries and headrents
-    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-
-    return advarrdets, freqdets, landlords, statusdets, tenuredets
-
-
 def get_combos_rentonly():
     # This function returns the list values for various comboboxes used only by rents
     actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
@@ -478,19 +476,23 @@ def pop_idlist_recent(recent_field, id):
         db.session.commit()
 
 
-def post_agent(id, action):
-    if action == "edit":
-        agent = Agent.query.get(id)
-    else:
+def post_agent(id):
+    if id == 0:
         agent = Agent()
-    agent.agdetails = request.form.get("address")
+        agent.id = 0
+        agent.code = ""
+    else:
+        agent = Agent.query.get(id)
+
+    agdet = request.form.get("address")
+    agent.agdetails = agdet
     agent.agemail = request.form.get("email")
     agent.agnotes = request.form.get("notes")
     db.session.add(agent)
     commit_to_database()
-    id_ = agent.id
+    agent = Agent.query.filter(Agent.agdetails == agdet).first()
 
-    return id_
+    return agent
 
 
 def post_charge(id):
@@ -515,12 +517,14 @@ def post_charge(id):
     return rent_id
 
 
-def post_landlord(id, action):
-    if action == "edit":
-        landlord = Landlord.query.get(id)
-    else:
+def post_landlord(id):
+    if id == 0:
         landlord = Landlord()
-    landlord.landlordname = request.form.get("name")
+        landlord.id = 0
+    else:
+        landlord = Landlord.query.get(id)
+    ll_name = request.form.get("name")
+    landlord.landlordname = ll_name
     landlord.landlordaddr = request.form.get("address")
     landlord.taxdate = request.form.get("taxdate")
     emailacc = request.form.get("emailacc")
@@ -536,9 +540,10 @@ def post_landlord(id, action):
         Manager.query.with_entities(Manager.id).filter \
             (Manager.managername == manager).one()[0]
     db.session.add(landlord)
-    db.session.commit()
-    id_ = landlord.id
-    return id_
+    commit_to_database()
+    landlord = Landlord.query.filter(Landlord.landlordname == ll_name).first()
+
+    return landlord
 
 
 def post_lease(id):

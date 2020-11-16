@@ -1,9 +1,10 @@
+from app import db
 from datetime import date
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database
 from app.models import Agent, Formletter, Headrent, Income, Incomealloc, Landlord, \
-    Loan, Loan_statement, Manager, Money_category, Money_item, Rent, Rental, Rental_statement, \
+    Loan, Loan_statement, Manager, Rent, Rental, Rental_statement, \
     Typeadvarr, Money_account, Template, Typefreq, Typedoc, Typepayment, Typestatus, Typetenure, Emailaccount
 
 
@@ -152,100 +153,6 @@ def getmaildata(rent_id, income_id):
     return incomedata, allocdata, bankdata, addressdata
 
 
-# money
-def get_moneyaccount(id):
-    moneyacc = Money_account.query.filter(Money_account.id == id).one_or_none()
-
-    return moneyacc
-
-
-def get_moneydets():
-    moneydets = Money_account.query.with_entities(Money_account.id, Money_account.bankname, Money_account.accname,
-                  Money_account.sortcode, Money_account.accnum, Money_account.accdesc,
-                           func.mjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
-                           func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).all()
-
-    accsums = Money_account.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
-                                            func.mjinn.acc_total(0).label('uncleared')).filter().first()
-
-    return moneydets, accsums
-
-
-def get_moneyitem(id):
-    bankitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id, Money_item.num,
-                Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,Money_account.accdesc,
-                   Money_category.cat_name, Money_item.cleared).filter(Money_item.id == id).one_or_none()
-
-    return bankitem
-
-
-def get_moneyitems(id, action):
-    money_filter = []
-    income_filter = []
-    values = {'accdesc': 'all accounts', 'payee': 'all', 'memo': 'all', 'category': 'all categories', 'cleared': 'all'}
-    if action == "account":
-        money_filter.append(Money_account.id == id)
-        income_filter.append(Money_account.id == id)
-        moneyacc = get_moneyaccount(id)
-        values['accdesc'] = moneyacc.accdesc
-    if request.method == "POST":
-        payee = request.form.get("payee") or "all"
-        if payee != "all":
-            money_filter.append(Money_item.payer.ilike('%{}%'.format(payee)))
-            income_filter.append(Income.payer.ilike('%{}%'.format(payee)))
-            values['payee'] = payee
-        memo = request.form.get("memo") or "all"
-        if memo != "all":
-            money_filter.append(Money_item.memo.ilike('%{}%'.format(memo)))
-            income_filter.append(Incomealloc.rentcode.ilike('%{}%'.format(memo)))
-            values['memo'] = memo
-        accdesc = request.form.get("accdesc") or "all accounts"
-        if accdesc != "all accounts":
-            money_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
-            income_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
-            values['accdesc'] = accdesc
-        clearedval = request.form.get("cleared") or "all"
-        values['cleared'] = clearedval
-        if clearedval == "cleared":
-            money_filter.append(Money_item.cleared == 1)
-        elif clearedval == "uncleared":
-            money_filter.append(Money_item.cleared == 0)
-            income_filter.append(Income.id == 0)
-        catval = request.form.get("category") or "all categories"
-        if catval != "all categories":
-            money_filter.append(Money_category.cat_name == catval)
-            if catval != "Jinn BACS income":
-                income_filter.append(Income.id == 0)
-        values['category'] = catval
-
-    moneyitems = \
-        Money_item.query.join(Money_account).join(Money_category) .with_entities(Money_item.id, Money_item.num,
-                     Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
-                           Money_account.accdesc, Money_category.cat_name, Money_item.cleared) \
-            .filter(*money_filter).union\
-            (Income.query.join(Money_account).join(Incomealloc).with_entities(Income.id, literal("X").label('num'),
-                  Income.date, Income.payer, Income.amount, Incomealloc.rentcode.label('memo'), Money_account.accdesc,
-                      literal("BACS income").label('cat_name'), literal("1").label('cleared')) \
-             .filter(*income_filter)) \
-             .order_by(desc(Money_item.date), desc(Income.date), Money_item.memo, Incomealloc.rentcode).limit(100)
-
-    accsums = Money_item.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()).label('cbalance'),
-                 func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
-
-    return accsums, moneyitems, values
-
-
-def get_money_options():
-    # return options for each multiple choice control in money_edit and money_filter pages
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    bankaccs.insert(0, "all accounts")
-    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
-    cats.insert(0, "all categories")
-    cleareds = ["all", "cleared", "uncleared"]
-
-    return bankaccs, cats, cleareds
-
-
 # rentals
 def get_rental(id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
@@ -270,13 +177,119 @@ def get_rentalstatement():
     return rentalstatem
 
 
-# common functions
-def get_combos_common():
-    # This function returns values for comboboxes used by rents, queries and headrents
-    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    tenuredets = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+def post_formletter(id, action):
+    if action == "edit":
+        formletter = Formletter.query.get(id)
+    else:
+        formletter = Formletter()
+    formletter.code = request.form.get("code")
+    formletter.summary = request.form.get("summary")
+    formletter.subject = request.form.get("subject")
+    formletter.block = request.form.get("block")
+    formletter.bold = request.form.get("bold")
+    doctype = request.form.get("doc_type")
+    formletter.doctype_id = \
+        Typedoc.query.with_entities(Typedoc.id).filter \
+            (Typedoc.desc == doctype).one()[0]
+    template = request.form.get("template")
+    formletter.template_id = \
+        Template.query.with_entities(Template.id).filter \
+            (Template.code == template).one()[0]
+    db.session.add(formletter)
+    db.session.commit()
+    id_ = formletter.id
 
-    return advarrdets, freqdets, landlords, statusdets, tenuredets
+    return id_
+
+
+def post_emailaccount(id, action):
+    if action == "edit":
+        emailacc = Emailaccount.query.get(id)
+    else:
+        emailacc = Emailaccount()
+    emailacc.smtp_server = request.form.get("smtp_server")
+    emailacc.smtp_port = request.form.get("smtp_port")
+    emailacc.smtp_timeout = request.form.get("smtp_timeout")
+    emailacc.smtp_debug = request.form.get("smtp_debug")
+    emailacc.smtp_tls = request.form.get("smtp_tls")
+    emailacc.smtp_user = request.form.get("smtp_user")
+    emailacc.smtp_password = request.form.get("smtp_password")
+    emailacc.smtp_sendfrom = request.form.get("smtp_sendfrom")
+    emailacc.imap_server = request.form.get("imap_server")
+    emailacc.imap_port = request.form.get("imap_port")
+    emailacc.imap_tls = request.form.get("imap_tls")
+    emailacc.imap_user = request.form.get("imap_user")
+    emailacc.imap_password = request.form.get("imap_password")
+    emailacc.imap_sentfolder = request.form.get("imap_sentfolder")
+    emailacc.imap_draftfolder = request.form.get("imap_draftfolder")
+    db.session.add(emailacc)
+    db.session.commit()
+    id_ = emailacc.id
+
+    return id_
+
+
+def post_headrent(id, action):
+    if action == "edit":
+        headrent = Headrent.query.get(id)
+    else:
+        headrent = Agent()
+    headrent.agdetails = request.form.get("agdetails")
+    db.session.add(headrent)
+    commit_to_database()
+    id_ = headrent.id
+
+    return id_
+
+
+def post_loan(id, action):
+    if action == "edit":
+        loan = Loan.query.get(id)
+    else:
+        loan = Loan()
+    loan.code = request.form.get("loancode")
+    loan.interest_rate = request.form.get("interest_rate")
+    loan.end_date = request.form.get("end_date")
+    frequency = request.form.get("frequency")
+    loan.frequency = \
+        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    advarr = request.form.get("advarr")
+    loan.advarr_id = \
+        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    loan.lender = request.form.get("lender")
+    loan.borrower = request.form.get("borrower")
+    loan.notes = request.form.get("notes")
+    # loan.val_date = request.form.get("val_date")
+    # loan.valuation = request.form.get("valuation")
+    db.session.add(loan)
+    db.session.commit()
+    id_ = loan.id
+
+    return id_
+
+
+def post_rental(id, action):
+    if action == "edit":
+        rental = Rental.query.get(id)
+    else:
+        rental = Rental()
+    rental.propaddr = request.form.get("propaddr")
+    rental.tenantname = request.form.get("tenantname")
+    rental.rentpa = request.form.get("rentpa")
+    rental.arrears = request.form.get("arrears")
+    rental.startrentdate = request.form.get("startrentdate")
+    if rental.astdate:
+        rental.astdate = request.form.get("astdate")
+    rental.lastgastest = request.form.get("lastgastest")
+    rental.note = request.form.get("note")
+    frequency = request.form.get("frequency")
+    rental.freq_id = \
+        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    advarr = request.form.get("advarr")
+    rental.advarr_id = \
+        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    db.session.add(rental)
+    db.session.commit()
+    id_ = rental.id
+
+    return id_
