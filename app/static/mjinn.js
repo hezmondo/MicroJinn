@@ -1,5 +1,6 @@
 $(document).ready(function(){
     $("#save_delete").hide();
+    $("#more_buttons").hide();
 //    if ($("#item_id").text() == "0") {
 //       $("#toggleview").click();
 //            }
@@ -29,6 +30,16 @@ $(document).ready(function(){
             $(this).text("edit");
             $(':input').prop('readonly', true);
             $("#save_delete").hide();
+        }
+    });
+    $("#more_less").click(function(){
+        if ($(this).text() == "more") {
+            $(this).text("less");
+            $("#more_buttons").show();
+            }
+        else {
+            $(this).text("more");
+            $("#more_buttons").hide();
         }
     });
     $(".custom-file-input").on("change", function() {

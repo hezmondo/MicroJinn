@@ -32,6 +32,12 @@
             <div class="col-md-2">
                 <a href="/docfiles/0" class="btn btn-block btn-primary" role="button">view all docfiles</a>
             </div>
+            <div class="col-md-2">
+                <a href="/docfile/0?doc_dig=doc&rentid={{ rentid }}" class="btn btn-block btn-primary" role="button">new doc in</a>
+            </div>
+            <div class="col-md-2">
+                <a href="/upload_file/{{ rentid }}?rentcode={{ docfiles.rentcode }}" class="btn btn-block btn-primary" role="button">new digfile</a>
+            </div>
         {% endif %}
     </div>
   <div class="form-group row">
