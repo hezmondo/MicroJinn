@@ -1,4 +1,4 @@
-### Basic start up guide for installing mjinn - last updated 17 Oct 2020
+### Basic start up guide for installing mjinn - last updated 26 Nov 2020
 
 ### Please install MySql Server and MySql Workbench using my new mysql server and workbench installation guide
  

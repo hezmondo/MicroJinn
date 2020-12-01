@@ -234,7 +234,7 @@ def get_rentobjs_plus(action, name):
     rentcode = request.form.get("rentcode") or ""
     source = request.form.get("source") or ""
     tenantname = request.form.get("tenantname") or ""
-    enddate = request.form.get("enddate") or date.today() + relativedelta(days=35)
+    enddate = request.form.get("enddate") or date.today() + relativedelta(days=45)
     runsize = request.form.get("runsize") or 100
     qfilter = []
     if agentdetails and agentdetails != "":
@@ -247,6 +247,8 @@ def get_rentobjs_plus(action, name):
         qfilter.append(Rent.source.ilike('%{}%'.format(source)))
     if tenantname and tenantname != "":
         qfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
+    if enddate and enddate != "":
+        qfilter.append(func.mjinn.next_rent_date(Rent.id, 1, 1) < "{}".format(enddate))
     landlords, statusdets, tenuredets = get_queryoptions_common()
     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
     if request.method == "POST":
@@ -634,7 +636,8 @@ def postrentobj(id):
     rent.mailto_id = \
         Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).one()[0]
     rent.note = request.form.get("note") or ""
-    rent.price = strToDec(request.form.get("price")) or strToDec("99999")
+    if request.form.get("price") != "None":
+        rent.price = strToDec(request.form.get("price")) or strToDec("99999")
     rent.rentpa = strToDec(request.form.get("rentpa"))
     salegrade = request.form.get("salegrade")
     rent.salegrade_id = \

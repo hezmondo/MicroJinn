@@ -22,6 +22,7 @@ from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, ge
         get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
         post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.writemail import writeMail
+from app.main.payrequests import forward_rents
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -412,12 +413,28 @@ def money_item(id):
                            cats=cats, cleareds=cleareds)
 
 
-@bp.route('/payrequests', methods=['GET', 'POST'])
+@bp.route('/payrequests/', methods=['GET', 'POST'])
 @login_required
 def payrequests():
-    payrequests = None
+    action = request.args.get('action', "view", type=str)
+    name = request.args.get('name', "queryall", type=str)
 
-    return render_template('payrequests.html', payrequests=payrequests)
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+
+    actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
+    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
+
+    if action == "run":
+        forward_rents(rentprops)
+
+    return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
+                       landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
+                       statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
+                       arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
+                       propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
+                       runsize=runsize, salegrade=salegrade, source=source, status=status,
+                       tenantname=tenantname, tenure=tenure, rentprops=rentprops)
 
 
 @bp.route('/properties', methods=['GET', 'POST'])
@@ -507,8 +524,8 @@ def rent_object(id):
     actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
     advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
 
-    # if session.get('mailtodets') == False:
-    #     session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    #if not session['mailtodets']:
+    #   session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
     session['propaddr'] = rentobj.propaddr
