@@ -3,7 +3,7 @@ from datetime import date
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database
-from app.models import Agent, Formletter, Headrent, Income, Incomealloc, Landlord, \
+from app.models import Agent, Formletter, FormPayRequest, Headrent, Income, Incomealloc, Landlord, \
     Loan, Loan_statement, Manager, Rent, Rental, Rental_statement, \
     Typeadvarr, Money_account, Template, Typefreq, Typedoc, Typepayment, Typestatus, Typetenure, Emailaccount
 
@@ -32,6 +32,17 @@ def get_formletter(id):
     return formletter
 
 
+# form payrequest
+def get_form_payrequest(id):
+
+    formletter = FormPayRequest.query.join(Typedoc).join(Template).with_entities(FormPayRequest.id, FormPayRequest.code,
+                                 FormPayRequest.summary, FormPayRequest.subject, FormPayRequest.block, FormPayRequest.bold,
+                                 Typedoc.desc, Template.desc.label("template")) \
+           .filter(FormPayRequest.id == id).one_or_none()
+
+    return formletter
+
+
 def get_formletters(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
@@ -46,6 +57,8 @@ def get_formletters(action):
                                        Formletter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
         formletters = Formletter.query.filter(Formletter.code.ilike('LEQ-%'))
+    elif action == "payrequest":
+        formletters = FormPayRequest.query.all()
     else:
         formletters = Formletter.query.all()
 

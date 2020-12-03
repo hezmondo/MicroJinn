@@ -1,0 +1,99 @@
+<!-- /templates/mergedocs/LTS.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" action="/save_html">
+    <div class="form-group row flex-row-reverse">
+		<div class="col-md-2">
+			<a href="/mail_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back to mail</a>
+		</div>
+        <div class="col-md-3">
+            <button id="savehtml" class="btn btn-block btn-success">save html of pay request</button>
+        </div>
+    </div>
+	<div id="doc_html" contenteditable="true">
+	    {% if method == "letter" %}
+			<div class="font-size-large" align="center">
+				<b>{{ rentobj.managername }}</b>
+			</div>
+			<div class="font-size-small" align="center">
+				{{ addressdata.manageraddr }}
+				<br />
+				{{ addressdata.manageraddr2 }}
+				<br />
+			</div>
+			<div class="font-size-medium" align="right">
+				Our Ref: {{ rentobj.rentcode }}
+				<br />
+				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
+			</div>
+			<div class="font-size-medium" align="left">
+				{% for item in mailaddr %}
+					{{ item }}
+					<br />
+				{% endfor %}
+				<br />
+				<br />
+				Dear {{ rentobj.tenantname }}
+			</div>
+	    {% else %}
+			<div class="font-size-medium" align="left">
+				Our Ref: {{ rentobj.rentcode }}
+				<br />
+				<br />
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
+				<br />
+				<br />
+				Dear {{ rentobj.tenantname }}
+			</div>
+		{% endif %}
+		<div class="font-size-medium" align="left">
+			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
+			<br />
+			{{ widgets.linebreaks_for_string(block) }}
+			<br />
+			<br />
+			Yours sincerely
+			<br />
+			<br />
+			<br />
+		    {% if method == "email" %}
+				<b>{{ rentobj.managername }}</b>
+				<br />
+				{{ addressdata.manageraddr }}
+				<br />
+				{{ addressdata.manageraddr2 }}
+				<br />
+		    {% endif %}
+			</div>
+		</div>
+	</div>
+    <div class="form-group row">
+		<div class="col-md-3">
+            <input type="hidden" id="xinput" name="xinput" value = "xyz">
+        </div>
+    </div>
+    <div class="form-group row">
+		<div class="col-md-2">
+            <input type="hidden" id="rentid" name="rentid" value = "{{ rentobj.id }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rentobj.rentcode }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="doc_type" name="doc_type" value = "{{ doctype }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="out_in" name="out_in" value = "out">
+        </div>
+    </div>
+</form>
+{% endblock %}

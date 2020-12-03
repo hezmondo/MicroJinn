@@ -5,14 +5,20 @@ from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
-from app.main.other import get_formletter, getmaildata
+from app.main.other import get_formletter, get_form_payrequest, getmaildata
 from app.main.functions import htmlSpecialMarkDown
+
 
 def writeMail(rent_id, income_id, formletter_id, action):
     # Get rent/prop/income details and output mail (letter/payrequest/account/email/invoice/rem adv)
     rentobj, properties = getrentobj_main(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
-    formletter = get_formletter(formletter_id)
+
+    if action == "payrequest":
+        formletter = get_form_payrequest(formletter_id)
+    else:
+        formletter = get_formletter(formletter_id)
+
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
     arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \

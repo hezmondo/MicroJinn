@@ -7,10 +7,10 @@
 <form method="POST" action="/docfile/{{ docfile.id }}">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="/docfiles/{{ docfile.rentid }}" class="btn btn-block btn-primary" role="button">back to docfiles</a>
+            <a href="/docfiles/{{ docfile.rent_id }}" class="btn btn-block btn-primary" role="button">back to docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="/rent_object/{{ docfile.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            <a href="/rent_object/{{ docfile.rent_id }}" class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         {% if doc_dig == "dig" %}
             <div class="col-md-2">

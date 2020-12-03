@@ -81,10 +81,9 @@ def get_docfiles(rentid):
 
     return docfiles, dfoutin
 
-
 def post_docfile(id):
     rentid = int(request.form.get('rentid'))
-    doc_dig = request.form.get('doc_dig')
+    doc_dig = request.form.get('doc_dig') or "doc"
     # new file for id 0, otherwise existing dig or doc file:
     if id == 0:
         # new file has to be doc as new digital file uses upload function

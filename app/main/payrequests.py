@@ -4,6 +4,7 @@ from app.models import Rent
 from app import db
 from datetime import date
 
+
 def forward_rents(rentprops):
     for rent_prop in rentprops:
         rent = Rent.query.get(rent_prop.id)

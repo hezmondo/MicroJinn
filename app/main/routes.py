@@ -349,17 +349,30 @@ def mail_edit(id):
     method = request.args.get('method', "email", type=str)
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
-        # print(request.form)
-        formletter_id = id
-        rent_id = request.form.get('rent_id')
-        addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
-        mailaddr = request.form.get('mailaddr')
-        summary = dcode + "-" + method + "-" + mailaddr[0:25]
-        mailaddr = mailaddr.split(", ")
+        if action == "payrequest":
+            formletter_id = id
+            rent_id = request.form.get('rent_id')
+            addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
+            mailaddr = request.form.get('mailaddr')
+            summary = dcode + "-" + method + "-" + mailaddr[0:25]
+            mailaddr = mailaddr.split(", ")
 
-        return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
-                               summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
-                               method=method, rentobj=rentobj, subject=subject)
+            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
+                                   summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                                   method=method, rentobj=rentobj, subject=subject)
+        else:
+            # print(request.form)
+            formletter_id = id
+            rent_id = request.form.get('rent_id')
+            addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
+                                                                                              action)
+            mailaddr = request.form.get('mailaddr')
+            summary = dcode + "-" + method + "-" + mailaddr[0:25]
+            mailaddr = mailaddr.split(", ")
+
+            return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
+                                   summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                                   method=method, rentobj=rentobj, subject=subject)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -542,7 +555,9 @@ def save_html():
     if request.method == "POST":
         id_ = post_docfile(0)
 
-        return redirect('/docfile/{}?doc_dig_doc'.format(id_))
+        return redirect('/docfiles/{}'.format(id_))
+
+        # return redirect('/docfile/{}?doc_dig_doc'.format(id_))
 
 
 @bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])
