@@ -81,6 +81,7 @@ def get_docfiles(rentid):
 
     return docfiles, dfoutin
 
+
 def post_docfile(id):
     rentid = int(request.form.get('rentid'))
     doc_dig = request.form.get('doc_dig') or "doc"
@@ -94,7 +95,6 @@ def post_docfile(id):
         docfile = Docfile.query.get(id) if doc_dig == "doc" else Digfile.query.get(id)
         docfile.rent_id = rentid
     docfile.doc_date = request.form.get('doc_date')
-    docfile.summary = request.form.get('summary')
     if doc_dig == "doc":
         docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
         # source_html = docfile.doc_text
@@ -103,6 +103,33 @@ def post_docfile(id):
     doctype = request.form.get('doc_type')
     docfile.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
+    docfile.summary = request.form.get('summary')
+    docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
+    db.session.add(docfile)
+    db.session.commit()
+    return rentid
+
+
+def post_payrequestfile():
+    # TODO: refactor
+    rentid = int(request.form.get('rentid'))
+    doc_dig = request.form.get('doc_dig') or "doc"
+    # new file for id 0, otherwise existing dig or doc file:
+
+    docfile = Docfile()
+    docfile.id = 0
+    docfile.rent_id = rentid
+
+    docfile.doc_date = request.form.get('doc_date')
+    if doc_dig == "doc":
+        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
+        # source_html = docfile.doc_text
+        # output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
+        # convert_html_to_pdf(source_html, output_filename)
+
+    docfile.doctype_id = 2
+    docfile.summary = "Pay request"
+
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
     db.session.add(docfile)
     db.session.commit()

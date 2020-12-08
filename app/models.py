@@ -167,16 +167,11 @@ class Formletter(db.Model):
 
 
 class FormPayRequest(db.Model):
-    __tablename__ = 'form_payrequest'
+    __tablename__ = 'formpayrequest'
 
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
     summary = db.Column(db.String(60))
-    subject = db.Column(db.String(150))
     block = db.Column(db.Text, nullable=True)
-    bold = db.Column(db.String(900))
-    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
-    template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
 
 class Headrent(db.Model):

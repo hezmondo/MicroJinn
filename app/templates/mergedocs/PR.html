@@ -4,7 +4,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="/save_html">
+<form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
 			<a href="/mail_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back to mail</a>
@@ -51,6 +51,10 @@
 		{% endif %}
 		<div class="font-size-medium" align="left">
 			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
+			<br />
+			<br />
+			{{ table }}
+			<br />
 			<br />
 			{{ widgets.linebreaks_for_string(block) }}
 			<br />

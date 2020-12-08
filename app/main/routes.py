@@ -7,7 +7,7 @@ from app import db
 from app.main import bp
 from app.main.common import get_combos_common
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.functions import backup_database
 from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
         get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
@@ -21,7 +21,7 @@ from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, ge
         get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
         get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
         post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
-from app.main.writemail import writeMail
+from app.main.writemail import writeMail, write_payrequest
 from app.main.payrequests import forward_rents
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
@@ -89,9 +89,9 @@ def delete_item(id):
 @login_required
 def docfile(id):
     if request.method == "POST":
-        rentid = post_docfile(id)
+        rent_id = post_docfile(id)
 
-        return redirect('/rent_object/{}'.format(rentid))
+        return redirect('/rent_object/{}'.format(rent_id))
 
     docfile, doc_dig = get_docfile(id)
 
@@ -350,16 +350,15 @@ def mail_edit(id):
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
         if action == "payrequest":
-            formletter_id = id
+            formpayrequest_id = id
             rent_id = request.form.get('rent_id')
-            addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
+            addressdata, block, rentobj, subject, table = write_payrequest(rent_id, formpayrequest_id)
             mailaddr = request.form.get('mailaddr')
-            summary = dcode + "-" + method + "-" + mailaddr[0:25]
+
             mailaddr = mailaddr.split(", ")
 
-            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
-                                   summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
-                                   method=method, rentobj=rentobj, subject=subject)
+            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block,
+                                   mailaddr=mailaddr, method=method, rentobj=rentobj, subject=subject, table=table)
         else:
             # print(request.form)
             formletter_id = id
@@ -552,8 +551,12 @@ def rent_object(id):
 
 @bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
+    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_docfile(0)
+        if action == "payrequest":
+            id_ = post_payrequestfile()
+        else:
+            id_ = post_docfile(0)
 
         return redirect('/docfiles/{}'.format(id_))
 

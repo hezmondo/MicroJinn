@@ -33,14 +33,11 @@ def get_formletter(id):
 
 
 # form payrequest
-def get_form_payrequest(id):
+def get_formpayrequest(id):
 
-    formletter = FormPayRequest.query.join(Typedoc).join(Template).with_entities(FormPayRequest.id, FormPayRequest.code,
-                                 FormPayRequest.summary, FormPayRequest.subject, FormPayRequest.block, FormPayRequest.bold,
-                                 Typedoc.desc, Template.desc.label("template")) \
-           .filter(FormPayRequest.id == id).one_or_none()
+    formpayrequest = FormPayRequest.query.filter(FormPayRequest.id == id).one_or_none()
 
-    return formletter
+    return formpayrequest
 
 
 def get_formletters(action):
