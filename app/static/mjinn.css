@@ -130,7 +130,6 @@ select:-internal-list-box option:checked {
 
 .pr_table th {
     text-align: center;
-    border-radius: 5px;
     background-color: #6666ff;
     color: white
 }
@@ -145,7 +144,6 @@ select:-internal-list-box option:checked {
     text-align: right;
     width: 20%;
 }
-
 
 /* End of docs.css */
 

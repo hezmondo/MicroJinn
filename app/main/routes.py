@@ -425,6 +425,7 @@ def money_item(id):
                            cats=cats, cleareds=cleareds)
 
 
+# TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
 @bp.route('/payrequests/', methods=['GET', 'POST'])
 @login_required
 def payrequests():

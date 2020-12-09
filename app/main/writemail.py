@@ -7,6 +7,7 @@ from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
 from app.main.payrequests import forward_rent, PayRequestTable, build_pr_table
+from app.models import Charge, Chargetype, Rent
 from app.main.functions import htmlSpecialMarkDown
 
 
@@ -21,6 +22,7 @@ def writeMail(rent_id, income_id, formletter_id, action):
     arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
     arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
+    # TODO: Check if rentobj.tenuredet == "Rentcharge" below
     rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     totdue = arrears + totcharges
@@ -99,38 +101,36 @@ def writeMail(rent_id, income_id, formletter_id, action):
     return addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode
 
 
+# TODO: refactor - some duplication of writeMail (above)
 def write_payrequest(rent_id, formpayrequest_id):
-    # TODO: refactor
     rentobj, properties = getrentobj_main(rent_id)
 
     # TODO: avoid passing 0 to getmaildata
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, 0)
 
-    formletter = get_formpayrequest(formpayrequest_id)
+    form_pay_request = get_formpayrequest(formpayrequest_id)
 
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
-    # arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
-    # arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
-    #     if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
-    # rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
-    # totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
-    # totdue = arrears + totcharges
+    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
+    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
+        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
+    rent_type = "rent charge" if rentobj.tenuredet == "Rentcharge" else "ground rent"
+    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
+    rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
 
-    if rentobj.rentpa != 0:
-        rent_gale = rentobj.rentpa / rentobj.freq_id
-    else:
-        rent_gale = 0
-
-    list_amounts = {}
-
+    list_table_amounts = {}
     if rent_gale:
-        list_amounts = {'Rent': rent_gale}
+        rent_statement = get_rent_statement(rentobj, rent_type)
+        list_table_amounts.update({rent_statement: rent_gale})
     if arrears:
-        list_amounts.update({'Arrears': arrears})
-
-    totdue = rent_gale+arrears
-
-    list_amounts.update({'Total due': totdue})
+        arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
+        list_table_amounts.update({arrears_statement: arrears})
+    # TODO: Charges can be calculated in rentobj rather than separately using a function here
+    charges = get_pay_request_charges(rent_id)
+    if charges:
+        list_table_amounts.update(charges)
+    totdue = rent_gale + arrears + totcharges
+    list_table_amounts.update({'The total amount payable is:': totdue})
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "no advarr",
                       '#accname#': bankdata.accname if bankdata else "no accname",
@@ -155,26 +155,70 @@ def write_payrequest(rent_id, formpayrequest_id):
                       '#periodly#': rentobj.freqdet if rentobj else "no periodly",
                       '#propaddr#': rentobj.propaddr if rentobj else "no property address",
                       '#rentcode#': rentobj.rentcode if rentobj else "no rentcode",
-                       # '#arrears_start_date#': arrears_start_date,
-                       # '#arrears_end_date#': arrears_end_date,
+                       '#arrears_start_date#': arrears_start_date,
+                       '#arrears_end_date#': arrears_end_date,
                       '#rentpa#': moneyToStr(rentobj.rentpa, pound=True) if rentobj else "no rent",
                        # '#rent_type#': rent_type,
                       '#tenantname#': rentobj.tenantname if rentobj else "no tenant name",
                        # '#totcharges#': moneyToStr(totcharges, pound=True),
-                       '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
+                      '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
 
                       '#today#': dateToStr(datetime.date.today())
                       }
 
-    subject = "I am the subject!"
+    subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
     subject = doReplace(word_variables, subject)
-    block = formletter.block if formletter.block else ""
+    block = form_pay_request.block if form_pay_request.block else ""
     block = doReplace(word_variables, block)
 
-    items = build_pr_table(list_amounts)
+    items = build_pr_table(list_table_amounts)
     table = PayRequestTable(items)
 
     return addressdata, block, rentobj, subject, table
+
+
+# TODO: Check that these functions belong in writeMail.py
+def get_rent_statement(rentobj, rent_type):
+    if rentobj.freq_id == 1:
+        freq = "One year's"
+    elif rentobj.freq_id == 2:
+        freq = "One half-year's"
+    elif rentobj.freq_id == 4:
+        freq = "One quarter's"
+    elif rentobj.freq_id == 12:
+        freq = "One month's"
+    elif rentobj.freq_id == 13:
+        freq = "One four weekly"
+    else:
+        freq = "One weekly"
+
+    if rentobj.nextrentdate > datetime.date.today():
+        f = "falls"
+    else:
+        f = "fell"
+
+    statement = "{0} {1} {2} due and payable {3} on {4}:".format(freq, rent_type, f,
+                                                                 rentobj.advarrdet, dateToStr(rentobj.nextrentdate))
+    return statement
+
+
+def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
+    statement = "Unpaid {0} is owing for the period {1} to {2}:".format(rent_type, arrears_start_date, arrears_end_date)
+    return statement
+
+
+# TODO: Copied from rent_obj.py. Can be refactored/included in rentobj?
+def get_pay_request_charges(rent_id):
+    qfilter = [Charge.rent_id == rent_id]
+    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
+                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+            .filter(*qfilter).all()
+    charge_table_items = {}
+    for charge in charges:
+        charge_detail = "{} added on {}:".format(charge.chargedesc.capitalize(), charge.chargestartdate)
+        charge_total = charge.chargetotal
+        charge_table_items.update({charge_detail: charge_total})
+    return charge_table_items
 
 
 def doReplace(dict, clause):

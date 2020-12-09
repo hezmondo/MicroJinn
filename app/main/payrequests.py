@@ -29,11 +29,8 @@ def forward_rent(rent_id, preview):
 
 def update_arrears(rent):
     previous_arrears = rent.arrears
-    rent_pa = rent.rentpa
-    freq_id = rent.freq_id
-    rent_gale = rent_pa / freq_id
-    new_arrears = previous_arrears + rent_gale
-    rent.arrears = new_arrears
+    rent_gale = rent.rentpa / rent.freq_id
+    rent.arrears = previous_arrears + rent_gale
     return
 
 
@@ -59,14 +56,13 @@ class PayRequestItem(object):
         self.details = details
         self.amount = amount
 
-    # identify the 'total' row
+    # identify the 'total amount' row
     def important(self):
-        return self.details.lower().startswith('t')
+        return self.details.lower().find("total amount") != -1
 
 
 class PayRequestTable(Table):
     classes = ['pr_table']
-
     details = Col('Details')
     amount = CurrencyCol(
         'Amount',
@@ -86,9 +82,5 @@ def build_pr_table(list_amounts):
     items = []
     for key in list_amounts:
         items.append(PayRequestItem(key, list_amounts[key]))
-
-    # items = [PayRequestItem('Name1', 54),
-    #          PayRequestItem('Name2', 32),
-    #          PayRequestItem('Total', 86)]
     return items
 

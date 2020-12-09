@@ -39,7 +39,7 @@ def get_agent(id):
 
     return agent
 
-
+# TODO: Do we need chargedesc?
 # charges
 def get_charge(id):
     rentcode = request.args.get('rentcode', "XNEWX" , type=str)
