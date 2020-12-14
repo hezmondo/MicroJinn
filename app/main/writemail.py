@@ -6,7 +6,8 @@ from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
-from app.main.payrequests import forward_rent, PayRequestTable, build_pr_table
+from app.main.payrequests import PayRequestTable, build_pr_table, get_pay_request_table_charges, \
+    determine_new_charges_and_case_suffix, get_rent_statement, get_arrears_statement
 from app.models import Charge, Chargetype, Rent
 from app.main.functions import htmlSpecialMarkDown
 
@@ -105,7 +106,7 @@ def writeMail(rent_id, income_id, formletter_id, action):
 def write_payrequest(rent_id, formpayrequest_id):
     rentobj, properties = getrentobj_main(rent_id)
 
-    # TODO: avoid passing 0 to getmaildata
+    # TODO: Can we avoid passing 0 to getmaildata
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, 0)
 
     form_pay_request = get_formpayrequest(formpayrequest_id)
@@ -126,8 +127,9 @@ def write_payrequest(rent_id, formpayrequest_id):
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         list_table_amounts.update({arrears_statement: arrears})
     # TODO: Charges can be calculated in rentobj rather than separately using a function here
-    charges = get_pay_request_charges(rent_id)
-    if charges:
+    if totcharges:
+        charges = get_pay_request_table_charges(rent_id)
+        charge_suffix = determine_new_charges_and_case_suffix(rentobj)
         list_table_amounts.update(charges)
     totdue = rent_gale + arrears + totcharges
     list_table_amounts.update({'The total amount payable is:': totdue})
@@ -175,50 +177,6 @@ def write_payrequest(rent_id, formpayrequest_id):
     table = PayRequestTable(items)
 
     return addressdata, block, rentobj, subject, table
-
-
-# TODO: Check that these functions belong in writeMail.py
-def get_rent_statement(rentobj, rent_type):
-    if rentobj.freq_id == 1:
-        freq = "One year's"
-    elif rentobj.freq_id == 2:
-        freq = "One half-year's"
-    elif rentobj.freq_id == 4:
-        freq = "One quarter's"
-    elif rentobj.freq_id == 12:
-        freq = "One month's"
-    elif rentobj.freq_id == 13:
-        freq = "One four weekly"
-    else:
-        freq = "One weekly"
-
-    if rentobj.nextrentdate > datetime.date.today():
-        f = "falls"
-    else:
-        f = "fell"
-
-    statement = "{0} {1} {2} due and payable {3} on {4}:".format(freq, rent_type, f,
-                                                                 rentobj.advarrdet, dateToStr(rentobj.nextrentdate))
-    return statement
-
-
-def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
-    statement = "Unpaid {0} is owing for the period {1} to {2}:".format(rent_type, arrears_start_date, arrears_end_date)
-    return statement
-
-
-# TODO: Copied from rent_obj.py. Can be refactored/included in rentobj?
-def get_pay_request_charges(rent_id):
-    qfilter = [Charge.rent_id == rent_id]
-    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
-                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(*qfilter).all()
-    charge_table_items = {}
-    for charge in charges:
-        charge_detail = "{} added on {}:".format(charge.chargedesc.capitalize(), charge.chargestartdate)
-        charge_total = charge.chargetotal
-        charge_table_items.update({charge_detail: charge_total})
-    return charge_table_items
 
 
 def doReplace(dict, clause):

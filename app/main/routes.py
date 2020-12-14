@@ -350,15 +350,17 @@ def mail_edit(id):
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
         if action == "payrequest":
+            # formpayrequest_id is the id of the pr template
             formpayrequest_id = id
             rent_id = request.form.get('rent_id')
             addressdata, block, rentobj, subject, table = write_payrequest(rent_id, formpayrequest_id)
             mailaddr = request.form.get('mailaddr')
-
+            # TODO: Do we want a specific PR code to begin the summary?
+            summary = "PR" + "-" + method + "-" + mailaddr[0:25]
             mailaddr = mailaddr.split(", ")
 
-            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block,
-                                   mailaddr=mailaddr, method=method, rentobj=rentobj, subject=subject, table=table)
+            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
+                                   method=method, rentobj=rentobj, subject=subject, summary=summary, table=table)
         else:
             # print(request.form)
             formletter_id = id
@@ -438,6 +440,7 @@ def payrequests():
     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
     runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
 
+    # TODO: forward rents using ajax so that the page needn't be reloaded
     if action == "run":
         forward_rents(rentprops)
 

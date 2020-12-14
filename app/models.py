@@ -397,6 +397,33 @@ class Money_item(db.Model):
     bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
+class PRArrearsMatrix(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    suffix = db.Column(db.Text, nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    recovery_charge = db.Column(db.Numeric(8, 2))
+    create_case = db.Column(db.Text, nullable=True)
+    arrears_clause = db.Column(db.Text, nullable=True)
+    delivery_overide = db.Column(db.Text, nullable=True)
+
+
+class PRHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    send_date = db.Column(db.Date)
+    mail_address = db.Column(db.String(180))
+    rent_date = db.Column(db.Date)
+    total_due = db.Column(db.Numeric(8, 2))
+    template_id = db.Column(db.Integer, db.ForeignKey('formpayrequest.id'))
+    suffix_id = db.Column(db.Integer, db.ForeignKey('pr_arrears_matrix.id'))
+    arrears_level = db.Column(db.String(1))
+    s166_valid = db.Column(db.String(1))
+    delivery_status = db.Column(db.String(1))
+    delivery_method = db.Column(db.String(1))
+    file_name = db.Column(db.String(45))
+
+
 class Property(db.Model):
     __tablename__ = 'property'
 

@@ -7,6 +7,7 @@ from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
 from app.main.functions import commit_to_database
 from app.models import Digfile, Docfile, Rent, Typedoc
+from app.main.payrequests import forward_rent
 
 
 def get_docfile(id):
@@ -111,14 +112,13 @@ def post_docfile(id):
 
 
 def post_payrequestfile():
-    # TODO: refactor
-    rentid = int(request.form.get('rentid'))
+    # TODO: refactor - similar code to post_docfile above
+    rent_id = int(request.form.get('rentid'))
     doc_dig = request.form.get('doc_dig') or "doc"
-    # new file for id 0, otherwise existing dig or doc file:
-
+    # new file has to be doc as new digital file uses upload function
     docfile = Docfile()
     docfile.id = 0
-    docfile.rent_id = rentid
+    docfile.rent_id = rent_id
 
     docfile.doc_date = request.form.get('doc_date')
     if doc_dig == "doc":
@@ -128,12 +128,18 @@ def post_payrequestfile():
         # convert_html_to_pdf(source_html, output_filename)
 
     docfile.doctype_id = 2
-    docfile.summary = "Pay request"
+
+    # TODO: What information do we want to put in the docfile summary field
+    docfile.summary = request.form.get('summary')
 
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
     db.session.add(docfile)
     db.session.commit()
-    return rentid
+
+    # TODO: Check that we want to forward rent and update database here
+    forward_rent(rent_id)
+
+    return rent_id
 
 
 def post_upload():
