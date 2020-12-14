@@ -80,7 +80,7 @@ def get_charge_details(rent_id):
 
 def determine_charges_suffix(rentobj):
     periods = rentobj.arrears * rentobj.freq_id / rentobj.rentpa
-    charges_total = rentobj.totcharges
+    charges_total = rentobj.totcharges if rentobj.totcharges else 0
     pr_exists = check_previous_pr_exists(rentobj.id)
     last_recovery_level = get_last_recovery_level(rentobj.id) if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
@@ -118,7 +118,7 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
                         chargetotal=recovery_charge_amount, chargedetails=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
-    db.session.commit()
+    commit_to_database()
 
 
 def check_previous_pr_exists(rent_id):
