@@ -1,9 +1,9 @@
 import sqlalchemy
-from sqlalchemy import func, select
+from sqlalchemy import func, literal
 from app.models import Charge, Chargetype, PRArrearsMatrix, PRHistory, Rent
 from app import db
 from flask_table import Table, Col
-from app.main.functions import dateToStr
+from app.main.functions import dateToStr, commit_to_database
 from locale import currency
 import datetime
 
@@ -17,7 +17,7 @@ def forward_rent(rent_id):
     rent = Rent.query.get(rent_id)
     update_last_rent_date(rent)
     update_arrears(rent)
-    db.session.commit()
+    commit_to_database()
 
 
 def update_arrears(rent):
@@ -31,25 +31,54 @@ def update_last_rent_date(rent):
     rent.lastrentdate = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
 
 
+def check_or_add_recovery_charge(rentobj):
+    charge_suffix = determine_charges_suffix(rentobj)
+    recovery_charge_amount, create_case_info = get_recovery_info(charge_suffix)
+    if recovery_charge_amount != 0:
+        if not check_charge_exists(rentobj.id, 10, recovery_charge_amount):
+            add_charge(rentobj.id, recovery_charge_amount, 10)
+
+
+# def check_charge_exists(rent_id, charge_type_id, charge_total):
+#     return True if db.session.execute(func.mjinn.check_charge_exists(rent_id,
+#                                                                      charge_type_id,
+#                                                                      charge_total)).scalar() == 1 else False
+
+
+def check_charge_exists(rent_id, charge_type_id, charge_total):
+    return db.session.query(literal(True)).filter(Charge.rent_id == rent_id,
+                                                  Charge.chargetype_id == charge_type_id,
+                                                  Charge.chargetotal == charge_total)
+
+
+def get_recovery_info(suffix):
+    recovery_charge = db.session.query(PRArrearsMatrix.recovery_charge).filter_by(suffix=suffix).scalar()
+    create_case_info = db.session.query(PRArrearsMatrix.create_case).filter_by(suffix=suffix).scalar()
+    return recovery_charge, create_case_info
+
+
 def get_pay_request_table_charges(rent_id):
     charges = get_charge_details(rent_id)
     charge_table_items = {}
+    total_charges = 0
     for charge in charges:
-        charge_detail = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
+        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
         charge_total = charge.chargetotal
-        charge_table_items.update({charge_detail: charge_total})
-    return charge_table_items
+        charge_table_items.update({charge_details: charge_total})
+        total_charges = total_charges + charge_total
+    return charge_table_items, total_charges
 
 
 def get_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
-                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
-            .filter(*qfilter).all()
+                                                                     Charge.chargestartdate, Charge.chargetotal,
+                                                                     Charge.chargedetails, Charge.chargebalance) \
+        .filter(*qfilter).all()
     return charges
 
 
-def determine_new_charges_and_case_suffix(rentobj):
+def determine_charges_suffix(rentobj):
     periods = rentobj.arrears * rentobj.freq_id / rentobj.rentpa
     charges_total = rentobj.totcharges
     pr_exists = check_previous_pr_exists(rentobj.id)
@@ -79,6 +108,17 @@ def get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, c
         return "ARC4"
     else:
         return "ARW"
+
+
+def add_charge(rent_id, recovery_charge_amount, chargetype_id):
+    today_string = dateToStr(datetime.date.today())
+    charge_type = Chargetype.chargedesc.filter_by(id=chargetype_id)
+    charge_details = "£{} {} added on {}:".format(recovery_charge_amount, charge_type.capitalize(), today_string)
+    new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=today_string,
+                        chargetotal=recovery_charge_amount, chargedetails=charge_details,
+                        chargebalance=recovery_charge_amount, rent_id=rent_id)
+    db.session.add(new_charge)
+    db.session.commit()
 
 
 def check_previous_pr_exists(rent_id):

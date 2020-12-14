@@ -7,8 +7,8 @@ from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
 from app.main.payrequests import PayRequestTable, build_pr_table, get_pay_request_table_charges, \
-    determine_new_charges_and_case_suffix, get_rent_statement, get_arrears_statement
-from app.models import Charge, Chargetype, Rent
+    get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
+from app.models import PRArrearsMatrix
 from app.main.functions import htmlSpecialMarkDown
 
 
@@ -106,6 +106,8 @@ def writeMail(rent_id, income_id, formletter_id, action):
 def write_payrequest(rent_id, formpayrequest_id):
     rentobj, properties = getrentobj_main(rent_id)
 
+    check_or_add_recovery_charge(rentobj)
+
     # TODO: Can we avoid passing 0 to getmaildata
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, 0)
 
@@ -116,7 +118,7 @@ def write_payrequest(rent_id, formpayrequest_id):
     arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
     rent_type = "rent charge" if rentobj.tenuredet == "Rentcharge" else "ground rent"
-    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
+    #  totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
 
     list_table_amounts = {}
@@ -126,11 +128,12 @@ def write_payrequest(rent_id, formpayrequest_id):
     if arrears:
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         list_table_amounts.update({arrears_statement: arrears})
-    # TODO: Charges can be calculated in rentobj rather than separately using a function here
+    # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
+    charges, totcharges = get_pay_request_table_charges(rent_id)
+
     if totcharges:
-        charges = get_pay_request_table_charges(rent_id)
-        charge_suffix = determine_new_charges_and_case_suffix(rentobj)
         list_table_amounts.update(charges)
+
     totdue = rent_gale + arrears + totcharges
     list_table_amounts.update({'The total amount payable is:': totdue})
 
