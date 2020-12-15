@@ -398,6 +398,8 @@ class Money_item(db.Model):
 
 
 class PRArrearsMatrix(db.Model):
+    __tablename__ = 'pr_arrears_matrix'
+
     id = db.Column(db.Integer, primary_key=True)
     suffix = db.Column(db.Text, nullable=True)
     description = db.Column(db.Text, nullable=True)
@@ -407,7 +409,20 @@ class PRArrearsMatrix(db.Model):
     delivery_overide = db.Column(db.Text, nullable=True)
 
 
+class PRBatch(db.Model):
+    __tablename__ = 'pr_batch'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    code = db.Column(db.String(30))
+    size = db.Column(db.Integer)
+    status = db.Column(db.String(1))
+    type = db.Column(db.String(1))
+
+
 class PRHistory(db.Model):
+    __tablename__ = 'pr_history'
+
     id = db.Column(db.Integer, primary_key=True)
     batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
