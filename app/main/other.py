@@ -3,7 +3,7 @@ from datetime import date
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database
-from app.models import Agent, Formletter, FormPayRequest, Headrent, Income, Incomealloc, Landlord, \
+from app.models import Agent, Form_letter, Form_payrequest, Headrent, Income, Incomealloc, Landlord, \
     Loan, Loan_statement, Manager, Rent, Rental, Rental_statement, \
     Typeadvarr, Money_account, Template, Typefreq, Typedoc, Typepayment, Typestatus, Typetenure, Emailaccount
 
@@ -23,19 +23,19 @@ def get_emailaccount(id):
 
 # formletters
 def get_formletter(id):
-
-    formletter = Formletter.query.join(Typedoc).join(Template).with_entities(Formletter.id, Formletter.code,
-                                 Formletter.summary, Formletter.subject, Formletter.block, Formletter.bold,
-                                 Typedoc.desc, Template.desc.label("template")) \
-           .filter(Formletter.id == id).one_or_none()
+    formletter = Form_letter.query.join(Typedoc).join(Template).with_entities(Form_letter.id, Form_letter.code,
+                                                                              Form_letter.description,
+                                                                              Form_letter.subject, Form_letter.block,
+                                                                              Typedoc.desc,
+                                                                              Template.desc.label("template")) \
+        .filter(Form_letter.id == id).one_or_none()
 
     return formletter
 
 
 # form payrequest
 def get_formpayrequest(id):
-
-    formpayrequest = FormPayRequest.query.filter(FormPayRequest.id == id).one_or_none()
+    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
 
     return formpayrequest
 
@@ -47,17 +47,17 @@ def get_formletters(action):
         subject = request.form.get("subject") or ""
         part1 = request.form.get("part1") or ""
         block = request.form.get("block") or ""
-        formletters = Formletter.query.filter(Formletter.code.ilike('%{}%'.format(code)),
-                               Formletter.subject.ilike('%{}%'.format(summary)),
-                               Formletter.subject.ilike('%{}%'.format(subject)),
-                               Formletter.part1.ilike('%{}%'.format(part1)),
-                                       Formletter.block.ilike('%{}%'.format(block))).all()
+        formletters = Form_letter.query.filter(Form_letter.code.ilike('%{}%'.format(code)),
+                                               Form_letter.subject.ilike('%{}%'.format(summary)),
+                                               Form_letter.subject.ilike('%{}%'.format(subject)),
+                                               Form_letter.part1.ilike('%{}%'.format(part1)),
+                                               Form_letter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
-        formletters = Formletter.query.filter(Formletter.code.ilike('LEQ-%'))
+        formletters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))
     elif action == "payrequest":
-        formletters = FormPayRequest.query.all()
+        formletters = Form_payrequest.query.all()
     else:
-        formletters = Formletter.query.all()
+        formletters = Form_letter.query.all()
 
     return formletters
 
@@ -67,10 +67,15 @@ def get_headrents():
     statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     statusdets.insert(0, "all statuses")
     headrents = Headrent.query.join(Typestatus).outerjoin(Agent).with_entities(Agent.agdetails, Headrent.id,
-                Headrent.hrcode, Headrent.rentpa, Headrent.arrears, Headrent.freq_id, Headrent.lastrentdate,
-                Headrent.propaddr,
-                func.mjinn.next_date(Headrent.lastrentdate, Headrent.freq_id, 1).label('nextrentdate'),
-                Typestatus.statusdet).limit(100).all()
+                                                                               Headrent.hrcode, Headrent.rentpa,
+                                                                               Headrent.arrears, Headrent.freq_id,
+                                                                               Headrent.lastrentdate,
+                                                                               Headrent.propaddr,
+                                                                               func.mjinn.next_date(
+                                                                                   Headrent.lastrentdate,
+                                                                                   Headrent.freq_id, 1).label(
+                                                                                   'nextrentdate'),
+                                                                               Typestatus.statusdet).limit(100).all()
     return headrents, statusdets
 
 
@@ -87,9 +92,9 @@ def get_headrent(id):
                            Headrent.propaddr, Headrent.rentpa, Headrent.reference, Headrent.note, Headrent.source,
                            Landlord.landlordname, Agent.agdetails, Typeadvarr.advarrdet, Typefreq.freqdet,
                            Typestatus.statusdet, Typetenure.tenuredet,
-        # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-            func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
-        .filter(Headrent.id == id) \
+                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
+            .filter(Headrent.id == id) \
             .one_or_none()
 
     return headrent
@@ -99,8 +104,10 @@ def get_headrent(id):
 def get_loan(id):
     loan = \
         Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
-                 Loan.end_date, Loan.lender, Loan.borrower, Loan.notes, Loan.val_date, Loan.valuation,
-                     Loan.interestpa, Typeadvarr.advarrdet, Typefreq.freqdet) \
+                                                                 Loan.end_date, Loan.lender, Loan.borrower, Loan.notes,
+                                                                 Loan.val_date, Loan.valuation,
+                                                                 Loan.interestpa, Typeadvarr.advarrdet,
+                                                                 Typefreq.freqdet) \
             .filter(Loan.id == id).one_or_none()
 
     return loan
@@ -113,27 +120,31 @@ def get_loan_options():
 
     return advarrdets, freqdets
 
+
 def get_loans(action):
     if action == "Nick":
-        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa) \
+        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender,
+                                         Loan.borrower,
+                                         Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa) \
             .filter(Loan.lender.ilike('%NJL%')).all()
         loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
                                            func.sum(Loan.interestpa).label('totint')) \
             .filter(Loan.lender.ilike('%NJL%')).first()
     else:
-        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa).all()
+        loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender,
+                                         Loan.borrower,
+                                         Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa).all()
         loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
-                            func.sum(Loan.interestpa).label('totint')).filter().first()
+                                           func.sum(Loan.interestpa).label('totint')).filter().first()
 
     return loans, loansum
 
 
 def get_loanstatement():
     loanstatement = Loan_statement.query.with_entities(Loan_statement.id, Loan_statement.date, Loan_statement.memo,
-                           Loan_statement.transaction, Loan_statement.rate, Loan_statement.interest,
-                           Loan_statement.add_interest, Loan_statement.balance).all()
+                                                       Loan_statement.transaction, Loan_statement.rate,
+                                                       Loan_statement.interest,
+                                                       Loan_statement.add_interest, Loan_statement.balance).all()
 
     return loanstatement
 
@@ -142,23 +153,29 @@ def get_loanstatement():
 def getmaildata(rent_id, income_id):
     if income_id == 0:
         incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
-                        Income.date.label("paydate"), Income.amount.label("payamount"), Typepayment.paytypedet) \
-                        .filter(Incomealloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
+                                                                                    Income.date.label("paydate"),
+                                                                                    Income.amount.label("payamount"),
+                                                                                    Typepayment.paytypedet) \
+            .filter(Incomealloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
         # income_id = incomedata.id
     else:
         incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
-                        Income.date.label("paydate"), Income.amount.label("payamount"), Typepayment.paytypedet) \
-                        .filter(Income.id == income_id).first()
+                                                                                    Income.date.label("paydate"),
+                                                                                    Income.amount.label("payamount"),
+                                                                                    Typepayment.paytypedet) \
+            .filter(Income.id == income_id).first()
     # allocdata = Incomealloc.join(Chargetype).with_entities(Incomealloc.id, Incomealloc.income_id,
     #                     Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
     #                     Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
     allocdata = None
     bankdata = Money_account.query.join(Landlord).join(Rent).with_entities(Money_account.accname, Money_account.accnum,
-                        Money_account.sortcode, Money_account.bankname).filter(Rent.id == rent_id)\
-                .one_or_none()
+                                                                           Money_account.sortcode,
+                                                                           Money_account.bankname).filter(
+        Rent.id == rent_id) \
+        .one_or_none()
     addressdata = Landlord.query.join(Rent).join(Manager).with_entities(
-                    Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
-                    ).filter(Rent.id == rent_id).one_or_none()
+        Landlord.landlordaddr, Manager.manageraddr, Manager.manageraddr2,
+    ).filter(Rent.id == rent_id).one_or_none()
 
     return incomedata, allocdata, bankdata, addressdata
 
@@ -167,8 +184,12 @@ def getmaildata(rent_id, income_id):
 def get_rental(id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
     rental = Rental.query.join(Typeadvarr).join(Typefreq).with_entities(Rental.id, Rental.rentalcode, Rental.arrears,
-                Rental.startrentdate, Rental.astdate, Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa,
-                    Rental.tenantname, Typeadvarr.advarrdet, Typefreq.freqdet).filter(Rental.id == id).one_or_none()
+                                                                        Rental.startrentdate, Rental.astdate,
+                                                                        Rental.lastgastest, Rental.note,
+                                                                        Rental.propaddr, Rental.rentpa,
+                                                                        Rental.tenantname, Typeadvarr.advarrdet,
+                                                                        Typefreq.freqdet).filter(
+        Rental.id == id).one_or_none()
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
     return rental, advarrdets, freqdets
@@ -189,9 +210,9 @@ def get_rentalstatement():
 
 def post_formletter(id, action):
     if action == "edit":
-        formletter = Formletter.query.get(id)
+        formletter = Form_letter.query.get(id)
     else:
-        formletter = Formletter()
+        formletter = Form_letter()
     formletter.code = request.form.get("code")
     formletter.summary = request.form.get("summary")
     formletter.subject = request.form.get("subject")

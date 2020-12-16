@@ -1,6 +1,6 @@
 import sqlalchemy
 from sqlalchemy import func, literal
-from app.models import Charge, Chargetype, PRArrearsMatrix, PRHistory, Rent
+from app.models import Charge, Chargetype, Pr_arrears_matrix, Rent
 from app import db
 from flask_table import Table, Col
 from app.main.functions import dateToStr, commit_to_database
@@ -52,8 +52,8 @@ def check_charge_exists(rent_id, charge_type_id, charge_total):
 
 
 def get_recovery_info(suffix):
-    recovery_charge = db.session.query(PRArrearsMatrix.recovery_charge).filter_by(suffix=suffix).scalar()
-    create_case_info = db.session.query(PRArrearsMatrix.create_case).filter_by(suffix=suffix).scalar()
+    recovery_charge = db.session.query(Pr_arrears_matrix.recovery_charge).filter_by(suffix=suffix).scalar()
+    create_case_info = db.session.query(Pr_arrears_matrix.create_case).filter_by(suffix=suffix).scalar()
     return recovery_charge, create_case_info
 
 
@@ -121,9 +121,10 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     commit_to_database()
 
 
+# TODO: complete this using Payrequests model
 def check_previous_pr_exists(rent_id):
-    exists = bool(db.session.query(PRHistory).filter_by(rent_id=rent_id).first())
-    return exists
+    # exists = bool(db.session.query(PRHistory).filter_by(rent_id=rent_id).first())
+    return False
 
 
 def get_last_recovery_level(rent_id):
@@ -132,26 +133,9 @@ def get_last_recovery_level(rent_id):
 
 
 def get_rent_statement(rentobj, rent_type):
-    if rentobj.freq_id == 1:
-        freq = "One year's"
-    elif rentobj.freq_id == 2:
-        freq = "One half-year's"
-    elif rentobj.freq_id == 4:
-        freq = "One quarter's"
-    elif rentobj.freq_id == 12:
-        freq = "One month's"
-    elif rentobj.freq_id == 13:
-        freq = "One four weekly"
-    else:
-        freq = "One weekly"
 
-    if rentobj.nextrentdate > datetime.date.today():
-        f = "falls"
-    else:
-        f = "fell"
+    statement = "The {0} {1} due and payable {2} on {3}:".format(rentobj.freqdet, rent_type, rentobj.advarrdet, dateToStr(rentobj.nextrentdate))
 
-    statement = "{0} {1} {2} due and payable {3} on {4}:".format(freq, rent_type, f,
-                                                                 rentobj.advarrdet, dateToStr(rentobj.nextrentdate))
     return statement
 
 

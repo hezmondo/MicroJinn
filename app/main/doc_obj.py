@@ -6,7 +6,7 @@ from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
 from app.main.functions import commit_to_database
-from app.models import Digfile, Docfile, Rent, Typedoc
+from app.models import Digfile, Docfile, Rent, Typedoc, Payrequest
 from app.main.payrequests import forward_rent
 
 
@@ -111,30 +111,30 @@ def post_docfile(id):
     return rentid
 
 
+# TODO: save to Payrequest table, make sure all fields are populated - may need to be moved
 def post_payrequestfile():
-    # TODO: refactor - similar code to post_docfile above
     rent_id = int(request.form.get('rentid'))
-    doc_dig = request.form.get('doc_dig') or "doc"
+    # doc_dig = request.form.get('doc_dig') or "doc"
     # new file has to be doc as new digital file uses upload function
-    docfile = Docfile()
-    docfile.id = 0
-    docfile.rent_id = rent_id
+    pay_request = Payrequest()
+    pay_request.id = 0
+    pay_request.rent_id = rent_id
 
-    docfile.doc_date = request.form.get('doc_date')
-    if doc_dig == "doc":
-        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
-        # source_html = docfile.doc_text
-        # output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
-        # convert_html_to_pdf(source_html, output_filename)
-
-    docfile.doctype_id = 2
+    pay_request.date = request.form.get('doc_date')
+    pay_request.block = request.form.get('xinput').replace("£", "&pound;")
 
     # TODO: What information do we want to put in the docfile summary field
-    docfile.summary = request.form.get('summary')
+    pay_request.summary = request.form.get('summary')
 
-    docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
-    db.session.add(docfile)
-    db.session.commit()
+    # TODO: Collect information for the fields below
+    # pay_request.batch_id = 0
+    # pay_request.rent_date = ""
+    # pay_request.total_due = ""
+
+    db.session.add(pay_request)
+
+    # TODO: Check vs db.session.commit()
+    commit_to_database()
 
     # TODO: Check that we want to forward rent and update database here
     forward_rent(rent_id)

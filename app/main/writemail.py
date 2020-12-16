@@ -8,7 +8,7 @@ from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
 from app.main.payrequests import PayRequestTable, build_pr_table, get_pay_request_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
-# from app.models import PRArrearsMatrix
+# from app.models import Pr_arrears_matrix
 from app.main.functions import htmlSpecialMarkDown
 
 
@@ -91,15 +91,13 @@ def writeMail(rent_id, income_id, formletter_id, action):
 
     subject = formletter.subject
     block = formletter.block if formletter.block else ""
-    bold = formletter.bold if formletter.bold else ""
     doctype = formletter.desc
     dcode = formletter.code
 
     subject = doReplace(word_variables, subject)
     block = doReplace(word_variables, block)
-    bold = doReplace(word_variables, bold)
 
-    return addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode
+    return addressdata, block, leasedata, rentobj, subject, doctype, dcode
 
 
 # TODO: refactor - some duplication of writeMail (above)

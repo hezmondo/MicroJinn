@@ -62,7 +62,7 @@ class Digfile(db.Model):
     dig_data = db.Column(db.LargeBinary, nullable=True)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    out_in = db.Column(db.Integer, nullable=False)
+    out_in = db.Column(db.SmallInteger, nullable=False)
 
 
 class Docfile(db.Model):
@@ -74,7 +74,7 @@ class Docfile(db.Model):
     doc_text = db.Column(db.Text)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    out_in = db.Column(db.Integer, nullable=False)
+    out_in = db.Column(db.SmallInteger, nullable=False)
 
 
 class Emailaccount(db.Model):
@@ -153,24 +153,25 @@ class Extrent(db.Model):
         return '<Extrent {}>'.format(self.rentcode)
         
         
-class Formletter(db.Model):
-    __tablename__ = 'formletter'
+class Form_letter(db.Model):
+    __tablename__ = 'form_letter'
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
-    summary = db.Column(db.String(60))
+    description = db.Column(db.String(60))
     subject = db.Column(db.String(150))
     block = db.Column(db.Text, nullable=True)
-    bold = db.Column(db.String(900))
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
     template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
 
-class FormPayRequest(db.Model):
-    __tablename__ = 'formpayrequest'
+class Form_payrequest(db.Model):
+    __tablename__ = 'form_payrequest'
 
     id = db.Column(db.Integer, primary_key=True)
-    summary = db.Column(db.String(60))
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(60))
+    subject = db.Column(db.String(150))
     block = db.Column(db.Text, nullable=True)
 
 
@@ -397,46 +398,43 @@ class Money_item(db.Model):
     bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
-class PRArrearsMatrix(db.Model):
+class Payrequest(db.Model):
+    __tablename__ = 'payrequest'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    summary = db.Column(db.String(90))
+    block = db.Column(db.Text)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
+    rent_date = db.Column(db.Date)
+    total_due = db.Column(db.Numeric(8, 2))
+    delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
+
+
+class Pr_arrears_matrix(db.Model):
     __tablename__ = 'pr_arrears_matrix'
 
     id = db.Column(db.Integer, primary_key=True)
-    suffix = db.Column(db.Text, nullable=True)
-    description = db.Column(db.Text, nullable=True)
+    suffix = db.Column(db.String(30), nullable=True)
+    description = db.Column(db.String(150), nullable=True)
     recovery_charge = db.Column(db.Numeric(8, 2))
-    create_case = db.Column(db.Text, nullable=True)
+    create_case = db.Column(db.Boolean, nullable=True)
     arrears_clause = db.Column(db.Text, nullable=True)
-    delivery_overide = db.Column(db.Text, nullable=True)
+    force_mail = db.Column(db.Boolean, nullable=True)
 
 
-class PRBatch(db.Model):
+class Pr_batch(db.Model):
     __tablename__ = 'pr_batch'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
     code = db.Column(db.String(30))
     size = db.Column(db.Integer)
-    status = db.Column(db.String(1))
-    type = db.Column(db.String(1))
+    status = db.Column(db.Integer, db.ForeignKey('typebatchstatus.id'))
+    is_account = db.Column(db.Boolean)
 
-
-class PRHistory(db.Model):
-    __tablename__ = 'pr_history'
-
-    id = db.Column(db.Integer, primary_key=True)
-    batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
-    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    send_date = db.Column(db.Date)
-    mail_address = db.Column(db.String(180))
-    rent_date = db.Column(db.Date)
-    total_due = db.Column(db.Numeric(8, 2))
-    template_id = db.Column(db.Integer, db.ForeignKey('formpayrequest.id'))
-    suffix_id = db.Column(db.Integer, db.ForeignKey('pr_arrears_matrix.id'))
-    arrears_level = db.Column(db.String(1))
-    s166_valid = db.Column(db.String(1))
-    delivery_status = db.Column(db.String(1))
-    delivery_method = db.Column(db.String(1))
-    file_name = db.Column(db.String(45))
+    pay_requests = db.relationship('Payrequest', backref='batch', lazy='dynamic')
 
 
 class Property(db.Model):
@@ -494,6 +492,7 @@ class Rent(db.Model):
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
+    payrequest_rent = db.relationship('Payrequest', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
@@ -534,7 +533,7 @@ class Template(db.Model):
     code = db.Column(db.String(15))
     desc = db.Column(db.String(60))
 
-    formletter_template = db.relationship('Formletter', backref='template', lazy='dynamic')
+    formletter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
 
 
 class Typeactype(db.Model):
@@ -556,6 +555,15 @@ class Typeadvarr(db.Model):
     headrent_typeadvarr = db.relationship('Headrent', backref='typeadvarr', lazy='dynamic')
     loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
+
+
+class Typebatchstatus(db.Model):
+    __tablename__ = 'typebatchstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(30))
+
+    batches = db.relationship('Pr_batch', backref='typebatchstatus', lazy='dynamic')
 
 
 class Typedeed(db.Model):
@@ -584,7 +592,7 @@ class Typedoc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(30))
 
-    formletter_typedoc = db.relationship('Formletter', backref='typedoc', lazy='dynamic')
+    formletter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('Digfile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
 
@@ -634,6 +642,7 @@ class Typeprdelivery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prdeliverydet = db.Column(db.String(45))
 
+    pr_typeprdelivery = db.relationship('Payrequest', backref='typeprdelivery', lazy='dynamic')
     rent_typeprdelivery = db.relationship('Rent', backref='typeprdelivery', lazy='dynamic')
 
 
