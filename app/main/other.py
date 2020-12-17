@@ -33,13 +33,6 @@ def get_formletter(id):
     return formletter
 
 
-# form payrequest
-def get_formpayrequest(id):
-    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
-
-    return formpayrequest
-
-
 def get_formletters(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
@@ -54,12 +47,19 @@ def get_formletters(action):
                                                Form_letter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
         formletters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))
-    elif action == "payrequest":
-        formletters = Form_payrequest.query.all()
     else:
         formletters = Form_letter.query.all()
 
     return formletters
+
+
+def get_formpayrequest(id):
+    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
+    return formpayrequest
+
+
+def get_formpayrequests():
+    return Form_payrequest.query.all()
 
 
 # head rents
@@ -71,7 +71,7 @@ def get_headrents():
                                                                                Headrent.arrears, Headrent.freq_id,
                                                                                Headrent.lastrentdate,
                                                                                Headrent.propaddr,
-                                                                               func.mjinn.next_date(
+                                                                               func.samjinn.next_date(
                                                                                    Headrent.lastrentdate,
                                                                                    Headrent.freq_id, 1).label(
                                                                                    'nextrentdate'),
@@ -93,7 +93,7 @@ def get_headrent(id):
                            Landlord.landlordname, Agent.agdetails, Typeadvarr.advarrdet, Typefreq.freqdet,
                            Typestatus.statusdet, Typetenure.tenuredet,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
+                           func.samjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
             .filter(Headrent.id == id) \
             .one_or_none()
 
@@ -214,7 +214,7 @@ def post_formletter(id, action):
     else:
         formletter = Form_letter()
     formletter.code = request.form.get("code")
-    formletter.summary = request.form.get("summary")
+    formletter.description = request.form.get("description")
     formletter.subject = request.form.get("subject")
     formletter.block = request.form.get("block")
     formletter.bold = request.form.get("bold")

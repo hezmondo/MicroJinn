@@ -9,7 +9,7 @@ from app.main.common import get_combos_common
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.functions import backup_database
-from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
+from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, get_formpayrequests, \
     get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_rental, getrentals, get_rentalstatement, \
     post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
@@ -349,32 +349,19 @@ def mail_edit(id):
     method = request.args.get('method', "email", type=str)
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
-        if action == "payrequest":
-            # formpayrequest_id is the id of the pr template
-            formpayrequest_id = id
-            rent_id = request.form.get('rent_id')
-            addressdata, block, rentobj, subject, table = write_payrequest(rent_id, formpayrequest_id)
-            mailaddr = request.form.get('mailaddr')
-            # TODO: Do we want a specific PR code to begin the summary?
-            summary = "PR" + "-" + method + "-" + mailaddr[0:25]
-            mailaddr = mailaddr.split(", ")
+        # print(request.form)
+        formletter_id = id
+        rent_id = request.form.get('rent_id')
+        addressdata, block, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
+                                                                                    action)
+        mailaddr = request.form.get('mailaddr')
+        summary = dcode + "-" + method + "-" + mailaddr[0:25]
+        mailaddr = mailaddr.split(", ")
 
-            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
-                                   method=method, rentobj=rentobj, subject=subject, summary=summary, table=table)
-        else:
-            # print(request.form)
-            formletter_id = id
-            rent_id = request.form.get('rent_id')
-            addressdata, block, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
-                                                                                        action)
-            mailaddr = request.form.get('mailaddr')
-            summary = dcode + "-" + method + "-" + mailaddr[0:25]
-            mailaddr = mailaddr.split(", ")
-
-            return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block,
-                                   doctype=doctype,
-                                   summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
-                                   method=method, rentobj=rentobj, subject=subject)
+        return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block,
+                               doctype=doctype,
+                               summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                               method=method, rentobj=rentobj, subject=subject)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -452,6 +439,35 @@ def payrequests():
                            propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
                            runsize=runsize, salegrade=salegrade, source=source, status=status,
                            tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+
+
+# TODO: Refactor - duplication of mail_dialog
+@bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
+@login_required
+def pr_dialog(id):
+    formpayrequests = get_formpayrequests()
+
+    return render_template('pr_dialog.html', formpayrequests=formpayrequests, rent_id=id)
+
+
+# TODO: Refactor - duplication of mail_edit
+@bp.route('/pr_edit/<int:id>', methods=["GET", "POST"])
+@login_required
+def pr_edit(id):
+    method = request.args.get('method', "email", type=str)
+    if request.method == "POST":
+        # formpayrequest_id is the id of the pr template
+        formpayrequest_id = id
+        rent_id = request.form.get('rent_id')
+        addressdata, block, rentobj, subject, table, totdue = write_payrequest(rent_id, formpayrequest_id)
+        mailaddr = request.form.get('mailaddr')
+        # TODO: Do we want a specific PR code to begin the summary?
+        summary = "PR" + "-" + method + "-" + mailaddr[0:25]
+        mailaddr = mailaddr.split(", ")
+
+        return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
+                               method=method, rentobj=rentobj, subject=subject, summary=summary, table=table,
+                               totdue=totdue)
 
 
 @bp.route('/properties', methods=['GET', 'POST'])
@@ -560,10 +576,12 @@ def save_html():
     if request.method == "POST":
         if action == "payrequest":
             id_ = post_payrequestfile()
+            # TODO: Redirect to payrequest list
+            return redirect('/docfiles/{}'.format(id_))
         else:
             id_ = post_docfile(0)
+            return redirect('/docfiles/{}'.format(id_))
 
-        return redirect('/docfiles/{}'.format(id_))
 
         # return redirect('/docfile/{}?doc_dig_doc'.format(id_))
 

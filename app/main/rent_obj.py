@@ -168,7 +168,7 @@ def get_leases():
         lease_filter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
 
     leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
-              func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
+              func.samjinn.lex_unexpired(Lease.id).label('unexpired'),
               Lease.term, Lease.upliftdate, Lease_uplift_type.uplift_type) \
         .filter(*lease_filter).limit(60).all()
 
@@ -248,7 +248,7 @@ def get_rentobjs_plus(action, name):
     if tenantname and tenantname != "":
         qfilter.append(Rent.tenantname.ilike('%{}%'.format(tenantname)))
     if enddate and enddate != "":
-        qfilter.append(func.mjinn.next_rent_date(Rent.id, 1, 1) < "{}".format(enddate))
+        qfilter.append(func.samjinn.next_rent_date(Rent.id, 1, 1) < "{}".format(enddate))
     landlords, statusdets, tenuredets = get_queryoptions_common()
     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
     if request.method == "POST":
@@ -340,7 +340,7 @@ def getrentobjs_basic(qfilter, runsize):
             .outerjoin(Agent) \
             .with_entities(Rent.id, Agent.agdetails, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.samjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
             .filter(*qfilter) \
             .limit(runsize).all()
@@ -375,8 +375,8 @@ def getrentobjs_advanced(qfilter, runsize):
             .join(Typetenure) \
             .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
+                           func.samjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.samjinn.tot_charges(Rent.id).label('totcharges'),
                            Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                            Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            Typetenure.tenuredet) \
@@ -403,11 +403,11 @@ def getrentobj_main(id):
             .join(Typetenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
-                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
-                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
+                           func.samjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.samjinn.paid_to_date(Rent.id).label('paidtodate'),
+                           func.samjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                           func.samjinn.prop_addr(Rent.id).label('propaddr'),
+                           func.samjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.agdetails, Landlord.landlordname, Manager.managername,
                            Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,

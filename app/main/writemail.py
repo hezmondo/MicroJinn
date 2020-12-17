@@ -6,7 +6,7 @@ from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
-from app.main.payrequests import PayRequestTable, build_pr_table, get_pay_request_table_charges, \
+from app.main.payrequests import PayRequestTable, build_pr_table, get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
 # from app.models import Pr_arrears_matrix
 from app.main.functions import htmlSpecialMarkDown
@@ -109,7 +109,7 @@ def write_payrequest(rent_id, formpayrequest_id):
     # TODO: Can we avoid passing 0 to getmaildata
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, 0)
 
-    form_pay_request = get_formpayrequest(formpayrequest_id)
+    form_payrequest = get_formpayrequest(formpayrequest_id)
 
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
@@ -127,7 +127,7 @@ def write_payrequest(rent_id, formpayrequest_id):
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         list_table_amounts.update({arrears_statement: arrears})
     # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
-    charges, totcharges = get_pay_request_table_charges(rent_id)
+    charges, totcharges = get_payrequest_table_charges(rent_id)
 
     if totcharges:
         list_table_amounts.update(charges)
@@ -171,13 +171,13 @@ def write_payrequest(rent_id, formpayrequest_id):
 
     subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
     subject = doReplace(word_variables, subject)
-    block = form_pay_request.block if form_pay_request.block else ""
+    block = form_payrequest.block if form_payrequest.block else ""
     block = doReplace(word_variables, block)
 
     items = build_pr_table(list_table_amounts)
     table = PayRequestTable(items)
 
-    return addressdata, block, rentobj, subject, table
+    return addressdata, block, rentobj, subject, table, totdue
 
 
 def doReplace(dict, clause):

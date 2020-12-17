@@ -7,10 +7,10 @@
 <form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="/mail_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back to mail</a>
+			<a href="/pr_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">
-            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save pay request</button>
+            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save payrequest</button>
         </div>
     </div>
 	<div id="doc_html" contenteditable="true">
@@ -93,10 +93,13 @@
             <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="doc_type" name="doc_type" value = "{{ doctype }}">
+            <input type="hidden" id="rent_date" name="rent_date" value = "{{ rentobj.nextrentdate }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="out_in" name="out_in" value = "out">
+            <input type="hidden" id="totdue" name="totdue" value = "{{ totdue }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="method" name="method" value = "{{ method }}">
         </div>
     </div>
 </form>
