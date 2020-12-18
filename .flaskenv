@@ -1,2 +1,2 @@
-FLASK_APP=mjinn.py
+FLASK_APP=samjinn.py
 FLASK_ENV=development

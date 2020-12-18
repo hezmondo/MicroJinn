@@ -57,7 +57,7 @@ def get_recovery_info(suffix):
     return recovery_charge, create_case_info
 
 
-def get_pay_request_table_charges(rent_id):
+def get_payrequest_table_charges(rent_id):
     charges = get_charge_details(rent_id)
     charge_table_items = {}
     total_charges = 0
@@ -133,9 +133,7 @@ def get_last_recovery_level(rent_id):
 
 
 def get_rent_statement(rentobj, rent_type):
-
     statement = "The {0} {1} due and payable {2} on {3}:".format(rentobj.freqdet, rent_type, rentobj.advarrdet, dateToStr(rentobj.nextrentdate))
-
     return statement
 
 

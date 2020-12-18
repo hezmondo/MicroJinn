@@ -67,7 +67,7 @@
         <thead>
         <tr>
             <th style="width: 10.00%">Code</th>
-            <th style="width: 70.00%">Summary</th>
+            <th style="width: 70.00%">Description</th>
             <th style="width: 10.00%">Action</th>
             <th style="width: 10.00%">Action</th>
         </tr>
@@ -76,7 +76,7 @@
         {% for item in formletters %}
         <tr>
             <td style="width: 10.00%">{{ item.code }}</td>
-            <td style="width: 70.00%">{{ item.summary}}</td>
+            <td style="width: 70.00%">{{ item.description}}</td>
             <td>
                 <button type="submit" formaction="/mail_edit/{{ item.id }}?method=email&action={{ action }}" class="btn btn-danger">email</button>
             </td>

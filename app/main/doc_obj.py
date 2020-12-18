@@ -111,27 +111,29 @@ def post_docfile(id):
     return rentid
 
 
-# TODO: save to Payrequest table, make sure all fields are populated - may need to be moved
+# TODO: May need to be moved
 def post_payrequestfile():
     rent_id = int(request.form.get('rentid'))
     # doc_dig = request.form.get('doc_dig') or "doc"
     # new file has to be doc as new digital file uses upload function
-    pay_request = Payrequest()
-    pay_request.id = 0
-    pay_request.rent_id = rent_id
+    payrequest = Payrequest()
+    payrequest.id = 0
+    payrequest.rent_id = rent_id
 
-    pay_request.date = request.form.get('doc_date')
-    pay_request.block = request.form.get('xinput').replace("£", "&pound;")
+    payrequest.date = request.form.get('doc_date')
+    payrequest.block = request.form.get('xinput').replace("£", "&pound;")
 
     # TODO: What information do we want to put in the docfile summary field
-    pay_request.summary = request.form.get('summary')
+    payrequest.summary = request.form.get('summary')
 
-    # TODO: Collect information for the fields below
-    # pay_request.batch_id = 0
-    # pay_request.rent_date = ""
-    # pay_request.total_due = ""
+    # payrequest.batch_id = 0
+    payrequest.rent_date = request.form.get('rent_date')
+    payrequest.total_due = request.form.get('totdue')
 
-    db.session.add(pay_request)
+    # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
+    payrequest.delivery_method = 1 if request.form.get('method') == "email" else 2
+
+    db.session.add(payrequest)
 
     # TODO: Check vs db.session.commit()
     commit_to_database()

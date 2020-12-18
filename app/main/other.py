@@ -33,13 +33,6 @@ def get_formletter(id):
     return formletter
 
 
-# form payrequest
-def get_formpayrequest(id):
-    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
-
-    return formpayrequest
-
-
 def get_formletters(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
@@ -54,12 +47,19 @@ def get_formletters(action):
                                                Form_letter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
         formletters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))
-    elif action == "payrequest":
-        formletters = Form_payrequest.query.all()
     else:
         formletters = Form_letter.query.all()
 
     return formletters
+
+
+def get_formpayrequest(id):
+    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
+    return formpayrequest
+
+
+def get_formpayrequests():
+    return Form_payrequest.query.all()
 
 
 # head rents
@@ -214,7 +214,7 @@ def post_formletter(id, action):
     else:
         formletter = Form_letter()
     formletter.code = request.form.get("code")
-    formletter.summary = request.form.get("summary")
+    formletter.description = request.form.get("description")
     formletter.subject = request.form.get("subject")
     formletter.block = request.form.get("block")
     formletter.bold = request.form.get("bold")

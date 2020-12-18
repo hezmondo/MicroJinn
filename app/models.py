@@ -434,7 +434,7 @@ class Pr_batch(db.Model):
     status = db.Column(db.Integer, db.ForeignKey('typebatchstatus.id'))
     is_account = db.Column(db.Boolean)
 
-    pay_requests = db.relationship('Payrequest', backref='batch', lazy='dynamic')
+    payrequests = db.relationship('Payrequest', backref='batch', lazy='dynamic')
 
 
 class Pr_filter(db.Model):
