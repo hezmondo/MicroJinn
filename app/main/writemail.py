@@ -145,26 +145,6 @@ def get_lease_variables(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, y
     return leasedata, lease_variables
 
 
-# def get_pr_variables(rent_id):
-#     addressdata, rentobj, word_variables = get_word_variables(rent_id)
-#     rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
-#     table_rows = {}
-#     if rent_gale:
-#         rent_statement = get_rent_statement(rentobj, rent_type)
-#         table_rows.update({rent_statement: moneyToStr(rent_gale, pound=True)})
-#     if arrears:
-#         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
-#         table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
-#     # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
-#     charges, totcharges = get_payrequest_table_charges(rent_id)
-#
-#     if totcharges:
-#         table_rows.update(charges)
-#
-#     totdue = rent_gale + arrears + totcharges
-#     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
-
-
      # word_variables = [
 #         ('#ChargesStat#', rent.chargesStatement() if rent else ""),
 #         ('#NFee#', moneyToStr(rent.info['NFeeTotal'] if rent else 15.00, pound=True)),
