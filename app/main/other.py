@@ -150,7 +150,7 @@ def get_loanstatement():
 
 
 # mail
-def getmaildata(rent_id, income_id):
+def getmaildata(rent_id, income_id=0):
     if income_id == 0:
         incomedata = Income.query.join(Incomealloc).join(Typepayment).with_entities(Income.id, Income.payer,
                                                                                     Income.date.label("paydate"),

@@ -8,83 +8,14 @@ from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
 from app.main.payrequests import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
-# from app.models import Pr_arrears_matrix
-from app.main.functions import htmlSpecialMarkDown
 
 
 def writeMail(rent_id, income_id, formletter_id, action):
-    # Get rent/prop/income details and output mail (letter/payrequest/account/email/invoice/rem adv)
-    rentobj, properties = getrentobj_main(rent_id)
-    incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
-
+    addressdata, rentobj, word_variables = get_word_variables(rent_id, income_id)
     formletter = get_formletter(formletter_id)
 
-    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
-    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
-    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
-        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
-    # TODO: Check if rentobj.tenuredet == "Rentcharge" below
-    rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
-    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
-    totdue = arrears + totcharges
-
-    word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "no advarr",
-        '#accname#': bankdata.accname if bankdata else "no accname",
-        '#accnum#': bankdata.accnum if bankdata else "no accnumber",
-        '#sortcode#': bankdata.sortcode if bankdata else "no sortcode",
-        '#bankname#': bankdata.bankname if bankdata else "no bankname",
-        '#arrears#': moneyToStr(arrears, pound=True),
-        '#hashcode#': hashCode(rentobj.rentcode) if rentobj else "no hashcode",
-        '#landlordaddr#': addressdata.landlordaddr if addressdata else "no landlord address",
-        '#landlordname#': rentobj.landlordname if rentobj else "no landlord name",
-        '#lastrentdate#': dateToStr(rentobj.lastrentdate) if rentobj else "11/11/1111",
-        '#lessor#': "rent charge owner" if rentobj.tenuredet == "rent charge" else "ground rent owner",
-        '#managername#': rentobj.managername if rentobj else "no manager name",
-        '#manageraddr#': addressdata.manageraddr if addressdata else "no manager address",
-        '#manageraddr2#': addressdata.manageraddr2 if addressdata else "no manager address2",
-        '#nextrentdate#': dateToStr(rentobj.nextrentdate) if rentobj else "no nextrentdate",
-        '#paidtodate#': dateToStr(rentobj.paidtodate) if rentobj else "no paidtodate",
-        '#payamount#': moneyToStr(incomedata.payamount, pound=True) if incomedata else "no payment",
-        '#paydate#': dateToStr(incomedata.paydate) if incomedata else "no paydate",
-        '#payer#': incomedata.payer if incomedata else "no payer",
-        '#paytypedet#': incomedata.paytypedet if incomedata else "no paytype",
-        '#periodly#': rentobj.freqdet if rentobj else "no periodly",
-        '#propaddr#': rentobj.propaddr if rentobj else "no property address",
-        '#rentcode#': rentobj.rentcode if rentobj else "no rentcode",
-        '#arrears_start_date#': arrears_start_date,
-        '#arrears_end_date#': arrears_end_date,
-        '#rentpa#': moneyToStr(rentobj.rentpa, pound=True) if rentobj else "no rent",
-        '#rent_type#': rent_type,
-        '#tenantname#': rentobj.tenantname if rentobj else "no tenant name",
-        '#totcharges#': moneyToStr(totcharges, pound=True),
-        '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
-        '#today#': dateToStr(datetime.date.today())
-    }
     if action == "lease":
-        fh_rate = request.form.get('fh_rate')
-        gr_rate = request.form.get('gr_rate')
-        new_gr_a = request.form.get('new_gr_a')
-        new_gr_b = request.form.get('new_gr_b')
-        yp_low = request.form.get('yp_low')
-        yp_high = request.form.get('yp_high')
-
-        leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
-        impval = leasedata["impvalk"] * 1000
-        unimpval = leasedata["impvalk"] * leasedata["realty"] * 10
-        lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
-                '#rent_code#': leasedata["rent_code"] if leasedata else "some rentcode",
-                '#relativity#': str(leasedata["realty"]) if leasedata else "some rentcode",
-                '#totval#': str(leasedata["totval"]) if leasedata else "some rentcode",
-                '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
-                '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
-                '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
-                '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
-                '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),
-                '#leq125a#': moneyToStr(leasedata["leq125a"] if leasedata else 55555.55, pound=True),
-                '#leq175a#': moneyToStr(leasedata["leq175a"] if leasedata else 55555.55, pound=True),
-                '#leq175f#': moneyToStr(leasedata["leq175f"] if leasedata else 55555.55, pound=True),
-                '#leq175p#': moneyToStr(leasedata["leq175p"] if leasedata else 55555.55, pound=True),
-                           }
+        leasedata, lease_variables = get_lease_variables()
         word_variables.update(lease_variables)
     else:
         leasedata = None
@@ -100,24 +31,17 @@ def writeMail(rent_id, income_id, formletter_id, action):
     return addressdata, block, leasedata, rentobj, subject, doctype, dcode
 
 
-# TODO: refactor - some duplication of writeMail (above)
+# TODO: We may need a get_pr_variables function later
 def write_payrequest(rent_id, formpayrequest_id):
-    rentobj, properties = getrentobj_main(rent_id)
+    addressdata, rentobj, word_variables = get_word_variables(rent_id)
 
     check_or_add_recovery_charge(rentobj)
 
-    # TODO: Can we avoid passing 0 to getmaildata
-    incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, 0)
-
-    form_payrequest = get_formpayrequest(formpayrequest_id)
-
-    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
-    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
-    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
-        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
-    rent_type = "rent charge" if rentobj.tenuredet == "Rentcharge" else "ground rent"
-    #  totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
+    arrears = rentobj.arrears
+    arrears_start_date = word_variables.get('#arrears_start_date#')
+    arrears_end_date = word_variables.get('#arrears_end_date#')
+    rent_type = word_variables.get('#rent_type#')
 
     table_rows = {}
     if rent_gale:
@@ -128,13 +52,40 @@ def write_payrequest(rent_id, formpayrequest_id):
         table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
     # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
     charges, totcharges = get_payrequest_table_charges(rent_id)
-
     if totcharges:
         table_rows.update(charges)
-
     totdue = rent_gale + arrears + totcharges
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
-    # table_rows.update({'The total amount payable is:': moneyToStr(totdue, pound=True)})
+
+    subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
+    subject = doReplace(word_variables, subject)
+
+    form_payrequest = get_formpayrequest(formpayrequest_id)
+    block = form_payrequest.block if form_payrequest.block else ""
+    block = doReplace(word_variables, block)
+
+    return addressdata, block, rentobj, subject, table_rows, totdue, totdue_string
+
+
+def doReplace(dict, clause):
+    for key, value in dict.items():
+        clause = clause.replace(key, value)
+
+    return clause
+
+
+def get_word_variables(rent_id, income_id=0):
+    rentobj, properties = getrentobj_main(rent_id)
+    incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
+
+    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
+    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
+    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
+        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
+    # TODO: Check if rentobj.tenuredet == "Rentcharge" below
+    rent_type = "rent charge" if rentobj.tenuredet == "rent charge" else "ground rent"
+    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
+    totdue = arrears + totcharges
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "no advarr",
                       '#accname#': bankdata.accname if bankdata else "no accname",
@@ -159,33 +110,40 @@ def write_payrequest(rent_id, formpayrequest_id):
                       '#periodly#': rentobj.freqdet if rentobj else "no periodly",
                       '#propaddr#': rentobj.propaddr if rentobj else "no property address",
                       '#rentcode#': rentobj.rentcode if rentobj else "no rentcode",
-                       '#arrears_start_date#': arrears_start_date,
-                       '#arrears_end_date#': arrears_end_date,
+                      '#arrears_start_date#': arrears_start_date,
+                      '#arrears_end_date#': arrears_end_date,
                       '#rentpa#': moneyToStr(rentobj.rentpa, pound=True) if rentobj else "no rent",
-                       # '#rent_type#': rent_type,
+                      '#rent_type#': rent_type,
                       '#tenantname#': rentobj.tenantname if rentobj else "no tenant name",
-                       # '#totcharges#': moneyToStr(totcharges, pound=True),
-                      '#totdue#': totdue_string,
-
+                      '#totcharges#': moneyToStr(totcharges, pound=True),
+                      '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
                       '#today#': dateToStr(datetime.date.today())
                       }
 
-    subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
-    subject = doReplace(word_variables, subject)
-    block = form_payrequest.block if form_payrequest.block else ""
-    block = doReplace(word_variables, block)
-
-    # items = build_pr_table(list_table_amounts)
-    # table = PayRequestTable(items)
-
-    return addressdata, block, rentobj, subject, table_rows, totdue, totdue_string
+    return addressdata, rentobj, word_variables
 
 
-def doReplace(dict, clause):
-    for key, value in dict.items():
-        clause = clause.replace(key, value)
+def get_lease_variables(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high):
+    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
+    impval = leasedata["impvalk"] * 1000
+    unimpval = leasedata["impvalk"] * leasedata["realty"] * 10
+    lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
+                       '#rent_code#': leasedata["rent_code"] if leasedata else "some rentcode",
+                       '#relativity#': str(leasedata["realty"]) if leasedata else "some rentcode",
+                       '#totval#': str(leasedata["totval"]) if leasedata else "some rentcode",
+                       '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
+                       '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
+                       '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
+                       '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
+                       '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),
+                       '#leq125a#': moneyToStr(leasedata["leq125a"] if leasedata else 55555.55, pound=True),
+                       '#leq175a#': moneyToStr(leasedata["leq175a"] if leasedata else 55555.55, pound=True),
+                       '#leq175f#': moneyToStr(leasedata["leq175f"] if leasedata else 55555.55, pound=True),
+                       '#leq175p#': moneyToStr(leasedata["leq175p"] if leasedata else 55555.55, pound=True),
+                       }
 
-    return clause
+    return leasedata, lease_variables
+
 
      # word_variables = [
 #         ('#ChargesStat#', rent.chargesStatement() if rent else ""),
