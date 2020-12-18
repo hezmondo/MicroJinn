@@ -2,8 +2,8 @@ import sqlalchemy
 from sqlalchemy import func, literal
 from app.models import Charge, Chargetype, Pr_arrears_matrix, Rent
 from app import db
-from flask_table import Table, Col
-from app.main.functions import dateToStr, commit_to_database
+
+from app.main.functions import dateToStr, commit_to_database, moneyToStr
 from locale import currency
 import datetime
 
@@ -64,7 +64,7 @@ def get_payrequest_table_charges(rent_id):
     for charge in charges:
         charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
         charge_total = charge.chargetotal
-        charge_table_items.update({charge_details: charge_total})
+        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
         total_charges = total_charges + charge_total
     return charge_table_items, total_charges
 
@@ -144,45 +144,45 @@ def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
 
 # Code to build PR tables
 # Format the currency column
-class CurrencyCol(Col):
-    def td_format(self, content):
-        content = float(content)
-        # locale.setlocale(locale.LC_NUMERIC, '')
-        return "£{:,.2f}".format(content)
+# class CurrencyCol(Col):
+#     def td_format(self, content):
+#         content = float(content)
+#         # locale.setlocale(locale.LC_NUMERIC, '')
+#         return "£{:,.2f}".format(content)
+#
+#
+# class PayRequestItem(object):
+#     def __init__(self, details, amount):
+#         self.details = details
+#         self.amount = amount
+#
+#     # identify the 'total amount' row
+#     def important(self):
+#         return self.details.lower().find("total amount") != -1
+#
+#
+# class PayRequestTable(Table):
+#     classes = ['pr_table']
+#     details = Col('Details')
+#     amount = CurrencyCol(
+#         'Amount',
+#         td_html_attrs={
+#             'class': 'amount-class'},
+#     )
+#
+#     # assign a class to the 'total' row so we can style it with css
+#     def get_tr_attrs(self, payrequest_item):
+#         if payrequest_item.important():
+#             return {'class': 'total'}
+#         else:
+#             return {}
 
 
-class PayRequestItem(object):
-    def __init__(self, details, amount):
-        self.details = details
-        self.amount = amount
-
-    # identify the 'total amount' row
-    def important(self):
-        return self.details.lower().find("total amount") != -1
-
-
-class PayRequestTable(Table):
-    classes = ['pr_table']
-    details = Col('Details')
-    amount = CurrencyCol(
-        'Amount',
-        td_html_attrs={
-            'class': 'amount-class'},
-    )
-
-    # assign a class to the 'total' row so we can style it with css
-    def get_tr_attrs(self, payrequest_item):
-        if payrequest_item.important():
-            return {'class': 'total'}
-        else:
-            return {}
-
-
-def build_pr_table(list_amounts):
-    items = []
-    for key in list_amounts:
-        items.append(PayRequestItem(key, list_amounts[key]))
-    return items
+# def build_pr_table(list_amounts):
+    # items = []
+    # for key in list_amounts:
+    #     items.append(PayRequestItem(key, list_amounts[key]))
+    # return items
 
 
 class RecoveryLevel:

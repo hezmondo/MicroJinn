@@ -53,7 +53,18 @@
 			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
 			<br />
 			<br />
-			{{ table }}
+			<table class="pr_table">
+			{% for statement, value in table_rows.items() %}
+				<tr>
+					<td>{{ statement }}</a></td>
+					<td class="amount_class">{{ value }}</td>
+				</tr>
+			{% endfor %}
+				<tr class="total">
+					<td>The total amount payable is:</a></td>
+					<td class="amount_class">{{ totdue_string }}</td>
+				</tr>
+			</table>
 			<br />
 			<br />
 			{{ widgets.linebreaks_for_string(block) }}

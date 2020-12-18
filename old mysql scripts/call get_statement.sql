@@ -1,4 +1,4 @@
-Use `mjinn`;
+Use `samjinn`;
 
 SET @thisloanid = 1;
 

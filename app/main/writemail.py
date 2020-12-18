@@ -6,7 +6,7 @@ from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.rent_obj import get_leasedata, getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
-from app.main.payrequests import PayRequestTable, build_pr_table, get_payrequest_table_charges, \
+from app.main.payrequests import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
 # from app.models import Pr_arrears_matrix
 from app.main.functions import htmlSpecialMarkDown
@@ -119,21 +119,22 @@ def write_payrequest(rent_id, formpayrequest_id):
     #  totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
 
-    list_table_amounts = {}
+    table_rows = {}
     if rent_gale:
         rent_statement = get_rent_statement(rentobj, rent_type)
-        list_table_amounts.update({rent_statement: rent_gale})
+        table_rows.update({rent_statement: moneyToStr(rent_gale, pound=True)})
     if arrears:
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
-        list_table_amounts.update({arrears_statement: arrears})
+        table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
     # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
     charges, totcharges = get_payrequest_table_charges(rent_id)
 
     if totcharges:
-        list_table_amounts.update(charges)
+        table_rows.update(charges)
 
     totdue = rent_gale + arrears + totcharges
-    list_table_amounts.update({'The total amount payable is:': totdue})
+    totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
+    # table_rows.update({'The total amount payable is:': moneyToStr(totdue, pound=True)})
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "no advarr",
                       '#accname#': bankdata.accname if bankdata else "no accname",
@@ -164,7 +165,7 @@ def write_payrequest(rent_id, formpayrequest_id):
                        # '#rent_type#': rent_type,
                       '#tenantname#': rentobj.tenantname if rentobj else "no tenant name",
                        # '#totcharges#': moneyToStr(totcharges, pound=True),
-                      '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
+                      '#totdue#': totdue_string,
 
                       '#today#': dateToStr(datetime.date.today())
                       }
@@ -174,10 +175,10 @@ def write_payrequest(rent_id, formpayrequest_id):
     block = form_payrequest.block if form_payrequest.block else ""
     block = doReplace(word_variables, block)
 
-    items = build_pr_table(list_table_amounts)
-    table = PayRequestTable(items)
+    # items = build_pr_table(list_table_amounts)
+    # table = PayRequestTable(items)
 
-    return addressdata, block, rentobj, subject, table, totdue
+    return addressdata, block, rentobj, subject, table_rows, totdue, totdue_string
 
 
 def doReplace(dict, clause):
