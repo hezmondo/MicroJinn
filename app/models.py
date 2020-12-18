@@ -165,16 +165,6 @@ class Form_letter(db.Model):
     template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
 
 
-class Form_payrequest(db.Model):
-    __tablename__ = 'form_payrequest'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    description = db.Column(db.String(60))
-    subject = db.Column(db.String(150))
-    block = db.Column(db.Text, nullable=True)
-
-
 class Headrent(db.Model):
     __tablename__ = 'headrent'
 
@@ -398,20 +388,6 @@ class Money_item(db.Model):
     bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
-class Payrequest(db.Model):
-    __tablename__ = 'payrequest'
-
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
-    summary = db.Column(db.String(90))
-    block = db.Column(db.Text)
-    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
-    rent_date = db.Column(db.Date)
-    total_due = db.Column(db.Numeric(8, 2))
-    delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
-
-
 class Pr_arrears_matrix(db.Model):
     __tablename__ = 'pr_arrears_matrix'
 
@@ -434,7 +410,7 @@ class Pr_batch(db.Model):
     status = db.Column(db.Integer, db.ForeignKey('typebatchstatus.id'))
     is_account = db.Column(db.Boolean)
 
-    payrequests = db.relationship('Payrequest', backref='batch', lazy='dynamic')
+    payrequests = db.relationship('Pr_history', backref='batch', lazy='dynamic')
 
 
 class Pr_filter(db.Model):
@@ -444,6 +420,30 @@ class Pr_filter(db.Model):
     code = db.Column(db.String(30))
     description = db.Column(db.String(90), nullable=True)
     filter = db.Column(db.String(900))
+
+
+class Pr_form(db.Model):
+    __tablename__ = 'pr_form'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(60))
+    subject = db.Column(db.String(150))
+    block = db.Column(db.Text, nullable=True)
+
+
+class Pr_history(db.Model):
+    __tablename__ = 'pr_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.Date)
+    summary = db.Column(db.String(90))
+    block = db.Column(db.Text)
+    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+    batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
+    rent_date = db.Column(db.Date)
+    total_due = db.Column(db.Numeric(8, 2))
+    delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
 
 
 class Property(db.Model):
@@ -501,7 +501,7 @@ class Rent(db.Model):
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
-    payrequest_rent = db.relationship('Payrequest', backref='rent', lazy='dynamic')
+    payrequest_rent = db.relationship('Pr_history', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
@@ -651,7 +651,7 @@ class Typeprdelivery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     prdeliverydet = db.Column(db.String(45))
 
-    pr_typeprdelivery = db.relationship('Payrequest', backref='typeprdelivery', lazy='dynamic')
+    pr_typeprdelivery = db.relationship('Pr_history', backref='typeprdelivery', lazy='dynamic')
     rent_typeprdelivery = db.relationship('Rent', backref='typeprdelivery', lazy='dynamic')
 
 

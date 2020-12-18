@@ -6,7 +6,7 @@ from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
 from app.main.functions import commit_to_database
-from app.models import Digfile, Docfile, Rent, Typedoc, Payrequest
+from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
 from app.main.payrequests import forward_rent
 
 
@@ -116,7 +116,7 @@ def post_payrequestfile():
     rent_id = int(request.form.get('rentid'))
     # doc_dig = request.form.get('doc_dig') or "doc"
     # new file has to be doc as new digital file uses upload function
-    payrequest = Payrequest()
+    payrequest = Pr_history()
     payrequest.id = 0
     payrequest.rent_id = rent_id
 

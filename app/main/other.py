@@ -3,7 +3,7 @@ from datetime import date
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from app.main.functions import commit_to_database
-from app.models import Agent, Form_letter, Form_payrequest, Headrent, Income, Incomealloc, Landlord, \
+from app.models import Agent, Form_letter, Pr_form, Headrent, Income, Incomealloc, Landlord, \
     Loan, Loan_statement, Manager, Rent, Rental, Rental_statement, \
     Typeadvarr, Money_account, Template, Typefreq, Typedoc, Typepayment, Typestatus, Typetenure, Emailaccount
 
@@ -54,12 +54,12 @@ def get_formletters(action):
 
 
 def get_formpayrequest(id):
-    formpayrequest = Form_payrequest.query.filter(Form_payrequest.id == id).one_or_none()
+    formpayrequest = Pr_form.query.filter(Pr_form.id == id).one_or_none()
     return formpayrequest
 
 
 def get_formpayrequests():
-    return Form_payrequest.query.all()
+    return Pr_form.query.all()
 
 
 # head rents
