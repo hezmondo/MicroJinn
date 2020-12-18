@@ -7,22 +7,23 @@ from app import db
 from app.main import bp
 from app.main.common import get_combos_common
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.functions import backup_database
 from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, \
-        get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
-        get_rental, getrentals, get_rentalstatement, \
-        post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
+    get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
+    get_rental, getrentals, get_rentalstatement, \
+    post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
 from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
-        get_inc_options, post_inc_obj
-from app.main.money import  get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
-        post_moneyaccount, post_moneyitem
+    get_inc_options, post_inc_obj
+from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
+    post_moneyaccount, post_moneyitem
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_rentonly, \
-        get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
-        get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
-        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
-from app.main.writemail import writeMail
-from app.models import Digfile, Jstore, Loan, Template, Typedoc
+    get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
+    get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
+    get_rentobjs_filter, post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
+from app.main.writemail import writeMail, write_payrequest
+from app.main.payrequests import forward_rents
+from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -88,9 +89,9 @@ def delete_item(id):
 @login_required
 def docfile(id):
     if request.method == "POST":
-        rentid = post_docfile(id)
+        rent_id = post_docfile(id)
 
-        return redirect('/rent_object/{}'.format(rentid))
+        return redirect('/rent_object/{}'.format(rent_id))
 
     docfile, doc_dig = get_docfile(id)
 
@@ -109,7 +110,8 @@ def docfiles(rentid):
 @login_required
 def download(id):
     digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
-    return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True, mimetype='application/pdf')
+    return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True,
+                     mimetype='application/pdf')
 
 
 @bp.route('/email_accounts', methods=['GET'])
@@ -231,7 +233,6 @@ def index():
     action = request.args.get('action', "view", type=str)
     agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs_basic(action)
 
-
     return render_template('home.html', agentdetails=agentdetails, propaddr=propaddr,
                            rentcode=rentcode, source=source, tenantname=tenantname, rentprops=rentprops)
 
@@ -313,8 +314,7 @@ def loans():
 
 @bp.route('/loanstat_dialog/<int:id>', methods=["GET", "POST"])
 def loanstat_dialog(id):
-
-    return render_template('loanstat_dialog.html', loanid = id, today = datetime.date.today())
+    return render_template('loanstat_dialog.html', loanid=id, today=datetime.date.today())
 
 
 @bp.route('/loan_statement/<int:id>', methods=["GET", "POST"])
@@ -322,7 +322,8 @@ def loanstat_dialog(id):
 def loan_statement(id):
     if request.method == "POST":
         stat_date = request.form.get("statdate")
-        rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"), params={"x": id, "y": stat_date})
+        rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"),
+                                    params={"x": id, "y": stat_date})
         checksums = rproxy.fetchall()
         db.session.commit()
         loanstatement = get_loanstatement()
@@ -339,7 +340,7 @@ def mail_dialog(id):
     action = request.args.get('action', "normal", type=str)
     formletters = get_formletters(action)
 
-    return render_template('mail_dialog.html', action=action, formletters=formletters, rent_id = id)
+    return render_template('mail_dialog.html', action=action, formletters=formletters, rent_id=id)
 
 
 @bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
@@ -348,17 +349,32 @@ def mail_edit(id):
     method = request.args.get('method', "email", type=str)
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
-        # print(request.form)
-        formletter_id = id
-        rent_id = request.form.get('rent_id')
-        addressdata, block, bold, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id, action)
-        mailaddr = request.form.get('mailaddr')
-        summary = dcode + "-" + method + "-" + mailaddr[0:25]
-        mailaddr = mailaddr.split(", ")
+        if action == "payrequest":
+            # formpayrequest_id is the id of the pr template
+            formpayrequest_id = id
+            rent_id = request.form.get('rent_id')
+            addressdata, block, rentobj, subject, table = write_payrequest(rent_id, formpayrequest_id)
+            mailaddr = request.form.get('mailaddr')
+            # TODO: Do we want a specific PR code to begin the summary?
+            summary = "PR" + "-" + method + "-" + mailaddr[0:25]
+            mailaddr = mailaddr.split(", ")
 
-        return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, bold=bold, doctype=doctype,
-                               summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
-                               method=method, rentobj=rentobj, subject=subject)
+            return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
+                                   method=method, rentobj=rentobj, subject=subject, summary=summary, table=table)
+        else:
+            # print(request.form)
+            formletter_id = id
+            rent_id = request.form.get('rent_id')
+            addressdata, block, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
+                                                                                        action)
+            mailaddr = request.form.get('mailaddr')
+            summary = dcode + "-" + method + "-" + mailaddr[0:25]
+            mailaddr = mailaddr.split(", ")
+
+            return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block,
+                                   doctype=doctype,
+                                   summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                                   method=method, rentobj=rentobj, subject=subject)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -412,12 +428,53 @@ def money_item(id):
                            cats=cats, cleareds=cleareds)
 
 
-@bp.route('/payrequests', methods=['GET', 'POST'])
+# TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
+@bp.route('/payrequests/', methods=['GET', 'POST'])
 @login_required
 def payrequests():
-    payrequests = None
+    action = request.args.get('action', "view", type=str)
+    name = request.args.get('name', "queryall", type=str)
 
-    return render_template('payrequests.html', payrequests=payrequests)
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+
+    actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
+    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
+
+    # TODO: forward rents using ajax so that the page needn't be reloaded
+    if action == "run":
+        forward_rents(rentprops)
+
+    return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
+                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
+                           statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
+                           arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
+                           propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
+                           runsize=runsize, salegrade=salegrade, source=source, status=status,
+                           tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+
+
+@bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
+@login_required
+def pr_main(id):
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    if id == 0:
+        rentprops = get_rentobjs_filter(1)
+    else:
+        rentprops = get_rentobjs_filter(id)
+
+    return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
+                           prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
+                           statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
+
+
+@bp.route('/pr_start', methods=['GET', 'POST'])
+@login_required
+def pr_start():
+    filters = Pr_filter.query.all()
+
+    return render_template('pr_start.html', filters=filters)
 
 
 @bp.route('/properties', methods=['GET', 'POST'])
@@ -507,25 +564,31 @@ def rent_object(id):
     actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
     advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
 
-    # if session.get('mailtodets') == False:
-    #     session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    # if not session['mailtodets']:
+    #   session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
     session['propaddr'] = rentobj.propaddr
     session['tenantname'] = rentobj.tenantname
 
     return render_template('rent_object.html', action=action, rentobj=rentobj,
-                       properties=properties, actypedets=actypedets, advarrdets=advarrdets, charges=charges,
-                       deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                       salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
+                           properties=properties, actypedets=actypedets, advarrdets=advarrdets, charges=charges,
+                           deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
+                           salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
 
 
 @bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
+    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_docfile(0)
+        if action == "payrequest":
+            id_ = post_payrequestfile()
+        else:
+            id_ = post_docfile(0)
 
-        return redirect('/docfile/{}?doc_dig_doc'.format(id_))
+        return redirect('/docfiles/{}'.format(id_))
+
+        # return redirect('/docfile/{}?doc_dig_doc'.format(id_))
 
 
 @bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])
@@ -537,8 +600,7 @@ def upload_file(rentid):
 
         return redirect('/rent_object/{}'.format(rentid))
 
-    return render_template('upload_dialog.html', rentcode=rentcode, rent_id = rentid)
-
+    return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rentid)
 
 # @bp.route('/uploads/<filename>')
 # def upload(filename):

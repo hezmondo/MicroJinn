@@ -3,10 +3,10 @@ SELECT
 FROM (
  SELECT
   @rownum:=@rownum+1 AS expected,
-  IF(@rownum=mjinn.income.id, 0, @rownum:=mjinn.income.id) AS got
+  IF(@rownum=samjinn.income.id, 0, @rownum:=samjinn.income.id) AS got
  FROM
   (SELECT @rownum:=0) AS a
-  JOIN mjinn.income
+  JOIN samjinn.income
   ORDER BY id
  ) AS z
 WHERE z.got!=0;

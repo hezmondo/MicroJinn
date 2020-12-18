@@ -6,7 +6,8 @@ from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
 from app.main.functions import commit_to_database
-from app.models import Digfile, Docfile, Rent, Typedoc
+from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
+from app.main.payrequests import forward_rent
 
 
 def get_docfile(id):
@@ -84,7 +85,7 @@ def get_docfiles(rentid):
 
 def post_docfile(id):
     rentid = int(request.form.get('rentid'))
-    doc_dig = request.form.get('doc_dig')
+    doc_dig = request.form.get('doc_dig') or "doc"
     # new file for id 0, otherwise existing dig or doc file:
     if id == 0:
         # new file has to be doc as new digital file uses upload function
@@ -95,7 +96,6 @@ def post_docfile(id):
         docfile = Docfile.query.get(id) if doc_dig == "doc" else Digfile.query.get(id)
         docfile.rent_id = rentid
     docfile.doc_date = request.form.get('doc_date')
-    docfile.summary = request.form.get('summary')
     if doc_dig == "doc":
         docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
         # source_html = docfile.doc_text
@@ -104,10 +104,44 @@ def post_docfile(id):
     doctype = request.form.get('doc_type')
     docfile.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
+    docfile.summary = request.form.get('summary')
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
     db.session.add(docfile)
     db.session.commit()
     return rentid
+
+
+# TODO: May need to be moved
+def post_payrequestfile():
+    rent_id = int(request.form.get('rentid'))
+    # doc_dig = request.form.get('doc_dig') or "doc"
+    # new file has to be doc as new digital file uses upload function
+    payrequest = Pr_history()
+    payrequest.id = 0
+    payrequest.rent_id = rent_id
+
+    payrequest.date = request.form.get('doc_date')
+    payrequest.block = request.form.get('xinput').replace("£", "&pound;")
+
+    # TODO: What information do we want to put in the docfile summary field
+    payrequest.summary = request.form.get('summary')
+
+    # payrequest.batch_id = 0
+    payrequest.rent_date = request.form.get('rent_date')
+    payrequest.total_due = request.form.get('totdue')
+
+    # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
+    payrequest.delivery_method = 1 if request.form.get('method') == "email" else 2
+
+    db.session.add(payrequest)
+
+    # TODO: Check vs db.session.commit()
+    commit_to_database()
+
+    # TODO: Check that we want to forward rent and update database here
+    forward_rent(rent_id)
+
+    return rent_id
 
 
 def post_upload():

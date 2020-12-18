@@ -47,7 +47,13 @@ $(document).ready(function(){
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
     $('#savehtml').click(function() {
-    var mysave = $('#doc_html').html();
-    $('#xinput').val(mysave);
+        var mysave = $('#doc_html').html();
+        $('#xinput').val(mysave);
     });
+});
+$(function() {
+  // Sidebar toggle behavior
+  $('#sidebarCollapse').on('click', function() {
+    $('#sidebar, #content').toggleClass('active');
+  });
 });

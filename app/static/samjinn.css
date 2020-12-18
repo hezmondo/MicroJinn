@@ -1,6 +1,12 @@
-/* import the necessary Bootstrap files
+/*
+ import the necessary Bootstrap files
 @import "bootstrap";
- */
+*/
+
+.dropdown-menu {
+  margin: 0;
+}
+
 .navbar-nav li:hover>.dropdown-menu {
   display: block;
 }
@@ -108,6 +114,36 @@ select:-internal-list-box option:checked {
 
 .font-size-17px {
     font-size: 9pt;
+}
+
+/*pay request table css*/
+
+.pr_table {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    border: solid #A3B9B9 1px;
+}
+
+.pr_table th, .pr_table td {
+    padding: 5px;
+}
+
+.pr_table th {
+    text-align: center;
+    background-color: #6666ff;
+    color: white
+}
+
+.total {
+    font-weight: bold;
+    border: solid #A3B9B9 1px;
+    background-color: #fafafa;
+}
+
+.pr_table .amount-class {
+    text-align: right;
+    width: 20%;
 }
 
 /* End of docs.css */

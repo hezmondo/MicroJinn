@@ -1,0 +1,31 @@
+<!-- /templates/pr_start.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="pr_filter">
+    <div class="table-fixed">
+        <table class="table" id="filters">
+            <thead>
+            <tr>
+                <th style="width: 10.00%">id</th>
+                <th style="width: 10.00%">code</th>
+                <th style="width: 70.00%">description</th>
+                <th style="width: 10.00%"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in filters %}
+            <tr id="{{ item.id }}">
+                <td style="width: 10.00%">{{ item.id }}</td>
+                <td style="width: 10.00%"> {{ item.code }}</td>
+                <td style="width: 60.00%"> {{ item.description }}</td>
+                <td>
+                    <button type="submit" formaction="/pr_main/{{ item.id }}" class="btn btn-danger">Go</button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</form>
+{% endblock %}

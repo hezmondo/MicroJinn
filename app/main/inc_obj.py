@@ -65,7 +65,7 @@ def get_incobj_options():
 def get_incobj_post(id):
     post = Rent.query.join(Landlord).join(Money_account).join(Charge).with_entities(Rent.rentcode,
                 Rent.arrears, Rent.datecode, Rent.lastrentdate, Rent.landlord_id,
-                func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
+                func.samjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
                 func.sum(Charge.chargebalance).label('chargetot'),
                 Rent.rentpa, Rent.tenantname, Rent.freq_id, Money_account.accdesc) \
                 .filter(Rent.id == id) \

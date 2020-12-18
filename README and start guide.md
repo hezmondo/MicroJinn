@@ -1,4 +1,4 @@
-### Basic start up guide for installing mjinn - last updated 17 Oct 2020
+### Basic start up guide for installing mjinn - last updated 26 Nov 2020
 
 ### Please install MySql Server and MySql Workbench using my new mysql server and workbench installation guide
  
@@ -35,6 +35,8 @@ and then use pip3 to install these dependencies:
 	pip3 install cryptography
 	
 	pip3 install xhtml2pdf
+
+    pip3 install flask-table
 
 **In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3**
 	
