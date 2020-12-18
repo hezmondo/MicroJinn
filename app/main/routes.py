@@ -20,10 +20,10 @@ from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_m
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_rentonly, \
     get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
     get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
-    post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
+    get_rentobjs_filter, post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.writemail import writeMail, write_payrequest
 from app.main.payrequests import forward_rents
-from app.models import Digfile, Jstore, Loan, Template, Typedoc
+from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -452,6 +452,29 @@ def payrequests():
                            propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
                            runsize=runsize, salegrade=salegrade, source=source, status=status,
                            tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+
+
+@bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
+@login_required
+def pr_main(id):
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    if id == 0:
+        rentprops = get_rentobjs_filter(1)
+    else:
+        rentprops = get_rentobjs_filter(id)
+
+    return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
+                           prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
+                           statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
+
+
+@bp.route('/pr_start', methods=['GET', 'POST'])
+@login_required
+def pr_start():
+    filters = Pr_filter.query.all()
+
+    return render_template('pr_start.html', filters=filters)
 
 
 @bp.route('/properties', methods=['GET', 'POST'])

@@ -7,114 +7,113 @@
 <form action="/payrequests" method="post">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rentcode">Rentcode starts with:</label>
+            <label for="rentcode">rentcode starts with:</label>
             <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ rentcode }}">
         </div>
         <div class="col-md-2">
-            <label for="tenantname">Tenant name:</label>
+            <label for="tenantname">renant name:</label>
             <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ tenantname }}">
         </div>
         <div class="col-md-2">
-            <label for="propaddr">Property details:</label>
+            <label for="propaddr">property details:</label>
             <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ propaddr }}">
         </div>
         <div class="col-md-2">
-            <label for="source">Source:</label>
+            <label for="source">source:</label>
             <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ source }}">
         </div>
         <div class="col-md-2">
-            <label for="agentdetails">Agent details:</label>
+            <label for="agentdetails">agent details:</label>
             <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ agentdetails }}">
         </div>
         <div class="col-md-2">
-            <label for="count">Count:</label>
+            <label for="count">count:</label>
             <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="enddate">End date:</label>
+            <label for="enddate">end date:</label>
             <input type="date" class="form-control" name="enddate" value="{{ enddate }}">
         </div>
         <div class="col-md-2">
-            <label for="runsize">Run size:</label>
+            <label for="runsize">run size:</label>
             <input type="text" class="form-control" name="runsize" value="{{ runsize }}">
         </div>
         <div class="col-md-2">
-            <label for="rentpa">Rent pa:</label>
+            <label for="rentpa">rent pa:</label>
             <input type="text" class="form-control" name="rentpa" data-toggle="tooltip" title="Example = 100" value="{{ rentpa }}">
         </div>
         <div class="col-md-2">
-            <label for="arrears">Rent arrears:</label>
+            <label for="arrears">rent arrears:</label>
             <input type="text" class="form-control" name="arrears" data-toggle="tooltip" title="Example < 100" value="{{ arrears }}">
         </div>
         <div class="col-md-2">
-            <label for="rentperiods">Rent periods owing:</label>
+            <label for="rentperiods">rent periods owing:</label>
             <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip" title="Example > 5" value="{{ rentperiods }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
-            <label for="landlord">Landlord:</label>
+            <label for="landlord">landlord:</label>
             {{ widgets.multiselect_as_select(name="landlord", items=landlords, items_selected=landlord or landlords) }}
         </div>
         <div class="col-md-2">
-            <label for="tenure">Tenure:</label>
+            <label for="tenure">tenure:</label>
             {{ widgets.multiselect_as_select(name="tenure", items=tenuredets, items_selected=tenure or tenuredets) }}
         </div>
         <div class="col-md-2">
-            <label for="salegrade">Sale grade:</label>
+            <label for="salegrade">sale grade:</label>
             {{ widgets.multiselect_as_select(name="salegrade", items=salegradedets, items_selected=salegrade or salegradedets) }}
         </div>
         <div class="col-md-2">
-            <label for="status">Status:</label>
+            <label for="status">status:</label>
             {{ widgets.multiselect_as_select(name="status", items=statusdets, items_selected=status or statusdets) }}
         </div>
         <div class="form-group col-md-2">
-            <label for="actype">Actype:</label>
+            <label for="actype">actype:</label>
             {{ widgets.multiselect_as_select(name="actype", items=actypedets, items_selected=actype or actypedets) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="agents">Mailto agent:</label>
+            <label for="agents">mailto agent:</label>
             {{ widgets.combobox(name="agents", items=options, item_selected=options[0]) }}
         </div>
         <div class="col-md-2">
-            <label for="charges">Charges:</label>
+            <label for="charges">charges:</label>
             {{ widgets.combobox(name="charges", items=options, item_selected=options[0]) }}
         </div>
         <div class="col-md-2">
-            <label for="emailable">Emailable:</label>
+            <label for="emailable">emailable:</label>
             {{ widgets.combobox(name="emailable", items=options, item_selected=options[0]) }}
         </div>
         <div class="col-md-2">
-            <label for="forsale">For sale:</label>
+            <label for="forsale">for sale:</label>
             {{ widgets.combobox(name="forsale", items=options, item_selected=options[0]) }}
         </div>
         <div class="col-md-3">
-            <label for="prdelivery">PR delivery:</label>
+            <label for="prdelivery">pR delivery:</label>
             {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery or prdeliveries) }}
         </div>
     </div>
-    </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=filter" class="btn btn-block btn-success ">Search</button>
+            <button type="submit" formaction="/payrequests/?action=filter" class="btn btn-block btn-success ">filter</button>
         </div>
         <div class="col-md-2">
-            <a href="/load_query" class="btn btn-block btn-primary" role="button">Load saved filter:</a>
+            <a href="/load_query" class="btn btn-block btn-primary" role="button">load saved filter:</a>
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="jname" placeholder="query name" value="{{ jname }}">
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=save" class="btn btn-block btn-danger ">Save query as</button>
+            <button type="submit" formaction="/payrequests/?action=save" class="btn btn-block btn-danger ">save query as</button>
         </div>
     </div>
-        <div class="form-group row flex-row-reverse">
+    <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=run" class="btn btn-block btn-success ">Create pay requests</button>
+            <button type="submit" formaction="/payrequests/?action=run" class="btn btn-block btn-success ">create pay requests</button>
         </div>
     </div>
 </form>
@@ -144,7 +143,7 @@
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 20.00%"> {{ item.agdetails }}</td>
-            <td style="width: 5.00%"><a href="/rent_object/{{ item.id }}">View/edit</a></td>
+            <td style="width: 5.00%"><a href="/rent_object/{{ item.id }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

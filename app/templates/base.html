@@ -11,32 +11,35 @@
     {% block navbar %}
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light" style=" background-color: #ededed;">
-            <a class="navbar-brand" href="{{ url_for('main.index', action='view') }}">MicroJinn</a>
+            <a class="navbar-brand" href="{{ url_for('main.index', action='view') }}">mjinn</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse text-center" id="navbarResponsive">
               <ul class="nav navbar-nav mr-auto">
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.agents') }}">Agents</a>
+                <a class="nav-link" href="{{ url_for('main.agents') }}">agents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.headrents') }}">Headrents</a>
+                <a class="nav-link" href="{{ url_for('main.headrents') }}">headrents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.income') }}">Income</a>
+                <a class="nav-link" href="{{ url_for('main.income') }}">income</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.loans') }}">Loans</a>
+                <a class="nav-link" href="{{ url_for('main.loans') }}">loans</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.money') }}">Money</a>
+                <a class="nav-link" href="{{ url_for('main.money') }}">money</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.payrequests') }}">Payrequests</a>
+                <a class="nav-link" href="{{ url_for('main.payrequests') }}">payrequests</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.rentals') }}">Rentals</a>
+                <a class="nav-link" href="{{ url_for('main.pr_start') }}">pr_start</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('main.rentals') }}">rentals</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -437,6 +437,15 @@ class Pr_batch(db.Model):
     pay_requests = db.relationship('Payrequest', backref='batch', lazy='dynamic')
 
 
+class Pr_filter(db.Model):
+    __tablename__ = 'pr_filter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(90), nullable=True)
+    filter = db.Column(db.String(900))
+
+
 class Property(db.Model):
     __tablename__ = 'property'
 

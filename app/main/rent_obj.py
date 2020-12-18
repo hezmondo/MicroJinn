@@ -10,8 +10,8 @@ from app.main.common import get_combos_common
 from app.main.functions import commit_to_database, dateToStr, strToDate, strToDec
 
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Jstore, Landlord, Lease, Lease_uplift_type, \
-    Manager, Property, Rent, Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typemailto, Typeprdelivery, \
-    Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
+    Manager, Pr_filter, Property, Rent, Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, \
+    Typemailto, Typeprdelivery, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
 
 # agents
@@ -316,8 +316,9 @@ def get_rentobjs_plus(action, name):
         store["ten"] = tenure
         j_id = \
             Jstore.query.with_entities(Jstore.id).filter \
-                (Jstore.name == jname).one()[0]
+                (Jstore.name == jname).one_or_none()
         if j_id:
+            j_id = j_id[0]
             jstore = Jstore.query.get(j_id)
             jstore.name = jname
             jstore.content = json.dumps(store)
@@ -384,6 +385,54 @@ def getrentobjs_advanced(qfilter, runsize):
             .limit(runsize).all()
 
     return rentobjs
+
+
+def get_rentobjs_filter(id):
+    qfilter = []
+    landlords, statusdets, tenuredets = get_queryoptions_common()
+    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+    returns = Pr_filter.query.with_entities(Pr_filter.filter).filter(Pr_filter.id == id)[0][0]
+    print(returns)
+    returns = json.loads(returns)
+    agentdetails = returns["agd"]
+    actype = returns["act"]
+    arrears = returns["arr"]
+    landlord = returns["lld"]
+    prdelivery = returns["prd"]
+    propaddr = returns["pop"]
+    rentcode = returns["rcd"]
+    rentpa = returns["rpa"]
+    rentperiods = returns["rpd"]
+    salegrade = returns["sal"]
+    status = returns["sta"]
+    source = returns["soc"]
+    tenantname = returns["tna"]
+    tenure = returns["ten"]
+    enddate = date.today() + relativedelta(days=45)
+    qfilter.append(func.samjinn.next_rent_date(Rent.id, 1, 1) < "{}".format(enddate))
+    if rentcode and rentcode != "":
+        qfilter.append(Rent.rentcode.startswith([rentcode]))
+    if actype and actype != actypedets and actype[0] != "all actypes":
+        qfilter.append(Typeactype.actypedet.in_(actype))
+    if arrears and arrears != "":
+        qfilter.append(text("Rent.arrears {}".format(arrears)))
+    if landlord and landlord != landlords and landlord[0] != "all landlords":
+        qfilter.append(Landlord.landlordname.in_(landlord))
+    if prdelivery and prdelivery != prdeliveries and prdelivery != "":
+        qfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
+    if rentpa and rentpa != "":
+        qfilter.append(text("Rent.rentpa {}".format(rentpa)))
+    if rentperiods and rentperiods != "":
+        qfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
+    if salegrade and salegrade != salegradedets and salegrade[0] != "all salegrades":
+        qfilter.append(Typesalegrade.salegradedet.in_(salegrade))
+    if status and status != statusdets and status[0] != "all statuses":
+        qfilter.append(Typestatus.statusdet.in_(status))
+    if tenure and tenure != tenuredets and tenure[0] != "all tenures":
+        qfilter.append(Typetenure.tenuredet.in_(tenure))
+    rentprops = getrentobjs_advanced(qfilter, 300)
+
+    return rentprops
 
 
 def getrentobj_main(id):
