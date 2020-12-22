@@ -3,9 +3,9 @@ from flask import request
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from app.main.common import readFromFile
-from app.main.functions import dateToStr, hashCode, moneyToStr, money
+from app.main.functions import dateToStr, hashCode, moneyToStr
 from app.main.rent_obj import get_leasedata, getrentobj_main
-from app.main.other import get_formletter, get_formpayrequest, getmaildata
+from app.main.other import get_formletter, get_pr_form, getmaildata
 from app.main.payrequests import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
 
@@ -32,7 +32,7 @@ def writeMail(rent_id, income_id, formletter_id, action):
 
 
 # TODO: We may need a get_pr_variables function later
-def write_payrequest(rent_id, formpayrequest_id):
+def writePayrequest(rent_id, formpayrequest_id):
     addressdata, rentobj, word_variables = get_word_variables(rent_id)
 
     check_or_add_recovery_charge(rentobj)
@@ -50,21 +50,21 @@ def write_payrequest(rent_id, formpayrequest_id):
     if arrears:
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
-    # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
+    # TODO: Minimise db queries - Charges can be taken from rentobj rather than separately using a function here
     charges, totcharges = get_payrequest_table_charges(rent_id)
     if totcharges:
         table_rows.update(charges)
     totdue = rent_gale + arrears + totcharges
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
 
-    subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
+    pr_form = get_pr_form(formpayrequest_id)
+    subject = pr_form.subject if pr_form.subject else ""
     subject = doReplace(word_variables, subject)
-
-    form_payrequest = get_formpayrequest(formpayrequest_id)
-    block = form_payrequest.block if form_payrequest.block else ""
+    block = pr_form.block if pr_form.block else ""
     block = doReplace(word_variables, block)
+    pr_code = pr_form.code if pr_form.code else ""
 
-    return addressdata, block, rentobj, subject, table_rows, totdue, totdue_string
+    return addressdata, block, pr_code, rentobj, subject, table_rows, totdue, totdue_string
 
 
 def doReplace(dict, clause):

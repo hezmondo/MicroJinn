@@ -2,7 +2,7 @@ from flask import redirect, request, url_for
 from app import db
 from app.main.functions import commit_to_database
 from app.models import Agent, Charge, Digfile, Docfile, Extmanager, Extrent, Form_letter, Income, Incomealloc, \
-    Landlord, Lease, Loan, Manager, Money_item, Property, Rent, Rental, Template, \
+    Landlord, Lease, Loan, Manager, Money_item, Pr_history, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
 
@@ -36,6 +36,8 @@ def delete_record(id):
         # db.session.delete(delete_loan_trans)
     elif item == "moneyacc":
         d_item = Money_account.query.get(id)
+    elif item == "pr_file":
+        d_item = Pr_history.query.get(id)
     elif item == "rentprop":
         d_item = Rent.query.get(id)
         d_item_1 = Property.query.filter(Property.rent_id == id).first()

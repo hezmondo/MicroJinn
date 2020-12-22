@@ -175,6 +175,7 @@
               <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="statementsMenuButton"
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
               <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
+                  <a class="dropdown-item" href="/pr_history/{{ rentobj.id }}">view payrequest history</a>
                 <a class="dropdown-item" href="/rent_object/0?action=new">new statement for this rent</a>
                 <a class="dropdown-item" href="/charges?rentid={{ rentobj.id }}">new account for this rent</a>
                 <a class="dropdown-item" href="/pr_dialog/{{ rentobj.id }}">new payrequest for this rent</a>

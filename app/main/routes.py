@@ -7,9 +7,10 @@ from app import db
 from app.main import bp
 from app.main.common import get_combos_common
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, get_pr_file, get_pr_history, \
+    post_pr_file
 from app.main.functions import backup_database
-from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, get_formpayrequests, \
+from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, get_pr_forms, \
     get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
     get_rental, getrentals, get_rentalstatement, \
     post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
@@ -21,7 +22,7 @@ from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, ge
     get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
     get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
     get_rentobjs_filter, post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
-from app.main.writemail import writeMail, write_payrequest
+from app.main.writemail import writeMail, writePayrequest
 from app.main.payrequests import forward_rents
 from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
 
@@ -443,7 +444,7 @@ def payrequests():
 @bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
 def pr_dialog(id):
-    formpayrequests = get_formpayrequests()
+    formpayrequests = get_pr_forms()
 
     return render_template('pr_dialog.html', formpayrequests=formpayrequests, rent_id=id)
 
@@ -453,20 +454,38 @@ def pr_dialog(id):
 def pr_edit(id):
     method = request.args.get('method', "email", type=str)
     if request.method == "POST":
-        # formpayrequest_id is the id of the pr template
-        formpayrequest_id = id
         rent_id = request.form.get('rent_id')
-        # TODO: passing both totdue and totdue_string with money formatting. Is there a better way?
-        addressdata, block, rentobj, subject, \
-            table_rows, totdue, totdue_string = write_payrequest(rent_id, formpayrequest_id)
+        # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
+        addressdata, block, pr_code, rentobj, subject, \
+            table_rows, totdue, totdue_string = writePayrequest(rent_id, id)
         mailaddr = request.form.get('mailaddr')
-        # TODO: Do we want a specific PR code to begin the summary?
-        summary = "PR" + "-" + method + "-" + mailaddr[0:25]
+        summary = pr_code + "-" + method + "-" + mailaddr[0:25]
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
                                method=method, rentobj=rentobj, subject=subject, summary=summary, table_rows=table_rows,
                                totdue=totdue, totdue_string=totdue_string)
+
+
+# TODO: improve pr_file editing functionality (beyond edit summary/block)
+@bp.route('/pr_file/<int:id>', methods=['GET', 'POST'])
+@login_required
+def pr_file(id):
+    if request.method == "POST":
+        rent_id = post_pr_file(id)
+
+        return redirect('/pr_history/{}'.format(rent_id))
+
+    pr_file = get_pr_file(id)
+
+    return render_template('pr_file.html', pr_file=pr_file)
+
+
+@bp.route('/pr_history/<int:rentid>', methods=['GET', 'POST'])
+def pr_history(rentid):
+    pr_history = get_pr_history(rentid)
+
+    return render_template('pr_history.html', rentid=rentid, pr_history=pr_history)
 
 
 @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
@@ -597,13 +616,11 @@ def save_html():
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         if action == "payrequest":
-            id_ = post_payrequestfile()
+            id_ = post_pr_file()
+            return redirect('/pr_history/{}'.format(id_))
         else:
             id_ = post_docfile(0)
-
-        return redirect('/docfiles/{}'.format(id_))
-
-        # return redirect('/docfile/{}?doc_dig_doc'.format(id_))
+            return redirect('/docfiles/{}'.format(id_))
 
 
 @bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])

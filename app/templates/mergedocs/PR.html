@@ -54,6 +54,10 @@
 			<br />
 			<br />
 			<table class="pr_table">
+				<tr class="pr_table_heading">
+					<td>Details</a></td>
+					<td>Amount</td>
+				</tr>
 			{% for statement, value in table_rows.items() %}
 				<tr>
 					<td>{{ statement }}</a></td>
@@ -65,7 +69,6 @@
 					<td class="amount_class">{{ totdue_string }}</td>
 				</tr>
 			</table>
-			<br />
 			<br />
 			{{ widgets.linebreaks_for_string(block) }}
 			<br />
@@ -98,7 +101,10 @@
             <input type="hidden" id="rentcode" name="rentcode" value = "{{ rentobj.rentcode }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
+            <input type="hidden" id="date" name="date" value = "{{ today_date }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="subject" name="subject" value = "{{ subject }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" id="summary" name="summary" value = "{{ summary }}">

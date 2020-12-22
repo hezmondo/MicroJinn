@@ -36,16 +36,14 @@
     <table class="table table-condensed">
         <thead>
         <tr>
-<!--            <th style="width: 10.00%">Code</th>-->
             <th style="width: 70.00%">Description</th>
-<!--            <th style="width: 10.00%">Action</th>-->
-<!--            <th style="width: 10.00%">Action</th>-->
+            <th style="width: 10.00%">Action</th>
+            <th style="width: 10.00%">Action</th>
         </tr>
         </thead>
         <tbody>
         {% for item in formpayrequests %}
         <tr>
-<!--            <td style="width: 10.00%">{{ item.code }}</td>-->
             <td style="width: 70.00%">{{ item.description}}</td>
             <td>
                 <button type="submit" formaction="/pr_edit/{{ item.id }}?method=email" class="btn btn-danger">email</button>

@@ -53,12 +53,12 @@ def get_formletters(action):
     return formletters
 
 
-def get_formpayrequest(id):
+def get_pr_form(id):
     formpayrequest = Pr_form.query.filter(Pr_form.id == id).one_or_none()
     return formpayrequest
 
 
-def get_formpayrequests():
+def get_pr_forms():
     return Pr_form.query.all()
 
 
