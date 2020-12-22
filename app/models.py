@@ -113,8 +113,8 @@ class Event(db.Model):
     __tablename__ = 'event'
 
     id = db.Column(db.Integer, primary_key=True)
-    event_date = db.Column(db.Date)
-    summary = db.Column(db.String(90))
+    date = db.Column(db.Date)
+    description = db.Column(db.String(90))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
 
