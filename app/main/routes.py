@@ -19,7 +19,7 @@ from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_m
     post_moneyaccount, post_moneyitem
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_rentonly, \
     get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
-    get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs_plus, get_rentobjs_basic, \
+    get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs, \
     get_rentobjs_filter, post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.writemail import writeMail, write_payrequest
 from app.main.payrequests import forward_rents
@@ -226,15 +226,13 @@ def income_post(id):
 
 
 @bp.route('/', methods=['GET', 'POST'])
-@bp.route('/index/', methods=['GET', 'POST'])
+@bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    action = request.args.get('action', "view", type=str)
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs_basic(action)
+    filter_dict, rentprops = get_rentobjs("basic")
 
-    return render_template('home.html', agentdetails=agentdetails, propaddr=propaddr,
-                           rentcode=rentcode, source=source, tenantname=tenantname, rentprops=rentprops)
+    return render_template('home.html', filter_dict=filter_dict, rentprops=rentprops)
 
 
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
@@ -279,16 +277,16 @@ def leases():
     return render_template('leases.html', leases=leases, uplift_types=uplift_types, rcd=rcd, uld=uld, ult=ult)
 
 
-@bp.route('/load_query', methods=['GET', 'POST'])
-def load_query():
+@bp.route('/load_filter', methods=['GET', 'POST'])
+def load_filter():
     if request.method == "POST":
-        jqname = request.form.get("jqname")
+        filter_name = request.form.get("filtername")
 
-        return redirect("/queries/?name={}".format(jqname))
+        return redirect("/queries/?filtername={}".format(filter_name))
 
-    jqueries = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
+    jfilters = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
 
-    return render_template('load_query.html', jqueries=jqueries)
+    return render_template('load_filter.html', jfilters=jfilters)
 
 
 @bp.route('/loan/<int:id>', methods=['GET', 'POST'])
@@ -515,20 +513,15 @@ def property(id):
 @bp.route('/queries/', methods=['GET', 'POST'])
 def queries():
     action = request.args.get('action', "view", type=str)
-    name = request.args.get('name', "queryall", type=str)
     landlords, statusdets, tenuredets = get_queryoptions_common()
     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
 
-    actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
+    filter_dict, rentprops = get_rentobjs("advanced")
 
-    return render_template('queries.html', action=action, actypedets=actypedets, floads=floads,
-                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
-                           arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
-                           propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
-                           runsize=runsize, salegrade=salegrade, source=source, status=status,
-                           tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+    return render_template('queries.html', action=action, landlords=landlords, statusdets=statusdets,
+                            tenuredets=tenuredets, actypedets=actypedets, floads=floads, options=options,
+                            prdeliveries=prdeliveries, salegradedets=salegradedets, filter_dict=filter_dict,
+                            rentprops=rentprops)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])

@@ -6,39 +6,39 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rentcode">Rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ rentcode }}">
+            <label for="rentcode">rentcode starts with:</label>
+            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ filter_dict.rentcode }}">
         </div>
         <div class="col-md-2">
-            <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ tenantname }}">
+            <label for="tenantname">tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ filter_dict.tenantname }}">
         </div>
         <div class="col-md-2">
-            <label for="propaddr">Property details:</label>
-            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ propaddr }}">
+            <label for="propaddr">property details:</label>
+            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ filter_dict.propaddr }}">
         </div>
         <div class="col-md-2">
-            <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ source }}">
+            <label for="source">source:</label>
+            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ filter_dict.source }}">
         </div>
         <div class="col-md-2">
-            <label for="agentdetails">Agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ agentdetails }}">
+            <label for="agentdetails">agent details:</label>
+            <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ filter_dict.agentdetails }}">
         </div>
         <div class="col-md-2">
-            <label for="count">Count:</label>
+            <label for="count">count:</label>
             <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/index/?action=basic" class="btn btn-block btn-success ">Search</button>
+            <button type="submit" formaction="/index" class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/external_rents" class="btn btn-block btn-primary ">Search external</button>
+            <button type="submit" formaction="/external_rents" class="btn btn-block btn-primary ">search external</button>
         </div>
         <div class="col-md-3">
-            <a href="/queries" class="btn btn-block btn-danger" role="button">Advanced queries</a>
+            <a href="/queries" class="btn btn-block btn-danger" role="button">advanced queries</a>
         </div>
     </div>
 </form>

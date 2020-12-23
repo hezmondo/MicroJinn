@@ -19,11 +19,11 @@ def get_moneyaccount(id):
 def get_moneydets():
     moneydets = Money_account.query.with_entities(Money_account.id, Money_account.bankname, Money_account.accname,
                   Money_account.sortcode, Money_account.accnum, Money_account.accdesc,
-                           func.samjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
-                           func.samjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).all()
+                           func.mjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
+                           func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).all()
 
-    accsums = Money_account.query.with_entities(func.samjinn.acc_total(1).label('cleared'),
-                                            func.samjinn.acc_total(0).label('uncleared')).filter().first()
+    accsums = Money_account.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
+                                            func.mjinn.acc_total(0).label('uncleared')).filter().first()
 
     return moneydets, accsums
 
@@ -86,8 +86,8 @@ def get_moneyitems(id):
              .filter(*income_filter)) \
              .order_by(desc(Money_item.date), desc(Income.date), Money_item.memo, Incomealloc.rentcode).limit(100)
 
-    accsums = Money_item.query.with_entities(func.samjinn.acc_balance(id, 1, date.today()).label('cbalance'),
-                 func.samjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
+    accsums = Money_item.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()).label('cbalance'),
+                 func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
 
     return accsums, moneyitems, values
 

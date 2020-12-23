@@ -28,7 +28,7 @@ def update_arrears(rent):
 
 # Arguments for next_rent_date: (rentid int, rentype int, periods int) RETURNS list of dates
 def update_last_rent_date(rent):
-    rent.lastrentdate = db.session.execute(func.samjinn.next_rent_date(rent.id, 1, 1)).scalar()
+    rent.lastrentdate = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
 
 
 def check_or_add_recovery_charge(rentobj):
@@ -40,7 +40,7 @@ def check_or_add_recovery_charge(rentobj):
 
 
 # def check_charge_exists(rent_id, charge_type_id, charge_total):
-#     return True if db.session.execute(func.samjinn.check_charge_exists(rent_id,
+#     return True if db.session.execute(func.mjinn.check_charge_exists(rent_id,
 #                                                                      charge_type_id,
 #                                                                      charge_total)).scalar() == 1 else False
 
@@ -84,7 +84,7 @@ def determine_charges_suffix(rentobj):
     pr_exists = check_previous_pr_exists(rentobj.id)
     last_recovery_level = get_last_recovery_level(rentobj.id) if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
-    oldest_charge_date = db.session.execute(func.samjinn.oldest_charge(rentobj.id)).scalar()
+    oldest_charge_date = db.session.execute(func.mjinn.oldest_charge(rentobj.id)).scalar()
     charge_90_days = oldest_charge_date and datetime.date.today() - oldest_charge_date > datetime.timedelta(90)
     return get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, charge_90_days)
 
@@ -128,7 +128,7 @@ def check_previous_pr_exists(rent_id):
 
 
 def get_last_recovery_level(rent_id):
-    last_recovery_level = db.session.execute(func.samjinn.last_recovery_level(rent_id)).scalar()
+    last_recovery_level = db.session.execute(func.mjinn.last_recovery_level(rent_id)).scalar()
     return last_recovery_level
 
 

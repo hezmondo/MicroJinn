@@ -4,14 +4,14 @@
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <!-- css files -- bootstrap first then mninn -->
+        <!-- css files -- bootstrap first then mjinn -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
         <link rel="stylesheet" href="{{ url_for('static', filename='samjinn.css') }}">
     </head>
     {% block navbar %}
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light" style=" background-color: #ededed;">
-            <a class="navbar-brand" href="{{ url_for('main.index', action='view') }}">mjinn</a>
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">mjinn</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
