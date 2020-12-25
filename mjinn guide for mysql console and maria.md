@@ -1,8 +1,10 @@
-### Basic localhost mysql commands in the terminal and in a windows mysql console
+### running mysql commands in linux terminal or windows mysql console - last updated 25 Dec 2020
 
-These instructions are for Linux but most of this works fine in a powershell window in Windows
+These instructions are for linux but most of this works fine in a powershell window in Windows
 
-Open a terminal anywhere, **if you cannot get into MySQL 8.0 as root (unknown) password, see latest advice below**
+Open a terminal anywhere 
+
+**if you cannot get into MySQL 8.0 as root (unknown) password, see latest advice below**
 
 I read somewhere that you should **not really use root to connect to MySQL server**. It is good practice to create a new user (such as peter or roger) with typical DBA privileges and a suitable password, to use to connect from Jinn and into workbench.
 
@@ -114,7 +116,7 @@ Login to the MySQL shell (see detailed instructions above) and run this command:
 
 ### If you need to get into MySQL server as root and you do not know your password:
 
-It seems that in Ubuntu 18.04, Mint 19 and Ubuntu 20.04, you cannot log onto the MySQL server as root in Workbench without first opening a terminal anywhere and executing these commands to either set for the first time, or to re-set a new password for root. **I suggest you use a reasonable password for root and write it down - eg Pete123456P** 
+**For mysql server prior to 8**: open a terminal anywhere and execute these commands to either set for the first time, or to re-set a new password for root. **I suggest you use a reasonable password for root and write it down - eg Pete123456P** 
 
 	sudo mysql -u root
 	
@@ -122,29 +124,74 @@ It seems that in Ubuntu 18.04, Mint 19 and Ubuntu 20.04, you cannot log onto the
 	
 	sudo service mysql restart
 
-It seems clear that this function (and the soluction above) was removed in MySQL 8.0.11
+**For mysql server 8 on**:
+First option using skip-grant-tables mode
 
-First option - if you in skip-grant-tables mode
+In order to skip the grant tables and reset the root password, we must first stop the MySQL service. Enter your Linux password if prompted.
 
-in mysqld_safe:
+    sudo /etc/init.d/mysql stop
+
+Ensure the directory /var/run/mysqld exists and correct owner set.
+
+    sudo mkdir /var/run/mysqld
+
+    sudo chown mysql /var/run/mysqld
+
+Now start MySQL with the --skip-grant-tables option. The & is required here.
+
+    sudo mysqld_safe --skip-grant-tables&
+
+You should see something similar to this:
+
+[1] 1283
+user@server:~$ 2019-02-12T11:15:59.872516Z mysqld_safe Logging to syslog.
+2019-02-12T11:15:59.879527Z mysqld_safe Logging to '/var/log/mysql/error.log'.
+2019-02-12T11:15:59.922502Z mysqld_safe Starting mysqld daemon with databases from /var/lib/m
+    sudo service mysql stop
+
+Now press ENTER to return to the Linux BASH prompt.
+
+You can now log in to the MySQL root account without a password.
+
+    sudo mysql --user=root mysql
+
+Once logged in, you will see the mysql> prompt.
 
     UPDATE mysql.user SET authentication_string=null WHERE User='root';
-    FLUSH PRIVILEGES;
-    exit;
 
-and then, in terminal:
+    flush privileges;
 
-    mysql -u root
+Replace your_password_here with your own. (Generate a strong password here)
 
-in mysql:
+    ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password_here';
 
-ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'yourpasswd';
+Flush privileges again.
 
-Second option - not in skip-grant-tables mode
+    flush privileges;
 
-just in mysql:
+Exit MySQL with "exit".
 
-    ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'yourpasswd';
+Now make sure all MySQL processes are stopped before starting the service again.
+
+    sudo killall -u mysql
+
+If you see a message similar to below, press ENTER to continue.
+
+2020-05-30T07:23:38.547616Z mysqld_safe mysqld from pid file /var/lib/mysql/ubuntu.pid ended
+
+Now start MySQL again.
+
+    sudo /etc/init.d/mysql start
+
+Log in to MySQL again and you should now be prompted for a password.
+
+    sudo mysql -p -u root
+
+Enter your MySQL root password. If correct, you should see something like:
+
+Welcome to the MySQL monitor.
+
+Now you are good to go!
 
 posts on this problem:
 
@@ -154,15 +201,8 @@ I got ERROR 1146 (42S02): Table 'mysql.role_edges' doesn't exist so I had to do 
 
 I had to use mysql_native_password instead of caching_sha2_password for this to work: ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'yourpasswd';. Not sure why
 
-### Old advice for MyQL before 8.0  to set password to Pete123456P: 
 
-	sudo mysql -u root
-	
-	=> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Pete123456P';
-	
-	sudo service mysql restart
 
-    
 ### Configure remote access to MySQL / MariaDB Databases
 
 This brief tutorial shows students and new users how to configure remote access to MySQL or MariaDB database servers on Ubuntu 18.04 systems. When configured correctly, you will be able to connect to the database servers from a remote system on the same network.
