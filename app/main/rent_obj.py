@@ -191,39 +191,55 @@ def get_property(id):
 def get_rentobjs(name):
     qfilter = []
     filter_dict = {
-        "rentcode": "one",
-        "agentdetails": "one",
-        "propaddr": "one",
-        "source": "one",
-        "tenantname": "one"
+        "rentcode": "",
+        "agentdetails": "",
+        "propaddr": "",
+        "source": "",
+        "tenantname": ""
     }
     if request.method == "GET":
         id_list = get_idlist_recent("recent_rents")
         qfilter.append(Rent.id.in_(id_list))
     if name != "basic":
-        add_dict = {
-            "actype": "many",
-            "arrears": "one",
-            "enddate": "one",
-            "filtername": "all",
-            "landlord": "many",
-            "prdelivery": "many",
-            "rentpa": "one",
-            "rentperiods": "one",
-            "runsize": "one",
-            "salegrade": "many",
-            "status": "many",
-            "tenure": "many"
+        dict_2 = {
+            "actype": "",
+            "arrears": "",
+            "enddate": "",
+            "filtername": "",
+            "landlord": "",
+            "prdelivery": "",
+            "rentpa": "",
+            "rentperiods": "",
+            "runsize": "",
+            "salegrade": "",
+            "status": "",
+            "tenure": ""
         }
-        filter_dict = {**filter_dict, **add_dict}
-    for key, value in filter_dict.items():
-        actval = ""
-        if value == "one":
-            actval = request.form.get("{}".format(key)) or ""
-        elif value == "many":
-            actval = request.form.getlist("{}".format(key)) or "all"
-        qfilter = filter_input(qfilter, key, actval)
-        filter_dict[key] = actval
+        filter_dict = {**filter_dict, **dict_2}
+        for key, value in filter_dict.items():
+            if key in("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
+                actval = request.form.getlist("{}".format(key)) or "all"
+            else:
+                actval = request.form.get("{}".format(key)) or ""
+            qfilter = filter_input(qfilter, key, actval)
+            filter_dict[key] = actval
+    if name == "save":
+        jname = filter_dict.get("filtername", "queryall")
+        j_id = \
+            Jstore.query.with_entities(Jstore.id).filter \
+                (Jstore.name == jname).one_or_none()
+        if j_id:
+            j_id = j_id[0]
+            jstore = Jstore.query.get(j_id)
+            jstore.name = jname
+            jstore.content = json.dumps(filter_dict)
+            db.session.commit()
+        else:
+            jstore = Jstore()
+            jstore.name = jname
+            jstore.content = json.dumps(filter_dict)
+            db.session.add(jstore)
+        db.session.commit()
     print(qfilter)
     rentprops = getrentobjs(qfilter, name, 100)
     print(filter_dict)
@@ -245,14 +261,24 @@ def filter_input(filter, key, value):
         filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
     elif key == "actype" and value != "" and "all" not in value:
         filter.append(Typeactype.actypedet.in_('{}'.format(value)))
-    elif key == "agentdetails" and value != "":
-        filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
     elif key == "arrears" and value != "":
         filter.append(Rent.arrears == strToDec('{}'.format(value)))
     elif key == "enddate" and value != "":
         filter.append(Rent.lastrentdate <= '{}'.format(value))
     elif key == "landlord" and value != "" and "all" not in value:
         filter.append(Landlord.landlordname.in_('{}'.format(value)))
+    elif key == "prdelivery" and value != "":
+        filter.append(Typeprdelivery.prdeliverydet.in_('{}'.format(value)))
+    elif key == "rentpa" and value != "":
+        filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+    elif key == "rentperiods" and value != "":
+        filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+    elif key == "salegrade" and value != "":
+        filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
+    elif key == "status" and value != "":
+        filter.append(Typestatus.statusdet.in_('{}'.format(value)))
+    elif key == "tenure" and value != "":
+        filter.append(Typetenure.tenuredet.in_('{}'.format(value)))
 
     return filter
 

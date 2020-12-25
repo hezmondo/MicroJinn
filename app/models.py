@@ -215,8 +215,9 @@ class Jstore(db.Model):
     __tablename__ = 'jstore'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30))
-    content = db.Column(db.String(900))
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(90), nullable=True)
+    content = db.Column(db.Text)
 
 
 class Landlord(db.Model):

@@ -516,7 +516,10 @@ def queries():
     landlords, statusdets, tenuredets = get_queryoptions_common()
     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
 
-    filter_dict, rentprops = get_rentobjs("advanced")
+    if action == "save":
+        filter_dict, rentprops = get_rentobjs("save")
+    else:
+        filter_dict, rentprops = get_rentobjs("advanced")
 
     return render_template('queries.html', action=action, landlords=landlords, statusdets=statusdets,
                             tenuredets=tenuredets, actypedets=actypedets, floads=floads, options=options,
