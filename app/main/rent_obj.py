@@ -6,7 +6,6 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, redirect, url_for, request, session
 from flask_login import current_user, login_required
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
-from app.main.common import get_combos_common
 from app.main.functions import commit_to_database, dateToStr, strToDate, strToDec
 
 from app.models import Agent, Charge, Chargetype, Extmanager, Extrent, Jstore, Landlord, Lease, Lease_uplift_type, \
@@ -39,7 +38,7 @@ def get_agent(id):
 
     return agent
 
-# TODO: Do we need chargedesc?
+
 # charges
 def get_charge(id):
     rentcode = request.args.get('rentcode', "XNEWX" , type=str)
@@ -188,24 +187,27 @@ def get_property(id):
 
 
 # rent object and associated queries
-def get_rentobjs(name):
+def get_rentobjs(action, filtername):
+    # if filtername and filtername != ""
     qfilter = []
-    filter_dict = {
+    filterdict = {
         "rentcode": "",
         "agentdetails": "",
         "propaddr": "",
         "source": "",
         "tenantname": ""
     }
-    if request.method == "GET":
+    if action == "basic" and request.method == "GET":
         id_list = get_idlist_recent("recent_rents")
         qfilter.append(Rent.id.in_(id_list))
-    if name != "basic":
+    if action not in ("basic", "external"):
         dict_2 = {
             "actype": "",
+            "agentmailto": "",
             "arrears": "",
+            "charges": "",
+            "emailable": "",
             "enddate": "",
-            "filtername": "",
             "landlord": "",
             "prdelivery": "",
             "rentpa": "",
@@ -215,36 +217,38 @@ def get_rentobjs(name):
             "status": "",
             "tenure": ""
         }
-        filter_dict = {**filter_dict, **dict_2}
-        for key, value in filter_dict.items():
-            if key in("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
-                actval = request.form.getlist("{}".format(key)) or "all"
-            else:
-                actval = request.form.get("{}".format(key)) or ""
+        filterdict = {**filterdict, **dict_2}
+    for key, value in filterdict.items():
+        if key in ("actype", "agentmailto", "charges", "landlord", "prdelivery", "salegrade", "status", "tenure"):
+            actval = request.form.getlist("{}".format(key)) or ""
+        else:
+            actval = request.form.get("{}".format(key)) or ""
+        if actval and actval != "" and "all" not in actval:
             qfilter = filter_input(qfilter, key, actval)
-            filter_dict[key] = actval
-    if name == "save":
-        jname = filter_dict.get("filtername", "queryall")
+        filterdict[key] = actval
+    rentprops = getrentobjs(qfilter, action, 100)
+    print(filterdict)
+    if action == "save":
+        jname = request.form.get("filtername")
         j_id = \
             Jstore.query.with_entities(Jstore.id).filter \
-                (Jstore.name == jname).one_or_none()
+                (Jstore.code == jname).one_or_none()
         if j_id:
             j_id = j_id[0]
             jstore = Jstore.query.get(j_id)
-            jstore.name = jname
-            jstore.content = json.dumps(filter_dict)
+            jstore.code = jname
+            jstore.content = json.dumps(filterdict)
             db.session.commit()
         else:
             jstore = Jstore()
-            jstore.name = jname
-            jstore.content = json.dumps(filter_dict)
+            jstore.code = jname
+            jstore.content = json.dumps(filterdict)
             db.session.add(jstore)
         db.session.commit()
-    print(qfilter)
-    rentprops = getrentobjs(qfilter, name, 100)
-    print(filter_dict)
-
-    return filter_dict, rentprops
+        #
+        # return redirect("/queries/?filtername={}".format(jname))
+    else:
+        return filterdict, rentprops
 
 
 def filter_input(filter, key, value):
@@ -261,30 +265,43 @@ def filter_input(filter, key, value):
         filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
     elif key == "actype" and value != "" and "all" not in value:
         filter.append(Typeactype.actypedet.in_('{}'.format(value)))
+    elif key == "agentmailto" and value == "exclude":
+        filter.append(Rent.mailto_id.notin_(1, 2))
+    elif key == "agentmailto" and value == "only":
+        filter.append(Rent.mailto_id.in_(1, 2))
     elif key == "arrears" and value != "":
         filter.append(Rent.arrears == strToDec('{}'.format(value)))
+    # get to this when I do
+    # elif key == "charges" and value == "exclude":
+    #     filter.append(Rent.mailto_id.notin_(1, 2))
+    # elif key == "charges" and value == "only":
+    #     filter.append(Rent.mailto_id.in_(1, 2))
+    # elif key == "emailable" and value == "exclude":
+    #     filter.append(Rent.mailto_id.notin_(1, 2))
+    # elif key == "emailable" and value == "only":
+    #     filter.append(Rent.mailto_id.in_(1, 2))
     elif key == "enddate" and value != "":
-        filter.append(Rent.lastrentdate <= '{}'.format(value))
+        filter.append(Rent.lastrentdate <= strToDate('{}'.format(value)))
     elif key == "landlord" and value != "" and "all" not in value:
         filter.append(Landlord.landlordname.in_('{}'.format(value)))
-    elif key == "prdelivery" and value != "":
+    elif key == "prdelivery" and value != "" and "all" not in value:
         filter.append(Typeprdelivery.prdeliverydet.in_('{}'.format(value)))
     elif key == "rentpa" and value != "":
         filter.append(Rent.rentpa == strToDec('{}'.format(value)))
     elif key == "rentperiods" and value != "":
         filter.append(Rent.rentpa == strToDec('{}'.format(value)))
-    elif key == "salegrade" and value != "":
+    elif key == "salegrade" and value != "" and "all" not in value:
         filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
-    elif key == "status" and value != "":
+    elif key == "status" and value != "" and "all" not in value:
         filter.append(Typestatus.statusdet.in_('{}'.format(value)))
-    elif key == "tenure" and value != "":
+    elif key == "tenure" and value != "" and "all" not in value:
         filter.append(Typetenure.tenuredet.in_('{}'.format(value)))
 
     return filter
 
 
-def getrentobjs(qfilter, name, runsize):
-    if name == "external":
+def getrentobjs(qfilter, action, runsize):
+    if action == "external":
         rentobjs = \
             Extrent.query \
             .join(Extmanager) \
@@ -294,7 +311,7 @@ def getrentobjs(qfilter, name, runsize):
             .filter(*qfilter) \
             .limit(runsize).all()
 
-    elif name == "advanced":
+    elif action == "advanced":
         rentobjs = \
                 Property.query \
                     .join(Rent) \
@@ -329,54 +346,6 @@ def getrentobjs(qfilter, name, runsize):
                 .limit(runsize).all()
 
     return rentobjs
-
-
-def get_rentobjs_filter(id):
-    qfilter = []
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-    returns = Pr_filter.query.with_entities(Pr_filter.filter).filter(Pr_filter.id == id)[0][0]
-    print(returns)
-    returns = json.loads(returns)
-    agentdetails = returns["agd"]
-    actype = returns["act"]
-    arrears = returns["arr"]
-    landlord = returns["lld"]
-    prdelivery = returns["prd"]
-    propaddr = returns["pop"]
-    rentcode = returns["rcd"]
-    rentpa = returns["rpa"]
-    rentperiods = returns["rpd"]
-    salegrade = returns["sal"]
-    status = returns["sta"]
-    source = returns["soc"]
-    tenantname = returns["tna"]
-    tenure = returns["ten"]
-    enddate = date.today() + relativedelta(days=45)
-    qfilter.append(func.mjinn.next_rent_date(Rent.id, 1, 1) < "{}".format(enddate))
-    if rentcode and rentcode != "":
-        qfilter.append(Rent.rentcode.startswith([rentcode]))
-    if actype and actype != actypedets and actype[0] != "all actypes":
-        qfilter.append(Typeactype.actypedet.in_(actype))
-    if arrears and arrears != "":
-        qfilter.append(text("Rent.arrears {}".format(arrears)))
-    if landlord and landlord != landlords and landlord[0] != "all landlords":
-        qfilter.append(Landlord.landlordname.in_(landlord))
-    if prdelivery and prdelivery != prdeliveries and prdelivery != "":
-        qfilter.append(Typeprdelivery.prdeliverydet.in_(prdelivery))
-    if rentpa and rentpa != "":
-        qfilter.append(text("Rent.rentpa {}".format(rentpa)))
-    if rentperiods and rentperiods != "":
-        qfilter.append(text("Rent.rentperiods {}".format(rentperiods)))
-    if salegrade and salegrade != salegradedets and salegrade[0] != "all salegrades":
-        qfilter.append(Typesalegrade.salegradedet.in_(salegrade))
-    if status and status != statusdets and status[0] != "all statuses":
-        qfilter.append(Typestatus.statusdet.in_(status))
-    if tenure and tenure != tenuredets and tenure[0] != "all tenures":
-        qfilter.append(Typetenure.tenuredet.in_(tenure))
-    rentprops = getrentobjs(qfilter, "advanced", 300)
-
-    return rentprops
 
 
 def getrentobj_main(id):
@@ -421,37 +390,6 @@ def getrentobj_main(id):
             .all()
 
     return rentobj, properties
-
-
-def get_combos_rentonly():
-    # This function returns the list values for various comboboxes used only by rents
-    actypedets = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
-    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
-    mailtodets = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
-    salegradedets = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-
-    return actypedets, deedcodes, mailtodets, salegradedets
-
-
-def get_queryoptions_common():
-    # return options for common multiple choice controls in home page and queries page
-    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
-    landlords.insert(0, "all landlords")
-    statusdets.insert(0, "all statuses")
-    tenuredets.insert(0, "all tenures")
-
-    return landlords, statusdets, tenuredets
-
-def get_queryoptions_advanced():
-    # return options for advanced multiple choice controls in home page and queries page
-    actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
-    salegradedets.insert(0, "all salegrades")
-    actypedets.insert(0, "all actypes")
-    floads = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    options = ("Include", "Exclude", "Only")
-
-    return actypedets, floads, options, prdeliveries, salegradedets
 
 
 def get_idlist_recent(recent_field):

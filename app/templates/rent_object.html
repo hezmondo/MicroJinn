@@ -12,7 +12,7 @@
         </div>
         <div class="col-md-5">
             <label for="landlord">landlord:</label>
-            {{ widgets.combobox(name="landlord", items=landlords, item_selected=rentobj.landlordname) }}
+            {{ widgets.combobox(name="landlord", items=combodict.landlords, item_selected=rentobj.landlordname) }}
         </div>
         <div class="col-md-5">
             <label for="tenant">tenant name:</label>
@@ -54,7 +54,7 @@
     <div class="form-group row">
         <div class="col-md-4">
             <label for="mailto">mail to:</label>
-            {{ widgets.combobox(name="mailto", items=mailtodets, item_selected=rentobj.mailtodet) }}
+            {{ widgets.combobox(name="mailto", items=combodict.mailtodets, item_selected=rentobj.mailtodet) }}
         </div>
         <div class="col-md-8">
             <label for="agent">agent:</label>
@@ -86,15 +86,15 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="frequency">frequency:</label>
-            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rentobj.freqdet) }}
+            {{ widgets.combobox(name="frequency", items=combodict.freqdets, item_selected=rentobj.freqdet) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">account type:</label>
-            {{ widgets.combobox(name="actype", items=actypedets, item_selected=rentobj.actypedet) }}
+            {{ widgets.combobox(name="actype", items=combodict.actypedets, item_selected=rentobj.actypedet) }}
         </div>
         <div class="col-md-3">
             <label for="advarr">advance or arrears:</label>
-            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rentobj.advarrdet) }}
+            {{ widgets.combobox(name="advarr", items=combodict.advarrdets, item_selected=rentobj.advarrdet) }}
         </div>
         <div class="form-group col-md-3">
             <label for="datecode">date code:</label>
@@ -104,7 +104,7 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="tenure">tenure:</label>
-            {{ widgets.combobox(name="tenure", items=tenuredets, item_selected=rentobj.tenuredet) }}
+            {{ widgets.combobox(name="tenure", items=combodict.tenuredets, item_selected=rentobj.tenuredet) }}
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
@@ -112,11 +112,11 @@
         </div>
         <div class="col-md-2">
             <label for="deedtype">deed type:</label>
-            {{ widgets.combobox(name="deedtype", items=deedcodes, item_selected=rentobj.deedcode) }}
+            {{ widgets.combobox(name="deedtype", items=combodict.deedcodes, item_selected=rentobj.deedcode) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">sale grade:</label>
-            {{ widgets.combobox(name="salegrade", items=salegradedets, item_selected=rentobj.salegradedet) }}
+            {{ widgets.combobox(name="salegrade", items=combodict.salegradedets, item_selected=rentobj.salegradedet) }}
         </div>
         <div class="col-md-2">
             <label for="price">price:</label>
@@ -124,7 +124,7 @@
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>
-            {{ widgets.combobox(name="status", items=statusdets, item_selected=rentobj.statusdet) }}
+            {{ widgets.combobox(name="status", items=combodict.statusdets, item_selected=rentobj.statusdet) }}
         </div>
     </div>
     <div class="form-group row flex-row-reverse">

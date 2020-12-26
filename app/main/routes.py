@@ -5,7 +5,7 @@ from flask_login import login_required
 from io import BytesIO
 from app import db
 from app.main import bp
-from app.main.common import get_combos_common
+from app.main.common import get_combodict
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.functions import backup_database
@@ -17,10 +17,9 @@ from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incob
     get_inc_options, post_inc_obj
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     post_moneyaccount, post_moneyitem
-from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_combos_rentonly, \
-    get_externalrent, get_landlord, get_landlord_extras, get_landlords, get_lease, get_leases, get_property, \
-    get_queryoptions_common, get_queryoptions_advanced, getrentobj_main, get_rentobjs, \
-    get_rentobjs_filter, post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
+from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_externalrent, get_landlord, \
+        get_landlord_extras, get_landlords, get_lease, get_leases, get_property, getrentobj_main, get_rentobjs, \
+        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
 from app.main.writemail import writeMail, write_payrequest
 from app.main.payrequests import forward_rents
 from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
@@ -134,7 +133,7 @@ def email_account(id):
 
 @bp.route('/external_rents', methods=['GET', 'POST'])
 def external_rents():
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs_basic("external")
+    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs("external", None)
 
     return render_template('external_rents.html', agentdetails=agentdetails, propaddr=propaddr, rentcode=rentcode,
                            source=source, tenantname=tenantname, rentprops=rentprops)
@@ -230,9 +229,9 @@ def income_post(id):
 @login_required
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    filter_dict, rentprops = get_rentobjs("basic")
+    filterdict, rentprops = get_rentobjs("basic", "all")
 
-    return render_template('home.html', filter_dict=filter_dict, rentprops=rentprops)
+    return render_template('home.html', filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
@@ -279,12 +278,7 @@ def leases():
 
 @bp.route('/load_filter', methods=['GET', 'POST'])
 def load_filter():
-    if request.method == "POST":
-        filter_name = request.form.get("filtername")
-
-        return redirect("/queries/?filtername={}".format(filter_name))
-
-    jfilters = [value for (value,) in Jstore.query.with_entities(Jstore.name).all()]
+    jfilters = Jstore.query.all()
 
     return render_template('load_filter.html', jfilters=jfilters)
 
@@ -419,23 +413,15 @@ def payrequests():
     action = request.args.get('action', "view", type=str)
     name = request.args.get('name', "queryall", type=str)
 
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+    combodict = get_combodict("advanced")
 
-    actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
+    filterdict, rentprops = get_rentobjs(action, name)
 
     # TODO: forward rents using ajax so that the page needn't be reloaded
     if action == "run":
         forward_rents(rentprops)
 
-    return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
-                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
-                           arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
-                           propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
-                           runsize=runsize, salegrade=salegrade, source=source, status=status,
-                           tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+    return render_template('payrequests.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
@@ -470,16 +456,10 @@ def pr_edit(id):
 @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
 @login_required
 def pr_main(id):
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    if id == 0:
-        rentprops = get_rentobjs_filter(1)
-    else:
-        rentprops = get_rentobjs_filter(id)
+    combodict = get_combodict("advanced")
+    filterdict, rentprops = get_rentobjs("payrequest", id)
 
-    return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
-                           prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
-                           statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
+    return render_template('pr_main.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/pr_start', methods=['GET', 'POST'])
@@ -512,19 +492,12 @@ def property(id):
 
 @bp.route('/queries/', methods=['GET', 'POST'])
 def queries():
-    action = request.args.get('action', "view", type=str)
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+    action = request.args.get('action', "advanced", type=str)
+    filtername = request.args.get('filtername', "ALLN", type=str)
+    combodict = get_combodict("advanced")
+    filterdict, rentprops = get_rentobjs(action, filtername)
 
-    if action == "save":
-        filter_dict, rentprops = get_rentobjs("save")
-    else:
-        filter_dict, rentprops = get_rentobjs("advanced")
-
-    return render_template('queries.html', action=action, landlords=landlords, statusdets=statusdets,
-                            tenuredets=tenuredets, actypedets=actypedets, floads=floads, options=options,
-                            prdeliveries=prdeliveries, salegradedets=salegradedets, filter_dict=filter_dict,
-                            rentprops=rentprops)
+    return render_template('queries.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])
@@ -565,27 +538,16 @@ def rent_object(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         postrentobj(id)
-    else:
-        pass
-
+    combodict = get_combodict("basic")
     rentobj, properties = getrentobj_main(id)
     charges = get_charges(id)
-    # owingstat = owingstat(rentobj, charges)
-
-    actypedets, deedcodes, mailtodets, salegradedets = get_combos_rentonly()
-    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
-
-    # if not session['mailtodets']:
-    #   session['mailtodets'] = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
     session['mailtodet'] = rentobj.mailtodet
     session['mailaddr'] = rentobj.mailaddr
     session['propaddr'] = rentobj.propaddr
     session['tenantname'] = rentobj.tenantname
 
-    return render_template('rent_object.html', action=action, rentobj=rentobj,
-                           properties=properties, actypedets=actypedets, advarrdets=advarrdets, charges=charges,
-                           deedcodes=deedcodes, freqdets=freqdets, landlords=landlords, mailtodets=mailtodets,
-                           salegradedets=salegradedets, statusdets=statusdets, tenuredets=tenuredets)
+    return render_template('rent_object.html', action=action, charges=charges, rentobj=rentobj, properties=properties,
+                           combodict=combodict)
 
 
 @bp.route('/save_html', methods=['GET', 'POST'])
