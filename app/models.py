@@ -420,7 +420,7 @@ class Pr_filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
     description = db.Column(db.String(90), nullable=True)
-    filter = db.Column(db.String(900))
+    content = db.Column(db.Text)
 
 
 class Pr_form(db.Model):

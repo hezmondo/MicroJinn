@@ -33,13 +33,9 @@ def get_combodict(type):
         "options": options
     }
     if type == "enhanced":
-        # add "all" as an option to allow this choice in certain filters
+        # add "all" as an option for filters allowing selection of more than one value
         actypes.insert(0, "all actypes")
-        # advarrdets.insert(0, "all advarrdets")
-        # deedcodes.insert(0, "all deedcodes")
-        # freqdets.insert(0, "all freqdets")
         landlords.insert(0, "all landlords")
-        # mailtodets.insert(0, "all mailtodets")
         prdeliveries.insert(0, "all prdeliveries")
         salegrades.insert(0, "all salegrades")
         statuses.insert(0, "all statuses")

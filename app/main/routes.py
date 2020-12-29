@@ -133,18 +133,17 @@ def email_account(id):
 
 @bp.route('/external_rents', methods=['GET', 'POST'])
 def external_rents():
-    agentdetails, propaddr, rentcode, source, tenantname, rentprops = get_rentobjs("external", None)
+    filterdict, rentprops = get_rentobjs("external", 0)
 
-    return render_template('external_rents.html', agentdetails=agentdetails, propaddr=propaddr, rentcode=rentcode,
-                           source=source, tenantname=tenantname, rentprops=rentprops)
+    return render_template('external_rents.html', filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/external_rent/<int:id>', methods=["GET"])
 @login_required
 def external_rent(id):
-    externalrent = get_externalrent(id)
+    external_rent = get_externalrent(id)
 
-    return render_template('external_rent.html', externalrent=externalrent)
+    return render_template('external_rent.html', external_rent=external_rent)
 
 
 @bp.route('/formletter/<int:id>', methods=['GET', 'POST'])
@@ -278,6 +277,7 @@ def leases():
 
 @bp.route('/load_filter', methods=['GET', 'POST'])
 def load_filter():
+    # load predefined filters from jstore for queries and payrequests
     jfilters = Jstore.query.all()
 
     return render_template('load_filter.html', jfilters=jfilters)
@@ -492,9 +492,12 @@ def property(id):
 
 @bp.route('/queries/<int:id>', methods=['GET', 'POST'])
 def queries(id):
+    # allows the user to obtain a selection of rent objects using multiple filter inputs
     action = request.args.get('action', "advanced", type=str)
     combodict = get_combodict("enhanced")
+    #gather combobox values, with "all" added as an option, in a dictionary
     filterdict, rentprops = get_rentobjs(action, id)
+    #gather filter values and selected rent objects in two dictionaries
 
     return render_template('queries.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 

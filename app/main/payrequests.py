@@ -9,26 +9,23 @@ import datetime
 
 
 def forward_rents(rentprops):
+    update_vals = []
     for rent_prop in rentprops:
-        forward_rent(rent_prop.id)
-
-
-def forward_rent(rent_id):
-    rent = Rent.query.get(rent_id)
-    update_last_rent_date(rent)
-    update_arrears(rent)
+        update_vals.append(forward_rent(rent_prop.id, True))
+    db.session.bulk_update_mappings(Rent, update_vals)
     commit_to_database()
 
 
-def update_arrears(rent):
-    previous_arrears = rent.arrears
-    rent_gale = rent.rentpa / rent.freq_id
-    rent.arrears = previous_arrears + rent_gale
-
-
-# Arguments for next_rent_date: (rentid int, rentype int, periods int) RETURNS list of dates
-def update_last_rent_date(rent):
-    rent.lastrentdate = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
+def forward_rent(rent_id, from_batch=False):
+    rent = Rent.query.get(rent_id)
+    last_rent_date = db.session.execute(func.samjinn.next_rent_date(rent_id, 1, 1)).scalar()
+    arrears = rent.arrears + (rent.rentpa / rent.freq_id)
+    if not from_batch:
+        rent.lastrentdate = last_rent_date
+        rent.arrears = arrears
+        commit_to_database()
+    else:
+        return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
 def check_or_add_recovery_charge(rentobj):
@@ -37,12 +34,6 @@ def check_or_add_recovery_charge(rentobj):
     if recovery_charge_amount != 0:
         if not check_charge_exists(rentobj.id, 10, recovery_charge_amount):
             add_charge(rentobj.id, recovery_charge_amount, 10)
-
-
-# def check_charge_exists(rent_id, charge_type_id, charge_total):
-#     return True if db.session.execute(func.mjinn.check_charge_exists(rent_id,
-#                                                                      charge_type_id,
-#                                                                      charge_total)).scalar() == 1 else False
 
 
 def check_charge_exists(rent_id, charge_type_id, charge_total):
@@ -69,6 +60,7 @@ def get_payrequest_table_charges(rent_id):
     return charge_table_items, total_charges
 
 
+# TODO: Decide if database queries should have their own module (probably)
 def get_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
@@ -84,7 +76,7 @@ def determine_charges_suffix(rentobj):
     pr_exists = check_previous_pr_exists(rentobj.id)
     last_recovery_level = get_last_recovery_level(rentobj.id) if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
-    oldest_charge_date = db.session.execute(func.mjinn.oldest_charge(rentobj.id)).scalar()
+    oldest_charge_date = db.session.execute(func.samjinn.oldest_charge(rentobj.id)).scalar()
     charge_90_days = oldest_charge_date and datetime.date.today() - oldest_charge_date > datetime.timedelta(90)
     return get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, charge_90_days)
 
@@ -128,7 +120,7 @@ def check_previous_pr_exists(rent_id):
 
 
 def get_last_recovery_level(rent_id):
-    last_recovery_level = db.session.execute(func.mjinn.last_recovery_level(rent_id)).scalar()
+    last_recovery_level = db.session.execute(func.samjinn.last_recovery_level(rent_id)).scalar()
     return last_recovery_level
 
 
@@ -140,49 +132,6 @@ def get_rent_statement(rentobj, rent_type):
 def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
     statement = "Unpaid {0} is owing for the period {1} to {2}:".format(rent_type, arrears_start_date, arrears_end_date)
     return statement
-
-
-# Code to build PR tables
-# Format the currency column
-# class CurrencyCol(Col):
-#     def td_format(self, content):
-#         content = float(content)
-#         # locale.setlocale(locale.LC_NUMERIC, '')
-#         return "£{:,.2f}".format(content)
-#
-#
-# class PayRequestItem(object):
-#     def __init__(self, details, amount):
-#         self.details = details
-#         self.amount = amount
-#
-#     # identify the 'total amount' row
-#     def important(self):
-#         return self.details.lower().find("total amount") != -1
-#
-#
-# class PayRequestTable(Table):
-#     classes = ['pr_table']
-#     details = Col('Details')
-#     amount = CurrencyCol(
-#         'Amount',
-#         td_html_attrs={
-#             'class': 'amount-class'},
-#     )
-#
-#     # assign a class to the 'total' row so we can style it with css
-#     def get_tr_attrs(self, payrequest_item):
-#         if payrequest_item.important():
-#             return {'class': 'total'}
-#         else:
-#             return {}
-
-
-# def build_pr_table(list_amounts):
-    # items = []
-    # for key in list_amounts:
-    #     items.append(PayRequestItem(key, list_amounts[key]))
-    # return items
 
 
 class RecoveryLevel:

@@ -186,9 +186,10 @@ def get_property(id):
     return property, proptypedets
 
 
-# get filter dictionary and filtered rent objects
 def get_rentobjs(action, id):
+    # get filter dictionary and filtered rent objects
     qfilter = []
+    # simple filter dictionary for home page
     dict_basic = {
         "rentcode": "",
         "agentdetails": "",
@@ -196,6 +197,7 @@ def get_rentobjs(action, id):
         "source": "",
         "tenantname": ""
     }
+    # more complex filter dictionary for queries and payrequest pages
     dict_plus = {
         "actype": ["all actypes"],
         "agentmailto": "include",
@@ -214,20 +216,24 @@ def get_rentobjs(action, id):
     }
     filterdict = dict_basic if action in ("basic", "external") else {**dict_basic, **dict_plus}
     if action == "load":
+        # load predefined filter dictionary from jstore or pr_filter
         jdict = Jstore.query.with_entities(Jstore.content).filter(Jstore.id == id).one_or_none()[0]
         jdict = json.loads(jdict)
         for key, value in jdict.items():
             filterdict[key] = value
         print ("filterdict after load")
         action = "advanced"
+    # for home page on "get"" visit we load the last 30 rents visited by this user
     if action == "basic" and request.method == "GET":
         id_list = get_idlist_recent("recent_rents")
         qfilter = [Rent.id.in_(id_list)]
     else:
-        qfilter, filterdict = get_qfilter(filterdict)
+        # now we construct the actual sqlalchemy filter using this filter dictionary
+        qfilter, filterdict = get_qfilter(filterdict, action)
         print("filterdict after qfilter done")
         print(filterdict)
     if action == "save":
+        # save this filter dictionary in either jstore or pr_filter
         print("filterdict during save")
         print(filterdict)
         jname = request.form.get("filtername")
@@ -247,12 +253,14 @@ def get_rentobjs(action, id):
             db.session.add(jstore)
         db.session.commit()
 
-    rentprops = getrentobjs(qfilter, action, 100)
+    # now get rent objects data using this filter
+    rentprops = get_rentobjs_data(qfilter, action, 100)
 
     return filterdict, rentprops
 
 
-def get_qfilter(filterdict):
+def get_qfilter(filterdict, action):
+    # first get filter values submitted from home or queries page and insert them into the dictionary
     if request.method == "POST":
         for key, value in filterdict.items():
             if key in ("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
@@ -263,19 +271,33 @@ def get_qfilter(filterdict):
             filterdict[key] = actval
     print(filterdict)
     filter = []
+    # now iterate through all key values - this should surely be capable of refactoring?
     for key, value in filterdict.items():
-        # actval = request.form.get("{}".format(key)) or value
-        #
         if key == "rentcode" and value and value != "":
-            filter.append(Rent.rentcode.startswith([value]))
+            if action == "external":
+                filter.append(Extrent.rentcode.startswith([value]))
+            else:
+                filter.append(Rent.rentcode.startswith([value]))
         elif key == "agentdetails" and value and value != "":
-            filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
+            if action == "external":
+                filter.append(Extrent.agentdetails.ilike('%{}%'.format(value)))
+            else:
+                filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
-            filter.append(Property.propaddr.ilike('%{}%'.format(value)))
+            if action == "external":
+                filter.append(Extrent.propaddr.ilike('%{}%'.format(value)))
+            else:
+                filter.append(Property.propaddr.ilike('%{}%'.format(value)))
         elif key == "source" and value and value != "":
-            filter.append(Rent.source.ilike('%{}%'.format(value)))
+            if action == "external":
+                filter.append(Extrent.source.ilike('%{}%'.format(value)))
+            else:
+                filter.append(Rent.source.ilike('%{}%'.format(value)))
         elif key == "tenantname" and value and value != "":
-            filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
+            if action == "external":
+                filter.append(Extrent.tenantname.ilike('%{}%'.format(value)))
+            else:
+                filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":
             if value and value != "" and value != [] and value != ["all actypes"]:
                 filter.append(Typeactype.actypedet.in_(value))
@@ -288,7 +310,7 @@ def get_qfilter(filterdict):
             else: filterdict[key] = "include"
         elif key == "arrears" and value and value != "":
             filter.append(Rent.arrears == strToDec('{}'.format(value)))
-        # get to this when I do
+        # I will get to this when I do
         # elif key == "charges" and value == "exclude":
         #     filter.append(Rent.mailto_id.notin_(1, 2))
         # elif key == "charges" and value == "only":
@@ -332,18 +354,19 @@ def get_qfilter(filterdict):
     return filter, filterdict
 
 
-def getrentobjs(qfilter, action, runsize):
+def get_rentobjs_data(qfilter, action, runsize):
     if action == "external":
+        # simple search of external rents submitted from home page - not yet completed
         rentobjs = \
             Extrent.query \
             .join(Extmanager) \
             .with_entities(Extrent.id, Extrent.rentcode, Extrent.propaddr, Extrent.tenantname, Extrent.owner,
                            Extrent.rentpa, Extrent.arrears, Extrent.lastrentdate, Extrent.source, Extrent.status,
                            Extmanager.codename, Extrent.agentdetails) \
-            .filter(*qfilter) \
-            .limit(runsize).all()
+            .filter(*qfilter).order_by(Extrent.rentcode).limit(runsize).all()
 
     elif action == "advanced":
+        # advanced search submitted from queries page
         rentobjs = \
                 Property.query \
                     .join(Rent) \
@@ -362,10 +385,10 @@ def getrentobjs(qfilter, action, runsize):
                                    Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                    Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                    Typetenure.tenuredet) \
-                    .filter(*qfilter) \
-                    .limit(runsize).all()
+                    .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
     else:
+        # simple search of main rents submitted from home page
         rentobjs = \
             Property.query \
                 .join(Rent) \
@@ -374,8 +397,7 @@ def getrentobjs(qfilter, action, runsize):
                                # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
-                .filter(*qfilter) \
-                .limit(runsize).all()
+                .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
     return rentobjs
 
