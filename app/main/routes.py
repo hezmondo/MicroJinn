@@ -229,7 +229,7 @@ def income_post(id):
 @login_required
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    filterdict, rentprops = get_rentobjs("basic", "all")
+    filterdict, rentprops = get_rentobjs("basic", 0)
 
     return render_template('home.html', filterdict=filterdict, rentprops=rentprops)
 
@@ -490,12 +490,11 @@ def property(id):
     return render_template('property.html', action=action, property=property, proptypedets=proptypedets)
 
 
-@bp.route('/queries/', methods=['GET', 'POST'])
-def queries():
+@bp.route('/queries/<int:id>', methods=['GET', 'POST'])
+def queries(id):
     action = request.args.get('action', "advanced", type=str)
-    filtername = request.args.get('filtername', "ALLN", type=str)
-    combodict = get_combodict("advanced")
-    filterdict, rentprops = get_rentobjs(action, filtername)
+    combodict = get_combodict("enhanced")
+    filterdict, rentprops = get_rentobjs(action, id)
 
     return render_template('queries.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 

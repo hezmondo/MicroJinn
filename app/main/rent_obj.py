@@ -186,49 +186,50 @@ def get_property(id):
     return property, proptypedets
 
 
-# rent object and associated queries
-def get_rentobjs(action, filtername):
-    # if filtername and filtername != ""
+# get filter dictionary and filtered rent objects
+def get_rentobjs(action, id):
     qfilter = []
-    filterdict = {
+    dict_basic = {
         "rentcode": "",
         "agentdetails": "",
         "propaddr": "",
         "source": "",
         "tenantname": ""
     }
+    dict_plus = {
+        "actype": ["all actypes"],
+        "agentmailto": "include",
+        "arrears": "",
+        "charges": "include",
+        "emailable": "include",
+        "enddate": "",
+        "landlord": ["all landlords"],
+        "prdelivery": ["all prdeliveries"],
+        "rentpa": "",
+        "rentperiods": "",
+        "runsize": "",
+        "salegrade": ["all salegrades"],
+        "status": ["all statuses"],
+        "tenure": ["all tenures"]
+    }
+    filterdict = dict_basic if action in ("basic", "external") else {**dict_basic, **dict_plus}
+    if action == "load":
+        jdict = Jstore.query.with_entities(Jstore.content).filter(Jstore.id == id).one_or_none()[0]
+        jdict = json.loads(jdict)
+        for key, value in jdict.items():
+            filterdict[key] = value
+        print ("filterdict after load")
+        action = "advanced"
     if action == "basic" and request.method == "GET":
         id_list = get_idlist_recent("recent_rents")
-        qfilter.append(Rent.id.in_(id_list))
-    if action not in ("basic", "external"):
-        dict_2 = {
-            "actype": "",
-            "agentmailto": "",
-            "arrears": "",
-            "charges": "",
-            "emailable": "",
-            "enddate": "",
-            "landlord": "",
-            "prdelivery": "",
-            "rentpa": "",
-            "rentperiods": "",
-            "runsize": "",
-            "salegrade": "",
-            "status": "",
-            "tenure": ""
-        }
-        filterdict = {**filterdict, **dict_2}
-    for key, value in filterdict.items():
-        if key in ("actype", "agentmailto", "charges", "landlord", "prdelivery", "salegrade", "status", "tenure"):
-            actval = request.form.getlist("{}".format(key)) or ""
-        else:
-            actval = request.form.get("{}".format(key)) or ""
-        if actval and actval != "" and "all" not in actval:
-            qfilter = filter_input(qfilter, key, actval)
-        filterdict[key] = actval
-    rentprops = getrentobjs(qfilter, action, 100)
-    print(filterdict)
+        qfilter = [Rent.id.in_(id_list)]
+    else:
+        qfilter, filterdict = get_qfilter(filterdict)
+        print("filterdict after qfilter done")
+        print(filterdict)
     if action == "save":
+        print("filterdict during save")
+        print(filterdict)
         jname = request.form.get("filtername")
         j_id = \
             Jstore.query.with_entities(Jstore.id).filter \
@@ -245,59 +246,90 @@ def get_rentobjs(action, filtername):
             jstore.content = json.dumps(filterdict)
             db.session.add(jstore)
         db.session.commit()
+
+    rentprops = getrentobjs(qfilter, action, 100)
+
+    return filterdict, rentprops
+
+
+def get_qfilter(filterdict):
+    if request.method == "POST":
+        for key, value in filterdict.items():
+            if key in ("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
+                actval = request.form.getlist(key)
+            else:
+                actval = request.form.get(key)
+            print(key, actval)
+            filterdict[key] = actval
+    print(filterdict)
+    filter = []
+    for key, value in filterdict.items():
+        # actval = request.form.get("{}".format(key)) or value
         #
-        # return redirect("/queries/?filtername={}".format(jname))
-    else:
-        return filterdict, rentprops
+        if key == "rentcode" and value and value != "":
+            filter.append(Rent.rentcode.startswith([value]))
+        elif key == "agentdetails" and value and value != "":
+            filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
+        elif key == "propaddr" and value and value != "":
+            filter.append(Property.propaddr.ilike('%{}%'.format(value)))
+        elif key == "source" and value and value != "":
+            filter.append(Rent.source.ilike('%{}%'.format(value)))
+        elif key == "tenantname" and value and value != "":
+            filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
+        elif key == "actype":
+            if value and value != "" and value != [] and value != ["all actypes"]:
+                filter.append(Typeactype.actypedet.in_(value))
+            else: filterdict[key] = ["all actypes"]
+        elif key == "agentmailto":
+            if value and value == "exclude":
+                filter.append(Rent.mailto_id.notin_(1, 2))
+            elif key == "agentmailto" and value and value == "only":
+                filter.append(Rent.mailto_id.in_(1, 2))
+            else: filterdict[key] = "include"
+        elif key == "arrears" and value and value != "":
+            filter.append(Rent.arrears == strToDec('{}'.format(value)))
+        # get to this when I do
+        # elif key == "charges" and value == "exclude":
+        #     filter.append(Rent.mailto_id.notin_(1, 2))
+        # elif key == "charges" and value == "only":
+        #     filter.append(Rent.mailto_id.in_(1, 2))
+        # elif key == "emailable" and value == "exclude":
+        #     filter.append(Rent.mailto_id.notin_(1, 2))
+        # elif key == "emailable" and value == "only":
+        #     filter.append(Rent.mailto_id.in_(1, 2))
+        elif key == "enddate" and value and value != "":
+            filter.append(Rent.lastrentdate <= strToDate('{}'.format(value)))
+        elif key == "landlord":
+            if value and value != "" and value != [] and value != ["all landlords"]:
+                filter.append(Landlord.landlordname.in_(value))
+            else: filterdict[key] = ["all landlords"]
+        elif key == "prdelivery":
+            if value and value != "" and value != [] and value != ["all prdeliveries"]:
+                filter.append(Typeprdelivery.prdeliverydet.in_(value))
+            else: filterdict[key] = ["all prdeliveries"]
 
+        elif key == "rentpa" and value and value != "":
+            filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+        elif key == "rentperiods" and value and value != "":
+            filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+        elif key == "salegrade":
+            if value and value != "" and value != "list" and value != [] and value != ["all salegrades"]:
+                filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
+            else:
+                filterdict[key] = ["all salegrades"]
+        elif key == "status":
+            if value and value != "" and value != [] and value != ["all statuses"]:
+                filter.append(Typestatus.statusdet.in_(value))
+            else:
+                filterdict[key] = ["all statuses"]
 
-def filter_input(filter, key, value):
-    if key == "rentcode" and value != "":
-        # filter.append(Rent.rentcode.startswith("{}".format(value)))
-        filter.append(Rent.rentcode.startswith([value]))
-    elif key == "agentdetails" and value != "":
-        filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
-    elif key == "propaddr" and value != "":
-        filter.append(Property.propaddr.ilike('%{}%'.format(value)))
-    elif key == "source" and value != "":
-        filter.append(Rent.source.ilike('%{}%'.format(value)))
-    elif key == "tenantname" and value != "":
-        filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
-    elif key == "actype" and value != "" and "all" not in value:
-        filter.append(Typeactype.actypedet.in_('{}'.format(value)))
-    elif key == "agentmailto" and value == "exclude":
-        filter.append(Rent.mailto_id.notin_(1, 2))
-    elif key == "agentmailto" and value == "only":
-        filter.append(Rent.mailto_id.in_(1, 2))
-    elif key == "arrears" and value != "":
-        filter.append(Rent.arrears == strToDec('{}'.format(value)))
-    # get to this when I do
-    # elif key == "charges" and value == "exclude":
-    #     filter.append(Rent.mailto_id.notin_(1, 2))
-    # elif key == "charges" and value == "only":
-    #     filter.append(Rent.mailto_id.in_(1, 2))
-    # elif key == "emailable" and value == "exclude":
-    #     filter.append(Rent.mailto_id.notin_(1, 2))
-    # elif key == "emailable" and value == "only":
-    #     filter.append(Rent.mailto_id.in_(1, 2))
-    elif key == "enddate" and value != "":
-        filter.append(Rent.lastrentdate <= strToDate('{}'.format(value)))
-    elif key == "landlord" and value != "" and "all" not in value:
-        filter.append(Landlord.landlordname.in_('{}'.format(value)))
-    elif key == "prdelivery" and value != "" and "all" not in value:
-        filter.append(Typeprdelivery.prdeliverydet.in_('{}'.format(value)))
-    elif key == "rentpa" and value != "":
-        filter.append(Rent.rentpa == strToDec('{}'.format(value)))
-    elif key == "rentperiods" and value != "":
-        filter.append(Rent.rentpa == strToDec('{}'.format(value)))
-    elif key == "salegrade" and value != "" and "all" not in value:
-        filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
-    elif key == "status" and value != "" and "all" not in value:
-        filter.append(Typestatus.statusdet.in_('{}'.format(value)))
-    elif key == "tenure" and value != "" and "all" not in value:
-        filter.append(Typetenure.tenuredet.in_('{}'.format(value)))
+        elif key == "tenure":
+            if value and value != "" and value != [] and value != ["all tenures"]:
+                filter.append(Typetenure.tenuredet.in_(value))
+            else:
+                filterdict[key] = ["all tenures"]
 
-    return filter
+    return filter, filterdict
 
 
 def getrentobjs(qfilter, action, runsize):

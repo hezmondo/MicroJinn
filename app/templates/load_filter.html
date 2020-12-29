@@ -19,7 +19,7 @@
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 70.00%">{{ item.description}}</td>
             <td>
-                <button type="submit" formaction="/queries/?filtername={{ item.code }}" class="btn btn-danger">load</button>
+                <button type="submit" formaction="/queries/{{ item.id }}?action=load" class="btn btn-danger">load</button>
             </td>
         </tr>
         {% endfor %}
