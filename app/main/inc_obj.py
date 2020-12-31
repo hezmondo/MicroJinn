@@ -1,6 +1,6 @@
 import datetime
 from flask import flash, redirect, request
-from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
+from sqlalchemy import desc, func
 from app import db
 from app.main.functions import commit_to_database
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment

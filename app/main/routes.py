@@ -8,22 +8,23 @@ from app.main import bp
 from app.main.common import get_combodict
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
+from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
 from app.main.functions import backup_database
-from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, get_formletters, get_formpayrequests, \
-    get_headrent, get_headrents, get_loan, get_loan_options, get_loans, get_loanstatement, \
-    get_rental, getrentals, get_rentalstatement, \
-    post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
+from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
+from app.main.headrent import get_headrent, get_headrents, post_headrent
 from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
     get_inc_options, post_inc_obj
 from app.main.lease import get_lease, get_leases, post_lease
-from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
+from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
+from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
     post_moneyaccount, post_moneyitem
+from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_externalrent, get_landlord, \
         get_landlord_extras, get_landlords, get_property, getrentobj_main, \
         post_agent, post_charge, post_landlord, post_property, postrentobj
-from app.main.rent_obj_filter import get_rentobjs
-from app.main.writemail import writeMail, write_payrequest
-from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
+from app.main.filter import get_rentobjs
+from app.main.mail import writeMail, write_payrequest
+from app.models import Digfile, Jstore, Loan, Money_account, Template, Typedoc
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -177,15 +178,13 @@ def headrents():
 @bp.route('/headrent/<int:id>', methods=["GET", "POST"])
 @login_required
 def headrent(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_headrent(id, action)
-        action = "view"
+        post_headrent(id)
     headrent = get_headrent(id)
-    advarrdets, freqdets, landlords, statusdets, tenuredets = get_combos_common()
+    combodict = get_combodict("basic")
+    #gather combobox values, with "all" added as an option, in a dictionary
 
-    return render_template('headrent.html', action=action, advarrdets=advarrdets, freqdets=freqdets,
-                           landlords=landlords, statusdets=statusdets, tenuredets=tenuredets, headrent=headrent)
+    return render_template('headrent.html', combodict=combodict, headrent=headrent)
 
 
 @bp.route('/income', methods=['GET', 'POST'])
@@ -358,17 +357,14 @@ def mail_edit(id):
 
 @bp.route('/money', methods=['GET', 'POST'])
 def money():
-    moneydets, accsums = get_moneydets()
+    accsums, moneydets = get_moneydets()
 
-    return render_template('money.html', moneydets=moneydets, accsums=accsums)
+    return render_template('money.html', accsums=accsums, moneydets=moneydets)
 
 
 @bp.route('/money_account/<int:id>', methods=['GET', 'POST'])
 @login_required
 def money_account(id):
-    if request.method == "POST":
-        id_ = post_moneyaccount(id)
-        return redirect('/money_account/{}'.format(id_))
     moneyacc = get_moneyaccount(id)
 
     return render_template('money_account.html', moneyacc=moneyacc)
@@ -386,25 +382,24 @@ def money_deduce(id):
 @bp.route('/money_items/<int:id>', methods=["GET", "POST"])
 @login_required
 def money_items(id):
-    bankaccs, cats, cleareds = get_money_options()
-    accsums, moneyitems, values = get_moneyitems(id)
+    moneydict = get_moneydict()
+    accsums, moneyvals, transitems = get_moneyitems(id)
 
-    return render_template('money_items.html', moneyitems=moneyitems, values=values,
-                           bankaccs=bankaccs, accsums=accsums, cats=cats, cleareds=cleareds)
+    return render_template('money_items.html', accsums=accsums, moneydict=moneydict, moneyvals=moneyvals,
+                           transitems=transitems)
 
 
 @bp.route('/money_item/<int:id>', methods=['GET', 'POST'])
 def money_item(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         bank_id = post_moneyitem(id)
-        return redirect('/money_account/{}'.format(bank_id))
 
-    bankaccs, cats, cleareds = get_money_options()
-    moneyitem = get_moneyitem(id)
+        return redirect('/money_items/{}'.format(bank_id))
 
-    return render_template('money_item.html', action=action, moneyitem=moneyitem, bankaccs=bankaccs,
-                           cats=cats, cleareds=cleareds)
+    money_dict = get_moneydict()
+    money_item, cleared = get_moneyitem(id)
+
+    return render_template('money_item.html', cleared=cleared, id=id, money_dict=money_dict, money_item=money_item)
 
 
 @bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])

@@ -7,23 +7,23 @@
     <div class="form-group row">
         <div class="col-md-3">
             <label for="paydate">pay date:</label>
-            <input type="date" class="form-control" name="paydate" value="{{ moneyitem.date }}" readonly="true">
+            <input type="date" class="form-control" name="paydate" value="{{ money_item.date }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="amount">total:</label>
-            <input type="text" class="form-control" name="amount" value="{{ moneyitem.amount }}" readonly="true">
+            <input type="text" class="form-control" name="amount" value="{{ money_item.amount }}" readonly="true">
         </div>
         <div class="col-md-3">
             <label for="payer">payer:</label>
-            <input type="text" class="form-control" name="payer" value="{{ moneyitem.payer }}" readonly="true">
+            <input type="text" class="form-control" name="payer" value="{{ money_item.payer }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="number">number:</label>
-            <input type="text" class="form-control" name="number" value="{{ moneyitem.num }}" readonly="true">
+            <input type="text" class="form-control" name="number" value="{{ money_item.num }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="cleared">cleared:</label>
-            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=moneyitem.cleared) }}
+            {{ widgets.combobox(name="cleared", items=money_dict.cleareds, item_selected=cleared) }}
         </div>
     </div>
     <div class="form-group row">
@@ -33,22 +33,16 @@
         </div>
         <div class="col-md-3">
             <label for="category">category:</label>
-            {{ widgets.combobox(name="category", items=cats, item_selected=moneyitem.cat_name) }}
+            {{ widgets.combobox(name="category", items=money_dict.cats, item_selected=money_item.cat_name) }}
         </div>
         <div class="col-md-3">
             <label for="bankaccount">bank account:</label>
-            {{ widgets.combobox(name="bankaccount", items=bankaccs, item_selected=moneyitem.accdesc) }}
+            {{ widgets.combobox(name="bankaccount", items=money_dict.bankaccs, item_selected=money_item.accdesc) }}
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="/money_items?rentid={{ moneyitem.rentid }}" class="btn btn-block btn-primary" role="button">back to items</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/money_item/0?action=new" class="btn btn-block btn-primary" role="button">new item</a>
-        </div>
-        <div class="col-md-2">
-            <a href="/money_item/{{ moneyitem.id }}?action=clone" class="btn btn-block btn-danger" role="button">clone item</a>
+            <a href="/money_items/{{ id }}" class="btn btn-block btn-primary" role="button">back to items</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
@@ -59,7 +53,10 @@
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
         <div class="col-md-2">
-            <a href="/delete_item/{{ moneyitem.id }}?item=moneyitem"
+            <button type="submit" formaction="/money_item/0" class="btn btn-block btn-success">save as new item</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/delete_item/{{ money_item.id }}?item=money_item"
                onclick="return confirm('Are you sure you want to delete this transaction?');"
                class="btn btn-block btn-warning" role="button">delete item</a>
         </div>

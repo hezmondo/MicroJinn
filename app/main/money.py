@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
@@ -7,7 +8,9 @@ from app.models import Income, Incomealloc, Money_account, Money_category, Money
 
 
 def get_moneyaccount(id):
-    if id == 0:
+    if request.method == "POST":
+        moneyacc = post_moneyaccount(id)
+    elif id == 0:
         moneyacc = Money_account()
         moneyacc.id = 0
     else:
@@ -25,57 +28,72 @@ def get_moneydets():
     accsums = Money_account.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
                                             func.mjinn.acc_total(0).label('uncleared')).filter().first()
 
-    return moneydets, accsums
+    return accsums, moneydets
 
 
 def get_moneyitem(id):
-    bankitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id, Money_item.num,
-                Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,Money_account.accdesc,
-                   Money_category.cat_name, Money_item.cleared).filter(Money_item.id == id).one_or_none()
+    if request.method == "POST":
+        moneyitem, cleared = post_moneyitem(id)
+    elif id == 0:
+        moneyitem = Money_item()
+        moneyitem.id = 0
+        moneyitem.date = datetime.date.today()
+        cleared = "cleared"
+    else:
+        moneyitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id, Money_item.num,
+                    Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo, Money_account.accdesc,
+                       Money_category.cat_name, Money_item.cleared).filter(Money_item.id == id).one_or_none()
+        cleared = "cleared" if moneyitem.cleared == 1 else "uncleared"
 
-    return bankitem
+    return moneyitem, cleared
 
 
 def get_moneyitems(id):
     money_filter = []
-    income_filter = []
-    values = {'accdesc': 'all accounts', 'payee': 'all', 'memo': 'all', 'category': 'all categories', 'cleared': 'all'}
+    income_filter = [Income.paytype_id != 1]
+    moneyvals= {
+        'accdesc': 'all accounts',
+        'payee': 'all payees',
+        'memo': 'all memos',
+        'category': 'all categories',
+        'cleared': 'all cleareds',
+        'accsums': 0.00
+    }
     if id != 0:
         money_filter.append(Money_account.id == id)
         income_filter.append(Money_account.id == id)
-        moneyacc = get_moneyaccount(id)
-        values['accdesc'] = moneyacc.accdesc
+        bankacc = Money_account.query.filter(Money_account.id == id).one_or_none()
+        moneyvals['bankacc'] = bankacc.accdesc
     if request.method == "POST":
         payee = request.form.get("payee") or "all"
         if payee != "all":
             money_filter.append(Money_item.payer.ilike('%{}%'.format(payee)))
             income_filter.append(Income.payer.ilike('%{}%'.format(payee)))
-            values['payee'] = payee
+            moneyvals['payee'] = payee
         memo = request.form.get("memo") or "all"
         if memo != "all":
             money_filter.append(Money_item.memo.ilike('%{}%'.format(memo)))
             income_filter.append(Incomealloc.rentcode.ilike('%{}%'.format(memo)))
-            values['memo'] = memo
+            moneyvals['memo'] = memo
         accdesc = request.form.get("accdesc") or "all accounts"
         if accdesc != "all accounts":
             money_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
             income_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
-            values['accdesc'] = accdesc
+            moneyvals['accdesc'] = accdesc
         clearedval = request.form.get("cleared") or "all"
-        values['cleared'] = clearedval
+        moneyvals['cleared'] = clearedval
         if clearedval == "cleared":
             money_filter.append(Money_item.cleared == 1)
         elif clearedval == "uncleared":
             money_filter.append(Money_item.cleared == 0)
-            income_filter.append(Income.id == 0)
         catval = request.form.get("category") or "all categories"
         if catval != "all categories":
             money_filter.append(Money_category.cat_name == catval)
             if catval != "Jinn BACS income":
                 income_filter.append(Income.id == 0)
-        values['category'] = catval
+        moneyvals['category'] = catval
 
-    moneyitems = \
+    transitems = \
         Money_item.query.join(Money_account).join(Money_category) .with_entities(Money_item.id, Money_item.num,
                      Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
                            Money_account.accdesc, Money_category.cat_name, Money_item.cleared) \
@@ -89,36 +107,44 @@ def get_moneyitems(id):
     accsums = Money_item.query.with_entities(func.mjinn.acc_balance(id, 1, date.today()).label('cbalance'),
                  func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
 
-    return accsums, moneyitems, values
+    return accsums, moneyvals, transitems
 
 
-def get_money_options():
+def get_moneydict():
     # return options for each multiple choice control in money_edit and money_filter pages
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     bankaccs.insert(0, "all accounts")
     cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
     cats.insert(0, "all categories")
-    cleareds = ["all", "cleared", "uncleared"]
+    cleareds = ["all cleareds", "cleared", "uncleared"]
+    money_dict = {
+        "bankaccs": bankaccs,
+        "cats": cats,
+        "cleareds": cleareds,
+    }
 
-    return bankaccs, cats, cleareds
+    return money_dict
 
 
 def post_moneyaccount(id):
+    # new moneyaccount:
     if id == 0:
         moneyacc = Money_account()
         moneyacc.id = 0
     else:
+        # existing moneyaccount:
         moneyacc = Money_account.query.get(id)
     moneyacc.bankname = request.form.get("bankname")
     moneyacc.accname = request.form.get("accname")
     moneyacc.sortcode = request.form.get("sortcode")
     moneyacc.accnum = request.form.get("accnum")
-    moneyacc.accdesc = request.form.get("accdesc")
+    accdesc = request.form.get("accdesc")
+    moneyacc.accdesc = accdesc
     db.session.add(moneyacc)
     db.session.commit()
-    id_ = moneyacc.id
+    moneyacc = Money_account.query.filter(Money_account.accdesc == accdesc).one_or_none()
 
-    return id_
+    return moneyacc
 
 
 def post_moneyitem(id):
@@ -146,6 +172,7 @@ def post_moneyitem(id):
             (Money_category.cat_name == category).one()[0]
     db.session.add(moneyitem)
     db.session.commit()
+
 
     return bank_id
 

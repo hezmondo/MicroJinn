@@ -6,43 +6,38 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="payee">Payee:</label>
-            <input type="text" class="form-control" name="payee" value="{{ values.payee }}">
-        </div>
-        <div class="col-md-2">
-            <label for="memo">Memo:</label>
-            <input type="text" class="form-control" name="memo" value="{{ values.memo }}">
-        </div>
-        <div class="col-md-2">
-            <label for="category">Category:</label>
-            {{ widgets.combobox(name="category", items=cats, item_selected=values.category) }}
-        </div>
-        {% if action == "allaccs" %}
-        <div class="col-md-2">
-            <label for="accdesc">Account:</label>
-            {{ widgets.combobox(name="accdesc", items=bankaccs, item_selected=values['accdesc']) }}
-        </div>
-        {% endif %}
-        <div class="col-md-2">
-            <label for="cleared">cleared:</label>
-            {{ widgets.combobox(name="cleared", items=cleareds, item_selected=values.cleared) }}
-        </div>
-        <div class="col-md-2">
-            <label for="balance">Balance:</label>
-            <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-9">
-            <input class="form-control form-control-lg" type="text" placeholder="Show transactions for {{ values.accdesc }}" readonly>
+            <input type="text" class="form-control" name="payee" value="{{ moneyvals.payee }}">
         </div>
         <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-danger">Filter now</button>
+            <input type="text" class="form-control" name="memo" value="{{ moneyvals.memo }}" placeholder="memo">
+        </div>
+        <div class="col-md-3">
+            {{ widgets.combobox(name="category", items=moneydict.cats, item_selected=moneyvals.category) }}
+        </div>
+        <div class="col-md-2">
+            {{ widgets.combobox(name="cleared", items=moneydict.cleareds, item_selected=moneyvals.cleared) }}
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-danger">search</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/money_item/0" class="btn btn-block btn-primary" role="button">new transaction</a>
+        </div>
+        <div class="col-md-3">
+            {{ widgets.combobox(name="accdesc", items=moneydict.bankaccs, item_selected=moneyvals['accdesc']) }}
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
+        </div>
+        <div class="col-md-3">
+            currently showing {{ moneyvals.accdesc }}
         </div>
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="moneyitems">
+    <table class="table" id="transitems">
         <thead>
         <tr>
             <th style="width: 8.00%">id</th>
@@ -57,7 +52,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in moneyitems %}
+        {% for item in transitems %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%"> {{ item.id }}</td>
             <td style="width: 8.00%"> {{ item.cleared }}</td>
