@@ -1,5 +1,7 @@
 # common.py - attempt to put all commonly used stuff here
+import json
 import os
+from flask_login import current_user, login_required
 from app.models import Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, Typeprdelivery, \
                         Typesalegrade, Typestatus, Typetenure\
 
@@ -44,6 +46,13 @@ def get_combodict(type):
         combo_dict["filternames"] = filternames
 
     return combo_dict
+
+
+def get_idlist_recent(type):
+    id_list = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
+    id_list = json.loads(getattr(current_user, type)) if getattr(current_user, type) else id_list
+
+    return id_list
 
 
 def preferredEncoding() -> str:

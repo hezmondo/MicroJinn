@@ -1,6 +1,6 @@
 import sqlalchemy
 import datetime
-from flask import flash, jsonify, redirect, render_template, request, send_from_directory, send_file, session, url_for
+from flask import redirect, render_template, request, send_from_directory, send_file, session, url_for
 from flask_login import login_required
 from io import BytesIO
 from app import db
@@ -15,13 +15,14 @@ from app.main.other import get_emailaccount, get_emailaccounts, get_formletter, 
     post_emailaccount, post_formletter, post_headrent, post_loan, post_rental
 from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
     get_inc_options, post_inc_obj
+from app.main.lease import get_lease, get_leases, post_lease
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_money_options, \
     post_moneyaccount, post_moneyitem
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_externalrent, get_landlord, \
-        get_landlord_extras, get_landlords, get_lease, get_leases, get_property, getrentobj_main, get_rentobjs, \
-        post_agent, post_charge, post_landlord, post_lease, post_property, postrentobj
+        get_landlord_extras, get_landlords, get_property, getrentobj_main, \
+        post_agent, post_charge, post_landlord, post_property, postrentobj
+from app.main.rent_obj_filter import get_rentobjs
 from app.main.writemail import writeMail, write_payrequest
-from app.main.payrequests import forward_rents
 from app.models import Digfile, Jstore, Loan, Pr_filter, Template, Typedoc
 
 
@@ -146,24 +147,24 @@ def external_rent(id):
     return render_template('external_rent.html', external_rent=external_rent)
 
 
-@bp.route('/formletter/<int:id>', methods=['GET', 'POST'])
+@bp.route('/form_letter/<int:id>', methods=['GET', 'POST'])
 @login_required
-def formletter(id):
+def form_letter(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         id_ = post_formletter(id, action)
-        return redirect('/formletter/{}?action=view'.format(id_))
+        return redirect('/form_letter/{}?action=view'.format(id_))
     formletter = get_formletter(id)
     templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
 
-    return render_template('formletter.html', action=action, formletter=formletter, templates=templates)
+    return render_template('form_letter.html', action=action, formletter=formletter, templates=templates)
 
 
-@bp.route('/formletters', methods=['GET'])
-def formletters():
+@bp.route('/form_letters', methods=['GET'])
+def form_letters():
     formletters = get_formletters("normal")
 
-    return render_template('formletters.html', formletters=formletters)
+    return render_template('form_letters.html', formletters=formletters)
 
 
 @bp.route('/headrents', methods=['GET', 'POST'])
@@ -351,7 +352,7 @@ def mail_edit(id):
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, doctype=doctype,
-                               summary=summary, formletter=formletter, leasedata=leasedata, mailaddr=mailaddr,
+                               summary=summary, leasedata=leasedata, mailaddr=mailaddr,
                                method=method, rentobj=rentobj, subject=subject)
 
 
@@ -396,32 +397,14 @@ def money_items(id):
 def money_item(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id_ = post_moneyitem(id, action)
-        return redirect('/money_item/{}?action=view'.format(id_))
+        bank_id = post_moneyitem(id)
+        return redirect('/money_account/{}'.format(bank_id))
 
     bankaccs, cats, cleareds = get_money_options()
     moneyitem = get_moneyitem(id)
 
     return render_template('money_item.html', action=action, moneyitem=moneyitem, bankaccs=bankaccs,
                            cats=cats, cleareds=cleareds)
-
-
-# TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
-@bp.route('/payrequests/', methods=['GET', 'POST'])
-@login_required
-def payrequests():
-    action = request.args.get('action', "view", type=str)
-    name = request.args.get('name', "queryall", type=str)
-
-    combodict = get_combodict("advanced")
-
-    filterdict, rentprops = get_rentobjs(action, name)
-
-    # TODO: forward rents using ajax so that the page needn't be reloaded
-    if action == "run":
-        forward_rents(rentprops)
-
-    return render_template('payrequests.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
 
 
 @bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
@@ -453,19 +436,10 @@ def pr_edit(id):
                                totdue=totdue, totdue_string=totdue_string)
 
 
-@bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
-@login_required
-def pr_main(id):
-    combodict = get_combodict("advanced")
-    filterdict, rentprops = get_rentobjs("payrequest", id)
-
-    return render_template('pr_main.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
-
-
 @bp.route('/pr_start', methods=['GET', 'POST'])
 @login_required
 def pr_start():
-    filters = Pr_filter.query.all()
+    filters = Jstore.query.all()
 
     return render_template('pr_start.html', filters=filters)
 
@@ -492,14 +466,15 @@ def property(id):
 
 @bp.route('/queries/<int:id>', methods=['GET', 'POST'])
 def queries(id):
-    # allows the user to obtain a selection of rent objects using multiple filter inputs
-    action = request.args.get('action', "advanced", type=str)
+    # allows the selection of rent objects using multiple filter inputs for query and pr_query
+    action = request.args.get('action', "query", type=str)
     combodict = get_combodict("enhanced")
     #gather combobox values, with "all" added as an option, in a dictionary
     filterdict, rentprops = get_rentobjs(action, id)
     #gather filter values and selected rent objects in two dictionaries
 
-    return render_template('queries.html', combodict=combodict, filterdict=filterdict, rentprops=rentprops)
+    return render_template('queries.html', action=action, combodict=combodict, filterdict=filterdict,
+                                             rentprops=rentprops)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])

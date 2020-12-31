@@ -6,53 +6,49 @@
 <form method="POST" id="target">
 	<div class="form-group row">
 		<div class="col-md-2">
-			<label for="code">Code:</label>
+			<label for="code">code:</label>
 			<input type="text" class="form-control" name="code" value="{{ formletter.code }}">
 		</div>
 		<div class="col-md-6">
-			<label for="description">Summary:</label>
+			<label for="description">summary:</label>
 			<input type="text" class="form-control" name="description" value="{{ formletter.description }}">
 		</div>
 		<div class="col-md-2">
-			<label for="doc_type">Type:</label>
+			<label for="doc_type">type:</label>
 			{{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=formletter.desc) }}
 		</div>
 		<div class="col-md-2">
-			<label for="template">Template:</label>
+			<label for="template">template:</label>
 			{{ widgets.combobox(name="template", items=templates, item_selected=formletter.template) }}
 		</div>
 	</div>
 	<div class="form-group row">
 		<div class="col-md-6">
-			<label for="subject">Subject:</label>
+			<label for="subject">subject:</label>
 			<input type="text" class="form-control" name="subject" value="{{ formletter.subject }}">
-		</div>
-		<div class="col-md-6">
-			<label for="bold">bold:</label>
-			<input type="text" class="form-control" name="bold" >{{ formletter.bold }}</textarea>
 		</div>
 	</div>
 	<div class="form-group row">
 		<div class="col-md-12">
-			<label for="block">Block:</label>
+			<label for="block">block:</label>
 			<textarea class="form-control" rows="24" name="block" >{{ formletter.block }}</textarea>
 		</div>
 	</div>
 	<div class="form-group row">
 	</div>
 	<div class="form-group row flex-row-reverse">
-		<div class="col-md-2">
-			<a href="/formletters" class="btn btn-block btn-primary" role="button">back to formletters</a>
+		<div class="col-md-3">
+			<a href="/form_letters" class="btn btn-block btn-primary" role="button">back to form_letters</a>
 		</div>
 		{% if action == "view" %}
 			<div class="col-md-3">
-				<a href="/formletter/{{ formletter.id }}?action=edit" class="btn btn-block btn-danger" role="button">Edit this formletter</a>
+				<a href="/form_letter/{{ formletter.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit this formletter</a>
 			</div>
 			<div class="col-md-3">
-				<a href="/formletter/{{ formletter.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this formletter</a>
+				<a href="/form_letter/{{ formletter.id }}?action=clone" class="btn btn-block btn-danger" role="button">clone this formletter</a>
 			</div>
 			<div class="col-md-3">
-				<a href="/formletter/0?action=new" class="btn btn-block btn-primary" role="button">Add new formletter</a>
+				<a href="/form_letter/0?action=new" class="btn btn-block btn-primary" role="button">add new formletter</a>
 			</div>
 		{% else %}
 			<div class="col-md-3">

@@ -121,29 +121,32 @@ def post_moneyaccount(id):
     return id_
 
 
-def post_moneyitem(id, action):
-    if action == "edit":
-        bankitem = Money_item.query.get(id)
+def post_moneyitem(id):
+    if id == 0:
+        # new moneyitem:
+        moneyitem = Money_item()
+        moneyitem.id = 0
     else:
-        bankitem = Money_item()
-    bankitem.num = request.form.get("num")
-    bankitem.date = request.form.get("date")
-    bankitem.amount = request.form.get("amount")
-    bankitem.payer = request.form.get("payer")
-    accdesc = request.form.get("accdesc")
-    bankitem.bankacc_id = \
+        # existing moneyitem:
+        moneyitem = Money_item.query.get(id)
+    moneyitem.num = request.form.get("number")
+    moneyitem.date = request.form.get("paydate")
+    moneyitem.amount = request.form.get("amount")
+    moneyitem.payer = request.form.get("payer")
+    bankaccount = request.form.get("bankaccount")
+    bank_id = \
         Money_account.query.with_entities(Money_account.id).filter \
-            (Money_account.accdesc == accdesc).one()[0]
+            (Money_account.accdesc == bankaccount).one()[0]
+    moneyitem.bankacc_id = bank_id
     cleared = request.form.get("cleared")
-    bankitem.cleared = 1 if cleared == "cleared" else 0
-    cat = request.form.get("category")
-    bankitem.cat_name = \
+    moneyitem.cleared = 1 if cleared == "cleared" else 0
+    category = request.form.get("category")
+    moneyitem.cat_id = \
         Money_category.query.with_entities(Money_category.id).filter \
-            (Money_category.cat_name == cat).one()[0]
-    db.session.add(bankitem)
+            (Money_category.cat_name == category).one()[0]
+    db.session.add(moneyitem)
     db.session.commit()
-    id_ = bankitem.id
 
-    return id_
+    return bank_id
 
 

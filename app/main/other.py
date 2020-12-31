@@ -21,7 +21,7 @@ def get_emailaccount(id):
     return emailacc
 
 
-# formletters
+# form_letters
 def get_formletter(id):
     formletter = Form_letter.query.join(Typedoc).join(Template).with_entities(Form_letter.id, Form_letter.code,
                                                                               Form_letter.description,
@@ -36,14 +36,12 @@ def get_formletter(id):
 def get_formletters(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
-        summary = request.form.get("summary") or ""
+        description = request.form.get("description") or ""
         subject = request.form.get("subject") or ""
-        part1 = request.form.get("part1") or ""
         block = request.form.get("block") or ""
         formletters = Form_letter.query.filter(Form_letter.code.ilike('%{}%'.format(code)),
-                                               Form_letter.subject.ilike('%{}%'.format(summary)),
+                                               Form_letter.description.ilike('%{}%'.format(description)),
                                                Form_letter.subject.ilike('%{}%'.format(subject)),
-                                               Form_letter.part1.ilike('%{}%'.format(part1)),
                                                Form_letter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
         formletters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))

@@ -1,10 +1,9 @@
 import datetime
-from flask import request
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-from app.main.common import readFromFile
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.rent_obj import get_leasedata, getrentobj_main
+from app.main.lease import get_lease_variables
+from app.main.rent_obj import getrentobj_main
 from app.main.other import get_formletter, get_formpayrequest, getmaildata
 from app.main.payrequests import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
@@ -15,7 +14,7 @@ def writeMail(rent_id, income_id, formletter_id, action):
     formletter = get_formletter(formletter_id)
 
     if action == "lease":
-        leasedata, lease_variables = get_lease_variables()
+        leasedata, lease_variables = get_lease_variables(rent_id)
         word_variables.update(lease_variables)
     else:
         leasedata = None
@@ -121,28 +120,6 @@ def get_word_variables(rent_id, income_id=0):
                       }
 
     return addressdata, rentobj, word_variables
-
-
-def get_lease_variables(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high):
-    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
-    impval = leasedata["impvalk"] * 1000
-    unimpval = leasedata["impvalk"] * leasedata["realty"] * 10
-    lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
-                       '#rent_code#': leasedata["rent_code"] if leasedata else "some rentcode",
-                       '#relativity#': str(leasedata["realty"]) if leasedata else "some rentcode",
-                       '#totval#': str(leasedata["totval"]) if leasedata else "some rentcode",
-                       '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
-                       '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
-                       '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
-                       '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
-                       '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),
-                       '#leq125a#': moneyToStr(leasedata["leq125a"] if leasedata else 55555.55, pound=True),
-                       '#leq175a#': moneyToStr(leasedata["leq175a"] if leasedata else 55555.55, pound=True),
-                       '#leq175f#': moneyToStr(leasedata["leq175f"] if leasedata else 55555.55, pound=True),
-                       '#leq175p#': moneyToStr(leasedata["leq175p"] if leasedata else 55555.55, pound=True),
-                       }
-
-    return leasedata, lease_variables
 
 
      # word_variables = [
