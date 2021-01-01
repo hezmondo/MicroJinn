@@ -8,6 +8,7 @@ from app.models import Income, Incomealloc, Money_account, Money_category, Money
 
 
 def get_moneyaccount(id):
+    # get values for a single account and deal with post
     if request.method == "POST":
         moneyacc = post_moneyaccount(id)
     elif id == 0:
@@ -31,6 +32,29 @@ def get_moneydets():
     return accsums, moneydets
 
 
+def get_moneydict():
+    # return options for multiple choice controls in money_item and money_items pages
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
+    bankaccs_all = bankaccs
+    bankaccs_all.insert(0, "all accounts")
+    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
+    cats_all = cats
+    cats_all.insert(0, "all categories")
+    cleareds = ["cleared", "uncleared"]
+    cleareds_all = cleareds
+    cleareds_all.insert(0, "all cleareds")
+    money_dict = {
+        "bankaccs": bankaccs,
+        "bankaccs_all": bankaccs_all,
+        "cats": cats,
+        "cats_all": cats_all,
+        "cleareds": cleareds,
+        "cleareds_all": cleareds_all
+    }
+
+    return money_dict
+
+
 def get_moneyitem(id):
     if request.method == "POST":
         moneyitem, cleared = post_moneyitem(id)
@@ -40,9 +64,11 @@ def get_moneyitem(id):
         moneyitem.date = datetime.date.today()
         cleared = "cleared"
     else:
-        moneyitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id, Money_item.num,
-                    Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo, Money_account.accdesc,
-                       Money_category.cat_name, Money_item.cleared).filter(Money_item.id == id).one_or_none()
+        moneyitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id,
+                    Money_item.num, Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
+                    Money_account.id.label("acc_id"), Money_account.accdesc, Money_category.cat_name,
+                    Money_item.cleared).filter(Money_item.id == id).one_or_none()
+
         cleared = "cleared" if moneyitem.cleared == 1 else "uncleared"
 
     return moneyitem, cleared
@@ -108,22 +134,6 @@ def get_moneyitems(id):
                  func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
 
     return accsums, moneyvals, transitems
-
-
-def get_moneydict():
-    # return options for each multiple choice control in money_edit and money_filter pages
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    bankaccs.insert(0, "all accounts")
-    cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
-    cats.insert(0, "all categories")
-    cleareds = ["all cleareds", "cleared", "uncleared"]
-    money_dict = {
-        "bankaccs": bankaccs,
-        "cats": cats,
-        "cleareds": cleareds,
-    }
-
-    return money_dict
 
 
 def post_moneyaccount(id):

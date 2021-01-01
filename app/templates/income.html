@@ -7,28 +7,28 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <input type="text" class="form-control" name="payer" placeholder="payer">
+            <input type="text" class="form-control" name="payer" value="{{ incomevals.payer }}">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="rentcode">
+            <input type="text" class="form-control" name="rentcode" value="{{ incomevals.rentcode }}">
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="accountdesc", items=bankaccs, item_selected=bankaccs[0]) }}
+            {{ widgets.combobox(name="bankacc", items=income_dict.bankaccs_all, item_selected=incomevals.bankacc) }}
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="paymtype", items=paytypes, item_selected=paytypes[0]) }}
+            {{ widgets.combobox(name="paytype", items=income_dict.paytypes_all, item_selected=incomevals.paytype) }}
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Search</button>
+            <button type="submit" class="btn btn-block btn-success">search</button>
         </div>
     </div>
-    {% if rentid != 0 %}
+    {% if incomevals.rentid != 0 %}
         <div class="form-group row flex-row-reverse">
             <div class="col-md-3">
                 <a href="/income_object/0?action=new" class="btn btn-block btn-primary" role="button">post income for this rent</a>
             </div>
             <div class="col-md-2">
-                <a href="/rent_object/{{ rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+                <a href="/rent_object/{{ incomevals.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
         </div>
     {% endif %}
@@ -37,12 +37,12 @@
     <table class="table" id="incomeitems">
         <thead>
         <tr>
-            <th style="width: 10.00%">Date</th>
-            <th style="width: 15.00%">Payer</th>
-            <th style="width: 10.00%">Amount</th>
-            <th style="width: 10.00%">Rentcode</th>
-            <th style="width: 20.00%">Bank account</th>
-            <th style="width: 20.00%">Payment type</th>
+            <th style="width: 10.00%">date</th>
+            <th style="width: 15.00%">payer</th>
+            <th style="width: 10.00%">amount</th>
+            <th style="width: 10.00%">rentcode</th>
+            <th style="width: 20.00%">bank account</th>
+            <th style="width: 20.00%">payment type</th>
             <th style="width: 10.00%"></th>
         </tr>
         </thead>

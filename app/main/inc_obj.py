@@ -6,39 +6,73 @@ from app.main.functions import commit_to_database
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment
 
 
-def get_incomes(rentid):
+def get_incomes(id):
+    #possible bank account id from money and possible param rentid as arg from rent screen
     qfilter = []
-    payer = request.form.get("payer") or ""
-    if payer and payer != "":
-        qfilter.append(Income.payer.ilike('%{}%'.format(payer)))
-    rentcode = request.form.get("rentcode") or ""
-    if rentcode and rentcode != "":
-        qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
-    accountdesc = request.form.get("accountdesc") if request.method == "POST" else ""
-    paymtype = request.form.get("paymtype") if request.method == "POST" else ""
-    if accountdesc and accountdesc != "" and accountdesc != "all accounts":
-        qfilter.append(Money_account.accdesc == accountdesc)
-    if paymtype and paymtype != ""and paymtype != "all payment types":
-        qfilter.append(Typepayment.paytypedet == paymtype)
-    if rentid > 0:
-        qfilter.append(Incomealloc.rent_id == rentid)
+    incomevals = {
+        'bankacc': 'all accounts',
+        'payer': 'all payers',
+        'rentcode': 'all rentcodes',
+        'rentid': 'all rentids',
+        'paytype': 'all payment types'
+    }
+    if id != 0:
+        # first deal with bank account id being passed from money app
+        qfilter.append(Money_account.id == id)
+        bankacc = Money_account.query.filter(Money_account.id == id).one_or_none()
+        incomevals['bankacc'] = bankacc.accdesc
+    if request.method == "POST":
+        payer = request.form.get("payer") or ""
+        if payer and payer != "" and payer != "all payers":
+            qfilter.append(Income.payer.ilike('%{}%'.format(payer)))
+            incomevals['payer'] = payer
+        rentcode = request.form.get("rentcode") or ""
+        if rentcode and rentcode != "" and rentcode != "all rentcodes":
+            qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
+            incomevals['rentcode'] = rentcode
+        bankacc = request.form.get("bankacc") or ""
+        if bankacc and bankacc != "" and bankacc != "all accounts":
+            qfilter.append(Money_account.accdesc == bankacc)
+            incomevals['bankacc'] = bankacc
+        paytype = request.form.get("paytype") or ""
+        if paytype and paytype != "" and paytype != "all payment types":
+            qfilter.append(Typepayment.paytypedet == paytype)
+            incomevals['paytype'] = paytype
+            # rentid = 0
+            # incomevals['rentid'] = 0
+    else:
+        # now deal with rentid coming from the rent screen
+        rentid = int(request.args.get('rentid', "0", type=str))
+        if rentid != 0:
+            qfilter.append(Incomealloc.rent_id == rentid)
+            incomevals['rentid'] = rentid
 
     incomes = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
-            .with_entities(Income.id, Income.date, Incomealloc.rentcode, Income.amount, Income.payer,
-                           Money_account.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
+            .with_entities(Income.id, Income.date, Incomealloc.rent_id, Incomealloc.rentcode, Income.amount,
+                           Income.payer, Money_account.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
             .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
 
-    return incomes
+    return incomes, incomevals
 
 
-def get_inc_options():
-    # return options for multiple choice controls in income
+def get_income_dict():
+    # return options for multiple choice controls in income object
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    bankaccs.insert(0, "all accounts")
+    bankaccs_all = bankaccs
+    bankaccs_all.insert(0, "all accounts")
+    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
-    paytypes.insert(0, "all payment types")
+    paytypes_all = paytypes
+    paytypes_all.insert(0, "all payment types")
+    income_dict = {
+        "bankaccs": bankaccs,
+        "bankaccs_all": bankaccs_all,
+        "paytypes": paytypes,
+        "paytypes_all": paytypes_all
+    }
 
-    return bankaccs, paytypes
+    return income_dict
 
 
 def get_incobj(id):
@@ -84,7 +118,7 @@ def get_incobj_post(id):
     return allocs, post, post_tot, today
 
 
-def post_inc_obj(id, action):
+def post_incomeobj(id, action):
     # this object comprises 1 income record plus 1 or more incomealloc records. First, we do the income record
     if action == "edit":
         income = Income.query.get(id)
@@ -148,7 +182,3 @@ def post_inc_obj(id, action):
 
     # having added the income record and all incomealloc records to the db session, we now attempt a commit
     db.session.commit()
-    # in case of a new record, we need to find and return the new id, to display the new (or updated) income object
-    id_ = income.id
-
-    return id_

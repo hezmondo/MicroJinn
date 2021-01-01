@@ -9,13 +9,16 @@
             <label for="paydate">pay date:</label>
             <input type="date" class="form-control" name="paydate" value="{{ income.date }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="amount">amount:</label>
             <input type="text" class="form-control" name="amount" value="{{ income.amount }}">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
             <label for="payer">payer:</label>
             <input type="text" class="form-control" name="payer" value="{{ income.payer }}">
+        </div>
+        <div class="col-md-2">
+            <a href="/money_items/{{ money_item.acc_id }}" class="btn btn-block btn-primary" role="button">back to items</a>
         </div>
     </div>
     <div class="form-group row">
@@ -23,13 +26,16 @@
             <label for="bankacc">bank account:</label>
             {{ widgets.combobox(name="bankacc", items=bankaccs, item_selected=income.accdesc) }}
         </div>
-        <div class="col-md-3">
-            <label for="paytype">payment type:</label>
+        <div class="col-md-2">
+            <label for="paytype">pay type:</label>
             {{ widgets.combobox(name="paytype", items=paytypes, item_selected=income.paytypedet) }}
         </div>
         <div class="col-md-2">
             <label for="id">id:</label>
             <input type="text" class="form-control" name="id" value="{{ income.id }}">
+        </div>
+        <div class="col-md-2">
+            <a href="/income/{{ money_item.acc_id }}" class="btn btn-block btn-primary" role="button">back to items</a>
         </div>
     </div>
     {% if action == "edit" %}
@@ -100,7 +106,7 @@
             </div>
         {% else %}
             <div class="col-md-3">
-                <button type="button" id="show-xalloc" class="btn btn-block btn-primary">hide extra allocation</button>
+                <button type="button" id="show-xalloc" class="btn btn-block btn-primary">show extra alloc</button>
             </div>
             <div class="col-md-3">
                 <a href="/delete_item/{{ income.id }}?item=income"

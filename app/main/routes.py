@@ -12,12 +12,11 @@ from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccoun
 from app.main.functions import backup_database
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
 from app.main.headrent import get_headrent, get_headrents, post_headrent
-from app.main.inc_obj import get_incobj_post, get_incomes, get_incobj, get_incobj_options, \
-    get_inc_options, post_inc_obj
+from app.main.inc_obj import get_incomes, get_incobj, get_income_dict
 from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
-    post_moneyaccount, post_moneyitem
+        post_moneyitem
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_externalrent, get_landlord, \
         get_landlord_extras, get_landlords, get_property, getrentobj_main, \
@@ -187,13 +186,13 @@ def headrent(id):
     return render_template('headrent.html', combodict=combodict, headrent=headrent)
 
 
-@bp.route('/income', methods=['GET', 'POST'])
-def income():
-    rentid = int(request.args.get('rentid', "0", type=str))
-    incomes = get_incomes(rentid)
-    bankaccs, paytypes = get_inc_options()
+@bp.route('/income/<int:id>', methods=['GET', 'POST'])
+def income(id):
+    # display recent income postings - id is money account id - if 0, display postings for all accounts
+    incomes, incomevals = get_incomes(id)
+    income_dict = get_income_dict()
 
-    return render_template('income.html', rentid=rentid, bankaccs=bankaccs, paytypes=paytypes, incomes=incomes)
+    return render_template('income.html', income_dict=income_dict, incomes=incomes, incomevals=incomevals)
 
 
 @bp.route('/income_object/<int:id>', methods=['GET', 'POST'])
@@ -203,24 +202,11 @@ def income_object(id):
     if request.method == "POST":
         id = post_inc_obj(id, action)
 
-    bankaccs, chargedescs, landlords, paytypes = get_incobj_options()
+    income_dict = get_income_dict()
     income, incomeallocs = get_incobj(id)
 
-    return render_template('income_object.html', action=action, bankaccs=bankaccs, chargedescs=chargedescs,
-                           income=income, incomeallocs=incomeallocs, landlords=landlords, paytypes=paytypes)
-
-
-@bp.route('/income_post/<int:id>', methods=['GET', 'POST'])
-@login_required
-def income_post(id):
-    if request.method == "POST":
-        post_inc_obj(id, "new")
-
-    bankaccs, chargedescs, landlords, paytypes = get_incobj_options()
-    allocs, post, post_tot, today = get_incobj_post(id)
-
-    return render_template('income_post.html', allocs=allocs, bankaccs=bankaccs, chargedescs=chargedescs,
-                           paytypes=paytypes, post=post, post_tot=post_tot, today=today)
+    return render_template('income_object.html', action=action, income=income, incomeallocs=incomeallocs,
+                           income_dict=income_dict)
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -382,10 +368,10 @@ def money_deduce(id):
 @bp.route('/money_items/<int:id>', methods=["GET", "POST"])
 @login_required
 def money_items(id):
-    moneydict = get_moneydict()
+    money_dict = get_moneydict()
     accsums, moneyvals, transitems = get_moneyitems(id)
 
-    return render_template('money_items.html', accsums=accsums, moneydict=moneydict, moneyvals=moneyvals,
+    return render_template('money_items.html', accsums=accsums, money_dict=money_dict, moneyvals=moneyvals,
                            transitems=transitems)
 
 

@@ -12,10 +12,10 @@
             <input type="text" class="form-control" name="memo" value="{{ moneyvals.memo }}" placeholder="memo">
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="category", items=moneydict.cats, item_selected=moneyvals.category) }}
+            {{ widgets.combobox(name="category", items=money_dict.cats_all, item_selected=moneyvals.category) }}
         </div>
         <div class="col-md-2">
-            {{ widgets.combobox(name="cleared", items=moneydict.cleareds, item_selected=moneyvals.cleared) }}
+            {{ widgets.combobox(name="cleared", items=money_dict.cleareds_all, item_selected=moneyvals.cleared) }}
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -26,7 +26,7 @@
             <a href="/money_item/0" class="btn btn-block btn-primary" role="button">new transaction</a>
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="accdesc", items=moneydict.bankaccs, item_selected=moneyvals['accdesc']) }}
+            {{ widgets.combobox(name="accdesc", items=money_dict.bankaccs_all, item_selected=moneyvals['accdesc']) }}
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
