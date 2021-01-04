@@ -132,21 +132,6 @@ def email_account(id):
     return render_template('email_account.html', action=action, emailacc=emailacc)
 
 
-@bp.route('/rents_external', methods=['GET', 'POST'])
-def rents_external():
-    filterdict, rentobjs = get_rentobjs("external", 0)
-
-    return render_template('rents_external.html', filterdict=filterdict, rentobjs=rentobjs)
-
-
-@bp.route('/rent_external/<int:id>', methods=["GET"])
-@login_required
-def rent_external(id):
-    rent_external = get_rent_external(id)
-
-    return render_template('rent_external.html', rent_external=rent_external)
-
-
 @bp.route('/form_letter/<int:id>', methods=['GET', 'POST'])
 @login_required
 def form_letter(id):
@@ -483,6 +468,21 @@ def rental_statement(id):
     print(rentalstatem)
 
     return render_template('rental_statement.html', rentalstatem=rentalstatem)
+
+
+@bp.route('/rent_external/<int:id>', methods=["GET"])
+@login_required
+def rent_external(id):
+    rent_external = get_rent_external(id)
+
+    return render_template('rent_external.html', rent_external=rent_external)
+
+
+@bp.route('/rents_external', methods=['GET', 'POST'])
+def rents_external():
+    filterdict, rentobjs = get_rentobjs("external", 0)
+
+    return render_template('rents_external.html', filterdict=filterdict, rentobjs=rentobjs)
 
 
 @bp.route('/rent_object/<int:id>', methods=['GET', 'POST'])
