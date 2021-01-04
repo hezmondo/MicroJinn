@@ -27,7 +27,7 @@
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
-            <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
+            <input type="text" class="form-control" name="count" value="{{ rentobjs|length }}">
         </div>
     </div>
     <div class="form-group row">
@@ -91,6 +91,10 @@
             <label for="prdelivery">pr delivery:</label>
             {{ widgets.multiselect_as_select(name="prdelivery", items=combodict.prdeliveries, items_selected=filterdict.prdelivery) }}
         </div>
+        <div class="col-md-2">
+            <label for="filtertype">filter type:</label>
+            {{ widgets.combobox(name="jtype", items=combodict.filtertypes, item_selected=filterdict.filtertype) }}
+        </div>
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
@@ -114,7 +118,7 @@
     </div>
     {% endif %}
     <div class="table-fixed">
-        <table class="table" id="rentprops">
+        <table class="table" id="rentobjs">
             <thead>
             <tr>
                 <th style="width: 8.00%">rentcode</th>
@@ -129,7 +133,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for item in rentprops %}
+            {% for item in rentobjs %}
             <tr id="{{ item.id }}">
                 <td style="width: 8.00%">{{ item.rentcode }}</td>
                 <td style="width: 8.00%"> {{ item.rentpa }}</td>

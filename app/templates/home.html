@@ -27,7 +27,7 @@
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
-            <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
+            <input type="text" class="form-control" name="count" value="{{ rentobjs|length }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -35,7 +35,7 @@
             <button type="submit" formaction="/index" class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/external_rents" class="btn btn-block btn-primary ">search external</button>
+            <button type="submit" formaction="/rents_external" class="btn btn-block btn-primary ">search external</button>
         </div>
         <div class="col-md-3">
             <a href="/queries/0" class="btn btn-block btn-danger" role="button">advanced queries</a>
@@ -43,7 +43,7 @@
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="rentprops">
+    <table class="table" id="rentobjs">
         <thead>
         <tr>
             <th style="width: 8.00%">rentcode</th>
@@ -58,7 +58,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rentprops %}
+        {% for item in rentobjs %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>

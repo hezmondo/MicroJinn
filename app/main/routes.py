@@ -5,25 +5,28 @@ from flask_login import login_required
 from io import BytesIO
 from app import db
 from app.main import bp
+from app.main.charge import get_charge, get_charges, post_charge
 from app.main.common import get_combodict
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
-from app.main.functions import backup_database
+from app.main.filter import get_rentobjs
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
+from app.main.functions import backup_database
 from app.main.headrent import get_headrent, get_headrents, post_headrent
-from app.main.inc_obj import get_incomes, get_incobj, get_income_dict
+from app.main.income_obj import get_incomes, get_incomeobj, get_income_dict, post_incomeobj
+from app.main.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
         post_moneyitem
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
-from app.main.rent_obj import get_agent, get_agents, get_charge, get_charges, get_externalrent, get_landlord, \
-        get_landlord_extras, get_landlords, get_property, getrentobj_main, \
-        post_agent, post_charge, post_landlord, post_property, postrentobj
+from app.main.rent_external import get_rent_external
+from app.main.rent_obj import getrentobj_main, postrentobj
+from app.main.agent import get_agent, get_agents, post_agent
 from app.main.filter import get_rentobjs
 from app.main.mail import writeMail, write_payrequest
-from app.models import Digfile, Jstore, Loan, Money_account, Template, Typedoc
+from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
 @bp.route('/agents', methods=['GET', 'POST'])
@@ -132,19 +135,19 @@ def email_account(id):
     return render_template('email_account.html', action=action, emailacc=emailacc)
 
 
-@bp.route('/external_rents', methods=['GET', 'POST'])
-def external_rents():
-    filterdict, rentprops = get_rentobjs("external", 0)
+@bp.route('/rents_external', methods=['GET', 'POST'])
+def rents_external():
+    filterdict, rentobjs = get_rentobjs("external", 0)
 
-    return render_template('external_rents.html', filterdict=filterdict, rentprops=rentprops)
+    return render_template('rents_external.html', filterdict=filterdict, rentobjs=rentobjs)
 
 
-@bp.route('/external_rent/<int:id>', methods=["GET"])
+@bp.route('/rent_external/<int:id>', methods=["GET"])
 @login_required
-def external_rent(id):
-    external_rent = get_externalrent(id)
+def rent_external(id):
+    rent_external = get_rent_external(id)
 
-    return render_template('external_rent.html', external_rent=external_rent)
+    return render_template('rent_external.html', rent_external=rent_external)
 
 
 @bp.route('/form_letter/<int:id>', methods=['GET', 'POST'])
@@ -190,7 +193,7 @@ def headrent(id):
 def income(id):
     # display recent income postings - id is money account id - if 0, display postings for all accounts
     incomes, incomevals = get_incomes(id)
-    income_dict = get_income_dict()
+    income_dict = get_income_dict("basic")
 
     return render_template('income.html', income_dict=income_dict, incomes=incomes, incomevals=incomevals)
 
@@ -200,10 +203,10 @@ def income(id):
 def income_object(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_inc_obj(id, action)
+        id = post_incomeobj(id, action)
 
-    income_dict = get_income_dict()
-    income, incomeallocs = get_incobj(id)
+    income_dict = get_income_dict("enhanced")
+    income, incomeallocs = get_incomeobj(id)
 
     return render_template('income_object.html', action=action, income=income, incomeallocs=incomeallocs,
                            income_dict=income_dict)
@@ -214,9 +217,9 @@ def income_object(id):
 @login_required
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    filterdict, rentprops = get_rentobjs("basic", 0)
+    filterdict, rentobjs = get_rentobjs("basic", 0)
 
-    return render_template('home.html', filterdict=filterdict, rentprops=rentprops)
+    return render_template('home.html', filterdict=filterdict, rentobjs=rentobjs)
 
 
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
@@ -227,10 +230,9 @@ def landlord(id):
     else:
         landlord = get_landlord(id)
 
-    managers, emailaccs, bankaccs = get_landlord_extras()
+    landlord_dict = get_landlord_dict()
 
-    return render_template('landlord.html', landlord=landlord, bankaccs=bankaccs,
-                           managers=managers, emailaccs=emailaccs)
+    return render_template('landlord.html', landlord=landlord, landlord_dict=landlord_dict)
 
 
 @bp.route('/landlords', methods=['GET'])
@@ -451,11 +453,11 @@ def queries(id):
     action = request.args.get('action', "query", type=str)
     combodict = get_combodict("enhanced")
     #gather combobox values, with "all" added as an option, in a dictionary
-    filterdict, rentprops = get_rentobjs(action, id)
+    filterdict, rentobjs = get_rentobjs(action, id)
     #gather filter values and selected rent objects in two dictionaries
 
     return render_template('queries.html', action=action, combodict=combodict, filterdict=filterdict,
-                                             rentprops=rentprops)
+                                             rentobjs=rentobjs)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])

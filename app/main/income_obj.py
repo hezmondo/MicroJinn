@@ -1,5 +1,5 @@
 import datetime
-from flask import flash, redirect, request
+from flask import request
 from sqlalchemy import desc, func
 from app import db
 from app.main.functions import commit_to_database
@@ -11,9 +11,9 @@ def get_incomes(id):
     qfilter = []
     incomevals = {
         'bankacc': 'all accounts',
-        'payer': 'all payers',
-        'rentcode': 'all rentcodes',
-        'rentid': 'all rentids',
+        'payer': '',
+        'rentcode': '',
+        'rentid': 0,
         'paytype': 'all payment types'
     }
     if id != 0:
@@ -38,8 +38,6 @@ def get_incomes(id):
         if paytype and paytype != "" and paytype != "all payment types":
             qfilter.append(Typepayment.paytypedet == paytype)
             incomevals['paytype'] = paytype
-            # rentid = 0
-            # incomevals['rentid'] = 0
     else:
         # now deal with rentid coming from the rent screen
         rentid = int(request.args.get('rentid', "0", type=str))
@@ -55,13 +53,11 @@ def get_incomes(id):
     return incomes, incomevals
 
 
-def get_income_dict():
+def get_income_dict(type):
     # return options for multiple choice controls in income object
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
     bankaccs_all = bankaccs
     bankaccs_all.insert(0, "all accounts")
-    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
     paytypes_all = paytypes
     paytypes_all.insert(0, "all payment types")
@@ -71,11 +67,16 @@ def get_income_dict():
         "paytypes": paytypes,
         "paytypes_all": paytypes_all
     }
+    if type == "enhanced":
+        chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+        landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
+        income_dict["chargedescs"] = chargedescs
+        income_dict["landlords"] = landlords
 
     return income_dict
 
 
-def get_incobj(id):
+def get_incomeobj(id):
     income = Income.query.join(Money_account).join(Typepayment).with_entities(Income.id, Income.date, Income.amount,
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
@@ -84,38 +85,6 @@ def get_incobj(id):
                     Chargetype.chargedesc).filter(Incomealloc.income_id == id).all()
 
     return income, incomeallocs
-
-
-def get_incobj_options():
-    # return options for multiple choice controls in income_object
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
-
-    return bankaccs, chargedescs, landlords, paytypes
-
-
-def get_incobj_post(id):
-    post = Rent.query.join(Landlord).join(Money_account).join(Charge).with_entities(Rent.rentcode,
-                Rent.arrears, Rent.datecode, Rent.lastrentdate, Rent.landlord_id,
-                func.mjinn.next_date(Rent.lastrentdate, Rent.freq_id, 1).label('nextrentdate'),
-                func.sum(Charge.chargebalance).label('chargetot'),
-                Rent.rentpa, Rent.tenantname, Rent.freq_id, Money_account.accdesc) \
-                .filter(Rent.id == id) \
-                .one_or_none()
-    arrears = post.arrears
-    today = datetime.date.today()
-    allocs = Charge.query.join(Chargetype).join(Rent).join(Landlord).with_entities(Rent.rentcode, Charge.id,
-                   Chargetype.chargedesc, Charge.chargebalance, Landlord.landlordname).filter(Charge.rent_id == id).all()
-    if post.chargetot and post.chargetot > 0:
-        post_tot = arrears + post.chargetot
-    elif arrears > 0:
-        post_tot = arrears
-    else:
-        post_tot = post.rentpa
-
-    return allocs, post, post_tot, today
 
 
 def post_incomeobj(id, action):

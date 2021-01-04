@@ -8,9 +8,9 @@ from locale import currency
 import datetime
 
 
-def forward_rents(rentprops):
+def forward_rents(rentobjs):
     update_vals = []
-    for rent_prop in rentprops:
+    for rent_prop in rentobjs:
         update_vals.append(forward_rent(rent_prop.id, True))
     db.session.bulk_update_mappings(Rent, update_vals)
     commit_to_database()

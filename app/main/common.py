@@ -1,6 +1,7 @@
-# common.py - attempt to put all commonly used stuff here
+# common.py - attempt to put all commonly used stuff here and in functions.py
 import json
 import os
+from app import db
 from flask_login import current_user, login_required
 from app.models import Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, Typeprdelivery, \
                         Typesalegrade, Typestatus, Typetenure\
@@ -44,6 +45,7 @@ def get_combodict(type):
         tenures.insert(0, "all tenures")
         filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
         combo_dict["filternames"] = filternames
+        combo_dict["filtertypes"] = ("payrequest", "rentprop", "income")
 
     return combo_dict
 
@@ -55,19 +57,29 @@ def get_idlist_recent(type):
     return id_list
 
 
-def preferredEncoding() -> str:
-    # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
-    # ("utf-8" for Linux, "cp1252" for Windows)
-    import locale
-    return locale.getpreferredencoding()
+def pop_idlist_recent(type, id):
+    id_list = json.loads(getattr(current_user, type))
+    if id not in id_list:
+        id_list.insert(0, id)
+        if len(id_list) > 30:
+            id_list.pop()
+        setattr(current_user, type, json.dumps(id_list))
+        db.session.commit()
 
 
-def readFromFile(filename):
-    basedir = os.path.abspath(os.path.dirname('mjinn'))
-    mergedir = os.path.join(basedir, 'app/templates/mergedocs')
-    filePath = os.path.join(mergedir, filename)
-    # with open(htmlFilePath, "r" encoding="utf-8") as f:
-    #     htmlText = f.read()
-    with filePath.open('r', encoding="utf-8") as f:
-        fileText = f.read()
-    return fileText
+# def preferredEncoding() -> str:
+#     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
+#     # ("utf-8" for Linux, "cp1252" for Windows)
+#     import locale
+#     return locale.getpreferredencoding()
+#
+#
+# def readFromFile(filename):
+#     basedir = os.path.abspath(os.path.dirname('mjinn'))
+#     mergedir = os.path.join(basedir, 'app/templates/mergedocs')
+#     filePath = os.path.join(mergedir, filename)
+#     # with open(htmlFilePath, "r" encoding="utf-8") as f:
+#     #     htmlText = f.read()
+#     with filePath.open('r', encoding="utf-8") as f:
+#         fileText = f.read()
+#     return fileText

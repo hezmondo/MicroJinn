@@ -7,10 +7,10 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <input type="text" class="form-control" name="payer" value="{{ incomevals.payer }}">
+            <input type="text" class="form-control" name="payer" value="{{ incomevals.payer }}" placeholder="all payers">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" value="{{ incomevals.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" value="{{ incomevals.rentcode }}" placeholder="all rentcodes">
         </div>
         <div class="col-md-3">
             {{ widgets.combobox(name="bankacc", items=income_dict.bankaccs_all, item_selected=incomevals.bankacc) }}
@@ -25,7 +25,7 @@
     {% if incomevals.rentid != 0 %}
         <div class="form-group row flex-row-reverse">
             <div class="col-md-3">
-                <a href="/income_object/0?action=new" class="btn btn-block btn-primary" role="button">post income for this rent</a>
+                <a href="/income_object/0?rentid={{ incomevals.rentid }}" class="btn btn-block btn-primary" role="button">post income for this rent</a>
             </div>
             <div class="col-md-2">
                 <a href="/rent_object/{{ incomevals.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>

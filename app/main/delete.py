@@ -1,7 +1,7 @@
 from flask import redirect, request, url_for
 from app import db
 from app.main.functions import commit_to_database
-from app.models import Agent, Charge, Digfile, Docfile, Extmanager, Extrent, Form_letter, Income, Incomealloc, \
+from app.models import Agent, Charge, Digfile, Docfile, Manager_external, Rent_external, Form_letter, Income, Incomealloc, \
     Landlord, Lease, Loan, Manager, Money_item, Property, Rent, Rental, Template, \
     Typeactype, Typeadvarr, Money_account, Typedeed, Typefreq, Typedoc, \
     Typemailto, Typepayment, Typeproperty, Typesalegrade, Typestatus, Typetenure, User, Emailaccount
