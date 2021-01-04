@@ -8,7 +8,8 @@ from app.main import bp
 from app.main.charge import get_charge, get_charges, post_charge
 from app.main.common import get_combodict
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, get_pr_file, \
+    get_pr_history, post_pr_file
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
 from app.main.filter import get_rentobjs
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
@@ -20,6 +21,7 @@ from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
         post_moneyitem
+from app.main.property import get_property, post_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
 from app.main.rent_obj import getrentobj_main, postrentobj
@@ -387,36 +389,36 @@ def money_item(id):
     money_dict = get_moneydict()
     money_item, cleared = get_moneyitem(id)
 
-# TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
-@bp.route('/payrequests/', methods=['GET', 'POST'])
-@login_required
-def payrequests():
-    action = request.args.get('action', "view", type=str)
-    name = request.args.get('name', "queryall", type=str)
-
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-
-    actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-    runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
-
-    # TODO: forward rents using ajax so that the page needn't be reloaded
-    if action == "run":
-        forward_rents(rentprops)
-
-    return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
-                           landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
-                           statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
-                           arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
-                           propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
-                           runsize=runsize, salegrade=salegrade, source=source, status=status,
-                           tenantname=tenantname, tenure=tenure, rentprops=rentprops)
+# # TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
+# @bp.route('/payrequests/', methods=['GET', 'POST'])
+# @login_required
+# def payrequests():
+#     action = request.args.get('action', "view", type=str)
+#     name = request.args.get('name', "queryall", type=str)
+#
+#     landlords, statusdets, tenuredets = get_queryoptions_common()
+#     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+#
+#     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
+#     runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
+#
+#     # TODO: forward rents using ajax so that the page needn't be reloaded
+#     if action == "run":
+#         forward_rents(rentprops)
+#
+#     return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
+#                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
+#                            statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
+#                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
+#                            propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
+#                            runsize=runsize, salegrade=salegrade, source=source, status=status,
+#                            tenantname=tenantname, tenure=tenure, rentprops=rentprops)
 
 
 @bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
 def pr_dialog(id):
-    formpayrequests = get_pr_forms()
+    formpayrequests = get_formpayrequests()
 
     return render_template('pr_dialog.html', formpayrequests=formpayrequests, rent_id=id)
 
@@ -429,7 +431,7 @@ def pr_edit(id):
         rent_id = request.form.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
         addressdata, block, pr_code, rentobj, subject, \
-            table_rows, totdue, totdue_string = writePayrequest(rent_id, id)
+            table_rows, totdue, totdue_string = write_payrequest(rent_id, id)
         mailaddr = request.form.get('mailaddr')
         summary = pr_code + "-" + method + "-" + mailaddr[0:25]
         mailaddr = mailaddr.split(", ")
@@ -460,19 +462,19 @@ def pr_history(rentid):
     return render_template('pr_history.html', rentid=rentid, pr_history=pr_history)
 
 
-@bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
-@login_required
-def pr_main(id):
-    actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-    landlords, statusdets, tenuredets = get_queryoptions_common()
-    if id == 0:
-        rentprops = get_rentobjs_filter(1)
-    else:
-        rentprops = get_rentobjs_filter(id)
-
-    return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
-                           prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
-                           statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
+# @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
+# @login_required
+# def pr_main(id):
+#     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+#     landlords, statusdets, tenuredets = get_queryoptions_common()
+#     if id == 0:
+#         rentprops = get_rentobjs_filter(1)
+#     else:
+#         rentprops = get_rentobjs_filter(id)
+#
+#     return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
+#                            prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
+#                            statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
 
 
 @bp.route('/pr_start', methods=['GET', 'POST'])

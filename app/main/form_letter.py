@@ -59,6 +59,7 @@ def post_formletter(id, action):
     return id_
 
 
+# TODO: These should be renamed and moved
 def get_formpayrequest(id):
     formpayrequest = Pr_form.query.filter(Pr_form.id == id).one_or_none()
     return formpayrequest

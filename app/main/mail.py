@@ -93,10 +93,11 @@ def write_payrequest(rent_id, formpayrequest_id):
     subject = doReplace(word_variables, subject)
 
     form_payrequest = get_formpayrequest(formpayrequest_id)
+    pr_code = form_payrequest.code
     block = form_payrequest.block if form_payrequest.block else ""
     block = doReplace(word_variables, block)
 
-    return addressdata, block, rentobj, subject, table_rows, totdue, totdue_string
+    return addressdata, block, pr_code, rentobj, subject, table_rows, totdue, totdue_string
 
 
 def doReplace(dict, clause):

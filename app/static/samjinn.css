@@ -128,7 +128,6 @@ table tr td {
 }
 
 .table-fixed, .table-condensed{
-    padding: 5px 5px 0px;
     box-shadow: 0 8px 16px rgba(0,0,0,.15)
 }
 
