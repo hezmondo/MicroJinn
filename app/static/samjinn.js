@@ -1,15 +1,16 @@
 $(document).ready(function(){
     $("#save_delete").hide();
     $("#more_buttons").hide();
+    $("#xalloc").hide();
 //    if ($("#item_id").text() == "0") {
 //       $("#toggleview").click();
 //            }
     $("#show-xalloc").click(function(){
         $("#xalloc").toggle();
-        if ($(this).text() == "Show extra allocation") {
-            $(this).text("Hide extra allocation");
+        if ($(this).text() == "show extra alloc") {
+            $(this).text("hide extra alloc");
             } else {
-            $(this).text("Show extra allocation");
+            $(this).text("show extra alloc");
         };
     });
     $('#add-alloc').click(function() {

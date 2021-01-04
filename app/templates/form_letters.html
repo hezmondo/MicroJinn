@@ -1,0 +1,51 @@
+<!-- /templates/form_letters.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="code" placeholder="code">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="description" placeholder="description">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="subject" placeholder="subject">
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="block" placeholder="block">
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">search</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/form_letter/0" class="btn btn-block btn-primary" role="button">add new formletter</a>
+        </div>
+    </div>
+    <div class="form-group row">
+    </div>
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th style="width: 10.00%">code</th>
+            <th style="width: 70.00%">description</th>
+            <th style="width: 10.00%">action</th>
+            <th style="width: 10.00%">action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in formletters %}
+        <tr>
+            <td style="width: 10.00%">{{ item.code }}</td>
+            <td style="width: 70.00%">{{ item.description }}</td>
+            <td style="width: 10.00%"><a href="/form_letter/{{ item.id }}">view</a></td>
+            <td style="width: 10.00%"><a href="/form_letter/{{ item.id }}">view</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% endblock %}

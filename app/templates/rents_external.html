@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="rentcode">rentcode starts with:</label>
+            <input type="text" class="form-control" name="rentcode" placeholder="any" value="{{ filterdict.rentcode }}">
+        </div>
+        <div class="col-md-2">
+            <label for="tenantname">tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" placeholder="any" value="{{ filterdict.tenantname }}">
+        </div>
+        <div class="col-md-2">
+            <label for="propaddr">property details:</label>
+            <input type="text" class="form-control" name="propaddr" placeholder="any" value="{{ filterdict.propaddr }}">
+        </div>
+        <div class="col-md-2">
+            <label for="source">source:</label>
+            <input type="text" class="form-control" name="source" placeholder="any" value="{{ filterdict.source }}">
+        </div>
+        <div class="col-md-2">
+            <label for="agentdetails">agent details:</label>
+            <input type="text" class="form-control" name="agentdetails" placeholder="any" value="{{ filterdict.agentdetails }}">
+        </div>
+        <div class="col-md-2">
+            <label for="count">count:</label>
+            <input type="text" class="form-control" name="count" value="{{ rentobjs|length }}">
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-success ">search</button>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" formaction="/index" class="btn btn-block btn-primary ">search main</button>
+        </div>
+    </div>
+</form>
+<!--<div class="container">-->
+<!--    <div class="row voffset2">-->
+<!--        <div class="col-lg-12">-->
+<!--            <h4 class="text-center">Filter name: {{ jname }}</h4>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
+<div class="table-fixed">
+    <table class="table" id="externalrents">
+        <thead>
+        <tr>
+            <th style="width: 8.00%">rentcode</th>
+            <th style="width: 8.00%">rentpa</th>
+            <th style="width: 8.00%">arrears</th>
+            <th style="width: 8.00%">nextrentdate</th>
+            <th style="width: 15.00%">tenantname</th>
+            <th style="width: 20.00%">propaddr</th>
+            <th style="width: 8.00%">source</th>
+            <th style="width: 20.00%">agent details</th>
+            <th style="width: 5.00%"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in rentobjs %}
+        <tr id="{{ item.id }}">
+            <td style="width: 8.00%">{{ item.rentcode }}</td>
+            <td style="width: 8.00%"> {{ item.rentpa }}</td>
+            <td style="width: 8.00%"> {{ item.arrears }}</td>
+            <td style="width: 8.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') if item.nextrentdate else 'none' }}</td>
+            <td style="width: 15.00%"> {{ item.tenantname }}</td>
+            <td style="width: 20.00%">{{ item.propaddr }}</td>
+            <td style="width: 8.00%"> {{ item.source }}</td>
+            <td style="width: 20.00%"> {{ item.agentdetails }}</td>
+            <td style="width: 5.00%"><a href="/rent_external/{{ item.id }}">view</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

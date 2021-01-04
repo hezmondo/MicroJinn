@@ -1,4 +1,4 @@
-### Installing mysql server and workbench in windows
+### Installing mysql server and workbench in windows - last updated 25 Dec 2020
 
 **mysql server**
 
@@ -10,9 +10,9 @@ Open the mysql msi app and install just myql server (Community Server 8.0.21) X6
   
 I chose development machine to use the least of the PC resources and accepted the splash creen with localhost 3306.
 
-You will be asked to set a password for root.  **If so, use a reasonable password for root and write it down - eg Pete123456P!** 
+You will be asked to set a password for root.  **If so, use a reasonable password for root and write it down - eg heZ1234567H!** 
 
-At this point, I opted to set up a non-root user (say peter) with typical DB admin privileges and to set a strong password - simple and quick.
+At this point, I opted to set up a non-root user (say hezm) with typical DB admin privileges and to set a strong password - simple and quick.
 
 You will use this non-root user and password in the essential start up file myconfig.py to connect to mjinn.
 
@@ -23,12 +23,17 @@ Open (or continue to use) the same mysql msi app and now add workbench from appl
 When starting workbench, you can either edit the offered root connection to your non-root username, or create a second connection to use that. 
 In either case, click to test the connection **without putting the password in first** and then put your password in and click to save it.  
 
-**if you cannot get into MySQL 8.0 as root (password unknown or not recognised) see my new mysql console guide and maria notes**
+### I had problems connecting workbench to mysql server using the correct root password:
 
+One issue is mysql server may not configure so as to allow workbench to connect as root.  If so, please follow the mmjinn guide for mysql console and maria, where you will learn how to configure mysql server in a terminal
 
-### Problems in importing mysql functions and procedures from another installation
+Another issue is if you have installed MySQLWorkbench as a Snap package. You want to store the database password(s) in the Gnome Passwords & Keys facility. However, a Snap package is sandboxed; it is not by default allowed to access this service. When you choose "Store in keychain" MySQLWorkbench is blocked by AppArmor. You need to enter a command to allow this package to access the service. The command is:
 
-Currently, you may get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error, when it gets to procedures and functions:
+    sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
+
+### Problems in importing mysql functions and procedures from one installation to another
+
+You may get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error when it gets to procedures and functions:
 
 1.  ERROR 1231 (42000) at line 1454: Variable 'sql_mode' can't be set to the value of 'NO_AUTO_CREATE_USER'
 
@@ -36,27 +41,18 @@ Currently, you may get some or all of these errors, but **NB:- all the tables wi
 
 3.  ERROR because MySQL dumps functions containing text such as this: SET TIME ZONE =
 
-To get around this, first use Notepad++ or any text editor to replace the text strings in your extracted mjinn dump file as follows:
+It is simple to get around this in windows by opening the offeding sql file (should be named routines) in notepad++ and replace the problem text with ""
+  
+	replace "/NO_AUTO_CREATE_USER//" with "" 
+	replace "/DEFINER=`root`@`localhost`//"  with ""
 
-replace DEFINER=`root`@`localhost` with "" 
-replace NO_AUTO_CREATE_USER with ""
+You may also need to remove any lines from the very end of your sql dump file containing the text "TIME ZONE".
 
-Now remove these problem lines from the very end of your sql dump file:
+Lastly you may get an error mentioning log_bin_trust_function_creators.  If so, either in mysql console or in workbench, run this:
 
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+    set global log_bin_trust_function_creators = 1; 
 
-if you get an error mentioning log_bin_trust_function_creators, open a query window in workbench and run this query:
-
-    set log_bin_trust_function_creators = 1;
-
-Now try the import again and if still stuck, try the following solution and/or call Hez if you are struggling.
+Now try the import again and you should be good to go
 
 **Hez favoured simple solution to data import issues:**
  
@@ -64,6 +60,6 @@ Create two sql dump files, one being just all the tables, named TablesDump, and 
 
 The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
 
-Dirty but job done and works fine. 
+So, after refreshing, you should now see all the tables and all the functions and procedures.
     
-**Feel free to check out my new mysql console guide and maria notes**
+**Feel free to check out the mjinn guide for mysql console and maria**

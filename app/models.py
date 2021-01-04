@@ -119,40 +119,6 @@ class Event(db.Model):
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
 
 
-class Extmanager(db.Model):
-    __tablename__ = 'extmanager'
-
-    id = db.Column(db.Integer, primary_key=True)
-    codename = db.Column(db.String(15))
-    details = db.Column(db.String(180))
-
-    extrent_extmanager = db.relationship('Extrent', backref='extmanager', lazy='dynamic')
-
-    def __repr__(self):
-        return '<Extmanager {}>'.format(self.codename)
-
-
-class Extrent(db.Model):
-    __tablename__ = 'extrent'
-
-    id = db.Column(db.Integer, primary_key=True)
-    rentcode = db.Column(db.String(20), index=True)
-    tenantname = db.Column(db.String(30))
-    propaddr = db.Column(db.String(180))
-    agentdetails = db.Column(db.String(45))
-    rentpa = db.Column(db.Numeric(8,2))
-    arrears = db.Column(db.Numeric(8,2))
-    lastrentdate = db.Column(db.Date)
-    tenure = db.Column(db.String(1))
-    owner = db.Column(db.String(15))
-    source = db.Column(db.String(15))
-    status = db.Column(db.String(1))
-    extmanager_id = db.Column(db.Integer, db.ForeignKey('extmanager.id'))
-
-    def __repr__(self):
-        return '<Extrent {}>'.format(self.rentcode)
-        
-        
 class Form_letter(db.Model):
     __tablename__ = 'form_letter'
 
@@ -215,8 +181,10 @@ class Jstore(db.Model):
     __tablename__ = 'jstore'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30))
-    content = db.Column(db.String(900))
+    type = db.Column(db.Integer)
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(90), nullable=True)
+    content = db.Column(db.Text)
 
 
 class Landlord(db.Model):
@@ -350,6 +318,19 @@ class Manager(db.Model):
         return '<Manager {}>'.format(self.name)
 
         
+class Manager_external(db.Model):
+    __tablename__ = 'manager_external'
+
+    id = db.Column(db.Integer, primary_key=True)
+    codename = db.Column(db.String(15))
+    details = db.Column(db.String(180))
+
+    rentext_managerext = db.relationship('Rent_external', backref='manager_external', lazy='dynamic')
+
+    def __repr__(self):
+        return '<Manager_external {}>'.format(self.codename)
+
+
 class Money_account(db.Model):
     __tablename__ = 'money_account'
 
@@ -419,7 +400,7 @@ class Pr_filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
     description = db.Column(db.String(90), nullable=True)
-    filter = db.Column(db.String(900))
+    content = db.Column(db.Text)
 
 
 class Pr_form(db.Model):
@@ -533,6 +514,27 @@ class Rental_statement(db.Model):
     amount = db.Column(db.Numeric(8, 2))
     payer = db.Column(db.String(60))
     balance = db.Column(db.Numeric(8, 2))
+
+
+class Rent_external(db.Model):
+    __tablename__ = 'rent_external'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rentcode = db.Column(db.String(20), index=True)
+    tenantname = db.Column(db.String(30))
+    propaddr = db.Column(db.String(180))
+    agentdetails = db.Column(db.String(45))
+    rentpa = db.Column(db.Numeric(8, 2))
+    arrears = db.Column(db.Numeric(8, 2))
+    lastrentdate = db.Column(db.Date)
+    tenure = db.Column(db.String(1))
+    owner = db.Column(db.String(15))
+    source = db.Column(db.String(15))
+    status = db.Column(db.String(1))
+    extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
+
+    def __repr__(self):
+        return '<Rent_external {}>'.format(self.rentcode)
 
 
 class Template(db.Model):

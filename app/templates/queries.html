@@ -6,143 +6,148 @@
 <form action="/queries" method="post">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="rentcode">Rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ rentcode }}">
+            <label for="rentcode">rentcode starts with:</label>
+            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="starts with" value="{{ filterdict.rentcode }}">
         </div>
         <div class="col-md-2">
-            <label for="tenantname">Tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ tenantname }}">
+            <label for="tenantname">tenant name:</label>
+            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ filterdict.tenantname }}">
         </div>
         <div class="col-md-2">
-            <label for="propaddr">Property details:</label>
-            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ propaddr }}">
+            <label for="propaddr">property details:</label>
+            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ filterdict.propaddr }}">
         </div>
         <div class="col-md-2">
-            <label for="source">Source:</label>
-            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ source }}">
+            <label for="source">source:</label>
+            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ filterdict.source }}">
         </div>
         <div class="col-md-2">
-            <label for="agentdetails">Agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ agentdetails }}">
+            <label for="agentdetails">agent details:</label>
+            <input type="text" class="form-control" name="agentdetails" data-toggle="tooltip" title="includes" value="{{ filterdict.agentdetails }}">
         </div>
         <div class="col-md-2">
-            <label for="count">Count:</label>
-            <input type="text" class="form-control" name="count" value="{{ rentprops|length }}">
+            <label for="count">count:</label>
+            <input type="text" class="form-control" name="count" value="{{ rentobjs|length }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="enddate">End date:</label>
-            <input type="date" class="form-control" name="enddate" value="{{ enddate }}">
+            <label for="enddate">end date:</label>
+            <input type="date" class="form-control" name="enddate" value="{{ filterdict.enddate }}">
         </div>
         <div class="col-md-2">
-            <label for="runsize">Run size:</label>
-            <input type="text" class="form-control" name="runsize" value="{{ runsize }}">
+            <label for="runsize">run size:</label>
+            <input type="text" class="form-control" name="runsize" value="{{ filterdict.runsize }}">
         </div>
         <div class="col-md-2">
-            <label for="rentpa">Rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" data-toggle="tooltip" title="Example = 100" value="{{ rentpa }}">
+            <label for="rentpa">rent pa:</label>
+            <input type="text" class="form-control" name="rentpa" data-toggle="tooltip" title="example = 100" value="{{ filterdict.rentpa }}">
         </div>
         <div class="col-md-2">
-            <label for="arrears">Rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" data-toggle="tooltip" title="Example < 100" value="{{ arrears }}">
+            <label for="arrears">rent arrears:</label>
+            <input type="text" class="form-control" name="arrears" data-toggle="tooltip" title="example < 100" value="{{ filterdict.arrears }}">
         </div>
         <div class="col-md-2">
-            <label for="rentperiods">Rent periods owing:</label>
-            <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip" title="Example > 5" value="{{ rentperiods }}">
+            <label for="rentperiods">rent periods owing:</label>
+            <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip" title="example > 5" value="{{ filterdict.rentperiods }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
-            <label for="landlord">Landlord:</label>
-            {{ widgets.multiselect_as_select(name="landlord", items=landlords, items_selected=landlord or landlords) }}
+            <label for="landlord">landlord:</label>
+            {{ widgets.multiselect_as_select(name="landlord", items=combodict.landlords, items_selected=filterdict.landlord) }}
         </div>
         <div class="col-md-2">
-            <label for="tenure">Tenure:</label>
-            {{ widgets.multiselect_as_select(name="tenure", items=tenuredets, items_selected=tenure or tenuredets) }}
+            <label for="tenure">tenure:</label>
+            {{ widgets.multiselect_as_select(name="tenure", items=combodict.tenures, items_selected=filterdict.tenure) }}
         </div>
         <div class="col-md-2">
-            <label for="salegrade">Sale grade:</label>
-            {{ widgets.multiselect_as_select(name="salegrade", items=salegradedets, items_selected=salegrade or salegradedets) }}
+            <label for="salegrade">sale grade:</label>
+            {{ widgets.multiselect_as_select(name="salegrade", items=combodict.salegrades, items_selected=filterdict.salegrade) }}
         </div>
         <div class="col-md-2">
-            <label for="status">Status:</label>
-            {{ widgets.multiselect_as_select(name="status", items=statusdets, items_selected=status or statusdets) }}
+            <label for="status">status:</label>
+            {{ widgets.multiselect_as_select(name="status", items=combodict.statuses, items_selected=filterdict.status) }}
         </div>
         <div class="form-group col-md-2">
-            <label for="actype">Actype:</label>
-            {{ widgets.multiselect_as_select(name="actype", items=actypedets, items_selected=actype or actypedets) }}
+            <label for="actype">actype:</label>
+            {{ widgets.multiselect_as_select(name="actype", items=combodict.actypes, items_selected=filterdict.actype) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="agents">Mailto agent:</label>
-            {{ widgets.combobox(name="agents", items=options, item_selected=options[0]) }}
+            <label for="agentmailto">mailto agent:</label>
+            {{ widgets.combobox(name="agentmailto", items=combodict.options, item_selected=filterdict.agentmailto) }}
         </div>
         <div class="col-md-2">
-            <label for="charges">Charges:</label>
-            {{ widgets.combobox(name="charges", items=options, item_selected=options[0]) }}
+            <label for="charges">charges:</label>
+            {{ widgets.combobox(name="charges", items=combodict.options, item_selected=filterdict.charges) }}
         </div>
         <div class="col-md-2">
-            <label for="emailable">Emailable:</label>
-            {{ widgets.combobox(name="emailable", items=options, item_selected=options[0]) }}
-        </div>
-        <div class="col-md-2">
-            <label for="forsale">For sale:</label>
-            {{ widgets.combobox(name="forsale", items=options, item_selected=options[0]) }}
+            <label for="emailable">emailable:</label>
+            {{ widgets.combobox(name="emailable", items=combodict.options, item_selected=filterdict.emailable) }}
         </div>
         <div class="col-md-3">
-            <label for="prdelivery">PR delivery:</label>
-            {{ widgets.multiselect(name="prdelivery", items=prdeliveries, items_selected=prdelivery or prdeliveries) }}
+            <label for="prdelivery">pr delivery:</label>
+            {{ widgets.multiselect_as_select(name="prdelivery", items=combodict.prdeliveries, items_selected=filterdict.prdelivery) }}
         </div>
-    </div>
+        <div class="col-md-2">
+            <label for="filtertype">filter type:</label>
+            {{ widgets.combobox(name="jtype", items=combodict.filtertypes, item_selected=filterdict.filtertype) }}
+        </div>
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/queries/?action=filter" class="btn btn-block btn-success ">Search</button>
+            <button type="submit" formaction="/queries/0?action=query" class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-2">
-            <a href="/load_query" class="btn btn-block btn-primary" role="button">Load saved filter:</a>
+            <a href="/load_filter" class="btn btn-block btn-primary" role="button">load saved filter:</a>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="jname" placeholder="query name" value="{{ jname }}">
+            <input type="text" class="form-control" name="filtername" placeholder="filter name" value="{{ filterdict.filtername }}">
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/queries/?action=save" class="btn btn-block btn-danger ">Save query as</button>
+            <button type="submit" formaction="/queries/0?action=save" class="btn btn-block btn-danger ">save query as</button>
         </div>
     </div>
+    {% if action == "pr_query" %}
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <button type="submit" formaction="/payrequests/?action=run" class="btn btn-block btn-success ">create pay requests</button>
+        </div>
+    </div>
+    {% endif %}
+    <div class="table-fixed">
+        <table class="table" id="rentobjs">
+            <thead>
+            <tr>
+                <th style="width: 8.00%">rentcode</th>
+                <th style="width: 8.00%">rentpa</th>
+                <th style="width: 8.00%">arrears</th>
+                <th style="width: 8.00%">nextrentdate</th>
+                <th style="width: 15.00%">tenantname</th>
+                <th style="width: 20.00%">propaddr</th>
+                <th style="width: 8.00%">source</th>
+                <th style="width: 20.00%">agent details</th>
+                <th style="width: 5.00%"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in rentobjs %}
+            <tr id="{{ item.id }}">
+                <td style="width: 8.00%">{{ item.rentcode }}</td>
+                <td style="width: 8.00%"> {{ item.rentpa }}</td>
+                <td style="width: 8.00%"> {{ item.arrears }}</td>
+                <td style="width: 8.00%"> {{ item.nextrentdate }}</td>
+                <td style="width: 15.00%"> {{ item.tenantname }}</td>
+                <td style="width: 20.00%">{{ item.propaddr }}</td>
+                <td style="width: 8.00%"> {{ item.source }}</td>
+                <td style="width: 20.00%"> {{ item.agdetails }}</td>
+                <td style="width: 5.00%"><a href="/rent_object/{{ item.id }}">view/edit</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </form>
-<div class="table-fixed">
-    <table class="table" id="rentprops">
-        <thead>
-        <tr>
-            <th style="width: 8.00%">rentcode</th>
-            <th style="width: 8.00%">rentpa</th>
-            <th style="width: 8.00%">arrears</th>
-            <th style="width: 8.00%">nextrentdate</th>
-            <th style="width: 15.00%">tenantname</th>
-            <th style="width: 20.00%">propaddr</th>
-            <th style="width: 8.00%">source</th>
-            <th style="width: 20.00%">agent details</th>
-            <th style="width: 5.00%"></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in rentprops %}
-        <tr id="{{ item.id }}">
-            <td style="width: 8.00%">{{ item.rentcode }}</td>
-            <td style="width: 8.00%"> {{ item.rentpa }}</td>
-            <td style="width: 8.00%"> {{ item.arrears }}</td>
-            <td style="width: 8.00%"> {{ item.nextrentdate }}</td>
-            <td style="width: 15.00%"> {{ item.tenantname }}</td>
-            <td style="width: 20.00%">{{ item.propaddr }}</td>
-            <td style="width: 8.00%"> {{ item.source }}</td>
-            <td style="width: 20.00%"> {{ item.agdetails }}</td>
-            <td style="width: 5.00%"><a href="/rent_object/{{ item.id }}">View/edit</a></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
 {% endblock %}

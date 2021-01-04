@@ -1,6 +1,6 @@
-### Basic start up guide for installing mjinn - last updated 26 Nov 2020
+### basic start up guide for installing mjinn - last updated 25 Dec 2020
 
-### Please install MySql Server and MySql Workbench using my new mysql server and workbench installation guide
+### install mysql server and mysql workbench using the mysql server and workbench installation guide
  
 **Now install Python 3.7, 3.8 or 3.9 (already in Linux). Easy and quick to install in Windows - https://www.python.org/downloads/**
 

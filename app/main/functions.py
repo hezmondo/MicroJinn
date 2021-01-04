@@ -1,3 +1,4 @@
+# functions.py - attempt to put all commonly used stuff here and in common.py
 import logging
 import re
 import hashlib
@@ -8,8 +9,7 @@ import decimal
 from app import db
 from flask import abort
 from sqlalchemy import exc
-from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN, ROUND_UP
-from app.main.exceptions import RentIntegerException
+from decimal import Decimal
 
 
 dbLogger = logging.getLogger("dbLogger")

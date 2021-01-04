@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <table class="table table-condensed">
+        <thead>
+        <tr>
+            <th style="width: 10.00%">code</th>
+            <th style="width: 70.00%">description</th>
+            <th style="width: 10.00%">action</th>
+            <th style="width: 10.00%">action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in jfilters %}
+        <tr>
+            <td style="width: 10.00%">{{ item.code }}</td>
+            <td style="width: 70.00%">{{ item.description}}</td>
+            <td>
+                <a href="/queries/{{ item.id }}?action=load" class="btn btn-danger">load</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</form>
+{% endblock %}
+
