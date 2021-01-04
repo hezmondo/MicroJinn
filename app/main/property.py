@@ -6,28 +6,32 @@ from app.models import Property, Typeproperty
 
 
 def get_property(id):
-    property = Property.query.join(Typeproperty).with_entities(Property.id, Property.propaddr,
-                   Typeproperty.proptypedet).filter(Property.id == id).one_or_none()
-    proptypedets = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
-
-    return property, proptypedets
-
-
-def post_property(id, action):
-    if action == "edit":
-        property = Property.query.get(id)
-    else:
+    if id == 0:
         property = Property()
-    property.propaddr = request.form.get("propaddr")
-    proptypedet = request.form.get("proptypedet")
-    property.typeprop_id = \
-        Typeproperty.query.with_entities(Typeproperty.id).filter \
-            (Typeproperty.proptypedet == proptypedet).one()[0]
-    db.session.add(property)
-    db.session.commit()
-    id_ = property.id
+        property.id = 0
+        property.typeprop_id = 4
+    else:
+        property = Property.query.get(id)
+    if request.method == "POST":
+        property = post_property(property)
+    proptypes = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.proptypedet).all()]
+    proptypeid = property.typeprop_id
+    proptype = Typeproperty.query.with_entities(Typeproperty.proptypedet).filter \
+                    (Typeproperty.id == proptypeid).one()[0]
+    return property, proptypes, proptype
 
-    return id_
+
+def post_property(property):
+    propaddr = request.form.get("propaddr")
+    property.propaddr = propaddr
+    proptype = request.form.get("proptype")
+    property.typeprop_id = Typeproperty.query.with_entities(Typeproperty.id).filter \
+            (Typeproperty.proptypedet == proptype).one()[0]
+    db.session.add(property)
+    commit_to_database()
+    property = Property.query.filter(Property.propaddr == propaddr).first()
+
+    return property
 
 
 

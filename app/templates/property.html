@@ -1,34 +1,36 @@
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="propid">Property id:</label>
+            <label for="propid">id:</label>
             <input type="text" class="form-control" name="propid" value="{{ property.id }}">
         </div>
         <div class="col-md-8">
-            <label for="propaddr">Property address:</label>
+            <label for="propaddr">address:</label>
             <input type="text" class="form-control" name="propaddr" value="{{ property.propaddr }}">
         </div>
         <div class="col-md-2">
-            <label for="proptype">Property type:</label>
-            <select class="form-control" name="proptypedet">
-                <option value="{{ property.proptypedet }}" selected>{{ property.proptypedet }}</option>
-                {% for proptypedet in proptypedets[0:] %}
-                <option value="{{ proptypedet }}">{{ proptypedet }}</option>
-                {% endfor %}
-            </select>
+            <label for="proptype">type:</label>
+            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=proptype) }}
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete">
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
+        </div>
         <div class="col-md-2">
             <a href="/delete_item/{{ property.id }}?item=property"
                onclick="return confirm('Are you sure you want to delete this property?');"
                class="btn btn-block btn-danger" role="button">Delete property</a>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Save changes</button>
         </div>
     </div>
 </form>

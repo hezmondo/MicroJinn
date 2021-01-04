@@ -5,6 +5,7 @@ from flask_login import login_required
 from io import BytesIO
 from app import db
 from app.main import bp
+from app.main.agent import get_agent, get_agents, post_agent
 from app.main.charge import get_charge, get_charges, post_charge
 from app.main.common import get_combodict
 from app.main.delete import delete_record
@@ -18,14 +19,13 @@ from app.main.income_obj import get_incomes, get_incomeobj, get_income_dict, pos
 from app.main.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
+from app.main.mail import writeMail, write_payrequest
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
         post_moneyitem
+from app.main.property import get_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
 from app.main.rent_obj import getrentobj_main, postrentobj
-from app.main.agent import get_agent, get_agents, post_agent
-from app.main.filter import get_rentobjs
-from app.main.mail import writeMail, write_payrequest
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -39,10 +39,7 @@ def agents():
 @bp.route('/agent/<int:id>', methods=["GET", "POST"])
 @login_required
 def agent(id):
-    if request.method == "POST":
-        agent = post_agent(id)
-    else:
-        agent = get_agent(id)
+    agent = get_agent(id)
 
     return render_template('agent.html', agent=agent)
 
@@ -184,7 +181,7 @@ def headrent(id):
         post_headrent(id)
     headrent = get_headrent(id)
     combodict = get_combodict("basic")
-    #gather combobox values, with "all" added as an option, in a dictionary
+    #gather basic combobox values in a dictionary
 
     return render_template('headrent.html', combodict=combodict, headrent=headrent)
 
@@ -422,7 +419,7 @@ def pr_edit(id):
 @bp.route('/pr_start', methods=['GET', 'POST'])
 @login_required
 def pr_start():
-    filters = Jstore.query.all()
+    filters = Jstore.query.filter(Jstore.type == 1).all()
 
     return render_template('pr_start.html', filters=filters)
 
@@ -438,13 +435,9 @@ def properties():
 @bp.route('/property/<int:id>', methods=["GET", "POST"])
 # @login_required
 def property(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        id = post_property(id, action)
+    property, proptypes, proptype = get_property(id)
 
-    property, proptypedets = get_property(id)
-
-    return render_template('property.html', action=action, property=property, proptypedets=proptypedets)
+    return render_template('property.html', property=property, proptypes=proptypes, proptype=proptype)
 
 
 @bp.route('/queries/<int:id>', methods=['GET', 'POST'])

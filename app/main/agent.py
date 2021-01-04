@@ -1,7 +1,7 @@
 from app import db
 from flask import request
 from app.main.common import get_idlist_recent, pop_idlist_recent
-from app.main.functions import commit_to_database, dateToStr, strToDate, strToDec
+from app.main.functions import commit_to_database
 from app.models import Agent
 
 
@@ -19,25 +19,19 @@ def get_agents():
 
 
 def get_agent(id):
-
     if id == 0:
         agent = Agent()
         agent.id = 0
     else:
         agent = Agent.query.get(id)
         pop_idlist_recent("recent_agents", id)
+    if request.method == "POST":
+        agent = post_agent(agent)
 
     return agent
 
 
-def post_agent(id):
-    if id == 0:
-        agent = Agent()
-        agent.id = 0
-        agent.code = ""
-    else:
-        agent = Agent.query.get(id)
-
+def post_agent(agent):
     agdet = request.form.get("address")
     agent.agdetails = agdet
     agent.agemail = request.form.get("email")

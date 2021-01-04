@@ -7,7 +7,7 @@ from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.lease import get_lease_variables
 from app.main.rent_obj import getrentobj_main
 from app.main.form_letter import get_formletter, get_formpayrequest
-from app.main.payrequests import get_payrequest_table_charges, \
+from app.main.payrequest import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
 
 
@@ -82,7 +82,7 @@ def write_payrequest(rent_id, formpayrequest_id):
     if arrears:
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
-    # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
+    # TODO: Charges can be calculated in rentobj/payrequest.py rather than separately using a function here
     charges, totcharges = get_payrequest_table_charges(rent_id)
     if totcharges:
         table_rows.update(charges)

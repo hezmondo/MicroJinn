@@ -209,9 +209,10 @@ def post_rentobj_filter(filterdict):
     print("filterdict during save")
     print(filterdict)
     jname = request.form.get("filtername")
-    if request.form.get("filtertype") =="payrequest":
+    jtype = request.form.get("filtertype")
+    if jtype == "payrequest":
         jtype = 1
-    elif request.form.get("filtertype") =="rentprop":
+    elif jtype == "rentprop":
         jtype = 2
     else:
         jtype = 3

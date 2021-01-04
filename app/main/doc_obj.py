@@ -7,7 +7,7 @@ from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
 from app.main.functions import commit_to_database
 from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
-from app.main.payrequests import forward_rent
+from app.main.payrequest import forward_rent
 
 
 def get_docfile(id):
