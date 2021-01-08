@@ -7,7 +7,7 @@
 <form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="/pr_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
+			<a href="/pr_dialog/{{ rentobject.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save payrequest</button>
@@ -16,7 +16,7 @@
 	<div id="doc_html" contenteditable="true">
 	    {% if method == "letter" %}
 			<div class="font-size-large" align="center">
-				<b>{{ rentobj.managername }}</b>
+				<b>{{ rentobject.managername }}</b>
 			</div>
 			<div class="font-size-small" align="center">
 				{{ addressdata.manageraddr }}
@@ -25,7 +25,7 @@
 				<br />
 			</div>
 			<div class="font-size-medium" align="right">
-				Our Ref: {{ rentobj.rentcode }}
+				Our Ref: {{ rentobject.rentcode }}
 				<br />
 				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 			</div>
@@ -36,17 +36,17 @@
 				{% endfor %}
 				<br />
 				<br />
-				Dear {{ rentobj.tenantname }}
+				Dear {{ rentobject.tenantname }}
 			</div>
 	    {% else %}
 			<div class="font-size-medium" align="left">
-				Our Ref: {{ rentobj.rentcode }}
+				Our Ref: {{ rentobject.rentcode }}
 				<br />
 				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobject.email }}
 				<br />
 				<br />
-				Dear {{ rentobj.tenantname }}
+				Dear {{ rentobject.tenantname }}
 			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
@@ -75,7 +75,7 @@
 			<br />
 			<br />
 		    {% if method == "email" %}
-				<b>{{ rentobj.managername }}</b>
+				<b>{{ rentobject.managername }}</b>
 				<br />
 				{{ addressdata.manageraddr }}
 				<br />
@@ -92,10 +92,10 @@
     </div>
     <div class="form-group row">
 		<div class="col-md-2">
-            <input type="hidden" id="rentid" name="rentid" value = "{{ rentobj.id }}">
+            <input type="hidden" id="rentid" name="rentid" value = "{{ rentobject.id }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rentobj.rentcode }}">
+            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rentobject.rentcode }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
@@ -104,7 +104,7 @@
             <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="rent_date" name="rent_date" value = "{{ rentobj.nextrentdate }}">
+            <input type="hidden" id="rent_date" name="rent_date" value = "{{ rentobject.nextrentdate }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" id="totdue" name="totdue" value = "{{ totdue }}">

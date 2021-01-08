@@ -1,16 +1,26 @@
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
-from app.main.common import pop_idlist_recent
+from app.main.common import get_combo_id, pop_idlist_recent
 from app.main.functions import commit_to_database, strToDec
 
 from app.models import Agent, Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typedeed, Typefreq, \
     Typemailto, Typeproperty, Typesalegrade, Typestatus, Typetenure
 
 
-def getrentobj_main(id):
+def create_new_rentobject():
+    # create new rent function noit yet built, so return id for dummy rent:
+    return 23
+
+
+def get_rentobject(id):
+    if id == 0:
+        # take the user to create new rent function:
+        id = create_new_rentobject()
+    elif request.method == "POST":
+        id = post_rent(id)
     pop_idlist_recent("recent_rents", id)
-    rentobj = \
+    rentobject = \
         Rent.query \
             .join(Landlord) \
             .join(Manager) \
@@ -37,7 +47,7 @@ def getrentobj_main(id):
                            Typetenure.tenuredet) \
             .filter(Rent.id == id) \
             .one_or_none()
-    if rentobj is None:
+    if rentobject is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
 
@@ -49,71 +59,44 @@ def getrentobj_main(id):
             .filter(Rent.id == id) \
             .all()
 
-    return rentobj, properties
+    return rentobject, properties
 
 
-def postrentobj(id):
-    if id == 0:
-        # new rent:
-        rent = Rent()
-        agent = Agent()
-        rent.rentcode = request.form.get("rentcode")
-        rent.id = 0
-    else:
-        # existing rent:
-        rent = Rent.query.get(id)
-        agent = Agent.query.filter(Agent.id == rent.agent_id).one_or_none()
-
+def post_rent(id):
+    rent = Rent.query.get(id)
+    rent.rentcode = request.form.get("rentcode")
     actype = request.form.get("actype")
-    rent.actype_id = \
-        Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actype).one()[0]
+    rent.actype_id = get_combo_id("actype", actype)
     advarr = request.form.get("advarr")
-    rent.advarr_id = \
-        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+    rent.advarr_id = get_combo_id("advarr", advarr)
     rent.arrears = strToDec(request.form.get("arrears"))
-
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")
-
     deedtype = request.form.get("deedtype")
-    rent.deed_id = \
-        Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == deedtype).one()[0]
+    rent.deed_id = get_combo_id("deedtype", deedtype)
     rent.email = request.form.get("email")
     frequency = request.form.get("frequency")
-    rent.freq_id = \
-        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+    rent.freq_id = get_combo_id("frequency", frequency)
     landlord = request.form.get("landlord")
-    rent.landlord_id = \
-        Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == landlord).one()[0]
+    rent.landlord_id = get_combo_id("landlord", landlord)
     rent.lastrentdate = request.form.get("lastrentdate")
     mailto = request.form.get("mailto")
-    rent.mailto_id = \
-        Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == mailto).one()[0]
+    rent.mailto_id = get_combo_id("mailto", mailto)
     rent.note = request.form.get("note") or ""
     if request.form.get("price") != "None":
         rent.price = strToDec(request.form.get("price")) or strToDec("99999")
     rent.rentpa = strToDec(request.form.get("rentpa"))
     salegrade = request.form.get("salegrade")
-    rent.salegrade_id = \
-        Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == salegrade).one()[0]
+    rent.salegrade_id = get_combo_id("salegrade", salegrade)
     rent.source = request.form.get("source")
     status = request.form.get("status")
-    rent.status_id = \
-        Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == status).one()[0]
+    rent.status_id = get_combo_id("status", status)
     rent.tenantname = request.form.get("tenantname")
     tenure = request.form.get("tenure")
-    rent.tenure_id = \
-        Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == tenure).one()[0]
-
-    agdetails = request.form.get("agent")
-    if agdetails and agdetails != "None":
-        if not agent:
-            agent = Agent()
-            agent.agdetails = agdetails
-            agent.rent_agent.append(rent)
-            db.session.add(agent)
-        else:
-            agent.agdetails = agdetails
+    rent.tenure_id = get_combo_id("tenure", tenure)
+    db.session.add(rent)
+    db.session.flush()
+    _id = rent.id
     db.session.commit()
 
-    return redirect('/rent_object/{}'.format(id))
+    return _id

@@ -9,7 +9,7 @@ from app.models import Agent, Charge, Manager_external, Rent_external, Jstore, L
     Typeprdelivery, Typesalegrade, Typestatus, Typetenure
 
 
-def get_rentobjs(action, id):
+def get_rentobjects(action, id):
     # get filter dictionary and filtered rent objects
     qfilter = []
     # simple filter dictionary for home page
@@ -56,11 +56,11 @@ def get_rentobjs(action, id):
         print("filterdict after qfilter done")
         print(filterdict)
     if action == "save":
-        post_rentobj_filter(filterdict)
+        post_rentobject_filter(filterdict)
     # now get filtered rent objects for this filter
-    rentobjs = get_rentobjs_data(qfilter, action, 100)
+    rentobjects = get_rentobjects_data(qfilter, action, 100)
 
-    return filterdict, rentobjs
+    return filterdict, rentobjects
 
 
 def get_qfilter(filterdict, action):
@@ -156,10 +156,10 @@ def get_qfilter(filterdict, action):
     return filter, filterdict
 
 
-def get_rentobjs_data(qfilter, action, runsize):
+def get_rentobjects_data(qfilter, action, runsize):
     if action == "basic":
         # simple search of main rents submitted from home page
-        rentobjs = \
+        rentobjects = \
             Property.query \
                 .join(Rent) \
                 .outerjoin(Agent) \
@@ -171,7 +171,7 @@ def get_rentobjs_data(qfilter, action, runsize):
 
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed
-        rentobjs = \
+        rentobjects = \
             Rent_external.query \
             .join(Manager_external) \
             .with_entities(Rent_external.id, Rent_external.rentcode, Rent_external.propaddr, Rent_external.tenantname, Rent_external.owner,
@@ -181,7 +181,7 @@ def get_rentobjs_data(qfilter, action, runsize):
 
     else:
         # advanced search submitted from queries page
-        rentobjs = \
+        rentobjects = \
                 Property.query \
                     .join(Rent) \
                     .join(Landlord) \
@@ -201,10 +201,10 @@ def get_rentobjs_data(qfilter, action, runsize):
                                    Typetenure.tenuredet) \
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
-    return rentobjs
+    return rentobjects
 
 
-def post_rentobj_filter(filterdict):
+def post_rentobject_filter(filterdict):
     # save this filter dictionary in jstore
     print("filterdict during save")
     print(filterdict)

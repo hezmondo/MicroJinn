@@ -8,86 +8,73 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentalcode">code:</label>
-            <input type="text" class="form-control" name="rentalcode" value="{{ rental.rentalcode }}">
+            <input type="text" class="form-control" name="rentalcode" value="{{ rental.rentalcode }}" readonly="true">
         </div>
         <div class="col-md-10">
             <label for="propaddr">property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rental.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" value="{{ rental.propaddr }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <label for="tenantname">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rental.tenantname }}">
+            <input type="text" class="form-control" name="tenantname" value="{{ rental.tenantname }}" readonly="true">
         </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-3">
-            <label for="rentpa">annual rent:</label>
-            <input type="text" class="form-control" name="rentpa" value="{{ rental.rentpa }}">
-        </div>
-        <div class="col-md-3">
-            <label for="arrears">rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}">
-        </div>
-        <div class="col-md-3">
-            <label for="astdate">AST start date:</label>
-            <input type="date" class="form-control" name="astdate" value="{{ rental.astdate }}">
-        </div>
-        <div class="col-md-3">
-            <label for="lastgastest">last gas safe test:</label>
-            <input type="date" class="form-control" name="lastgastest" value="{{ rental.lastgastest }}">
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-3">
-            <label for="startrentdate">statement from:</label>
-            <input type="date" class="form-control" name="startrentdate" value="{{ rental.startrentdate }}">
-        </div>
-        <div class="col-md-9">
+        <div class="col-md-6">
             <label for="note">notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ rental.note }}">
+            <input type="text" class="form-control" name="note" value="{{ rental.note }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-3">
+        <div class="col-md-2">
+            <label for="rentpa">annual rent:</label>
+            <input type="text" class="form-control" name="rentpa" value="{{ rental.rentpa }}" readonly="true">
+        </div>
+        <div class="col-md-2">
+            <label for="arrears">rent arrears:</label>
+            <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}" readonly="true">
+        </div>
+        <div class="col-md-2">
             <label for="frequency">frequency:</label>
             {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rental.freqdet) }}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="advarr">advance/arrears:</label>
             {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rental.advarrdet) }}
         </div>
+        <div class="col-md-2">
+            <label for="astdate">AST start date:</label>
+            <input type="date" class="form-control" name="astdate" value="{{ rental.astdate }}" readonly="true">
+        </div>
+        <div class="col-md-2">
+            <label for="lastgastest">last gas safe test:</label>
+            <input type="date" class="form-control" name="lastgastest" value="{{ rental.lastgastest }}" readonly="true">
+        </div>
     </div>
-    <div class="form-group row flex-row-reverse">
+    <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-2">
             <a href="/rentals" class="btn btn-block btn-primary" role="button">back to rentals</a>
         </div>
-        {% if action == "view" %}
-            <div class="col-md-2">
-                <a href="/rental/{{ rental.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit rental</a>
-            </div>
-            <div class="col-md-2">
-                <a href="/rental/{{ rental.id }}?action=clone" class="btn btn-block btn-primary" role="button">clone this rental</a>
-            </div>
-            <div class="col-md-3">
-                <a href="/rental_statement/{{ rental.id }}" class="btn btn-block btn-primary" role="button">produce statement</a>
-            </div>
-            <div class="col-md-2">
-                <a href="/rental/0?action=new" class="btn btn-block btn-primary" role="button">add new rental</a>
-            </div>
-        {% else %}
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-block btn-success">save changes</button>
-            </div>
-            {% if action == "edit" %}
-                <div class="col-md-2">
-                    <a href="/delete_item/{{ rental.id }}?item=rental"
-                       onclick="return confirm('are you sure you want to delete this rental?');"
-                       class="btn btn-block btn-danger" role="button">delete this rental</a>
-                </div>
-            {% endif %}
-        {% endif %}
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/rental_statement/{{ rental.id }}" class="btn btn-block btn-primary" role="button">get statement</a>
+        </div>
+        <div class="col-md-2">
+            <label for="startrentdate">statement from:</label>
+            <input type="date" class="form-control" name="startrentdate" value="{{ rental.startrentdate }}" readonly="true">
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete" >
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/delete_item/{{ rental.id }}?item=rental"
+               onclick="return confirm('are you sure you want to delete this rental?');"
+               class="btn btn-block btn-danger" role="button">delete this rental</a>
+        </div>
     </div>
 </form>
 {% endblock %}

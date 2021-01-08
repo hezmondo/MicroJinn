@@ -4,7 +4,7 @@
 
 **Download and install git for Windows**, accepting all the default options.
 
-Make sure you have already created an empty folder **C:\Flask\samjinn**.
+Make sure you have already created an empty folder **C:\Flask\mjinn**.
 
 Type git into the Windows search bar and right click on `Git bash` and either pin to taskbar or set as desktop shortcut.
 
@@ -20,11 +20,11 @@ Start git bash and then execute these commands:
 
 `git config --global email.address` (to check you are connected to the correct email address)
 
-`cd C:\Flask\samjinn`
+`cd C:\Flask\mjinn`
 
 `git clone https://github.com/hezmondo/mjinn .`  (the dot persuades git to clone the repo into the folder you are already in)
 
-This will clone the Master branch of minn into C:\Flask\samjinn along with the git connections to our Github repo
+This will clone the Master branch of minn into C:\Flask\mjinn along with the git connections to our Github repo
 
 
 **How to switch branches using git bash:**
@@ -102,7 +102,7 @@ then switch from `origin/master` to `origin/samjinn` by ticking the relevant box
 
 then click the `Pull` button.
 
-You are now connected to the samjinn branch and all subsequent pushes and pulls will link to that branch.
+You are now connected to the sammjinn branch and all subsequent pushes and pulls will link to that branch.
 
 **How to count lines of code in project**  Open powershell window in Code folder and try this:
 

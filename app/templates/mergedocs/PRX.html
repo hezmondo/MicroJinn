@@ -3,7 +3,7 @@
 {% block app_content %}
 	<div contenteditable="true">
 		<div class="font-size-large" align="center">
-			<b>{{ rentobj.managername }}</b>
+			<b>{{ rentobject.managername }}</b>
 		</div>
 		<div class="font-size-small" align="center">
 			{{ addressdata.manageraddr }}
@@ -12,7 +12,7 @@
 			<br />
 		</div>
 		<div class="font-size-medium" align="right">
-			Our Ref: {{ rentobj.rentcode }}
+			Our Ref: {{ rentobject.rentcode }}
 			<br />
 			Date: {{ today_date }}
 		</div>
@@ -37,12 +37,12 @@
 			<!-- %include "payreq_clauses_normal.html" -->
 
 			<!-- %if %ChargeType% == "ground rent" % -->
-			{% if rentobj.tenuredet == "Rentcharge" %}
+			{% if rentobject.tenuredet == "Rentcharge" %}
 			<br />
 			{% else %}
 			<br />
 			<div class="font-size-small">
-				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rentobj.landlordname }} whose address (at which notices, including notices in proceedings, should be served) is {{ addressdata.manageraddr }}.
+				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rentobject.landlordname }} whose address (at which notices, including notices in proceedings, should be served) is {{ addressdata.manageraddr }}.
 			</div>
 			{% endif %}
 			<!-- %endif %ChargeType% -->

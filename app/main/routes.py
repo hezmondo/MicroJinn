@@ -11,7 +11,7 @@ from app.main.common import get_combodict
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
-from app.main.filter import get_rentobjs
+from app.main.filter import get_rentobjects
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
 from app.main.functions import backup_database
 from app.main.headrent import get_headrent, get_headrents, post_headrent
@@ -25,7 +25,7 @@ from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_m
 from app.main.property import get_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
-from app.main.rent_obj import getrentobj_main, postrentobj
+from app.main.rentobject import get_rentobject
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -162,8 +162,6 @@ def headrents():
 @bp.route('/headrent/<int:id>', methods=["GET", "POST"])
 @login_required
 def headrent(id):
-    if request.method == "POST":
-        post_headrent(id)
     headrent = get_headrent(id)
     combodict = get_combodict("basic")
     #gather basic combobox values in a dictionary
@@ -199,9 +197,9 @@ def income_object(id):
 @login_required
 def index():
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
-    filterdict, rentobjs = get_rentobjs("basic", 0)
+    filterdict, rentobjects = get_rentobjects("basic", 0)
 
-    return render_template('home.html', filterdict=filterdict, rentobjs=rentobjs)
+    return render_template('home.html', filterdict=filterdict, rentobjects=rentobjects)
 
 
 @bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
@@ -314,7 +312,7 @@ def mail_edit(id):
             # print(request.form)
         formletter_id = id
         rent_id = request.form.get('rent_id')
-        addressdata, block, leasedata, rentobj, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
+        addressdata, block, leasedata, rentobject, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
                                                                                     action)
         mailaddr = request.form.get('mailaddr')
         summary = dcode + "-" + method + "-" + mailaddr[0:25]
@@ -322,7 +320,7 @@ def mail_edit(id):
 
         return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, doctype=doctype,
                                summary=summary, leasedata=leasedata, mailaddr=mailaddr,
-                               method=method, rentobj=rentobj, subject=subject)
+                               method=method, rentobject=rentobject, subject=subject)
 
 
 @bp.route('/money', methods=['GET', 'POST'])
@@ -389,7 +387,7 @@ def pr_edit(id):
         formpayrequest_id = id
         rent_id = request.form.get('rent_id')
         # TODO: passing both totdue and totdue_string with money formatting. Is there a better way?
-        addressdata, block, rentobj, subject, \
+        addressdata, block, rentobject, subject, \
             table_rows, totdue, totdue_string = write_payrequest(rent_id, formpayrequest_id)
         mailaddr = request.form.get('mailaddr')
         # TODO: Do we want a specific PR code to begin the summary?
@@ -397,7 +395,7 @@ def pr_edit(id):
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
-                               method=method, rentobj=rentobj, subject=subject, summary=summary, table_rows=table_rows,
+                               method=method, rentobject=rentobject, subject=subject, summary=summary, table_rows=table_rows,
                                totdue=totdue, totdue_string=totdue_string)
 
 
@@ -431,11 +429,11 @@ def queries(id):
     action = request.args.get('action', "query", type=str)
     combodict = get_combodict("enhanced")
     #gather combobox values, with "all" added as an option, in a dictionary
-    filterdict, rentobjs = get_rentobjs(action, id)
+    filterdict, rentobjects = get_rentobjects(action, id)
     #gather filter values and selected rent objects in two dictionaries
 
     return render_template('queries.html', action=action, combodict=combodict, filterdict=filterdict,
-                                             rentobjs=rentobjs)
+                                             rentobjects=rentobjects)
 
 
 @bp.route('/rentals', methods=['GET', 'POST'])
@@ -480,26 +478,23 @@ def rent_external(id):
 
 @bp.route('/rents_external', methods=['GET', 'POST'])
 def rents_external():
-    filterdict, rentobjs = get_rentobjs("external", 0)
+    filterdict, rentobjects = get_rentobjects("external", 0)
 
-    return render_template('rents_external.html', filterdict=filterdict, rentobjs=rentobjs)
+    return render_template('rents_external.html', filterdict=filterdict, rentobjects=rentobjects)
 
 
 @bp.route('/rent_object/<int:id>', methods=['GET', 'POST'])
 # @login_required
 def rent_object(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        postrentobj(id)
     combodict = get_combodict("basic")
-    rentobj, properties = getrentobj_main(id)
+    rentobject, properties = get_rentobject(id)
     charges = get_charges(id)
-    session['mailtodet'] = rentobj.mailtodet
-    session['mailaddr'] = rentobj.mailaddr
-    session['propaddr'] = rentobj.propaddr
-    session['tenantname'] = rentobj.tenantname
+    session['mailtodet'] = rentobject.mailtodet
+    session['mailaddr'] = rentobject.mailaddr
+    session['propaddr'] = rentobject.propaddr
+    session['tenantname'] = rentobject.tenantname
 
-    return render_template('rent_object.html', action=action, charges=charges, rentobj=rentobj, properties=properties,
+    return render_template('rentobject.html', charges=charges, rentobject=rentobject, properties=properties,
                            combodict=combodict)
 
 

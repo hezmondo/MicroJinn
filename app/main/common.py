@@ -67,6 +67,28 @@ def pop_idlist_recent(type, id):
         db.session.commit()
 
 
+def get_combo_id(type, value):
+    if type == "actype":
+        combo_id = Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == value).one()[0]
+    if type == "advarr":
+        combo_id = Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == value).one()[0]
+    if type == "deedtype":
+        combo_id = Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == value).one()[0]
+    if type == "frequency":
+        combo_id = Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == value).one()[0]
+    if type == "landlord":
+        combo_id = Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == value).one()[0]
+    if type == "mailto":
+        combo_id = Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == value).one()[0]
+    if type == "salegrade":
+        combo_id = Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == value).one()[0]
+    if type == "status":
+        combo_id = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == value).one()[0]
+    if type == "tenure":
+        combo_id = Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == value).one()[0]
+
+    return combo_id
+
 # def preferredEncoding() -> str:
 #     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
 #     # ("utf-8" for Linux, "cp1252" for Windows)
