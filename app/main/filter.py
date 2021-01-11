@@ -15,7 +15,7 @@ def get_rentobjects(action, id):
     # simple filter dictionary for home page
     dict_basic = {
         "rentcode": "",
-        "agentdetails": "",
+        "agentdetail": "",
         "propaddr": "",
         "source": "",
         "tenantname": "",
@@ -82,11 +82,11 @@ def get_qfilter(filterdict, action):
                 filter.append(Rent_external.rentcode.startswith([value]))
             else:
                 filter.append(Rent.rentcode.startswith([value]))
-        elif key == "agentdetails" and value and value != "":
+        elif key == "detail" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.agentdetails.ilike('%{}%'.format(value)))
+                filter.append(Rent_external.agentdetail.ilike('%{}%'.format(value)))
             else:
-                filter.append(Agent.agdetails.ilike('%{}%'.format(value)))
+                filter.append(Agent.detail.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
             if action == "external":
                 filter.append(Rent_external.propaddr.ilike('%{}%'.format(value)))
@@ -163,7 +163,7 @@ def get_rentobjects_data(qfilter, action, runsize):
             Property.query \
                 .join(Rent) \
                 .outerjoin(Agent) \
-                .with_entities(Rent.id, Agent.agdetails, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
+                .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
                                # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
@@ -176,7 +176,7 @@ def get_rentobjects_data(qfilter, action, runsize):
             .join(Manager_external) \
             .with_entities(Rent_external.id, Rent_external.rentcode, Rent_external.propaddr, Rent_external.tenantname, Rent_external.owner,
                            Rent_external.rentpa, Rent_external.arrears, Rent_external.lastrentdate, Rent_external.source, Rent_external.status,
-                           Manager_external.codename, Rent_external.agentdetails) \
+                           Manager_external.codename, Rent_external.agentdetail) \
             .filter(*qfilter).order_by(Rent_external.rentcode).limit(runsize).all()
 
     else:
@@ -192,7 +192,7 @@ def get_rentobjects_data(qfilter, action, runsize):
                     .join(Typestatus) \
                     .join(Typesalegrade) \
                     .join(Typetenure) \
-                    .with_entities(Rent.id, Typeactype.actypedet, Agent.agdetails, Rent.arrears, Rent.lastrentdate,
+                    .with_entities(Rent.id, Typeactype.actypedet, Agent.detail, Rent.arrears, Rent.lastrentdate,
                                    # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                    func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                    func.mjinn.tot_charges(Rent.id).label('totcharges'),

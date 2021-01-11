@@ -1,4 +1,4 @@
-<!-- /templates/rentobject.html  -->
+<!-- /templates/rent_object.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -58,7 +58,7 @@
         </div>
         <div class="col-md-8">
             <label for="agent">agent:</label>
-            <input type="text" class="form-control" name="agent" value="{{ rentobject.agdetails }}" readonly="true">
+            <input type="text" class="form-control" name="agent" value="{{ rentobject.detail }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
@@ -92,13 +92,17 @@
             <label for="actype">account type:</label>
             {{ widgets.combobox(name="actype", items=combodict.actypes, item_selected=rentobject.actypedet) }}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="advarr">advance or arrears:</label>
             {{ widgets.combobox(name="advarr", items=combodict.advars, item_selected=rentobject.advarrdet) }}
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-2">
             <label for="datecode">date code:</label>
             <input type="text" class="form-control" name="datecode" value="{{ rentobject.datecode }}" readonly="true">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="prdelivery">pr delivery:</label>
+            {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries, item_selected=rentobject.pr) }}
         </div>
     </div>
     <div class="form-group row">

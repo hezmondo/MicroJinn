@@ -49,23 +49,23 @@ def get_recovery_info(suffix):
 
 
 def get_payrequest_table_charges(rent_id):
-    charges = get_charge_details(rent_id)
+    charges = get_charge_detail(rent_id)
     charge_table_items = {}
     total_charges = 0
     for charge in charges:
-        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
+        charge_detail = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
         charge_total = charge.chargetotal
-        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
+        charge_table_items.update({charge_detail: moneyToStr(charge_total, pound=True)})
         total_charges = total_charges + charge_total
     return charge_table_items, total_charges
 
 
 # TODO: Decide if database queries should have their own module (probably)
-def get_charge_details(rent_id):
+def get_charge_detail(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,
-                                                                     Charge.chargedetails, Charge.chargebalance) \
+                                                                     Charge.chargedetail, Charge.chargebalance) \
         .filter(*qfilter).all()
     return charges
 
@@ -105,9 +105,9 @@ def get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, c
 def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     today_string = dateToStr(datetime.date.today())
     charge_type = Chargetype.chargedesc.filter_by(id=chargetype_id)
-    charge_details = "£{} {} added on {}:".format(recovery_charge_amount, charge_type.capitalize(), today_string)
+    charge_detail = "£{} {} added on {}:".format(recovery_charge_amount, charge_type.capitalize(), today_string)
     new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=today_string,
-                        chargetotal=recovery_charge_amount, chargedetails=charge_details,
+                        chargetotal=recovery_charge_amount, chargedetail=charge_detail,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
     commit_to_database()

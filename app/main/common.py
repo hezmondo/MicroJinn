@@ -2,9 +2,10 @@
 import json
 import os
 from app import db
+from flask import request
 from flask_login import current_user, login_required
-from app.models import Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, Typeprdelivery, \
-                        Typesalegrade, Typestatus, Typetenure\
+from app.models import Agent, Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, \
+                        Typeprdelivery, Typesalegrade, Typestatus, Typetenure\
 
 
 # common functions
@@ -67,27 +68,47 @@ def pop_idlist_recent(type, id):
         db.session.commit()
 
 
-def get_combo_id(type, value):
-    if type == "actype":
-        combo_id = Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == value).one()[0]
-    if type == "advarr":
-        combo_id = Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == value).one()[0]
-    if type == "deedtype":
-        combo_id = Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == value).one()[0]
-    if type == "frequency":
-        combo_id = Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == value).one()[0]
-    if type == "landlord":
-        combo_id = Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == value).one()[0]
-    if type == "mailto":
-        combo_id = Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == value).one()[0]
-    if type == "salegrade":
-        combo_id = Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == value).one()[0]
-    if type == "status":
-        combo_id = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == value).one()[0]
-    if type == "tenure":
-        combo_id = Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == value).one()[0]
+def get_postvals_toid():
+    # returns the post values for rent and head rent as dict with class id generated for combobox value
+    postvals_toid = {
+        "actype": "",
+        "advarr": "",
+        "agent": "",
+        "frequency": "",
+        "landlord": "",
+        "mailto": "",
+        "prdelivery": "",
+        "salegrade": "",
+        "status": "",
+        "tenure": ""
+    }
+    for key, value in postvals_toid.items():
+        actval = request.form.get(key)
+        if actval and actval != "":
+            if key == "actype":
+                actval = Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actval).one()[0]
+            elif key == "advarr":
+                actval = Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == actval).one()[0]
+            elif key == "agent":
+                actval = Agent.query.with_entities(Agent.id).filter(Agent.detail == actval).one()[0]
+            elif key == "deedtype":
+                actval = Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == actval).one()[0]
+            elif key == "frequency":
+                actval = Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == actval).one()[0]
+            elif key == "landlord":
+                actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == actval).one()[0]
+            elif key == "mailto":
+                actval = Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == actval).one()[0]
+            elif key == "salegrade":
+                actval = Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == actval).one()[0]
+            elif key == "status":
+                actval = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == actval).one()[0]
+            elif key == "tenure":
+                actval = Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == actval).one()[0]
+            postvals_toid[key] = actval
+            print(key, value)
 
-    return combo_id
+    return postvals_toid
 
 # def preferredEncoding() -> str:
 #     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()

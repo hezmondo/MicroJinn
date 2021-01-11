@@ -9,13 +9,13 @@ from app.main.agent import get_agent, get_agents, post_agent
 from app.main.charge import get_charge, get_charges, post_charge
 from app.main.common import get_combodict
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
+from app.main.doc_object import get_docfile, get_docfiles, post_docfile, post_upload, post_payrequestfile
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
 from app.main.filter import get_rentobjects
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
 from app.main.functions import backup_database
 from app.main.headrent import get_headrent, get_headrents, post_headrent
-from app.main.income_obj import get_incomes, get_incomeobj, get_income_dict, post_incomeobj
+from app.main.income_object import get_incomes, get_income_object, get_income_dict, post_income_object
 from app.main.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
@@ -25,7 +25,7 @@ from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_m
 from app.main.property import get_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
-from app.main.rentobject import get_rentobject
+from app.main.rent_object import get_rentobject
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -183,10 +183,10 @@ def income(id):
 def income_object(id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_incomeobj(id, action)
+        id = post_income_object(id, action)
 
     income_dict = get_income_dict("enhanced")
-    income, incomeallocs = get_incomeobj(id)
+    income, incomeallocs = get_income_object(id)
 
     return render_template('income_object.html', action=action, income=income, incomeallocs=incomeallocs,
                            income_dict=income_dict)
@@ -494,7 +494,7 @@ def rent_object(id):
     session['propaddr'] = rentobject.propaddr
     session['tenantname'] = rentobject.tenantname
 
-    return render_template('rentobject.html', charges=charges, rentobject=rentobject, properties=properties,
+    return render_template('rent_object.html', charges=charges, rentobject=rentobject, properties=properties,
                            combodict=combodict)
 
 

@@ -16,7 +16,7 @@
             <button type="submit" class="btn btn-block btn-primary">search</button>
         </div>
         <div class="col-md-3">
-            <input type="text" class="form-control" name="chargedetails" placeholder="Charge details">
+            <input type="text" class="form-control" name="chargedetail" placeholder="charge details">
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="rentcode" placeholder="rent code">
@@ -42,7 +42,7 @@
             <td style="width: 25.00%"> {{ charge.chargedesc }}</td>
             <td style="width: 10.00%"> {{ charge.chargestartdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
-            <td style="width: 25.00%"> {{ charge.chargedetails }}</td>
+            <td style="width: 25.00%"> {{ charge.chargedetail }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
             <td style="width: 5.00%"><a href="/charge/{{ charge.id }}">view</a></td>
         </tr>

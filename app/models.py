@@ -12,12 +12,11 @@ class Agent(db.Model):
     __tablename__ = 'agent'
 
     id = db.Column(db.Integer, primary_key=True)
-    agdetails = db.Column(db.String(180))
-    agemail = db.Column(db.String(60))
-    agnotes = db.Column(db.String(60))
+    detail = db.Column(db.String(180))
+    email = db.Column(db.String(90))
+    note = db.Column(db.String(90))
     code = db.Column(db.String(15))
 
-    emailad_agent = db.relationship('Emailad', backref='agent', lazy='dynamic')
     headrent_agent = db.relationship('Headrent', backref='agent', lazy='dynamic')
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
@@ -29,7 +28,7 @@ class Charge(db.Model):
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     chargestartdate = db.Column(db.Date)
     chargetotal = db.Column(db.Numeric(8,2))
-    chargedetails = db.Column(db.String(140))
+    chargedetail = db.Column(db.String(140))
     chargebalance = db.Column(db.Numeric(8,2))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
@@ -105,8 +104,6 @@ class Emailad(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     emailaddr = db.Column(db.String(90))
-    rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
 
 
 class Event(db.Model):
@@ -135,7 +132,7 @@ class Headrent(db.Model):
     __tablename__ = 'headrent'
 
     id = db.Column(db.Integer, primary_key=True)
-    hrcode = db.Column(db.String(15), index=True, unique=True)
+    code = db.Column(db.String(15), index=True, unique=True)
     rentpa = db.Column(db.Numeric(8,2))
     arrears = db.Column(db.Numeric(8,2))
     lastrentdate = db.Column(db.Date)
@@ -323,7 +320,7 @@ class Manager_external(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     codename = db.Column(db.String(15))
-    details = db.Column(db.String(180))
+    detail = db.Column(db.String(180))
 
     rentext_managerext = db.relationship('Rent_external', backref='manager_external', lazy='dynamic')
 
@@ -477,7 +474,6 @@ class Rent(db.Model):
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     digfile_rent = db.relationship('Digfile', backref='rent', lazy='dynamic')
     docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
-    emailad_rent = db.relationship('Emailad', backref='rent', lazy='dynamic')
     event_rent = db.relationship('Event', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
@@ -523,7 +519,7 @@ class Rent_external(db.Model):
     rentcode = db.Column(db.String(20), index=True)
     tenantname = db.Column(db.String(30))
     propaddr = db.Column(db.String(180))
-    agentdetails = db.Column(db.String(45))
+    agentdetail = db.Column(db.String(45))
     rentpa = db.Column(db.Numeric(8, 2))
     arrears = db.Column(db.Numeric(8, 2))
     lastrentdate = db.Column(db.Date)

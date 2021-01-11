@@ -76,7 +76,7 @@ def get_income_dict(type):
     return income_dict
 
 
-def get_incomeobj(id):
+def get_income_object(id):
     income = Income.query.join(Money_account).join(Typepayment).with_entities(Income.id, Income.date, Income.amount,
               Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
 
@@ -87,7 +87,7 @@ def get_incomeobj(id):
     return income, incomeallocs
 
 
-def post_incomeobj(id, action):
+def post_income_object(id, action):
     # this object comprises 1 income record plus 1 or more incomealloc records. First, we do the income record
     if action == "edit":
         income = Income.query.get(id)

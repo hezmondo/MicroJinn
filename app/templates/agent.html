@@ -4,25 +4,25 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row">
-        <div class="col-md-8">
-            <label for="address">agent address:</label>
-            <input type="text" class="form-control" name="address" value="{{ agent.agdetails }}" readonly="true">
+        <div class="col-md-10">
+            <label for="detail">agent details:</label>
+            <input type="text" class="form-control" name="detail" value="{{ agent.detail }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="item_id">agent id:</label>
-            <input type="text" class="form-control" name="item_id" value="{{ agent.id }}" readonly="true">
+            <label for="ag_id">agent id:</label>
+            <input type="text" class="form-control" name="ag_id" value="{{ agent.id }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-12">
             <label for="email">agent email:</label>
-            <input type="text" class="form-control" name="email" value="{{ agent.agemail }}" readonly="true">
+            <input type="text" class="form-control" name="email" value="{{ agent.email }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-12">
-            <label for="notes">agent notes:</label>
-            <input type="text" class="form-control" name="notes" value="{{ agent.agnotes }}" readonly="true">
+            <label for="note">agent notes:</label>
+            <input type="text" class="form-control" name="note" value="{{ agent.note }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">

@@ -21,7 +21,7 @@ def get_charge(id):
     else:
         charge = \
             Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.id.label("rentid"), Rent.rentcode,
-                   Chargetype.chargedesc, Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails,
+                   Chargetype.chargedesc, Charge.chargestartdate, Charge.chargetotal, Charge.chargedetail,
                        Charge.chargebalance) \
                     .filter(Charge.id == id).one_or_none()
     chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
@@ -33,14 +33,14 @@ def get_charges(rentid):
     qfilter = []
     if request.method == "POST":
         rcd = request.form.get("rentcode") or ""
-        cdt = request.form.get("chargedetails") or ""
+        cdt = request.form.get("chargedetail") or ""
         qfilter.append(Rent.rentcode.startswith([rcd]))
-        qfilter.append(Charge.chargedetails.ilike('%{}%'.format(cdt)))
+        qfilter.append(Charge.chargedetail.ilike('%{}%'.format(cdt)))
     elif rentid != "0":
         qfilter.append(Charge.rent_id == rentid)
 
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
-                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetails, Charge.chargebalance) \
+                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetail, Charge.chargebalance) \
             .filter(*qfilter).all()
 
     return charges
@@ -59,7 +59,7 @@ def post_charge(id):
             Chargetype.chargedesc == request.form.get("chargedesc")).one()[0]
     charge.chargestartdate = request.form.get("chargestartdate")
     charge.chargetotal = strToDec(request.form.get("chargetotal"))
-    charge.chargedetails = request.form.get("chargedetails")
+    charge.chargedetail = request.form.get("chargedetail")
     charge.chargebalance = strToDec(request.form.get("chargebalance"))
     rent_id = charge.rent_id
     db.session.add(charge)

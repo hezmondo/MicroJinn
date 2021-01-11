@@ -296,7 +296,7 @@ def constructCharges(chargesList):
     charges = []
 
     for charge in chargesList:
-        chargeDetail = "{}{}:".format(charge["ChargeDetails"],
+        chargeDetail = "{}{}:".format(charge["ChargeDetail"],
                                       " - balance owing" if charge["ChargeBalance"] < charge["ChargeTotal"] else "")
         chargeAmount = moneyToStr(charge["ChargeBalance"], commas=False, pound=True)
 
@@ -307,8 +307,8 @@ def constructCharges(chargesList):
 
 def formatCharges(mergeDict):
     # htmlfunctions.py, eprpayrequestfunctions.py
-    mergeDict["ChargeDetails"] = "\n".join([charge[0] for charge in mergeDict["Charges"]])
-    mergeDict["ChargeAmounts"] = "\n".join([charge[1] for charge in mergeDict["Charges"]])
+    mergeDict["ChargeDetail"] = "\n".join([charge[0] for charge in mergeDict["Charges"]])
+    mergeDict["ChargeAmount"] = "\n".join([charge[1] for charge in mergeDict["Charges"]])
 
 
 UkDateFormat = "%d-%b-%Y"

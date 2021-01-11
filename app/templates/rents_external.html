@@ -20,8 +20,8 @@
             <input type="text" class="form-control" name="source" placeholder="any" value="{{ filterdict.source }}">
         </div>
         <div class="col-md-2">
-            <label for="agentdetails">agent details:</label>
-            <input type="text" class="form-control" name="agentdetails" placeholder="any" value="{{ filterdict.agentdetails }}">
+            <label for="agentdetail">agent details:</label>
+            <input type="text" class="form-control" name="agentdetail" placeholder="any" value="{{ filterdict.agentdetail }}">
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
@@ -69,7 +69,7 @@
             <td style="width: 15.00%"> {{ item.tenantname }}</td>
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
-            <td style="width: 20.00%"> {{ item.agentdetails }}</td>
+            <td style="width: 20.00%"> {{ item.agentdetail }}</td>
             <td style="width: 5.00%"><a href="/rent_external/{{ item.id }}">view</a></td>
         </tr>
         {% endfor %}

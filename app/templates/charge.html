@@ -28,8 +28,8 @@
             <input type="text" class="form-control" id="chargetotal" name="chargetotal" value="{{ charge.chargetotal }}" readonly="true">
         </div>
         <div class="col-md-4">
-            <label for="chargedetails">charge details:</label>
-            <input type="text" class="form-control" id="chargedetails" name="chargedetails" value="{{ charge.chargedetails }}" readonly="true">
+            <label for="chargedetail">charge details:</label>
+            <input type="text" class="form-control" id="chargedetail" name="chargedetail" value="{{ charge.chargedetail }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="chargebalance">charge balance:</label>
@@ -65,7 +65,7 @@
 <script type="text/javascript">
     var input1 = document.getElementById('chargedesc');
     var input2 = document.getElementById('chargetotal');
-    var input3 = document.getElementById('chargedetails');
+    var input3 = document.getElementById('chargedetail');
     var input4 = document.getElementById('chargebalance');
 
     input2.addEventListener('change', function() {
