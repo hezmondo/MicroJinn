@@ -1,7 +1,7 @@
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
-from app.main.common import get_postvals_toid, pop_idlist_recent
+from app.main.common import get_postvals_id, pop_idlist_recent
 from app.main.functions import commit_to_database, strToDec
 
 from app.models import Agent, Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typedeed, Typefreq, \
@@ -64,30 +64,30 @@ def get_rentobject(id):
 
 def post_rent(id):
     rent = Rent.query.get(id)
-    postvals_toid = get_postvals_toid()
+    postvals_id = get_postvals_id()
     # we need the post values with the class id generated for the actual combobox values:
-    rent.actype_id = postvals_toid["actype"]
-    rent.advarr_id = postvals_toid["advar"]
-    rent.arrears = strToDec(postvals_toid["arrears"])
+    rent.actype_id = postvals_id["actype"]
+    rent.advarr_id = postvals_id["advar"]
+    rent.arrears = strToDec(postvals_id["arrears"])
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")
     rent.deed_id = request.form.get("deedcode")
     rent.email = request.form.get("email")
-    rent.freq_id = postvals_toid["frequency"]
-    rent.landlord_id = postvals_toid["landlord"]
+    rent.freq_id = postvals_id["frequency"]
+    rent.landlord_id = postvals_id["landlord"]
     rent.lastrentdate = request.form.get("lastrentdate")
-    rent.mailto_id = postvals_toid["mailto"]
+    rent.mailto_id = postvals_id["mailto"]
     rent.note = request.form.get("note")
-    rent.prdelivery_id = postvals_toid["prdelivery"]
+    rent.prdelivery_id = postvals_id["prdelivery"]
     rent.price = strToDec(request.form.get("price")) or strToDec("99999")
     rent.rentcode = request.form.get("rentcode")
     rent.rentpa = strToDec(request.form.get("rentpa"))
     rent.rentcode = request.form.get("rentcode")
-    rent.salegrade_id = postvals_toid["salegrade"]
+    rent.salegrade_id = postvals_id["salegrade"]
     rent.source = request.form.get("source")
-    rent.status_id = postvals_toid["status"]
+    rent.status_id = postvals_id["status"]
     rent.tenantname = request.form.get("tenantname")
-    rent.tenure_id = postvals_toid["tenure"]
+    rent.tenure_id = postvals_id["tenure"]
     db.session.add(rent)
     db.session.flush()
     _id = rent.id

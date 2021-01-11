@@ -68,9 +68,9 @@ def pop_idlist_recent(type, id):
         db.session.commit()
 
 
-def get_postvals_toid():
+def get_postvals_id():
     # returns the post values for rent and head rent as dict with class id generated for combobox value
-    postvals_toid = {
+    postvals_id = {
         "actype": "",
         "advarr": "",
         "agent": "",
@@ -82,7 +82,7 @@ def get_postvals_toid():
         "status": "",
         "tenure": ""
     }
-    for key, value in postvals_toid.items():
+    for key, value in postvals_id.items():
         actval = request.form.get(key)
         if actval and actval != "":
             if key == "actype":
@@ -105,10 +105,10 @@ def get_postvals_toid():
                 actval = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == actval).one()[0]
             elif key == "tenure":
                 actval = Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == actval).one()[0]
-            postvals_toid[key] = actval
+            postvals_id[key] = actval
             print(key, value)
 
-    return postvals_toid
+    return postvals_id
 
 # def preferredEncoding() -> str:
 #     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()

@@ -82,7 +82,7 @@ def get_qfilter(filterdict, action):
                 filter.append(Rent_external.rentcode.startswith([value]))
             else:
                 filter.append(Rent.rentcode.startswith([value]))
-        elif key == "detail" and value and value != "":
+        elif key == "agentdetail" and value and value != "":
             if action == "external":
                 filter.append(Rent_external.agentdetail.ilike('%{}%'.format(value)))
             else:

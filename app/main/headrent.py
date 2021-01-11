@@ -1,7 +1,7 @@
 from app import db
 from flask import request
 from sqlalchemy import desc, func
-from app.main.common import get_postvals_toid
+from app.main.common import get_postvals_id
 from app.main.functions import commit_to_database, strToDec
 from app.models import Agent, Headrent, Landlord, Typeadvarr, Typefreq, Typestatus, Typetenure\
 
@@ -51,25 +51,25 @@ def get_headrent(id):
 
 def post_headrent(id):
     headrent = Headrent.query.get(id)
-    postvals_toid = get_postvals_toid()
+    postvals_id = get_postvals_id()
     # we need the post values as class id generated for the actual combobox values:
-    headrent.advarr_id = postvals_toid["advarr"]
-    headrent.agent_id = postvals_toid["agent"]
+    headrent.advarr_id = postvals_id["advarr"]
+    headrent.agent_id = postvals_id["agent"]
     headrent.arrears = strToDec(request.form.get("arrears"))
     # we may write code later to generate datecode from lastrentdate!:
     headrent.code = request.form.get("rentcode")
     headrent.datecode = request.form.get("datecode")
-    headrent.freq_id = postvals_toid["frequency"]
-    headrent.landlord_id = postvals_toid["landlord"]
+    headrent.freq_id = postvals_id["frequency"]
+    headrent.landlord_id = postvals_id["landlord"]
     headrent.lastrentdate = request.form.get("lastrentdate")
     headrent.note = request.form.get("note")
     headrent.reference = request.form.get("reference")
     headrent.rentpa = strToDec(request.form.get("rentpa"))
-    headrent.salegrade_id = postvals_toid["salegrade"]
+    headrent.salegrade_id = postvals_id["salegrade"]
     headrent.source = request.form.get("source")
-    headrent.status_id = postvals_toid["status"]
+    headrent.status_id = postvals_id["status"]
     headrent.tenantname = request.form.get("tenantname")
-    headrent.tenure_id = postvals_toid["tenure"]
+    headrent.tenure_id = postvals_id["tenure"]
     db.session.add(headrent)
     db.session.flush()
     _id = headrent.id
