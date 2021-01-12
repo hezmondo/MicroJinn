@@ -5,7 +5,7 @@ from sqlalchemy import desc, func
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Manager, Money_account, Rent, Typepayment
 from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.lease import get_lease_variables
-from app.main.rent_object import get_rentobject
+from app.main.rent_object import get_rent_object
 from app.main.form_letter import get_formletter, get_formpayrequest
 from app.main.payrequest import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
@@ -107,7 +107,7 @@ def doReplace(dict, clause):
 
 
 def get_word_variables(rent_id, income_id=0):
-    rentobject, properties = get_rentobject(rent_id)
+    rentobject, properties = get_rent_object(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
 
     arrears = rentobject.arrears if rentobject.arrears else Decimal(0)

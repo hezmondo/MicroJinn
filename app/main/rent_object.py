@@ -13,7 +13,7 @@ def create_new_rent():
     return 23
 
 
-def get_rentobject(id):
+def get_rent_object(id):
     if id == 0:
         # take the user to create new rent function:
         id = create_new_rent()

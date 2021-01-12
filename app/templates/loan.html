@@ -6,82 +6,74 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="loancode">Loan code:</label>
-            <input type="text" class="form-control" name="loancode" value="{{ loan.code }}">
+            <label for="loancode">loan code:</label>
+            <input type="text" class="form-control" name="loancode" value="{{ loan.code }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="interest_rate">Interest rate:</label>
-            <input type="text" class="form-control" name="interest_rate" value="{{ loan.interest_rate }}">
+            <label for="interest_rate">interest rate:</label>
+            <input type="text" class="form-control" name="interest_rate" value="{{ loan.interest_rate }}" readonly="true">
         </div>
         <div class="col-md-3">
-            <label for="end_date">End date:</label>
-            <input type="date" class="form-control" name="end_date" value="{{ loan.end_date }}">
+            <label for="end_date">end date:</label>
+            <input type="date" class="form-control" name="end_date" value="{{ loan.end_date }}" readonly="true">
         </div>
         <div class="col-md-3">
-            <label for="frequency">Frequency:</label>
+            <label for="frequency">frequency:</label>
             {{ widgets.combobox(name="frequency", items=freqdets, item_selected=loan.freqdet) }}
         </div>
         <div class="col-md-2">
-            <label for="advarr">Advance/Arrears:</label>
+            <label for="advarr">advance/Arrears:</label>
             {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=loan.advarrdet) }}
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="lender">Lender:</label>
-            <input type="text" class="form-control" name="lender" value="{{ loan.lender }}">
+            <label for="lender">lender:</label>
+            <input type="text" class="form-control" name="lender" value="{{ loan.lender }}" readonly="true">
         </div>
         <div class="col-md-3">
-            <label for="borrower">Borrower:</label>
-            <input type="text" class="form-control" name="borrower" value="{{ loan.borrower }}">
+            <label for="borrower">borrower:</label>
+            <input type="text" class="form-control" name="borrower" value="{{ loan.borrower }}" readonly="true">
         </div>
         <div class="col-md-7">
-            <label for="notes">Notes:</label>
-            <input type="text" class="form-control" name="notes" value="{{ loan.notes }}">
+            <label for="notes">notes:</label>
+            <input type="text" class="form-control" name="notes" value="{{ loan.notes }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-3">
-            <label for="val_date">Valuation date:</label>
-            <input type="date" class="form-control" name="val_date" value="{{ loan.val_date }}">
+            <label for="val_date">valuation date:</label>
+            <input type="date" class="form-control" name="val_date" value="{{ loan.val_date }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="valuation">Valuation:</label>
-            <input type="text" class="form-control" name="valuation" value="{{ loan.valuation }}">
+            <label for="valuation">valuation:</label>
+            <input type="text" class="form-control" name="valuation" value="{{ loan.valuation }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="interestpa">Interest pa:</label>
-            <input type="text" class="form-control" name="interestpa" value="{{ loan.interestpa }}">
+            <label for="interestpa">interest pa:</label>
+            <input type="text" class="form-control" name="interestpa" value="{{ loan.interestpa }}" readonly="true">
         </div>
     </div>
-    <div class="form-group row">
-        {% if action == "view" %}
-        <div class="col-md-3">
-            <a href="/loan/{{ loan.id }}?action=edit" class="btn btn-block btn-primary" role="button">Edit this loan</a>
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="/loans" class="btn btn-block btn-primary" role="button">back to loans</a>
         </div>
-        <div class="col-md-3">
-            <a href="/loan/{{ loan.id }}?action=clone" class="btn btn-block btn-danger" role="button">Clone this loan</a>
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
         <div class="col-md-3">
             <a href="/loanstat_dialog/{{ loan.id }}" class="btn btn-block btn-primary" role="button">Produce statement for this loan</a>
         </div>
-        <div class="col-md-3">
-            <a href="/loan/0?action=new" class="btn btn-block btn-primary" role="button">Add new loan</a>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete" >
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
-        {% elif action == "edit" %}
         <div class="col-md-2">
             <a href="/delete_item/{{ loan.id }}?item=loan"
                onclick="return confirm('Are you sure you want to delete this loan?');"
-               class="btn btn-block btn-warning" role="button">Delete this loan</a>
+               class="btn btn-block btn-warning" role="button">delete this loan</a>
         </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">Save changes</button>
-        </div>
-        {% else %}
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success">Save as new loan</button>
-        </div>
-        {% endif %}
     </div>
 </form>
 {% endblock %}

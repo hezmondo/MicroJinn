@@ -25,7 +25,7 @@ from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_m
 from app.main.property import get_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
-from app.main.rent_object import get_rentobject
+from app.main.rent_object import get_rent_object
 from app.models import Digfile, Jstore, Loan, Template, Typedoc
 
 
@@ -254,14 +254,10 @@ def load_filter():
 @bp.route('/loan/<int:id>', methods=['GET', 'POST'])
 @login_required
 def loan(id):
-    action = request.args.get('action', "view", type=str)
-    if request.method == "POST":
-        id = post_loan(id, action)
-        action = "view"
     loan = get_loan(id)
     advarrdets, freqdets = get_loan_options()
 
-    return render_template('loan.html', action=action, loan=loan, advarrdets=advarrdets, freqdets=freqdets)
+    return render_template('loan.html', loan=loan, advarrdets=advarrdets, freqdets=freqdets)
 
 
 @bp.route('/loans', methods=['GET', 'POST'])
@@ -487,7 +483,7 @@ def rents_external():
 # @login_required
 def rent_object(id):
     combodict = get_combodict("basic")
-    rentobject, properties = get_rentobject(id)
+    rentobject, properties = get_rent_object(id)
     charges = get_charges(id)
     session['mailtodet'] = rentobject.mailtodet
     session['mailaddr'] = rentobject.mailaddr

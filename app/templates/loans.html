@@ -5,10 +5,10 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="/loans?action=Nick" class="btn btn-block btn-primary" role="button">Show only Nick loans</a>
+            <a href="/loans?action=Nick" class="btn btn-block btn-primary" role="button">show only Nick loans</a>
         </div>
         <div class="col-md-3">
-            <a href="/loan/0?action=new" class="btn btn-block btn-danger" role="button">Add new loan</a>
+            <a href="/loan/0" class="btn btn-block btn-danger" role="button">add new loan</a>
         </div>
     </div>
 </form>
@@ -21,10 +21,10 @@
             <th style="width: 10.00%">int rate</th>
             <th style="width: 12.00%">lender</th>
             <th style="width: 12.00%">end date</th>
-            <th style="width: 12.00%">Notes</th>
-            <th style="width: 12.00%">Valuation date</th>
-            <th style="width: 10.00%">Valuation</th>
-            <th style="width: 8.00%">Action</th>
+            <th style="width: 12.00%">notes</th>
+            <th style="width: 12.00%">valuation date</th>
+            <th style="width: 10.00%">valuation</th>
+            <th style="width: 8.00%">action</th>
         </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@
             <td style="width: 12.00%"> {{ item.notes }}</td>
             <td style="width: 12.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 10.00%"> {{ item.valuation }}</td>
-            <td style="width: 8.00%"><a href="/loan/{{ item.id }}?action=view">View</a></td>
+            <td style="width: 8.00%"><a href="/loan/{{ item.id }}">view</a></td>
         </tr>
         {% endfor %}
         <tr>
@@ -46,7 +46,7 @@
         <tr>
             <td style="width: 6.00%"></td>
             <td style="width: 10.00%"></td>
-            <td style="width: 14.00%">Total for all loans</td>
+            <td style="width: 14.00%">total for all loans</td>
             <td style="width: 10.00%"></td>
             <td style="width: 12.00%"></td>
             <td style="width: 10.00%"></td>

@@ -57,7 +57,7 @@ def get_moneydict():
 
 def get_moneyitem(id):
     if request.method == "POST":
-        moneyitem, cleared = post_moneyitem(id)
+        id = post_moneyitem(id)
     elif id == 0:
         moneyitem = Money_item()
         moneyitem.id = 0

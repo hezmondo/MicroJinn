@@ -32,7 +32,7 @@ def get_agent(id):
 
 
 def post_agent(id):
-    agent = Agent.query.get(id)
+    agent = Agent.query.get(id) or Agent()
     agent.detail = request.form.get("detail")
     agent.email = request.form.get("email")
     agent.note = request.form.get("note")

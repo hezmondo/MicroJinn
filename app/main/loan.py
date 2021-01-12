@@ -2,15 +2,23 @@ from app import db
 from flask import request
 from sqlalchemy import desc, func
 from app.models import Loan, Loan_statement, Typeadvarr, Typefreq
+from app.main.functions import commit_to_database
+
 
 def get_loan(id):
-    loan = \
-        Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
-                                                                 Loan.end_date, Loan.lender, Loan.borrower, Loan.notes,
-                                                                 Loan.val_date, Loan.valuation,
-                                                                 Loan.interestpa, Typeadvarr.advarrdet,
-                                                                 Typefreq.freqdet) \
-            .filter(Loan.id == id).one_or_none()
+    if request.method == "POST":
+        id = post_loan(id)
+    if id != 0:
+        loan = \
+            Loan.query.join(Typeadvarr).join(Typefreq).with_entities(Loan.id, Loan.code, Loan.interest_rate,
+                                                                     Loan.end_date, Loan.lender, Loan.borrower, Loan.notes,
+                                                                     Loan.val_date, Loan.valuation,
+                                                                     Loan.interestpa, Typeadvarr.advarrdet,
+                                                                     Typefreq.freqdet) \
+                .filter(Loan.id == id).one_or_none()
+    else:
+        loan = Loan()
+        loan.id = 0
 
     return loan
 
@@ -51,11 +59,8 @@ def get_loanstatement():
     return loanstatement
 
 
-def post_loan(id, action):
-    if action == "edit":
-        loan = Loan.query.get(id)
-    else:
-        loan = Loan()
+def post_loan(id):
+    loan = Loan.query.get(id) or Loan()
     loan.code = request.form.get("loancode")
     loan.interest_rate = request.form.get("interest_rate")
     loan.end_date = request.form.get("end_date")
@@ -71,7 +76,8 @@ def post_loan(id, action):
     # loan.val_date = request.form.get("val_date")
     # loan.valuation = request.form.get("valuation")
     db.session.add(loan)
-    db.session.commit()
-    id_ = loan.id
+    db.session.flush()
+    _id = loan.id
+    commit_to_database()
 
-    return id_
+    return _id
