@@ -1,17 +1,16 @@
 import sqlalchemy
 import datetime
+import json
 from flask import redirect, render_template, request, send_from_directory, send_file, session, url_for
 from flask_login import login_required
 from io import BytesIO
-from app import db
+from app import db, decimal_default
 from app.main import bp
 from app.main.charge import get_charge, get_charges, post_charge
 from app.main.common import get_combodict
 from app.main.delete import delete_record
-from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload, get_pr_file, \
-    get_pr_history, post_pr_file
+from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
-from app.main.filter import get_rentobjs
 from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
 from app.main.functions import backup_database
 from app.main.headrent import get_headrent, get_headrents, post_headrent
@@ -21,6 +20,7 @@ from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
         post_moneyitem
+from app.main.payrequests import get_pr_file, get_pr_history, post_pr_file
 from app.main.property import get_property, post_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
@@ -267,7 +267,7 @@ def leases():
 
 @bp.route('/load_filter', methods=['GET', 'POST'])
 def load_filter():
-    # load predefined filters from jstore for queries and payrequests
+    # load predefined filters from jstore for queries and payrequest
     jfilters = Jstore.query.all()
 
     return render_template('load_filter.html', jfilters=jfilters)
@@ -389,10 +389,10 @@ def money_item(id):
     money_dict = get_moneydict()
     money_item, cleared = get_moneyitem(id)
 
-# # TODO: Possible refactor of payrequests - currently a duplication of queries but with forward_rents function
-# @bp.route('/payrequests/', methods=['GET', 'POST'])
+# # TODO: Possible refactor of payrequest - currently a duplication of queries but with forward_rents function
+# @bp.route('/payrequest/', methods=['GET', 'POST'])
 # @login_required
-# def payrequests():
+# def payrequest():
 #     action = request.args.get('action', "view", type=str)
 #     name = request.args.get('name', "queryall", type=str)
 #
@@ -406,7 +406,7 @@ def money_item(id):
 #     if action == "run":
 #         forward_rents(rentprops)
 #
-#     return render_template('payrequests.html', action=action, actypedets=actypedets, floads=floads,
+#     return render_template('payrequest.html', action=action, actypedets=actypedets, floads=floads,
 #                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
 #                            statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
 #                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
@@ -426,19 +426,22 @@ def pr_dialog(id):
 @bp.route('/pr_edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def pr_edit(id):
-    method = request.args.get('method', "email", type=str)
     if request.method == "POST":
+        method = request.args.get('method', "email", type=str)
         rent_id = request.form.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
-        addressdata, block, pr_code, rentobj, subject, \
-            table_rows, totdue, totdue_string = write_payrequest(rent_id, id)
+        # TODO: All hidden variables can be passed in a single json object
+        addressdata, block, pr_data, rentobj, table_rows, totdue_string = write_payrequest(rent_id, id)
+
         mailaddr = request.form.get('mailaddr')
-        summary = pr_code + "-" + method + "-" + mailaddr[0:25]
+        summary = pr_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
         mailaddr = mailaddr.split(", ")
 
+        pr_data = json.dumps(pr_data, default=decimal_default)
+
         return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
-                               method=method, rentobj=rentobj, subject=subject, summary=summary, table_rows=table_rows,
-                               totdue=totdue, totdue_string=totdue_string)
+                               method=method, pr_data=pr_data, rentobj=rentobj, summary=summary, table_rows=table_rows,
+                               totdue_string=totdue_string)
 
 
 # TODO: improve pr_file editing functionality (beyond edit summary/block)

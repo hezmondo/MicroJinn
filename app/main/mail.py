@@ -7,8 +7,9 @@ from app.main.functions import dateToStr, hashCode, moneyToStr, money
 from app.main.lease import get_lease_variables
 from app.main.rent_obj import getrentobj_main
 from app.main.form_letter import get_formletter, get_formpayrequest
-from app.main.payrequests import get_payrequest_table_charges, \
-    get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
+from app.main.payrequests import create_pr_charges_table, \
+    get_rent_statement, get_arrears_statement
+
 
 
 # mail
@@ -65,10 +66,8 @@ def writeMail(rent_id, income_id, formletter_id, action):
 
 # TODO: We may need a get_pr_variables function later
 def write_payrequest(rent_id, formpayrequest_id):
+
     addressdata, rentobj, word_variables = get_word_variables(rent_id)
-
-    check_or_add_recovery_charge(rentobj)
-
     rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
     arrears = rentobj.arrears
     arrears_start_date = word_variables.get('#arrears_start_date#')
@@ -82,11 +81,11 @@ def write_payrequest(rent_id, formpayrequest_id):
     if arrears:
         arrears_statement = get_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
         table_rows.update({arrears_statement: moneyToStr(arrears, pound=True)})
-    # TODO: Charges can be calculated in rentobj/payrequests.py rather than separately using a function here
-    charges, totcharges = get_payrequest_table_charges(rent_id)
-    if totcharges:
-        table_rows.update(charges)
-    totdue = rent_gale + arrears + totcharges
+    # TODO: Finish implementation of arrears_clause
+    arrears_clause, charge_table_items, create_case, total_charges, new_charge_dict, new_arrears_level = create_pr_charges_table(rentobj)
+    if total_charges:
+        table_rows.update(charge_table_items)
+    totdue = rent_gale + arrears + total_charges
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
 
     subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
@@ -97,7 +96,20 @@ def write_payrequest(rent_id, formpayrequest_id):
     block = form_payrequest.block if form_payrequest.block else ""
     block = doReplace(word_variables, block)
 
-    return addressdata, block, pr_code, rentobj, subject, table_rows, totdue, totdue_string
+    # new_charge_dict = json.dumps(new_charge_dict, default=decimal_default)
+
+    pr_data = {
+        'create_case': create_case,
+        'new_arrears_level': new_arrears_level,
+        'new_charge_dict': new_charge_dict,
+        'pr_code': pr_code,
+        'rent_date_string': str(rentobj.nextrentdate),
+        'rent_id': rent_id,
+        'rentcode': rentobj.rentcode,
+        'subject': subject,
+        'tot_due': totdue
+    }
+    return addressdata, block, pr_data, rentobj, table_rows, totdue_string
 
 
 def doReplace(dict, clause):
@@ -155,8 +167,7 @@ def get_word_variables(rent_id, income_id=0):
 
     return addressdata, rentobj, word_variables
 
-
-     # word_variables = [
+    # word_variables = [
 #         ('#ChargesStat#', rent.chargesStatement() if rent else ""),
 #         ('#NFee#', moneyToStr(rent.info['NFeeTotal'] if rent else 15.00, pound=True)),
 #         ('#NextRentStat#', rent.nextRentStatement() if rent else ""),

@@ -48,7 +48,6 @@ def getrentobj_main(id):
             .with_entities(Property.id, Property.propaddr, Typeproperty.proptypedet) \
             .filter(Rent.id == id) \
             .all()
-
     return rentobj, properties
 
 

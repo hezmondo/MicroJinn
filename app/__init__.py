@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from config import Config
+import decimal
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -16,6 +17,12 @@ login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
 mail = Mail()
 bootstrap = Bootstrap()
+
+
+def decimal_default(obj):
+    if isinstance(obj, decimal.Decimal):
+        return str(obj)
+    raise TypeError
 
 
 def create_app(config_class=Config):

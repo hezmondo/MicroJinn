@@ -22,6 +22,14 @@ class Agent(db.Model):
     rent_agent = db.relationship('Rent', backref='agent', lazy='dynamic')
 
 
+class Case(db.Model):
+    __tablename__ = 'case'
+
+    id = db.Column(db.Integer, db.ForeignKey('rent.id'), primary_key=True)
+    case_details = db.Column(db.String(180))
+    case_nad = db.Column(db.Date)
+
+
 class Charge(db.Model):
     __tablename__ = 'charge'
 
@@ -424,6 +432,7 @@ class Pr_history(db.Model):
     batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
     rent_date = db.Column(db.Date)
     total_due = db.Column(db.Numeric(8, 2))
+    arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
 
 
@@ -474,6 +483,7 @@ class Rent(db.Model):
     status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
+    case_rent = db.relationship('Case', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
     digfile_rent = db.relationship('Digfile', backref='rent', lazy='dynamic')
     docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')

@@ -5,9 +5,8 @@ from app import db
 from flask import flash, redirect, url_for, request, session
 from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
 from werkzeug.utils import secure_filename
-from app.main.functions import commit_to_database
-from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
-from app.main.payrequests import forward_rent
+from app.models import Digfile, Docfile, Rent, Typedoc
+
 
 
 def get_docfile(id):
@@ -109,54 +108,6 @@ def post_docfile(id):
     db.session.add(docfile)
     db.session.commit()
     return rentid
-
-
-def get_pr_file(id):
-    pr_file = Pr_history.query.join(Rent).with_entities(Pr_history.id, Pr_history.summary, Pr_history.block,
-                                                        Pr_history.date, Rent.rentcode,
-                                                        Rent.id.label("rent_id")) \
-                                                        .filter(Pr_history.id == id).one_or_none()
-
-    return pr_file
-
-
-def get_pr_history(rent_id):
-    return Pr_history.query.filter_by(rent_id=rent_id)
-
-
-# TODO: Improve editing functionality. Do we want the (email) subject saved anywhere? - currently in a hidden input in PR.html
-def post_pr_file(id=0):
-    rent_id = int(request.form.get('rentid'))
-
-    # New payrequest
-    if id == 0:
-        pr_history = Pr_history()
-        pr_history.id = 0
-        pr_history.rent_id = rent_id
-        pr_history.date = request.form.get('date')
-        # TODO: Update batch_id logic when we have multiple payrequests
-        # pr_history.batch_id = 0
-        pr_history.rent_date = request.form.get('rent_date')
-        pr_history.total_due = request.form.get('totdue')
-        # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
-        pr_history.delivery_method = 1 if request.form.get('method') == "email" else 2
-    # Old payrequest
-    else:
-        pr_history = Pr_history.query.get(id)
-
-    pr_history.summary = request.form.get('summary')
-    pr_history.block = request.form.get('xinput').replace("£", "&pound;")
-
-    db.session.add(pr_history)
-
-    # TODO: Check vs db.session.commit()
-    commit_to_database()
-
-    # TODO: Check that we want to forward rent and update database here
-    if id == 0:
-        forward_rent(rent_id)
-
-    return rent_id
 
 
 def post_upload():

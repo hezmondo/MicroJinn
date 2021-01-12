@@ -1,11 +1,12 @@
-import sqlalchemy
+import json
+from dateutil.relativedelta import relativedelta
 from sqlalchemy import func, literal
-from app.models import Charge, Chargetype, Pr_arrears_matrix, Rent
+from app.models import Case, Charge, Chargetype, Pr_arrears_matrix, Pr_history, Rent
 from app import db
-
 from app.main.functions import dateToStr, commit_to_database, moneyToStr
-from locale import currency
-import datetime
+from datetime import date, datetime, timedelta
+from decimal import Decimal
+from flask import request
 
 
 def forward_rents(rentobjs):
@@ -28,40 +29,8 @@ def forward_rent(rent_id, from_batch=False):
         return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
-def check_or_add_recovery_charge(rentobj):
-    charge_suffix = determine_charges_suffix(rentobj)
-    recovery_charge_amount, create_case_info = get_recovery_info(charge_suffix)
-    if recovery_charge_amount != 0:
-        if not check_charge_exists(rentobj.id, 10, recovery_charge_amount):
-            add_charge(rentobj.id, recovery_charge_amount, 10)
-
-
-def check_charge_exists(rent_id, charge_type_id, charge_total):
-    return db.session.query(literal(True)).filter(Charge.rent_id == rent_id,
-                                                  Charge.chargetype_id == charge_type_id,
-                                                  Charge.chargetotal == charge_total)
-
-
-def get_recovery_info(suffix):
-    recovery_charge = db.session.query(Pr_arrears_matrix.recovery_charge).filter_by(suffix=suffix).scalar()
-    create_case_info = db.session.query(Pr_arrears_matrix.create_case).filter_by(suffix=suffix).scalar()
-    return recovery_charge, create_case_info
-
-
-def get_payrequest_table_charges(rent_id):
-    charges = get_charge_details(rent_id)
-    charge_table_items = {}
-    total_charges = 0
-    for charge in charges:
-        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
-        charge_total = charge.chargetotal
-        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
-        total_charges = total_charges + charge_total
-    return charge_table_items, total_charges
-
-
 # TODO: Decide if database queries should have their own module (probably)
-def get_charge_details(rent_id):
+def get_rent_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,
@@ -70,58 +39,144 @@ def get_charge_details(rent_id):
     return charges
 
 
+def check_recovery_in_charges(charges, recovery_charge_amount):
+    includes_recovery = False
+    for charge in charges:
+        if charge.chargetotal == recovery_charge_amount and charge.chargedesc == "recovery costs":
+            includes_recovery = True
+    return includes_recovery
+
+
+def create_pr_charges_table(rentobj):
+    charges = get_rent_charge_details(rentobj.id)
+    charge_table_items = {}
+    new_charge_dict = {}
+    total_charges = 0
+    for charge in charges:
+        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
+        charge_total = charge.chargetotal
+        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
+        total_charges = total_charges + charge_total
+    # TODO: Store new_charge object to save later, add create_case logic
+    suffix = determine_charges_suffix(rentobj)
+    arrears_clause, create_case, recovery_charge_amount = get_recovery_info(suffix)
+    new_arrears_level = get_new_arrears_level(suffix)
+    if recovery_charge_amount > 0 and not check_recovery_in_charges(charges, recovery_charge_amount):
+        new_charge_dict = create_charge_dict(rentobj.id, recovery_charge_amount, 10)
+        charge_details = "{} added on {}:".format("Recovery costs", dateToStr(datetime.date.today()))
+        charge_table_items.update({charge_details: moneyToStr(recovery_charge_amount, pound=True)})
+        total_charges = total_charges + recovery_charge_amount
+
+    return arrears_clause, charge_table_items, create_case, total_charges, new_charge_dict, new_arrears_level
+
+
+def check_charge_exists(rent_id, charge_total, charge_type_id):
+    return db.session.query(literal(True)).filter(Charge.rent_id == rent_id,
+                                                  Charge.chargetype_id == charge_type_id,
+                                                  Charge.chargetotal == charge_total)
+
+
+# TODO: Can we combine all pr variables into a single json dict, or as a pr class object?
+def create_charge_dict(rent_id, charge_total, charge_type_id):
+    new_charge_dict = {
+        'rent_id': rent_id,
+        'charge_total': charge_total,
+        'charge_type_id': charge_type_id
+    }
+    return new_charge_dict
+
+
+def create_case(rent_id):
+    case = Case()
+    case.id = rent_id
+    case.case_details = "Automatically created on {}".format(dateToStr(date.today()))
+    case.case_nad = date.today() + relativedelta(days=30)
+    db.session.merge(case)
+
+
+def get_recovery_info(suffix):
+    recovery_info = Pr_arrears_matrix.query.with_entities(Pr_arrears_matrix.arrears_clause,
+                                                                      Pr_arrears_matrix.recovery_charge,
+                                                                      Pr_arrears_matrix.create_case).\
+        filter_by(suffix=suffix).one_or_none()
+    arrears_clause = recovery_info.arrears_clause
+    create_case = recovery_info.create_case
+    recovery_charge = recovery_info.recovery_charge
+    return arrears_clause, create_case, recovery_charge
+
+
 def determine_charges_suffix(rentobj):
     periods = rentobj.arrears * rentobj.freq_id / rentobj.rentpa
     charges_total = rentobj.totcharges if rentobj.totcharges else 0
     pr_exists = check_previous_pr_exists(rentobj.id)
-    last_recovery_level = get_last_recovery_level(rentobj.id) if pr_exists else ""
+    last_arrears_level = get_last_arrears_level(rentobj.id) if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
     oldest_charge_date = db.session.execute(func.samjinn.oldest_charge(rentobj.id)).scalar()
-    charge_90_days = oldest_charge_date and datetime.date.today() - oldest_charge_date > datetime.timedelta(90)
-    return get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, charge_90_days)
+    charge_90_days = oldest_charge_date and date.today() - oldest_charge_date > timedelta(90)
+    return get_charges_suffix(periods, charges_total, pr_exists, last_arrears_level, charge_90_days)
 
 
-def get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, charge_90_days):
+def get_charges_suffix(periods, charges_total, pr_exists, last_arrears_level, charge_90_days):
     if periods == 0 and charges_total > 0 and charge_90_days:
         return "ZERACH"
     elif periods == 0:
         return "ZERA"
-    elif periods > 0 and last_recovery_level == RecoveryLevel.Normal and not pr_exists:
+    elif periods > 0 and last_arrears_level == ArrearsLevel.Normal and not pr_exists:
         return "ZERA"
-    elif periods > 0 and last_recovery_level == RecoveryLevel.Normal and pr_exists:
+    elif periods > 0 and last_arrears_level == ArrearsLevel.Normal and pr_exists:
         return "ARW"
-    elif periods > 1 and last_recovery_level == RecoveryLevel.Warning:
+    elif periods > 1 and last_arrears_level == ArrearsLevel.Warning:
         return "ARC1"
-    elif periods > 1 and last_recovery_level == RecoveryLevel.First:
+    elif periods > 1 and last_arrears_level == ArrearsLevel.First:
         return "ARC2"
-    elif periods > 2 and last_recovery_level == RecoveryLevel.Second:
+    elif periods > 2 and last_arrears_level == ArrearsLevel.Second:
         return "ARC3"
-    elif periods > 3 and last_recovery_level == RecoveryLevel.Third:
+    elif periods > 3 and last_arrears_level == ArrearsLevel.Third:
         return "ARC4"
+    # TODO: Check what we want to do when last_arrears_level = 4. Jinn reverts back to warning.
     else:
         return "ARW"
 
 
+def get_new_arrears_level(suffix):
+    if suffix == "ZERA" or suffix == "ZERACH":
+        return ArrearsLevel.Normal
+    elif suffix == "ARW":
+        return ArrearsLevel.Warning
+    elif suffix == "ARC1":
+        return ArrearsLevel.First
+    elif suffix == "ARC2":
+        return ArrearsLevel.Second
+    elif suffix == "ARC3":
+        return ArrearsLevel.Third
+    elif suffix == "ARC4":
+        return ArrearsLevel.Fourth
+
+
 def add_charge(rent_id, recovery_charge_amount, chargetype_id):
-    today_string = dateToStr(datetime.date.today())
-    charge_type = Chargetype.chargedesc.filter_by(id=chargetype_id)
-    charge_details = "£{} {} added on {}:".format(recovery_charge_amount, charge_type.capitalize(), today_string)
-    new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=today_string,
+    today_string = dateToStr(date.today())
+    charge_type = get_charge_type(chargetype_id)
+    charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
+    new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=date.today(),
                         chargetotal=recovery_charge_amount, chargedetails=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
-    commit_to_database()
 
 
-# TODO: complete this using Payrequests model
+def get_charge_type(chargetype_id):
+    return db.session.query(Chargetype.chargedesc).filter_by(id=chargetype_id).scalar()
+
+
 def check_previous_pr_exists(rent_id):
-    # exists = bool(db.session.query(PRHistory).filter_by(rent_id=rent_id).first())
-    return False
+    exists = bool(db.session.query(Pr_history).filter_by(rent_id=rent_id).first())
+    return exists
 
 
-def get_last_recovery_level(rent_id):
-    last_recovery_level = db.session.execute(func.samjinn.last_recovery_level(rent_id)).scalar()
-    return last_recovery_level
+# TODO: check that arrears_level is best recorded in pr_history and where to signal if pr delivery is complete -
+# TODO: currently if delivery_method > 3 in pr_history, then delivery is incomplete. This value is used in last_arrears_level
+def get_last_arrears_level(rent_id):
+    last_arrears_level = db.session.execute(func.samjinn.last_arrears_level(rent_id)).scalar()
+    return last_arrears_level
 
 
 def get_rent_statement(rentobj, rent_type):
@@ -134,7 +189,60 @@ def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
     return statement
 
 
-class RecoveryLevel:
+def get_pr_file(id):
+    pr_file = Pr_history.query.join(Rent).with_entities(Pr_history.id, Pr_history.summary, Pr_history.block,
+                                                        Pr_history.date, Rent.rentcode,
+                                                        Rent.id.label("rent_id")) \
+                                                        .filter(Pr_history.id == id).one_or_none()
+
+    return pr_file
+
+
+def get_pr_history(rent_id):
+    return Pr_history.query.filter_by(rent_id=rent_id)
+
+
+# TODO: Improve editing functionality. Do we want the (email) subject saved anywhere? - currently in a hidden input in PR.html
+def post_pr_file(id=0):
+    pr_data = json.loads(request.form.get('pr_data'))
+    rent_id = pr_data.get("rent_id")
+    # New payrequest
+    if id == 0:
+        pr_history = Pr_history()
+        pr_history.id = 0
+        pr_history.rent_id = rent_id
+        pr_history.date = request.form.get('date')
+        # TODO: Update batch_id logic when we have multiple payrequest
+        # pr_history.batch_id = 0
+        pr_history.rent_date = datetime.strptime(pr_data.get("rent_date_string"), '%Y-%m-%d')
+        pr_history.total_due = pr_data.get("tot_due")
+        pr_history.arrears_level = pr_data.get("new_arrears_level")
+        # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
+        pr_history.delivery_method = 1 if request.form.get('method') == "email" else 2
+    # Old payrequest
+    else:
+        pr_history = Pr_history.query.get(id)
+
+    pr_history.summary = request.form.get('summary')
+    pr_history.block = request.form.get('xinput').replace("£", "&pound;")
+
+    db.session.add(pr_history)
+
+    if id == 0:
+        forward_rent(rent_id)
+        new_charge_dict = pr_data.get("new_charge_dict")
+        if len(new_charge_dict) > 0:
+            add_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
+                       new_charge_dict.get("charge_type_id"))
+        if pr_data.get("create_case"):
+            create_case(rent_id)
+
+    commit_to_database()
+
+    return rent_id
+
+
+class ArrearsLevel:
     Normal = ""
     Warning = "W"
     First = "1"
