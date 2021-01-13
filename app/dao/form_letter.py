@@ -1,7 +1,5 @@
 from app import db
 from flask import request
-from sqlalchemy import desc, func
-from app.main.functions import commit_to_database
 from app.models import Form_letter, Pr_form, Template, Typedoc\
 
 
@@ -32,6 +30,11 @@ def get_formletters(action):
         formletters = Form_letter.query.all()
 
     return formletters
+
+
+def get_templates():
+    templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
+    return templates
 
 
 def post_formletter(id, action):

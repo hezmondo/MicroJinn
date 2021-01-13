@@ -1,13 +1,13 @@
 import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import desc, func
-from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Manager, Money_account, Rent, Typepayment
-from app.main.functions import dateToStr, hashCode, moneyToStr, money
-from app.main.lease import get_lease_variables
-from app.main.rent_object import get_rent_object
-from app.main.form_letter import get_formletter, get_formpayrequest
-from app.main.payrequest import get_payrequest_table_charges, \
+from sqlalchemy import desc
+from app.models import Income, Incomealloc, Landlord, Manager, Money_account, Rent, Typepayment
+from app.dao.functions import dateToStr, hashCode, moneyToStr
+from app.dao.lease import get_lease_variables
+from app.dao.rent_object import get_rent_object
+from app.dao.form_letter import get_formletter, get_formpayrequest
+from app.dao.payrequest import get_payrequest_table_charges, \
     get_rent_statement, get_arrears_statement, check_or_add_recovery_charge
 
 

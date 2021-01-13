@@ -25,10 +25,10 @@
     {% if incomevals.rentid != 0 %}
         <div class="form-group row flex-row-reverse">
             <div class="col-md-3">
-                <a href="/income_object/0?rentid={{ incomevals.rentid }}" class="btn btn-block btn-primary" role="button">post income for this rent</a>
+                <a href="{{ url_for('io_bp.income_object', id=item.id, rentid=incomevals.rentid) }}" class="btn btn-block btn-primary" role="button">post income for this rent</a>
             </div>
             <div class="col-md-2">
-                <a href="/rent_object/{{ incomevals.rentid }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+                <a href="{{ url_for('ro_bp.rent_object', id=incomevals.rentid) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
         </div>
     {% endif %}
@@ -55,7 +55,7 @@
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 20.00%"> {{ item.accdesc }}</td>
             <td style="width: 20.00%"> {{ item.paytypedet }}</td>
-            <td style="width: 10.00%"><a href="/income_object/{{ item.id }}">View</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('io_bp.income_object', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -1,9 +1,8 @@
 import datetime
 from datetime import date
-from flask import flash, redirect, url_for, request, session
-from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
+from flask import request
+from sqlalchemy import desc, func, literal
 from app import db
-from app.main.functions import commit_to_database
 from app.models import Income, Incomealloc, Money_account, Money_category, Money_item
 
 

@@ -2,12 +2,17 @@ import imghdr
 import os
 from xhtml2pdf import pisa
 from app import db
-from flask import flash, redirect, url_for, request, session
-from sqlalchemy import and_, asc, desc, extract, func, literal, or_, text
+from flask import request
+from sqlalchemy import desc, literal
 from werkzeug.utils import secure_filename
-from app.main.functions import commit_to_database
+from app.dao.functions import commit_to_database
 from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
-from app.main.payrequest import forward_rent
+from app.dao.payrequest import forward_rent
+
+
+def get_digfile(id):
+    digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
+    return digfile
 
 
 def get_docfile(id):

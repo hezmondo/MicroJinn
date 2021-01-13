@@ -1,8 +1,8 @@
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
-from app.main.common import get_postvals_id, pop_idlist_recent
-from app.main.functions import commit_to_database, strToDec
+from app.dao.common import get_postvals_id, pop_idlist_recent
+from app.dao.functions import strToDec
 
 from app.models import Agent, Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typedeed, Typefreq, \
     Typemailto, Typeproperty, Typesalegrade, Typestatus, Typetenure
@@ -17,9 +17,6 @@ def get_rent_object(id):
     if id == 0:
         # take the user to create new rent function:
         id = create_new_rent()
-    elif request.method == "POST":
-        id = post_rent(id)
-    pop_idlist_recent("recent_rents", id)
     rentobject = \
         Rent.query \
             .join(Landlord) \
@@ -50,7 +47,8 @@ def get_rent_object(id):
     if rentobject is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
-
+    else:
+        pop_idlist_recent("recent_rents", id)
     properties = \
         Property.query \
             .join(Rent) \
@@ -67,7 +65,7 @@ def post_rent(id):
     postvals_id = get_postvals_id()
     # we need the post values with the class id generated for the actual combobox values:
     rent.actype_id = postvals_id["actype"]
-    rent.advarr_id = postvals_id["advar"]
+    rent.advarr_id = postvals_id["advarr"]
     rent.arrears = strToDec(postvals_id["arrears"])
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")

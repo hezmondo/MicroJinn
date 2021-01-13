@@ -1,10 +1,8 @@
-import sqlalchemy
 from sqlalchemy import func, literal
 from app.models import Charge, Chargetype, Pr_arrears_matrix, Rent
 from app import db
 
-from app.main.functions import dateToStr, commit_to_database, moneyToStr
-from locale import currency
+from app.dao.functions import dateToStr, commit_to_database, moneyToStr
 import datetime
 
 

@@ -1,6 +1,6 @@
 from app import db
 from flask import request
-from app.main.functions import commit_to_database
+from app.dao.functions import commit_to_database
 
 from app.models import Property, Typeproperty
 

@@ -1,15 +1,22 @@
 import json
 from app import db
-from flask import request
+from flask import request, session
 from sqlalchemy import func
-from app.main.common import get_idlist_recent
-from app.main.functions import commit_to_database, dateToStr, strToDate, strToDec
+from app.dao.common import get_idlist_recent
+from app.dao.functions import strToDate, strToDec
 
 from app.models import Agent, Charge, Manager_external, Rent_external, Jstore, Landlord, Property, Rent, Typeactype, \
-    Typeprdelivery, Typesalegrade, Typestatus, Typetenure
+    Typedoc, Typeprdelivery, Typesalegrade, Typestatus, Typetenure
+
+
+def get_filters(type):
+    filters = Jstore.query.filter(Jstore.type == type).all()
+    return filters
 
 
 def get_rentobjects(action, id):
+    # collect doctypes to hold in session, as this is the first trip to the server
+    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     # get filter dictionary and filtered rent objects
     qfilter = []
     # simple filter dictionary for home page
@@ -158,7 +165,7 @@ def get_qfilter(filterdict, action):
 
 def get_rentobjects_data(qfilter, action, runsize):
     if action == "basic":
-        # simple search of main rents submitted from home page
+        # simple search of views rents submitted from home page
         rentobjects = \
             Property.query \
                 .join(Rent) \

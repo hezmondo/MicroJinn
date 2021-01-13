@@ -11,59 +11,59 @@
     {% block navbar %}
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light" style=" background-color: #ededed;">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">mjinn</a>
+            <a class="navbar-brand" href="{{ url_for('ho_bp.index') }}">mjinn</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="navbar-collapse text-center" id="navbarResponsive">
               <ul class="nav navbar-nav mr-auto">
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.agents') }}">agents</a>
+                <a class="nav-link" href="{{ url_for('ag_bp.agents') }}">agents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.headrents') }}">headrents</a>
+                <a class="nav-link" href="{{ url_for('hr_bp.headrents') }}">headrents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.income', id=0) }}">income</a>
+                <a class="nav-link" href="{{ url_for('io_bp.income', id=0) }}">income</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.loans') }}">loans</a>
+                <a class="nav-link" href="{{ url_for('lo_bp.loans') }}">loans</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.money') }}">money</a>
+                <a class="nav-link" href="{{ url_for('mo_bp.money') }}">money</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.pr_start') }}">pr_start</a>
+                <a class="nav-link" href="{{ url_for('pr_bp.pr_start') }}">pr_start</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('main.rentals') }}">rentals</a>
+                <a class="nav-link" href="{{ url_for('re_bp.rentals') }}">rentals</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Utilities
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                      <a class="dropdown-item" href="/backup">backup or restore mjinn</a>
-                      <a class="dropdown-item" href="/charges">charges</a>
-                      <a class="dropdown-item" href="/docfiles/0">docfiles</a>
-                      <a class="dropdown-item" href="/email_accounts">email accounts</a>
-                      <a class="dropdown-item" href="/rents_external">external rents</a>
-                      <a class="dropdown-item" href="/form_letters">form_letters</a>
-                      <a class="dropdown-item" href="/leases">leases</a>
-                      <a class="dropdown-item" href="/landlords">landlords</a>
+                      <a class="dropdown-item" href="{{ url_for('ut_bp.backup') }}">backup or restore mjinn</a>
+                      <a class="dropdown-item" href="{{ url_for('ch_bp.charges') }}">charges</a>
+                      <a class="dropdown-item" href="{{ url_for('do_bp.docfiles', rentid=0) }}">docfiles</a>
+                      <a class="dropdown-item" href="{{ url_for('em_bp.email_accounts') }}">email accounts</a>
+                      <a class="dropdown-item" href="{{ url_for('rx_bp.rents_external') }}">external rents</a>
+                      <a class="dropdown-item" href="{{ url_for('fo_bp.form_letters') }}">form_letters</a>
+                      <a class="dropdown-item" href="{{ url_for('le_bp.leases') }}">leases</a>
+                      <a class="dropdown-item" href="{{ url_for('la_bp.landlords') }}">landlords</a>
                       <a class="dropdown-item" href="/properties">properties</a>
                     </div>
                   </li>
                  {% if current_user.is_anonymous %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">login</a>
                   </li>
                   {% else %}
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.user', username=current_user.username) }}">Profile</a>
+                    <a class="nav-link" href="{{ url_for('auth.user', username=current_user.username) }}">profile</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">logout</a>
                   </li>
                   {% endif %}
                 </ul>

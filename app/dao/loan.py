@@ -1,8 +1,8 @@
 from app import db
 from flask import request
-from sqlalchemy import desc, func
+from sqlalchemy import func
 from app.models import Loan, Loan_statement, Typeadvarr, Typefreq
-from app.main.functions import commit_to_database
+from app.dao.functions import commit_to_database
 
 
 def get_loan(id):

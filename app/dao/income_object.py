@@ -1,8 +1,6 @@
-import datetime
 from flask import request
-from sqlalchemy import desc, func
+from sqlalchemy import desc
 from app import db
-from app.main.functions import commit_to_database
 from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment
 
 

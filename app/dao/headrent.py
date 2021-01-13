@@ -1,8 +1,8 @@
 from app import db
 from flask import request
-from sqlalchemy import desc, func
-from app.main.common import get_postvals_id
-from app.main.functions import commit_to_database, strToDec
+from sqlalchemy import func
+from app.dao.common import get_postvals_id
+from app.dao.functions import strToDec
 from app.models import Agent, Headrent, Landlord, Typeadvarr, Typefreq, Typestatus, Typetenure\
 
 

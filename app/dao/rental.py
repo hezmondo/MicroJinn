@@ -1,7 +1,7 @@
+import  sqlalchemy
 from app import db
 from flask import request
-from sqlalchemy import desc, func
-from app.main.functions import commit_to_database
+from sqlalchemy import func
 from app.models import Rental, Rental_statement, Typeadvarr, Typefreq\
 
 
@@ -27,6 +27,8 @@ def getrentals():
 
 
 def get_rentalstatement():
+    db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": id})
+    db.session.commit()
     rentalstatem = Rental_statement.query.all()
 
     return rentalstatem

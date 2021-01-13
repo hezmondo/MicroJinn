@@ -1,4 +1,4 @@
-from app.main.exception_template import ExceptionTemplate
+from app.views.exception_template import ExceptionTemplate
 
 
 class RentIntegerException(ExceptionTemplate):
