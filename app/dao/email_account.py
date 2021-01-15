@@ -15,11 +15,11 @@ def get_emailaccount(id):
     return emailacc
 
 
-def post_emailaccount(id, action):
-    if action == "edit":
-        emailacc = Emailaccount.query.get(id)
-    else:
+def post_emailaccount(id):
+    if id == 0:
         emailacc = Emailaccount()
+    else:
+        emailacc = Emailaccount.query.get(id)
     emailacc.smtp_server = request.form.get("smtp_server")
     emailacc.smtp_port = request.form.get("smtp_port")
     emailacc.smtp_timeout = request.form.get("smtp_timeout")
@@ -36,7 +36,8 @@ def post_emailaccount(id, action):
     emailacc.imap_sentfolder = request.form.get("imap_sentfolder")
     emailacc.imap_draftfolder = request.form.get("imap_draftfolder")
     db.session.add(emailacc)
+    db.session.flush()
+    _id = emailacc.id
     db.session.commit()
-    id_ = emailacc.id
 
-    return id_
+    return _id

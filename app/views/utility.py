@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.dao.delete import delete_record
+from app.dao.utility import delete_record
 from app.dao.functions import backup_database
 
 ut_bp = Blueprint('ut_bp', __name__)
@@ -18,4 +18,4 @@ def backup():
 def delete_item(id):
     redir, rentid = delete_record(id)
 
-    return redirect(url_for('{}'.format(redir)))
+    return redirect(url_for('{}')).format(redir)

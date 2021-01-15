@@ -46,23 +46,23 @@ def get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high
 
 
 def get_leases():
-    lease_filter = []
+    lfilter = []
     rcd = request.form.get("rentcode") or "all rentcodes"
     uld = request.form.get("upliftdays") or ""
     ult = request.form.get("uplift_type") or "all uplift types"
     if rcd and rcd != "all rentcodes":
-        lease_filter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
+        lfilter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
     if uld and uld != "":
         uld = int(uld)
         enddate = date.today() + relativedelta(days=uld)
-        lease_filter.append(Lease.upliftdate <= enddate)
+        lfilter.append(Lease.upliftdate <= enddate)
     if ult and ult != "" and ult != "all uplift types":
-        lease_filter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
+        lfilter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
 
     leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
               func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
               Lease.term, Lease.upliftdate, Lease_uplift_type.uplift_type) \
-        .filter(*lease_filter).limit(60).all()
+        .filter(*lfilter).limit(60).all()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")

@@ -5,6 +5,7 @@ from app.dao.doc_object import get_digfile, get_docfile, get_docfiles, post_docf
 
 do_bp = Blueprint('do_bp', __name__)
 
+
 @do_bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
 @login_required
 def docfile(id):

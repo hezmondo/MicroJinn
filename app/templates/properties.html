@@ -1,10 +1,55 @@
 <!-- /templates/properties.html  -->
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
-<div class="form-row">
-    <div class="col-md-12">
-        <h1>This page and the associated view have not yet been constructed</h1>
+<form method="POST" id="target">
+    <div class="form-group row flex-row-reverse align-items-end">
+        {% if rentid != 0 %}
+            <div class="col-md-2">
+                <a href="{{ url_for('ro_bp.rent_object', id=rentid) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('ho_bp.property', id=0, rentid=rentid) }}" class="btn btn-block btn-danger" role="button">new property for this rent</a>
+            </div>
+        {% else %}
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-primary">search</button>
+        </div>
+        <div class="col-md-3">
+            <label for="proptype">status:</label>
+            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=proptypes[0]) }}
+        </div>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="address" placeholder="address">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
+        </div>
+        {% endif %}
     </div>
+</form>
+<div class="table-fixed">
+    <table class="table" id="properties">
+        <thead>
+        <tr>
+            <th style="width: 10.00%">rentcode</th>
+            <th style="width: 75.00%">address</th>
+            <th style="width: 15.00%">proptype</th>
+            <th style="width: 10.00%">action</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in properties %}
+        <tr id="{{ item.id }}">
+            <td style="width: 10.00%"> {{ item.rentcode }}</td>
+            <td style="width: 75.00%"> {{ item.propaddr }}</td>
+            <td style="width: 15.00%"> {{ item.detail }}</td>
+            <td style="width: 10.00%"><a href="{{ url_for('ho_bp.property', id=item.id) }}">view</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

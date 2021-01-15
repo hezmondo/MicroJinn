@@ -116,6 +116,15 @@ select:-internal-list-box option:checked {
     font-size: 9pt;
 }
 
+/* table for email accounts (overspilling at right)*/
+
+.my-table {
+    word-wrap: break-word;
+    table-layout:fixed;
+    width: 100%;
+}
+
+
 /*pay request table css*/
 
 .pr_table {

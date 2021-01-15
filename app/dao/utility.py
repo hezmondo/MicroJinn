@@ -20,6 +20,7 @@ def delete_record(id):
         Digfile.query.filter_by(id=id).delete()
     elif item == "emailacc":
         Emailaccount.query.filter_by(id=id).delete()
+        redir = "em_bp.email_accounts"
     elif item == "formletter":
         Form_letter.query.filter_by(id=id).delete()
     elif item == "incomealloc":
@@ -37,7 +38,7 @@ def delete_record(id):
     elif item == "rentprop":
         Money_account.query.filter_by(id=id).delete()
     else:
-        redir = "views/index"
+        redir = "ho_bp.home"
     commit_to_database()
 
     return redir, id_2

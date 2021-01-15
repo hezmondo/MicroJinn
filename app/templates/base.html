@@ -11,7 +11,7 @@
     {% block navbar %}
     <div class="container">
         <nav class="navbar navbar-expand-md navbar-light" style=" background-color: #ededed;">
-            <a class="navbar-brand" href="{{ url_for('ho_bp.index') }}">mjinn</a>
+            <a class="navbar-brand" href="{{ url_for('ho_bp.home') }}">mjinn</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -40,7 +40,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Utilities
+                    utilities
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                       <a class="dropdown-item" href="{{ url_for('ut_bp.backup') }}">backup or restore mjinn</a>
@@ -51,7 +51,7 @@
                       <a class="dropdown-item" href="{{ url_for('fo_bp.form_letters') }}">form_letters</a>
                       <a class="dropdown-item" href="{{ url_for('le_bp.leases') }}">leases</a>
                       <a class="dropdown-item" href="{{ url_for('la_bp.landlords') }}">landlords</a>
-                      <a class="dropdown-item" href="/properties">properties</a>
+                      <a class="dropdown-item" href="{{ url_for('ho_bp.properties', rentid=0) }}">properties</a>
                     </div>
                   </li>
                  {% if current_user.is_anonymous %}

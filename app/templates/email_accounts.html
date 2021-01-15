@@ -5,37 +5,34 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="/email_account/0?action=new" class="btn btn-block btn-primary" role="button">Add new email account</a>
+            <a href="{{ url_for('em_bp.email_account', id=0) }}" class="btn btn-block btn-primary"
+               role="button">add email account</a>
         </div>
     </div>
 </form>
-<div class="table-fixed">
-    <table class="table" id="emailaccs">
+<div class="page">
+    <table class="my-table" id="emailaccs">
         <thead>
         <tr>
-            <th style="width: 5.00%">id</th>
-            <th style="width: 10.00%">smtp_server</th>
-            <th style="width: 10.00%">smtp_port</th>
-            <th style="width: 10.00%">smtp_user</th>
-            <th style="width: 15.00%">smtp_sendfrom</th>
-            <th style="width: 10.00%">imap_server</th>
-            <th style="width: 10.00%">imap_sentfolder</th>
-            <th style="width: 10.00%">imap_draftfolder</th>
-            <th style="width: 5.00%"></th>
+            <th style="width: 6.00%">id</th>
+            <th style="width: 18.00%">smtp_server</th>
+            <th style="width: 9.00%">smtp_port</th>
+            <th style="width: 22.00%">smtp_user</th>
+            <th style="width: 22.00%">smtp_sendfrom</th>
+            <th style="width: 17.00%">imap_server</th>
+            <th style="width: 7.00%"></th>
         </tr>
         </thead>
         <tbody>
         {% for item in emailaccs %}
         <tr id="{{ item.id }}">
             <td style="width: 5.00%">{{ item.id }}</td>
-            <td style="width: 10.00%">{{ item.smtp_server }}</td>
-            <td style="width: 10.00%">{{ item.smtp_port }}</td>
-            <td style="width: 10.00%">{{ item.smtp_user }}</td>
-            <td style="width: 15.00%">{{ item.smtp_sendfrom }}</td>
-            <td style="width: 10.00%">{{ item.imap_server }}</td>
-            <td style="width: 10.00%">{{ item.imap_sentfolder }}</td>
-            <td style="width: 10.00%">{{ item.imap_draftfolder }}</td>
-            <td style="width: 5.00%"><a href="/email_account/{{ item.id }}">view</a></td>
+            <td style="width: 18.00%">{{ item.smtp_server }}</td>
+            <td style="width: 9.00%">{{ item.smtp_port }}</td>
+            <td style="width: 22.00%">{{ item.smtp_user }}</td>
+            <td style="width: 22.00%">{{ item.smtp_sendfrom }}</td>
+            <td style="width: 17.00%">{{ item.imap_server }}</td>
+            <td style="width: 7.00%"><a href="{{ url_for('em_bp.email_account', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

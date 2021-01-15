@@ -4,6 +4,7 @@ from app.dao.charge import get_charges, get_charge, post_charge
 
 ch_bp = Blueprint('ch_bp', __name__)
 
+
 @ch_bp.route('/charge/<int:id>', methods=["GET", "POST"])
 @login_required
 def charge(id):

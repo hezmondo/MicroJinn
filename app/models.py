@@ -657,7 +657,7 @@ class Typeproperty(db.Model):
     __tablename__ = 'typeproperty'
 
     id = db.Column(db.Integer, primary_key=True)
-    proptypedet = db.Column(db.String(45))
+    detail = db.Column(db.String(45))
 
     property_typeproperty = db.relationship('Property', backref='typeproperty', lazy='dynamic')
 

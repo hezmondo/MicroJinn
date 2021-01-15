@@ -19,25 +19,14 @@
             <input type="text" class="form-control" name="tenantname" value="{{ rentobject.tenantname }}" readonly="true">
         </div>
     </div>
-    <div class="table-fixed">
-        <table class="table" id="properties">
-            <thead>
-            <tr>
-                <th style="width: 75.00%">property</th>
-                <th style="width: 15.00%">property type</th>
-                <th style="width: 10.00%">action</th>
-            </tr>
-            </thead>
-            <tbody>
-        {% for item in properties %}
-            <tr id="{{ item.id }}">
-                <td style="width: 75.00%">{{ item.propaddr }}</td>
-                <td style="width: 15.00%"> {{ item.proptypedet }}</td>
-                <td style="width: 10.00%"><a href="/property/{{ item.id }}">view</a></td>
-            </tr>
-        {% endfor %}
-            </tbody>
-        </table>
+    <div class="form-group row align-items-end">
+        <div class="col-md-10">
+            <label for="propaddr">property address:</label>
+            <input type="text" class="form-control" name="propaddr" value="{{ rentobject.propaddr }}" readonly="true">
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('ho_bp.properties', rentid=rentobject.id) }}" class="btn btn-block btn-primary" role="button">view</a>
+        </div>
     </div>
     <div class="form-group row">
     </div>

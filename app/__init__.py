@@ -83,7 +83,7 @@ def create_app(config_class=Config):
     from .views.rent_external import rx_bp
     app.register_blueprint(rx_bp, url_prefix='/views')
 
-    from .views.utilities import ut_bp
+    from .views.utility import ut_bp
     app.register_blueprint(ut_bp, url_prefix='/views')
 
     if not app.debug and not app.testing:
