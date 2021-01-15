@@ -14,7 +14,7 @@ def get_filters(type):
     return filters
 
 
-def get_rentobjects(action, id):
+def get_rent_s(action, id):
     # collect doctypes to hold in session, as this is the first trip to the server
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     # get filter dictionary and filtered rent objects
@@ -63,11 +63,11 @@ def get_rentobjects(action, id):
         print("filterdict after qfilter done")
         print(filterdict)
     if action == "save":
-        post_rentobject_filter(filterdict)
+        post_rent__filter(filterdict)
     # now get filtered rent objects for this filter
-    rentobjects = get_rentobjects_data(qfilter, action, 100)
+    rent_s = get_rent_s_data(qfilter, action, 100)
 
-    return filterdict, rentobjects
+    return filterdict, rent_s
 
 
 def get_qfilter(filterdict, action):
@@ -163,10 +163,10 @@ def get_qfilter(filterdict, action):
     return filter, filterdict
 
 
-def get_rentobjects_data(qfilter, action, runsize):
+def get_rent_s_data(qfilter, action, runsize):
     if action == "basic":
         # simple search of views rents submitted from home page
-        rentobjects = \
+        rent_s = \
             Property.query \
                 .join(Rent) \
                 .outerjoin(Agent) \
@@ -178,7 +178,7 @@ def get_rentobjects_data(qfilter, action, runsize):
 
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed
-        rentobjects = \
+        rent_s = \
             Rent_external.query \
             .join(Manager_external) \
             .with_entities(Rent_external.id, Rent_external.rentcode, Rent_external.propaddr, Rent_external.tenantname, Rent_external.owner,
@@ -188,7 +188,7 @@ def get_rentobjects_data(qfilter, action, runsize):
 
     else:
         # advanced search submitted from queries page
-        rentobjects = \
+        rent_s = \
                 Property.query \
                     .join(Rent) \
                     .join(Landlord) \
@@ -208,10 +208,10 @@ def get_rentobjects_data(qfilter, action, runsize):
                                    Typetenure.tenuredet) \
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
-    return rentobjects
+    return rent_s
 
 
-def post_rentobject_filter(filterdict):
+def post_rent__filter(filterdict):
     # save this filter dictionary in jstore
     print("filterdict during save")
     print(filterdict)

@@ -4,9 +4,9 @@ from flask import Blueprint, redirect, render_template,  request
 from flask_login import login_required
 from app.dao.loan import get_loan, get_loans, get_loan_options, get_loanstatement
 
-lo_bp = Blueprint('lo_bp', __name__)
+loan_bp = Blueprint('loan_bp', __name__)
 
-@lo_bp.route('/loan/<int:id>', methods=['GET', 'POST'])
+@loan_bp.route('/loan/<int:id>', methods=['GET', 'POST'])
 @login_required
 def loan(id):
     loan = get_loan(id)
@@ -15,7 +15,7 @@ def loan(id):
     return render_template('loan.html', loan=loan, advarrdets=advarrdets, freqdets=freqdets)
 
 
-@lo_bp.route('/loans', methods=['GET', 'POST'])
+@loan_bp.route('/loans', methods=['GET', 'POST'])
 def loans():
     action = request.args.get('action', "view", type=str)
     loans, loansum = get_loans(action)
@@ -23,12 +23,12 @@ def loans():
     return render_template('loans.html', loans=loans, loansum=loansum)
 
 
-@lo_bp.route('/loanstat_dialog/<int:id>', methods=["GET", "POST"])
+@loan_bp.route('/loanstat_dialog/<int:id>', methods=["GET", "POST"])
 def loanstat_dialog(id):
     return render_template('loanstat_dialog.html', loanid=id, today=datetime.date.today())
 
 
-@lo_bp.route('/loan_statement/<int:id>', methods=["GET", "POST"])
+@loan_bp.route('/loan_statement/<int:id>', methods=["GET", "POST"])
 @login_required
 def loan_statement(id):
     if request.method == "POST":

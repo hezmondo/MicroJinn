@@ -23,7 +23,7 @@ def pr_edit(id):
         formpayrequest_id = id
         rent_id = request.form.get('rent_id')
         # TODO: passing both totdue and totdue_string with money formatting. Is there a better way?
-        addressdata, block, rentobject, subject, \
+        addressdata, block, rent_, subject, \
             table_rows, totdue, totdue_string = write_payrequest(rent_id, formpayrequest_id)
         mailaddr = request.form.get('mailaddr')
         # TODO: Do we want a specific PR code to begin the summary?
@@ -31,7 +31,7 @@ def pr_edit(id):
         mailaddr = mailaddr.split(", ")
 
         return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
-                               method=method, rentobject=rentobject, subject=subject, summary=summary, table_rows=table_rows,
+                               method=method, rent_=rent_, subject=subject, summary=summary, table_rows=table_rows,
                                totdue=totdue, totdue_string=totdue_string)
 
 

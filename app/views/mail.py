@@ -23,7 +23,7 @@ def mail_edit(id):
             # print(request.form)
         formletter_id = id
         rent_id = request.form.get('rent_id')
-        addressdata, block, leasedata, rentobject, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
+        addressdata, block, leasedata, rent_, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
                                                                                     action)
         mailaddr = request.form.get('mailaddr')
         summary = dcode + "-" + method + "-" + mailaddr[0:25]
@@ -31,4 +31,4 @@ def mail_edit(id):
 
         return render_template('mergedocs/LTS.html', addressdata=addressdata, block=block, doctype=doctype,
                                summary=summary, leasedata=leasedata, mailaddr=mailaddr,
-                               method=method, rentobject=rentobject, subject=subject)
+                               method=method, rent_=rent_, subject=subject)

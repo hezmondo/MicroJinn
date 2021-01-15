@@ -10,19 +10,20 @@ def delete_record(id):
     id_2 = int(request.args.get('id_2', "0", type=str))
     if item == "agent":
         Agent.query.filter_by(id=id).delete()
-        redir = "ag_bp.agents"
+        redir = "agent_bp.agents"
     elif item == "bankitem":
         Money_item.query.filter_by(id=id).delete()
     elif item == "charge":
         Charge.query.filter_by(id=id).delete()
-        redir = "ro_bp.rent_object/{}".format(id_2)
+        redir = "rent_bp.rent_/{}".format(id_2)
     elif item == "dig":
         Digfile.query.filter_by(id=id).delete()
     elif item == "emailacc":
         Emailaccount.query.filter_by(id=id).delete()
-        redir = "em_bp.email_accounts"
+        redir = "emailacc_bp.email_accounts"
     elif item == "formletter":
         Form_letter.query.filter_by(id=id).delete()
+        redir = "formletter_bp.form_/{}".format(id_2)
     elif item == "incomealloc":
         Incomealloc.query.filter_by(id=id).delete()
     elif item == "landlord":
@@ -35,10 +36,12 @@ def delete_record(id):
         # db.session.delete(delete_loan_trans)
     elif item == "moneyacc":
         Money_account.query.filter_by(id=id).delete()
-    elif item == "rentprop":
-        Money_account.query.filter_by(id=id).delete()
+    elif item == "property":
+        Property.query.filter_by(id=id).delete()
+        redir = "home_bp.properties"
+        id_2 = 0
     else:
-        redir = "ho_bp.home"
+        redir = "home_bp.home"
     commit_to_database()
 
     return redir, id_2

@@ -2,7 +2,7 @@ from flask import redirect, render_template,  request
 from flask_login import login_required
 from app.views import bp
 from app.dao.common import get_combodict
-from app.dao.filter import get_filters, get_rentobjects
+from app.dao.filter import get_filters, get_rent_s
 
 
 @bp.route('/load_filter', methods=['GET', 'POST'])
@@ -19,8 +19,8 @@ def queries(id):
     action = request.args.get('action', "query", type=str)
     combodict = get_combodict("enhanced")
     #gather combobox values, with "all" added as an option, in a dictionary
-    filterdict, rentobjects = get_rentobjects(action, id)
+    filterdict, rent_s = get_rent_s(action, id)
     #gather filter values and selected rent objects in two dictionaries
 
     return render_template('queries.html', action=action, combodict=combodict, filterdict=filterdict,
-                                             rentobjects=rentobjects)
+                                             rent_s=rent_s)

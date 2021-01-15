@@ -13,11 +13,11 @@ def create_new_rent():
     return 23
 
 
-def get_rent_object(id):
+def get_rent_(id):
     if id == 0:
         # take the user to create new rent function:
         id = create_new_rent()
-    rentobject = \
+    rent_ = \
         Rent.query \
             .join(Landlord) \
             .join(Manager) \
@@ -44,17 +44,13 @@ def get_rent_object(id):
                            Typetenure.tenuredet) \
             .filter(Rent.id == id) \
             .one_or_none()
-    if rentobject is None:
+    if rent_ is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
     else:
         pop_idlist_recent("recent_rents", id)
-        session['mailtodet'] = rentobject.mailtodet
-        session['mailaddr'] = rentobject.mailaddr
-        session['propaddr'] = rentobject.propaddr
-        session['tenantname'] = rentobject.tenantname
 
-    return rentobject
+    return rent_
 
 
 def post_rent(id):

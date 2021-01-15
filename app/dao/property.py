@@ -27,10 +27,15 @@ def get_properties(rentid):
     return properties, proptypes
 
 
-def get_property(id):
-    property = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
-                               Property.rent_id, Rent.rentcode, ) \
-        .filter(Property.id == id).one_or_none()
+def get_property(id, rentid):
+    if id == 0:
+        rentcode = Rent.query.with_entities(Rent.rentcode) \
+            .filter(Rent.id==rentid).one_or_none()[0]
+        property = {"id": 0, "rentcode": rentcode, "rent_id": rentid, "typeprop_id": 4}
+    else:
+        property = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
+                                   Property.rent_id, Rent.rentcode, ) \
+            .filter(Property.id == id).one_or_none()
 
     return property
 
@@ -44,9 +49,13 @@ def get_proptypes(type):
     return proptypes
 
 
-def post_property(id):
+def post_property(id, rentid):
+    if id == 0:
+        property = Property()
+        property.rent_id = rentid
+    else:
+        property = Property.query.get(id)
     propaddr = request.form.get("propaddr")
-    property = Property() if id == 0 else Property.query.get(id)
     property.propaddr = propaddr
     proptype = request.form.get("proptype")
     property.typeprop_id = Typeproperty.query.with_entities(Typeproperty.id).filter \

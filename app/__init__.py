@@ -29,62 +29,62 @@ def create_app(config_class=Config):
     mail.init_app(app)
     bootstrap.init_app(app)
 
-    from .views.agent import ag_bp
-    app.register_blueprint(ag_bp, url_prefix='/views')
+    from .views.agent import agent_bp
+    app.register_blueprint(agent_bp, url_prefix='/views')
 
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    from .views.charge import ch_bp
-    app.register_blueprint(ch_bp, url_prefix='/views')
+    from .views.charge import charge_bp
+    app.register_blueprint(charge_bp, url_prefix='/views')
 
-    from .views.doc_object import do_bp
-    app.register_blueprint(do_bp, url_prefix='/views')
+    from .views.doc_object import doc_bp
+    app.register_blueprint(doc_bp, url_prefix='/views')
 
-    from .views.email_account import em_bp
-    app.register_blueprint(em_bp, url_prefix='/views')
+    from .views.email_account import emailacc_bp
+    app.register_blueprint(emailacc_bp, url_prefix='/views')
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
 
-    from .views.form_letter import fo_bp
-    app.register_blueprint(fo_bp, url_prefix='/views')
+    from .views.form_letter import formletter_bp
+    app.register_blueprint(formletter_bp, url_prefix='/views')
 
-    from .views.headrent import hr_bp
-    app.register_blueprint(hr_bp, url_prefix='/views')
+    from .views.headrent import headrent_bp
+    app.register_blueprint(headrent_bp, url_prefix='/views')
 
-    from .views.home import ho_bp
-    app.register_blueprint(ho_bp, url_prefix='/')
+    from .views.home import home_bp
+    app.register_blueprint(home_bp, url_prefix='/')
 
-    from .views.income_object import  io_bp
-    app.register_blueprint(io_bp, url_prefix='/views')
+    from .views.income_ import  income_bp
+    app.register_blueprint(income_bp, url_prefix='/views')
 
-    from .views.landlord import la_bp
-    app.register_blueprint(la_bp, url_prefix='/views')
+    from .views.landlord import landlord_bp
+    app.register_blueprint(landlord_bp, url_prefix='/views')
 
-    from .views.lease import le_bp
-    app.register_blueprint(le_bp, url_prefix='/views')
+    from .views.lease import lease_bp
+    app.register_blueprint(lease_bp, url_prefix='/views')
 
-    from .views.loan import lo_bp
-    app.register_blueprint(lo_bp, url_prefix='/views')
+    from .views.loan import loan_bp
+    app.register_blueprint(loan_bp, url_prefix='/views')
 
-    from .views.money import mo_bp
-    app.register_blueprint(mo_bp, url_prefix='/views')
+    from .views.money import money_bp
+    app.register_blueprint(money_bp, url_prefix='/views')
 
     from .views.payrequest import pr_bp
     app.register_blueprint(pr_bp, url_prefix='/views')
 
-    from .views.rental import re_bp
-    app.register_blueprint(re_bp, url_prefix='/views')
+    from .views.rental import rental_bp
+    app.register_blueprint(rental_bp, url_prefix='/views')
 
-    from .views.rent_object import ro_bp
-    app.register_blueprint(ro_bp, url_prefix='/views')
+    from .views.rent_ import rent_bp
+    app.register_blueprint(rent_bp, url_prefix='/views')
 
-    from .views.rent_external import rx_bp
-    app.register_blueprint(rx_bp, url_prefix='/views')
+    from .views.rent_external import rentx_bp
+    app.register_blueprint(rentx_bp, url_prefix='/views')
 
-    from .views.utility import ut_bp
-    app.register_blueprint(ut_bp, url_prefix='/views')
+    from .views.utility import util_bp
+    app.register_blueprint(util_bp, url_prefix='/views')
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:

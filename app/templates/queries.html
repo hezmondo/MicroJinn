@@ -27,7 +27,7 @@
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
-            <input type="text" class="form-control" name="count" value="{{ rentobjects|length }}">
+            <input type="text" class="form-control" name="count" value="{{ rent_s|length }}">
         </div>
     </div>
     <div class="form-group row">
@@ -118,7 +118,7 @@
     </div>
     {% endif %}
     <div class="table-fixed">
-        <table class="table" id="rentobjects">
+        <table class="table" id="rent_s">
             <thead>
             <tr>
                 <th style="width: 8.00%">rentcode</th>
@@ -133,7 +133,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for item in rentobjects %}
+            {% for item in rent_s %}
             <tr id="{{ item.id }}">
                 <td style="width: 8.00%">{{ item.rentcode }}</td>
                 <td style="width: 8.00%"> {{ item.rentpa }}</td>
@@ -143,7 +143,7 @@
                 <td style="width: 20.00%">{{ item.propaddr }}</td>
                 <td style="width: 8.00%"> {{ item.source }}</td>
                 <td style="width: 20.00%"> {{ item.detail }}</td>
-                <td style="width: 5.00%"><a href="/rent_object/{{ item.id }}">view/edit</a></td>
+                <td style="width: 5.00%"><a href="/rent_/{{ item.id }}">view/edit</a></td>
             </tr>
             {% endfor %}
             </tbody>

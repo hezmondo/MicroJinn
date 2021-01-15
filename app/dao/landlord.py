@@ -13,13 +13,12 @@ def get_landlords():
 
 
 def get_landlord(id):
-    if id == 0:
-        landlord = Landlord()
-        landlord.id = 0
-    else:
-        landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
+
+    landlord = Landlord.query.join(Manager).join(Emailaccount).join(Money_account).with_entities(Landlord.id,
                      Landlord.landlordname, Landlord.landlordaddr, Landlord.taxdate, Manager.managername,
-                         Emailaccount.smtp_server, Money_account.accdesc).filter(Landlord.id == id).one_or_none()
+                         Emailaccount.smtp_server, Money_account.accdesc) \
+        .filter(Landlord.id == id).one_or_none()
+
     return landlord
 
 

@@ -25,7 +25,7 @@
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
-            <input type="text" class="form-control" name="count" value="{{ rentobjects|length }}">
+            <input type="text" class="form-control" name="count" value="{{ rent_s|length }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -60,7 +60,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rentobjects %}
+        {% for item in rent_s %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>

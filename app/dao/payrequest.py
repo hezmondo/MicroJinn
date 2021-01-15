@@ -6,9 +6,9 @@ from app.dao.functions import dateToStr, commit_to_database, moneyToStr
 import datetime
 
 
-def forward_rents(rentobjects):
+def forward_rents(rent_s):
     update_vals = []
-    for rent_prop in rentobjects:
+    for rent_prop in rent_s:
         update_vals.append(forward_rent(rent_prop.id, True))
     db.session.bulk_update_mappings(Rent, update_vals)
     commit_to_database()
@@ -26,12 +26,12 @@ def forward_rent(rent_id, from_batch=False):
         return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
-def check_or_add_recovery_charge(rentobject):
-    charge_suffix = determine_charges_suffix(rentobject)
+def check_or_add_recovery_charge(rent_):
+    charge_suffix = determine_charges_suffix(rent_)
     recovery_charge_amount, create_case_info = get_recovery_info(charge_suffix)
     if recovery_charge_amount != 0:
-        if not check_charge_exists(rentobject.id, 10, recovery_charge_amount):
-            add_charge(rentobject.id, recovery_charge_amount, 10)
+        if not check_charge_exists(rent_.id, 10, recovery_charge_amount):
+            add_charge(rent_.id, recovery_charge_amount, 10)
 
 
 def check_charge_exists(rent_id, charge_type_id, charge_total):
@@ -68,13 +68,13 @@ def get_charge_detail(rent_id):
     return charges
 
 
-def determine_charges_suffix(rentobject):
-    periods = rentobject.arrears * rentobject.freq_id / rentobject.rentpa
-    charges_total = rentobject.totcharges if rentobject.totcharges else 0
-    pr_exists = check_previous_pr_exists(rentobject.id)
-    last_recovery_level = get_last_recovery_level(rentobject.id) if pr_exists else ""
+def determine_charges_suffix(rent_):
+    periods = rent_.arrears * rent_.freq_id / rent_.rentpa
+    charges_total = rent_.totcharges if rent_.totcharges else 0
+    pr_exists = check_previous_pr_exists(rent_.id)
+    last_recovery_level = get_last_recovery_level(rent_.id) if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
-    oldest_charge_date = db.session.execute(func.mjinn.oldest_charge(rentobject.id)).scalar()
+    oldest_charge_date = db.session.execute(func.mjinn.oldest_charge(rent_.id)).scalar()
     charge_90_days = oldest_charge_date and datetime.date.today() - oldest_charge_date > datetime.timedelta(90)
     return get_charges_suffix(periods, charges_total, pr_exists, last_recovery_level, charge_90_days)
 
@@ -122,8 +122,8 @@ def get_last_recovery_level(rent_id):
     return last_recovery_level
 
 
-def get_rent_statement(rentobject, rent_type):
-    statement = "The {0} {1} due and payable {2} on {3}:".format(rentobject.freqdet, rent_type, rentobject.advarrdet, dateToStr(rentobject.nextrentdate))
+def get_rent_statement(rent_, rent_type):
+    statement = "The {0} {1} due and payable {2} on {3}:".format(rent_.freqdet, rent_type, rent_.advarrdet, dateToStr(rent_.nextrentdate))
     return statement
 
 

@@ -8,10 +8,12 @@
     <div class="form-group row flex-row-reverse align-items-end">
         {% if rentid != 0 %}
             <div class="col-md-2">
-                <a href="{{ url_for('ro_bp.rent_object', id=rentid) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                   class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('ho_bp.property', id=0, rentid=rentid) }}" class="btn btn-block btn-danger" role="button">new property for this rent</a>
+                <a href="{{ url_for('home_bp.property', id=0, rentid=rentid) }}"
+                   class="btn btn-block btn-danger" role="button">new property for this rent</a>
             </div>
         {% else %}
         <div class="col-md-2">
@@ -46,7 +48,7 @@
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 75.00%"> {{ item.propaddr }}</td>
             <td style="width: 15.00%"> {{ item.detail }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('ho_bp.property', id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('home_bp.property', id=item.id) }}">edit</a></td>
         </tr>
         {% endfor %}
         </tbody>
