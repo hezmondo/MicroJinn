@@ -31,13 +31,13 @@ def get_property(id, rentid):
     if id == 0:
         rentcode = Rent.query.with_entities(Rent.rentcode) \
             .filter(Rent.id==rentid).one_or_none()[0]
-        property = {"id": 0, "rentcode": rentcode, "rent_id": rentid, "typeprop_id": 4}
+        property_ = {"id": 0, "rentcode": rentcode, "rent_id": rentid, "typeprop_id": 4}
     else:
-        property = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
+        property_ = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
                                    Property.rent_id, Rent.rentcode, ) \
             .filter(Property.id == id).one_or_none()
 
-    return property
+    return property_
 
 
 def get_proptypes(type):

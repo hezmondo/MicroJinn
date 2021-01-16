@@ -7,23 +7,28 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="Starts with" value="{{ filterdict.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip"
+                   title="Starts with" value="{{ filterdict.rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="tenantname">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ filterdict.tenantname }}">
+            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.tenantname }}">
         </div>
         <div class="col-md-2">
             <label for="propaddr">property details:</label>
-            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ filterdict.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
-            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ filterdict.source }}">
+            <input type="text" class="form-control" name="source" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.source }}">
         </div>
         <div class="col-md-2">
             <label for="agentdetail">agent details:</label>
-            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip" title="includes" value="{{ filterdict.agentdetail }}">
+            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.agentdetail }}">
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
@@ -32,10 +37,12 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/index" class="btn btn-block btn-success ">search</button>
+            <button type="submit" formaction="{{ url_for('home_bp.home') }}"
+                    class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/rents_external" class="btn btn-block btn-primary ">search external</button>
+            <button type="submit" formaction="/views/rents_ex"
+                    class="btn btn-block btn-primary ">search external</button>
         </div>
         <div class="col-md-3">
             <a href="/queries/0" class="btn btn-block btn-danger" role="button">advanced queries</a>

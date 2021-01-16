@@ -1,4 +1,4 @@
-<!-- /templates/property.html  -->
+<!-- /templates/property_.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -8,20 +8,20 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">rentcode:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ property.rentcode }}" readonly="true">
+            <input type="text" class="form-control" name="rentcode" value="{{ property_.rentcode }}" readonly="true">
         </div>
         <div class="col-md-8">
             <label for="propaddr">address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ property.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" value="{{ property_.propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="proptype">type:</label>
-            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=property.detail) }}
+            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=property_.detail) }}
         </div>
     </div>
     <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-2">
-            <a href="{{ url_for('rent_bp.rent_', id=property.rent_id) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            <a href="{{ url_for('rent_bp.rent_', id=property_.rent_id) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('home_bp.properties', rentid=0) }}" class="btn btn-block btn-primary" role="button">all properties</a>
@@ -31,13 +31,13 @@
         </div>
         {% if rentid != "0" %}
         <div class="col-md-2">
-            <a href="{{ url_for('util_bp.delete_item', id=property.id, item=property) }}"
+            <a href="{{ url_for('util_bp.delete_item', id=property_.id, item='property', id_2=property_.rent_id) }}"
                onclick="return confirm('Are you sure you want to delete this property?');"
                class="btn btn-block btn-danger" role="button">delete property</a>
         </div>
         {% endif %}
         <div class="col-md-2">
-            <input type="text" class="form-control" name="propid" value="{{ property.id }}" readonly="true">
+            <input type="text" class="form-control" name="propid" value="{{ property_.id }}" readonly="true">
         </div>
     </div>
 </form>

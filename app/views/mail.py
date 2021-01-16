@@ -1,11 +1,12 @@
-from flask import redirect, render_template,  request
+from flask import Blueprint, render_template,  request
 from flask_login import login_required
-from app.views import bp
 from app.dao.form_letter import get_formletters
 from app.dao.mail import writeMail
 
+mail_bp = Blueprint('mail_bp', __name__)
 
-@bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
+
+@mail_bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_dialog(id):
     action = request.args.get('action', "normal", type=str)
@@ -14,7 +15,7 @@ def mail_dialog(id):
     return render_template('mail_dialog.html', action=action, formletters=formletters, rent_id=id)
 
 
-@bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
+@mail_bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def mail_edit(id):
     method = request.args.get('method', "email", type=str)

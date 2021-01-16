@@ -30,7 +30,7 @@ def property(id):
 
         return redirect(url_for('home_bp.property', id=id))
 
-    property = get_property(id, rentid)
+    property_ = get_property(id, rentid)
     proptypes = get_proptypes("basic")
 
-    return render_template('property.html', property=property, proptypes=proptypes)
+    return render_template('property.html', property_=property_, proptypes=proptypes)

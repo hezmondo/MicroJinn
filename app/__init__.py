@@ -38,11 +38,8 @@ def create_app(config_class=Config):
     from .views.charge import charge_bp
     app.register_blueprint(charge_bp, url_prefix='/views')
 
-    from .views.doc_object import doc_bp
+    from .views.doc_ import doc_bp
     app.register_blueprint(doc_bp, url_prefix='/views')
-
-    from .views.email_account import emailacc_bp
-    app.register_blueprint(emailacc_bp, url_prefix='/views')
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
@@ -68,6 +65,9 @@ def create_app(config_class=Config):
     from .views.loan import loan_bp
     app.register_blueprint(loan_bp, url_prefix='/views')
 
+    from .views.mail import mail_bp
+    app.register_blueprint(mail_bp, url_prefix='/views')
+
     from .views.money import money_bp
     app.register_blueprint(money_bp, url_prefix='/views')
 
@@ -79,9 +79,6 @@ def create_app(config_class=Config):
 
     from .views.rent_ import rent_bp
     app.register_blueprint(rent_bp, url_prefix='/views')
-
-    from .views.rent_external import rentx_bp
-    app.register_blueprint(rentx_bp, url_prefix='/views')
 
     from .views.utility import util_bp
     app.register_blueprint(util_bp, url_prefix='/views')

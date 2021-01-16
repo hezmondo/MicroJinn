@@ -5,7 +5,7 @@ from sqlalchemy import func
 from app.dao.common import get_idlist_recent
 from app.dao.functions import strToDate, strToDec
 
-from app.models import Agent, Charge, Manager_external, Rent_external, Jstore, Landlord, Property, Rent, Typeactype, \
+from app.models import Agent, Charge, Manager_external, Rent_ex, Jstore, Landlord, Property, Rent, Typeactype, \
     Typedoc, Typeprdelivery, Typesalegrade, Typestatus, Typetenure
 
 
@@ -86,27 +86,27 @@ def get_qfilter(filterdict, action):
     for key, value in filterdict.items():
         if key == "rentcode" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.rentcode.startswith([value]))
+                filter.append(Rent_ex.rentcode.startswith([value]))
             else:
                 filter.append(Rent.rentcode.startswith([value]))
         elif key == "agentdetail" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.agentdetail.ilike('%{}%'.format(value)))
+                filter.append(Rent_ex.agentdetail.ilike('%{}%'.format(value)))
             else:
                 filter.append(Agent.detail.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.propaddr.ilike('%{}%'.format(value)))
+                filter.append(Rent_ex.propaddr.ilike('%{}%'.format(value)))
             else:
                 filter.append(Property.propaddr.ilike('%{}%'.format(value)))
         elif key == "source" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.source.ilike('%{}%'.format(value)))
+                filter.append(Rent_ex.source.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.source.ilike('%{}%'.format(value)))
         elif key == "tenantname" and value and value != "":
             if action == "external":
-                filter.append(Rent_external.tenantname.ilike('%{}%'.format(value)))
+                filter.append(Rent_ex.tenantname.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":
@@ -179,12 +179,12 @@ def get_rent_s_data(qfilter, action, runsize):
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed
         rent_s = \
-            Rent_external.query \
+            Rent_ex.query \
             .join(Manager_external) \
-            .with_entities(Rent_external.id, Rent_external.rentcode, Rent_external.propaddr, Rent_external.tenantname, Rent_external.owner,
-                           Rent_external.rentpa, Rent_external.arrears, Rent_external.lastrentdate, Rent_external.source, Rent_external.status,
-                           Manager_external.codename, Rent_external.agentdetail) \
-            .filter(*qfilter).order_by(Rent_external.rentcode).limit(runsize).all()
+            .with_entities(Rent_ex.id, Rent_ex.rentcode, Rent_ex.propaddr, Rent_ex.tenantname, Rent_ex.owner,
+                           Rent_ex.rentpa, Rent_ex.arrears, Rent_ex.lastrentdate, Rent_ex.source, Rent_ex.status,
+                           Manager_external.codename, Rent_ex.agentdetail) \
+            .filter(*qfilter).order_by(Rent_ex.rentcode).limit(runsize).all()
 
     else:
         # advanced search submitted from queries page

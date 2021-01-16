@@ -41,7 +41,7 @@ def get_charges(rentid):
 
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
                      Charge.chargestartdate, Charge.chargetotal, Charge.chargedetail, Charge.chargebalance) \
-            .filter(*qfilter).all()
+            .filter(*qfilter).order_by(Rent.rentcode).all()
 
     return charges
 

@@ -25,7 +25,8 @@
             <input type="text" class="form-control" name="propaddr" value="{{ rent_.propaddr }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('home_bp.properties', rentid=rent_.id) }}" class="btn btn-block btn-primary" role="button">view</a>
+            <a href="{{ url_for('home_bp.properties', rentid=rent_.id) }}"
+               class="btn btn-block btn-primary" role="button">view</a>
         </div>
     </div>
     <div class="form-group row">
@@ -125,16 +126,17 @@
             <button type="button" id="more_less" class="btn btn-block btn-danger">more</button>
         </div>
         <div class="col-md-2">
-            <a href="/charges?rentid={{ rent_.id }}&rentcode={{ rent_.rentcode }}" class="btn btn-block btn-primary" role="button">charges</a>
+            <a href="{{ url_for('charge_bp.charges', rentid=rent_.id, rentcode=rent_.rentcode) }}"
+               class="btn btn-block btn-primary" role="button">charges</a>
         </div>
         <div class="col-md-2">
-            <a href="/income/0?rentid={{ rent_.id }}" class="btn btn-block btn-primary" role="button">income</a>
+            <a href="/views/income/0?rentid={{ rent_.id }}" class="btn btn-block btn-primary" role="button">income</a>
         </div>
         <div class="col-md-2">
-            <a href="/mail_dialog/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">mail</a>
+            <a href="/views/mail_dialog/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">mail</a>
         </div>
         <div class="col-md-2">
-            <a href="/docfiles/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">docfiles</a>
+            <a href="/views/docfiles/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">docfiles</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
@@ -155,23 +157,24 @@
     </div>
     <div class="form-group row flex-row-reverse" id="more_buttons">
         <div class="col-md-2">
-            <a href="/lease/0?rentid={{ rent_.id }}&rentcode={{ rent_.rentcode }}" class="btn btn-block btn-primary" role="button">leaseinfo</a>
+            <a href="{{ url_for('lease_bp.lease', id=rent_.id) }}" class="btn btn-block btn-primary" role="button">leaseinfo</a>
         </div>
         <div class="col-md-2">
             <a href="/docfiles/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="/docfiles/{{ rent_.id }}" class="btn btn-block btn-primary" role="button">something</a>
+            <a href="{{ url_for('home_bp.properties', rentid=rent_.id) }}"
+               class="btn btn-block btn-primary" role="button">something</a>
         </div>
         <div class="col-md-2">
             <div class="dropdown">
               <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="statementsMenuButton"
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
               <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
-                <a class="dropdown-item" href="/rent_/0?action=new">new statement for this rent</a>
-                <a class="dropdown-item" href="/charges?rentid={{ rent_.id }}">new account for this rent</a>
-                <a class="dropdown-item" href="/pr_dialog/{{ rent_.id }}">new payrequest for this rent</a>
-                <a class="dropdown-item" href="/mail_dialog/{{ rent_.id }}">new s166 for this rent</a>
+                <a class="dropdown-item" href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new statement for this rent</a>
+                <a class="dropdown-item" href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new account for this rent</a>
+                <a class="dropdown-item" href="{{ url_for('pr_bp.pr_start', rentid=rent_.id) }}">new payrequest for this rent</a>
+                <a class="dropdown-item" href="{{ url_for('mail_bp.mail_dialog', id=rent_.id) }}">new s166 for this rent</a>
               </div>
             </div>
         </div>
@@ -180,8 +183,8 @@
               <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="otherMenuButton"
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">other actions</button>
               <div class="dropdown-menu" aria-labelledby="otherMenuButton">
-                <a class="dropdown-item" href="/lease/0?action=new&rentid={{ rent_.id }}&rentcode={{ rent_.rentcode }}" >add lease for this rent</a>
-                <a class="dropdown-item" href="/rent_/0?action=clone">clone rent and property</a>
+                <a class="dropdown-item" href="/views/lease/0?action=new&rentid={{ rent_.id }}&rentcode={{ rent_.rentcode }}" >add lease for this rent</a>
+                <a class="dropdown-item" href="/views/rent_/0?action=clone">clone rent and property</a>
               </div>
             </div>
         </div>

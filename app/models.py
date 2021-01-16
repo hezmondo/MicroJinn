@@ -322,7 +322,7 @@ class Manager_external(db.Model):
     codename = db.Column(db.String(15))
     detail = db.Column(db.String(180))
 
-    rentext_managerext = db.relationship('Rent_external', backref='manager_external', lazy='dynamic')
+    rentext_managerext = db.relationship('Rent_ex', backref='manager_external', lazy='dynamic')
 
     def __repr__(self):
         return '<Manager_external {}>'.format(self.codename)
@@ -512,8 +512,8 @@ class Rental_statement(db.Model):
     balance = db.Column(db.Numeric(8, 2))
 
 
-class Rent_external(db.Model):
-    __tablename__ = 'rent_external'
+class Rent_ex(db.Model):
+    __tablename__ = 'rent_ex'
 
     id = db.Column(db.Integer, primary_key=True)
     rentcode = db.Column(db.String(20), index=True)
@@ -530,7 +530,7 @@ class Rent_external(db.Model):
     extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
 
     def __repr__(self):
-        return '<Rent_external {}>'.format(self.rentcode)
+        return '<Rent_ex {}>'.format(self.rentcode)
 
 
 class Template(db.Model):
