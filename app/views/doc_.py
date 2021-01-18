@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, send_file
 from flask_login import login_required
 from io import BytesIO
-from app.dao.doc_object import get_digfile, get_docfile, get_docfiles, post_docfile, post_payrequestfile, post_upload
+from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_payrequestfile, post_upload
 
 doc_bp = Blueprint('doc_bp', __name__)
 
@@ -10,9 +10,9 @@ doc_bp = Blueprint('doc_bp', __name__)
 @login_required
 def docfile(id):
     if request.method == "POST":
-        rent_id = post_docfile(id)
+        rentid = post_docfile(id)
 
-        return redirect('/rent_/{}'.format(rent_id))
+        return redirect("/views/rent_/{}".format(rentid))
 
     docfile, doc_dig = get_docfile(id)
 

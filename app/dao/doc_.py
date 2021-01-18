@@ -95,11 +95,9 @@ def post_docfile(id):
     if id == 0:
         # new file has to be doc as new digital file uses upload function
         docfile = Docfile()
-        docfile.id = 0
-        docfile.rent_id = rentid
     else:
         docfile = Docfile.query.get(id) if doc_dig == "doc" else Digfile.query.get(id)
-        docfile.rent_id = rentid
+    docfile.rent_id = rentid
     docfile.doc_date = request.form.get('doc_date')
     if doc_dig == "doc":
         docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
@@ -112,8 +110,11 @@ def post_docfile(id):
     docfile.summary = request.form.get('summary')
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
     db.session.add(docfile)
+    db.session.flush()
+    id_ = docfile.id
     db.session.commit()
-    return rentid
+
+    return id_
 
 
 # TODO: May need to be moved

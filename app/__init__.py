@@ -29,9 +29,6 @@ def create_app(config_class=Config):
     mail.init_app(app)
     bootstrap.init_app(app)
 
-    from .views.agent import agent_bp
-    app.register_blueprint(agent_bp, url_prefix='/views')
-
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
@@ -50,20 +47,17 @@ def create_app(config_class=Config):
     from .views.headrent import headrent_bp
     app.register_blueprint(headrent_bp, url_prefix='/views')
 
-    from .views.home import home_bp
-    app.register_blueprint(home_bp, url_prefix='/')
-
     from .views.income_ import  income_bp
     app.register_blueprint(income_bp, url_prefix='/views')
-
-    from .views.landlord import landlord_bp
-    app.register_blueprint(landlord_bp, url_prefix='/views')
 
     from .views.lease import lease_bp
     app.register_blueprint(lease_bp, url_prefix='/views')
 
     from .views.loan import loan_bp
     app.register_blueprint(loan_bp, url_prefix='/views')
+
+    from .views.main import main_bp
+    app.register_blueprint(main_bp)
 
     from .views.mail import mail_bp
     app.register_blueprint(mail_bp, url_prefix='/views')

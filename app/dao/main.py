@@ -1,8 +1,8 @@
 from flask import redirect, request, url_for
 from app import db
 from app.dao.functions import commit_to_database
-from app.models import Agent, Charge, Digfile, Form_letter, Incomealloc, Landlord, Loan, \
-    Manager_external, Money_item, Property, Rent_ex, Money_account, Emailaccount
+from app.models import Agent, Charge, Digfile, Emailaccount, Form_letter, Incomealloc, Landlord, Loan, \
+    Manager_external, Money_item, Property,  Rent, Rent_ex, Money_account
 
 
 def delete_record(id):
@@ -10,7 +10,7 @@ def delete_record(id):
     id_2 = request.args.get('id_2')
     if item == "agent":
         Agent.query.filter_by(id=id).delete()
-        redir = "agent_bp.agents"
+        redir = "main_bp.agents"
     elif item == "bankitem":
         Money_item.query.filter_by(id=id).delete()
         redir = "views/money_items".format(id_2)
@@ -21,7 +21,7 @@ def delete_record(id):
         Digfile.query.filter_by(id=id).delete()
     elif item == "emailacc":
         Emailaccount.query.filter_by(id=id).delete()
-        redir = "util_bp.email_accounts"
+        redir = "main_bp.email_accounts"
     elif item == "formletter":
         Form_letter.query.filter_by(id=id).delete()
         redir = "formletter_bp.form_, id={}".format(id_2)
@@ -42,8 +42,11 @@ def delete_record(id):
     elif item == "property":
         Property.query.filter_by(id=id).delete()
         redir = "properties"
+    elif item == "rent":
+        Rent.query.filter_by(id=id).delete()
+        redir = "main_bp.home"
     else:
-        redir = "home_bp.home"
+        redir = "main_bp.home"
     commit_to_database()
 
     return redir, id_2

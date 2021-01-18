@@ -6,10 +6,12 @@
     <div class="form-group row flex-row-reverse">
         {% if rentid != "0" %}
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                   class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('charge_bp.charge', id=rentid, rentcode=rentcode) }}" class="btn btn-block btn-danger" role="button">new charge for this rent</a>
+                <a href="{{ url_for('charge_bp.charge', id=0, rentid=rentid, rentcode=rentcode) }}"
+                   class="btn btn-block btn-danger" role="button">new charge for this rent</a>
             </div>
         {% endif %}
         <div class="col-md-2">

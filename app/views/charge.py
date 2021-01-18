@@ -11,7 +11,7 @@ def charge(id):
     if request.method == "POST":
         rentid = post_charge(id)
 
-        return redirect("{{ url_for('rent_bp.rent_', id={}) }}".format(rentid))
+        return redirect("/views/rent_/{}".format(rentid))
 
     charge, chargedescs = get_charge(id)
 

@@ -8,7 +8,7 @@
     <div class="form-group row flex-row-reverse">
         {% if rentid == 0 %}
             <div class="col-md-2">
-                <button type="submit" class="btn btn-block btn-success">Search</button>
+                <button type="submit" class="btn btn-block btn-success">search</button>
             </div>
             <div class="col-md-2">
                 <input type="text" class="form-control" name="rentcode" placeholder="rent code">
@@ -27,16 +27,20 @@
             </div>
         {% else %}
             <div class="col-md-2">
-                <a href="/rent_/{{ rentid }}" class="btn btn-block btn-primary" role="button">return to rent</a>
+                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                   class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-2">
-                <a href="/docfiles/0" class="btn btn-block btn-primary" role="button">view all docfiles</a>
+                <a href="{{ url_for('doc_bp.docfiles', rentid=0) }}"
+                   class="btn btn-block btn-primary" role="button">view all docfiles</a>
             </div>
             <div class="col-md-2">
-                <a href="/docfile/0?doc_dig=doc&rentid={{ rentid }}" class="btn btn-block btn-primary" role="button">new doc in</a>
+                <a href="{{ url_for('doc_bp.docfile', id=0, doc_dig='doc', rentid=rentid) }}"
+                   class="btn btn-block btn-primary" role="button">new doc in</a>
             </div>
             <div class="col-md-2">
-                <a href="/upload_file/{{ rentid }}?rentcode={{ docfiles.rentcode }}" class="btn btn-block btn-primary" role="button">new digfile</a>
+                <a href="{{ url_for('doc_bp.upload_file', rentid=rentid, rentcode=docfiles.rentcode) }}"
+                   class="btn btn-block btn-primary" role="button">new digfile</a>
             </div>
         {% endif %}
     </div>
@@ -64,7 +68,7 @@
                 <td style="width: 10.00%"> {{ item.desc }}</td>
                 <td style="width: 10.00%"> {{ item.doc_dig }}</td>
                 <td style="width: 10.00%"> {{ item.out_in }}</td>
-                <td style="width: 10.00%"><a href="/docfile/{{ item.id }}?doc_dig={{ item.doc_dig }}">view</a></td>
+                <td style="width: 10.00%"><a href="{{ url_for('doc_bp.docfile', id=item.id, doc_dig=item.doc_dig) }}">view</a></td>
             </tr>
             {% endfor %}
             </tbody>

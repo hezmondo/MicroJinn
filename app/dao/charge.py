@@ -61,8 +61,9 @@ def post_charge(id):
     charge.chargetotal = strToDec(request.form.get("chargetotal"))
     charge.chargedetail = request.form.get("chargedetail")
     charge.chargebalance = strToDec(request.form.get("chargebalance"))
-    rent_id = charge.rent_id
     db.session.add(charge)
+    db.session.flush()
+    rent_id = charge.rent_id
     db.session.commit()
 
     return rent_id
