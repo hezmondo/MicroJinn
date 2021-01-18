@@ -13,7 +13,7 @@ def get_headrents():
                                                                                Headrent.arrears, Headrent.freq_id,
                                                                                Headrent.lastrentdate,
                                                                                Headrent.propaddr,
-                                                                               func.mjinn.next_date(
+                                                                               func.samjinn.next_date(
                                                                                    Headrent.lastrentdate,
                                                                                    Headrent.freq_id, 1).label(
                                                                                    'nextrentdate'),
@@ -35,7 +35,7 @@ def get_headrent(id):
                            Landlord.landlordname, Agent.agdetails, Typeadvarr.advarrdet, Typefreq.freqdet,
                            Typestatus.statusdet, Typetenure.tenuredet,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
+                           func.samjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
             .filter(Headrent.id == id) \
             .one_or_none()
 

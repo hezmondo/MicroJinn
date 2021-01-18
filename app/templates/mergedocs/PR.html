@@ -7,7 +7,7 @@
 <form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="/pr_dialog/{{ rentobj.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
+			<a href="/pr_dialog/{{ rent_pr.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save payrequest</button>
@@ -16,16 +16,16 @@
 	<div id="doc_html" contenteditable="true">
 	    {% if method == "letter" %}
 			<div class="font-size-large" align="center">
-				<b>{{ rentobj.managername }}</b>
+				<b>{{ rent_pr.managername }}</b>
 			</div>
 			<div class="font-size-small" align="center">
-				{{ addressdata.manageraddr }}
+				{{ rent_pr.manageraddr }}
 				<br />
-				{{ addressdata.manageraddr2 }}
+				{{ rent_pr.manageraddr2 }}
 				<br />
 			</div>
 			<div class="font-size-medium" align="right">
-				Our Ref: {{ rentobj.rentcode }}
+				Our Ref: {{ rent_pr.rentcode }}
 				<br />
 				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 			</div>
@@ -36,17 +36,17 @@
 				{% endfor %}
 				<br />
 				<br />
-				Dear {{ rentobj.tenantname }}
+				Dear {{ rent_pr.tenantname }}
 			</div>
 	    {% else %}
 			<div class="font-size-medium" align="left">
-				Our Ref: {{ rentobj.rentcode }}
+				Our Ref: {{ rent_pr.rentcode }}
 				<br />
 				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rentobj.email }}
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent_pr.email }}
 				<br />
 				<br />
-				Dear {{ rentobj.tenantname }}
+				Dear {{ rent_pr.tenantname }}
 			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
@@ -77,14 +77,11 @@
 			<br />
 			<br />
 			<br />
-		    {% if method == "email" %}
-				<b>{{ rentobj.managername }}</b>
-				<br />
-				{{ addressdata.manageraddr }}
-				<br />
-				{{ addressdata.manageraddr2 }}
-				<br />
-		    {% endif %}
+			<b>{{ rent_pr.managername }}</b>
+			<br />
+			{{ rent_pr.manageraddr }}
+			<br />
+			{{ rent_pr.manageraddr2 }}
 			</div>
 		</div>
 	</div>

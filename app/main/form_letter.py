@@ -1,8 +1,6 @@
 from app import db
 from flask import request
-from sqlalchemy import desc, func
-from app.main.functions import commit_to_database
-from app.models import Form_letter, Pr_form, Template, Typedoc\
+from app.models import Form_letter, Template, Typedoc
 
 
 def get_formletter(id):
@@ -58,12 +56,3 @@ def post_formletter(id, action):
 
     return id_
 
-
-# TODO: These should be renamed and moved
-def get_formpayrequest(id):
-    formpayrequest = Pr_form.query.filter(Pr_form.id == id).one_or_none()
-    return formpayrequest
-
-
-def get_formpayrequests():
-    return Pr_form.query.all()

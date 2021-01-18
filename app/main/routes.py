@@ -11,7 +11,7 @@ from app.main.common import get_combodict
 from app.main.delete import delete_record
 from app.main.doc_obj import get_docfile, get_docfiles, post_docfile, post_upload
 from app.main.email import get_emailaccount, get_emailaccounts, post_emailaccount
-from app.main.form_letter import get_formletter, get_formletters, get_formpayrequests, post_formletter
+from app.main.form_letter import get_formletter, get_formletters, post_formletter
 from app.main.functions import backup_database
 from app.main.headrent import get_headrent, get_headrents, post_headrent
 from app.main.income_obj import get_incomes, get_incomeobj, get_income_dict, post_incomeobj
@@ -20,7 +20,7 @@ from app.main.lease import get_lease, get_leases, post_lease
 from app.main.loan import get_loan, get_loan_options, get_loans, get_loanstatement, post_loan
 from app.main.money import get_moneyaccount, get_moneydets, get_moneyitem, get_moneyitems, get_moneydict, \
         post_moneyitem
-from app.main.payrequests import get_pr_file, get_pr_history, post_pr_file
+from app.main.payrequests import get_pr_forms, get_pr_file, get_pr_history, post_pr_file
 from app.main.property import get_property, post_property
 from app.main.rental import get_rental, getrentals, get_rentalstatement, post_rental
 from app.main.rent_external import get_rent_external
@@ -389,49 +389,24 @@ def money_item(id):
     money_dict = get_moneydict()
     money_item, cleared = get_moneyitem(id)
 
-# # TODO: Possible refactor of payrequest - currently a duplication of queries but with forward_rents function
-# @bp.route('/payrequest/', methods=['GET', 'POST'])
-# @login_required
-# def payrequest():
-#     action = request.args.get('action', "view", type=str)
-#     name = request.args.get('name', "queryall", type=str)
-#
-#     landlords, statusdets, tenuredets = get_queryoptions_common()
-#     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-#
-#     actype, agentdetails, arrears, enddate, jname, landlord, prdelivery, propaddr, rentcode, rentpa, rentperiods, \
-#     runsize, salegrade, source, status, tenantname, tenure, rentprops = get_rentobjs_plus(action, name)
-#
-#     # TODO: forward rents using ajax so that the page needn't be reloaded
-#     if action == "run":
-#         forward_rents(rentprops)
-#
-#     return render_template('payrequest.html', action=action, actypedets=actypedets, floads=floads,
-#                            landlords=landlords, options=options, prdeliveries=prdeliveries, salegradedets=salegradedets,
-#                            statusdets=statusdets, tenuredets=tenuredets, actype=actype, agentdetails=agentdetails,
-#                            arrears=arrears, enddate=enddate, jname=jname, landlord=landlord, prdelivery=prdelivery,
-#                            propaddr=propaddr, rentcode=rentcode, rentpa=rentpa, rentperiods=rentperiods,
-#                            runsize=runsize, salegrade=salegrade, source=source, status=status,
-#                            tenantname=tenantname, tenure=tenure, rentprops=rentprops)
 
-
-@bp.route('/pr_dialog/<int:id>', methods=["GET", "POST"])
+@bp.route('/pr_dialog/<int:rent_id>', methods=["GET", "POST"])
 @login_required
-def pr_dialog(id):
-    formpayrequests = get_formpayrequests()
+def pr_dialog(rent_id):
+    pr_forms = get_pr_forms()
 
-    return render_template('pr_dialog.html', formpayrequests=formpayrequests, rent_id=id)
+    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
 
 
-@bp.route('/pr_edit/<int:id>', methods=["GET", "POST"])
+@bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])
 @login_required
-def pr_edit(id):
+def pr_edit(pr_form_id):
     if request.method == "POST":
         method = request.args.get('method', "email", type=str)
         rent_id = request.form.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
         # TODO: All hidden variables can be passed in a single json object
-        addressdata, block, pr_data, rentobj, table_rows, totdue_string = write_payrequest(rent_id, id)
+        block, pr_data, rent_pr, table_rows, totdue_string = write_payrequest(rent_id, pr_form_id)
 
         mailaddr = request.form.get('mailaddr')
         summary = pr_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
@@ -439,30 +414,30 @@ def pr_edit(id):
 
         pr_data = json.dumps(pr_data, default=decimal_default)
 
-        return render_template('mergedocs/PR.html', addressdata=addressdata, block=block, mailaddr=mailaddr,
-                               method=method, pr_data=pr_data, rentobj=rentobj, summary=summary, table_rows=table_rows,
+        return render_template('mergedocs/PR.html', block=block, mailaddr=mailaddr,
+                               method=method, pr_data=pr_data, rent_pr=rent_pr, summary=summary, table_rows=table_rows,
                                totdue_string=totdue_string)
 
 
 # TODO: improve pr_file editing functionality (beyond edit summary/block)
-@bp.route('/pr_file/<int:id>', methods=['GET', 'POST'])
+@bp.route('/pr_file/<int:pr_id>', methods=['GET', 'POST'])
 @login_required
-def pr_file(id):
+def pr_file(pr_id):
     if request.method == "POST":
-        rent_id = post_pr_file(id)
+        rent_id = post_pr_file(pr_id)
 
         return redirect('/pr_history/{}'.format(rent_id))
 
-    pr_file = get_pr_file(id)
+    pr_file = get_pr_file(pr_id)
 
     return render_template('pr_file.html', pr_file=pr_file)
 
 
-@bp.route('/pr_history/<int:rentid>', methods=['GET', 'POST'])
-def pr_history(rentid):
-    pr_history = get_pr_history(rentid)
+@bp.route('/pr_history/<int:rent_id>', methods=['GET', 'POST'])
+def pr_history(rent_id):
+    pr_history = get_pr_history(rent_id)
 
-    return render_template('pr_history.html', rentid=rentid, pr_history=pr_history)
+    return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history)
 
 
 # @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
