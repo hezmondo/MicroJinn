@@ -16,25 +16,30 @@
         </div>
         <div class="col-md-6">
             <label for="chargedesc">charge type:</label>
-            {{ widgets.combobox_id(idc="chargedesc", name="chargedesc", items=chargedescs, item_selected=charge.chargedesc) }}
+            {{ widgets.combobox_id(idc="chargedesc", name="chargedesc",
+            items=chargedescs, item_selected=charge.chargedesc) }}
         </div>
         <div class="col-md-2">
             <label for="chargestartdate">charge start date:</label>
-            <input type="date" class="form-control" id="date" name="chargestartdate" value="{{ charge.chargestartdate }}" readonly="true">
+            <input type="date" class="form-control" id="date" name="chargestartdate"
+                   value="{{ charge.chargestartdate }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="chargetotal">charge total:</label>
-            <input type="text" class="form-control" id="chargetotal" name="chargetotal" value="{{ charge.chargetotal }}" readonly="true">
+            <input type="text" class="form-control" id="chargetotal" name="chargetotal"
+                   value="{{ charge.chargetotal }}" readonly="true">
         </div>
         <div class="col-md-4">
             <label for="chargedetail">charge details:</label>
-            <input type="text" class="form-control" id="chargedetail" name="chargedetail" value="{{ charge.chargedetail }}" readonly="true">
+            <input type="text" class="form-control" id="chargedetail" name="chargedetail"
+                   value="{{ charge.chargedetail }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="chargebalance">charge balance:</label>
-            <input type="text" class="form-control" id="chargebalance" name="chargebalance" value="{{ charge.chargebalance }}" readonly="true">
+            <input type="text" class="form-control" id="chargebalance" name="chargebalance"
+                   value="{{ charge.chargebalance }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="rentid">rent id:</label>
@@ -43,10 +48,12 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="{{ url_for('rent_bp.rent_', id=charge.rentid) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            <a href="{{ url_for('rent_bp.rent_', id=charge.rentid) }}"
+               class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('charge_bp.charges', id=charge.rentid) }}" class="btn btn-block btn-primary" role="button">back to charges</a>
+            <a href="{{ url_for('charge_bp.charges', id=charge.rentid) }}"
+               class="btn btn-block btn-primary" role="button">back to charges</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>

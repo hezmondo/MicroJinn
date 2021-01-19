@@ -1,4 +1,4 @@
-<!-- /templates/income_object.html  -->
+<!-- /templates/income_.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -36,7 +36,8 @@
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('income_bp.income', id=0) }}" class="btn btn-block btn-primary" role="button">back to income</a>
+            <a href="{{ url_for('income_bp.income', id=0) }}"
+               class="btn btn-block btn-primary" role="button">back to income</a>
         </div>
     </div>
     <div id="save_delete">
@@ -75,7 +76,8 @@
                 </div>
                 <div class="col-md-2">
                     <label for="chargedesc">charge type:</label>
-                    {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs, item_selected=item.chargedesc) }}
+                    {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs,
+                    item_selected=item.chargedesc) }}
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <a href="{{ url_for('util_bp.delete_item', id=item.id, item='incomealloc') }}"
@@ -139,7 +141,8 @@
         </div>
         <div class="col-md-2">
             <label for="chargedesc">charge type:</label>
-            {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs, item_selected=income_dict.chargedescs[0]) }}
+            {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs,
+            item_selected=income_dict.chargedescs[0]) }}
         </div>
             <div class="col-md-2">
                 <button  type="button" id="add-alloc" class="btn btn-block btn-primary">add allocation</button>

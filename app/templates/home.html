@@ -1,3 +1,4 @@
+<!-- /templates/home.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -41,7 +42,7 @@
                     class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/views/rents_ex"
+            <button type="submit" formaction="{{ url_for('main_bp.rents_ex') }}"
                     class="btn btn-block btn-primary ">search external</button>
         </div>
         <div class="col-md-3">

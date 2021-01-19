@@ -107,7 +107,7 @@ def doReplace(dict, clause):
 
 
 def get_word_variables(rent_id, income_id=0):
-    rent_, properties = get_rent_(rent_id)
+    rent_ = get_rent_(rent_id)
     incomedata, allocdata, bankdata, addressdata = getmaildata(rent_id, income_id)
 
     arrears = rent_.arrears if rent_.arrears else Decimal(0)

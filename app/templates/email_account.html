@@ -1,3 +1,4 @@
+<!-- /templates/email_account.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -11,7 +12,8 @@
         </div>
         <div class="col-md-2">
             <label for="smtp_server">smtp_server:</label>
-            <input type="text" class="form-control" name="smtp_server" value="{{ emailacc.smtp_server }}" readonly="true">
+            <input type="text" class="form-control" name="smtp_server"
+                   value="{{ emailacc.smtp_server }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="smtp_port">smtp_port:</label>
@@ -19,11 +21,13 @@
         </div>
         <div class="col-md-2">
             <label for="smtp_timeout">smtp_timeout:</label>
-            <input type="text" class="form-control" name="smtp_timeout" value="{{ emailacc.smtp_timeout }}" readonly="true">
+            <input type="text" class="form-control" name="smtp_timeout"
+                   value="{{ emailacc.smtp_timeout }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="smtp_debug">smtp_debug:</label>
-            <input type="text" class="form-control" name="smtp_debug" value="{{ emailacc.smtp_debug }}" readonly="true">
+            <input type="text" class="form-control" name="smtp_debug"
+                   value="{{ emailacc.smtp_debug }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="smtp_tls">smtp_tls:</label>
@@ -37,48 +41,58 @@
         </div>
         <div class="col-md-3">
             <label for="smtp_password">smtp_password:</label>
-            <input type="text" class="form-control" name="smtp_password" value="{{ emailacc.smtp_password }}" readonly="true">
+            <input type="text" class="form-control" name="smtp_password"
+                   value="{{ emailacc.smtp_password }}" readonly="true">
         </div>
         <div class="col-md-3">
             <label for="smtp_sendfrom">smtp_sendfrom:</label>
-            <input type="text" class="form-control" name="smtp_sendfrom" value="{{ emailacc.smtp_sendfrom }}" readonly="true">
+            <input type="text" class="form-control" name="smtp_sendfrom"
+                   value="{{ emailacc.smtp_sendfrom }}" readonly="true">
         </div>
         <div class="col-md-3">
             <label for="imap_server">imap_server:</label>
-            <input type="text" class="form-control" name="imap_server" value="{{ emailacc.imap_server }}" readonly="true">
+            <input type="text" class="form-control" name="imap_server"
+                   value="{{ emailacc.imap_server }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="imap_port">imap_port:</label>
-            <input type="text" class="form-control" name="imap_port" value="{{ emailacc.imap_port }}" readonly="true">
+            <input type="text" class="form-control" name="imap_port"
+                   value="{{ emailacc.imap_port }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="imap_tls">imap_tls:</label>
-            <input type="text" class="form-control" name="imap_tls" value="{{ emailacc.imap_tls }}" readonly="true">
+            <input type="text" class="form-control" name="imap_tls"
+                   value="{{ emailacc.imap_tls }}" readonly="true">
         </div>
         <div class="col-md-4">
             <label for="imap_user">imap_user:</label>
-            <input type="text" class="form-control" name="imap_user" value="{{ emailacc.imap_user }}" readonly="true">
+            <input type="text" class="form-control" name="imap_user"
+                   value="{{ emailacc.imap_user }}" readonly="true">
         </div>
         <div class="col-md-4">
             <label for="imap_password">imap_password:</label>
-            <input type="text" class="form-control" name="imap_password" value="{{ emailacc.imap_password }}" readonly="true">
+            <input type="text" class="form-control" name="imap_password"
+                   value="{{ emailacc.imap_password }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-6">
             <label for="imap_sentfolder">imap_sentfolder:</label>
-            <input type="text" class="form-control" name="imap_sentfolder" value="{{ emailacc.imap_sentfolder }}" readonly="true">
+            <input type="text" class="form-control" name="imap_sentfolder"
+                   value="{{ emailacc.imap_sentfolder }}" readonly="true">
         </div>
         <div class="col-md-6">
             <label for="imap_draftfolder">imap_draftfolder:</label>
-            <input type="text" class="form-control" name="imap_draftfolder" value="{{ emailacc.imap_draftfolder }}" readonly="true">
+            <input type="text" class="form-control" name="imap_draftfolder"
+                   value="{{ emailacc.imap_draftfolder }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-3">
-            <a href="{{ url_for('util_bp.email_accounts') }}" class="btn btn-block btn-primary" role="button">back to email accounts</a>
+            <a href="{{ url_for('util_bp.email_accounts') }}"
+               class="btn btn-block btn-primary" role="button">back to email accounts</a>
         </div>
         <div class="col-md-3">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>

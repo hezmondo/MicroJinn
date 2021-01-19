@@ -22,5 +22,5 @@ def income_object(id):
     income_dict = get_income_dict("enhanced")
     income, incomeallocs = get_income_(id)
 
-    return render_template('income_object.html', action=action, income=income, incomeallocs=incomeallocs,
+    return render_template('income_.html', action=action, income=income, incomeallocs=incomeallocs,
                            income_dict=income_dict)

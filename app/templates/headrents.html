@@ -1,3 +1,4 @@
+<!-- /templates/headrents.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -56,7 +57,7 @@
             <td style="width: 8.00%"> {{ item.freq_id }}</td>
             <td style="width: 10.00%"> {{ item.statusdet }}</td>
             <td style="width: 12.00%"> {{ item.detail }}</td>
-            <td style="width: 8.00%"><a href="/headrent/{{ item.id }}?action=view">view</a></td>
+            <td style="width: 8.00%"><a href="{{ url_for('headrent_bp.headrent', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

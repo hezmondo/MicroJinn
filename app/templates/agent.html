@@ -27,10 +27,12 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agents') }}" class="btn btn-block btn-primary" role="button">back to agents</a>
+            <a href="{{ url_for('main_bp.agents') }}"
+               class="btn btn-block btn-primary" role="button">back to agents</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agent', id=0) }}" class="btn btn-block btn-primary" role="button">new agent</a>
+            <a href="{{ url_for('main_bp.agent', id=0) }}"
+               class="btn btn-block btn-primary" role="button">new agent</a>
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="agentid" value = "{{ agent.id }}">

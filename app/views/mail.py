@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template,  request
 from flask_login import login_required
+from app.dao.rent_ import get_rent_mail
 from app.dao.form_letter import get_formletters
 from app.dao.mail import writeMail
 
@@ -11,8 +12,9 @@ mail_bp = Blueprint('mail_bp', __name__)
 def mail_dialog(id):
     action = request.args.get('action', "normal", type=str)
     formletters = get_formletters(action)
+    rent_mail = get_rent_mail(id)
 
-    return render_template('mail_dialog.html', action=action, formletters=formletters, rent_id=id)
+    return render_template('mail_dialog.html', action=action, formletters=formletters, rent_mail=rent_mail)
 
 
 @mail_bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])

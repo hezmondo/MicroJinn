@@ -22,7 +22,8 @@
             <button type="submit" class="btn btn-block btn-success">search</button>
         </div>
         <div class="col-md-3">
-            <a href="/views/form_letter/0" class="btn btn-block btn-primary" role="button">add new formletter</a>
+            <a href="{{ url_for('formletter_bp.form_letter', id=0) }}"
+               class="btn btn-block btn-primary" role="button">add new formletter</a>
         </div>
     </div>
     <div class="form-group row">
@@ -40,7 +41,7 @@
         <tr>
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 70.00%">{{ item.description }}</td>
-            <td style="width: 10.00%"><a href="/views/form_letter/{{ item.id }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('formletter_bp.form_letter', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>
