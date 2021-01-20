@@ -53,46 +53,6 @@ def get_rent_(id):
     return rent_
 
 
-def get_rent_(id):
-    if id == 0:
-        # take the user to create new rent function:
-        id = create_new_rent()
-    rent_ = \
-        Rent.query \
-            .join(Landlord) \
-            .join(Manager) \
-            .outerjoin(Agent) \
-            .join(Typeactype) \
-            .join(Typeadvarr) \
-            .join(Typedeed) \
-            .join(Typefreq) \
-            .join(Typemailto) \
-            .join(Typesalegrade) \
-            .join(Typestatus) \
-            .join(Typetenure) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
-                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
-                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                           Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
-                           Agent.detail, Landlord.landlordname, Manager.managername,
-                           Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
-                           Typemailto.mailtodet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                           Typetenure.tenuredet) \
-            .filter(Rent.id == id) \
-            .one_or_none()
-    if rent_ is None:
-        flash('Invalid rent code')
-        return redirect(url_for('auth.login'))
-    else:
-        pop_idlist_recent("recent_rents", id)
-
-    return rent_
-
-
 def get_rent_mail(id):
     rent_mail = \
         Rent.query.join(Typemailto).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,

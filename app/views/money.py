@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template,  request
 from flask_login import login_required
 from app.dao.money import get_moneyaccount, get_moneydets, get_moneydict, get_moneyitem, get_moneyitems, \
-        post_moneyitem
+        post_moneyaccount, post_moneyitem
 
 money_bp = Blueprint('money_bp', __name__)
 
@@ -15,6 +15,11 @@ def money():
 @money_bp.route('/money_account/<int:id>', methods=['GET', 'POST'])
 @login_required
 def money_account(id):
+    if request.method == "POST":
+        acc_id = post_moneyaccount(id)
+
+        return redirect('/money_account/{}'.format(acc_id))
+
     moneyacc = get_moneyaccount(id)
 
     return render_template('money_account.html', moneyacc=moneyacc)
@@ -32,6 +37,7 @@ def money_deduce(id):
 @money_bp.route('/money_items/<int:id>', methods=["GET", "POST"])
 @login_required
 def money_items(id):
+    # the incoming id is the account id
     money_dict = get_moneydict()
     accsums, moneyvals, transitems = get_moneyitems(id)
 
@@ -49,4 +55,4 @@ def money_item(id):
     money_dict = get_moneydict()
     money_item, cleared = get_moneyitem(id)
 
-    return render_template('money_item.html', cleared=cleared, id=id, money_dict=money_dict, money_item=money_item)
+    return render_template('money_item.html', cleared=cleared, money_dict=money_dict, money_item=money_item)

@@ -6,6 +6,7 @@ from app.dao.rent_ import get_rent_, post_rent
 
 rent_bp = Blueprint('rent_bp', __name__)
 
+
 @rent_bp.route('/rent_/<int:id>', methods=['GET', 'POST'])
 # @login_required
 def rent_(id):

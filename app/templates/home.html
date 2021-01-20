@@ -46,7 +46,8 @@
                     class="btn btn-block btn-primary ">search external</button>
         </div>
         <div class="col-md-3">
-            <a href="/queries/0" class="btn btn-block btn-danger" role="button">advanced queries</a>
+            <a href="{{ url_for('filter_bp.filter', id=0) }}"
+               class="btn btn-block btn-danger" role="button">advanced filter</a>
         </div>
     </div>
 </form>

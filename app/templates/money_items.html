@@ -1,3 +1,4 @@
+<!-- /templates/money_items.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -47,7 +48,7 @@
             <th style="width: 10.00%">amount</th>
             <th style="width: 14.00%">memo</th>
             <th style="width: 12.00%">account</th>
-            <th style="width: 14.00%">cCategory</th>
+            <th style="width: 14.00%">category</th>
             <th style="width: 8.00%"></th>
         </tr>
         </thead>
@@ -62,7 +63,7 @@
             <td style="width: 14.00%">{{ item.memo }}</td>
             <td style="width: 12.00%"> {{ item.accdesc }}</td>
             <td style="width: 14.00%"> {{ item.cat_name }}</td>
-            <td style="width: 8.00%"><a href="/money_deduce/{{ item.id }}?action={{ item.num }}">View</a></td>
+            <td style="width: 8.00%"><a href="{{ url_for('/money_bp.money_deduce', id=item.id, action=item.num) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -1,29 +1,35 @@
+<!-- /templates/filter.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form action="/queries" method="post">
+<form action="/filter" method="post">
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">rentcode starts with:</label>
-            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip" title="starts with" value="{{ filterdict.rentcode }}">
+            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip"
+                   title="starts with" value="{{ filterdict.rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="tenantname">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip" title="includes" value="{{ filterdict.tenantname }}">
+            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.tenantname }}">
         </div>
         <div class="col-md-2">
             <label for="propaddr">property details:</label>
-            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip" title="includes" value="{{ filterdict.propaddr }}">
+            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
-            <input type="text" class="form-control" name="source" data-toggle="tooltip" title="includes" value="{{ filterdict.source }}">
+            <input type="text" class="form-control" name="source" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.source }}">
         </div>
         <div class="col-md-2">
             <label for="agentdetail">agent details:</label>
-            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip" title="includes" value="{{ filterdict.agentdetail }}">
+            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
+                   title="includes" value="{{ filterdict.agentdetail }}">
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
@@ -41,37 +47,45 @@
         </div>
         <div class="col-md-2">
             <label for="rentpa">rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" data-toggle="tooltip" title="example = 100" value="{{ filterdict.rentpa }}">
+            <input type="text" class="form-control" name="rentpa" data-toggle="tooltip"
+                   title="example = 100" value="{{ filterdict.rentpa }}">
         </div>
         <div class="col-md-2">
             <label for="arrears">rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" data-toggle="tooltip" title="example < 100" value="{{ filterdict.arrears }}">
+            <input type="text" class="form-control" name="arrears" data-toggle="tooltip"
+                   title="example < 100" value="{{ filterdict.arrears }}">
         </div>
         <div class="col-md-2">
             <label for="rentperiods">rent periods owing:</label>
-            <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip" title="example > 5" value="{{ filterdict.rentperiods }}">
+            <input type="text" class="form-control" name="rentperiods" data-toggle="tooltip"
+                   title="example > 5" value="{{ filterdict.rentperiods }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">landlord:</label>
-            {{ widgets.multiselect_as_select(name="landlord", items=combodict.landlords, items_selected=filterdict.landlord) }}
+            {{ widgets.multiselect_as_select(name="landlord", items=combodict.landlords,
+            items_selected=filterdict.landlord) }}
         </div>
         <div class="col-md-2">
             <label for="tenure">tenure:</label>
-            {{ widgets.multiselect_as_select(name="tenure", items=combodict.tenures, items_selected=filterdict.tenure) }}
+            {{ widgets.multiselect_as_select(name="tenure", items=combodict.tenures,
+            items_selected=filterdict.tenure) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">sale grade:</label>
-            {{ widgets.multiselect_as_select(name="salegrade", items=combodict.salegrades, items_selected=filterdict.salegrade) }}
+            {{ widgets.multiselect_as_select(name="salegrade", items=combodict.salegrades,
+            items_selected=filterdict.salegrade) }}
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>
-            {{ widgets.multiselect_as_select(name="status", items=combodict.statuses, items_selected=filterdict.status) }}
+            {{ widgets.multiselect_as_select(name="status", items=combodict.statuses,
+            items_selected=filterdict.status) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">actype:</label>
-            {{ widgets.multiselect_as_select(name="actype", items=combodict.actypes, items_selected=filterdict.actype) }}
+            {{ widgets.multiselect_as_select(name="actype", items=combodict.actypes,
+            items_selected=filterdict.actype) }}
         </div>
     </div>
     <div class="form-group row">
@@ -89,7 +103,8 @@
         </div>
         <div class="col-md-3">
             <label for="prdelivery">pr delivery:</label>
-            {{ widgets.multiselect_as_select(name="prdelivery", items=combodict.prdeliveries, items_selected=filterdict.prdelivery) }}
+            {{ widgets.multiselect_as_select(name="prdelivery", items=combodict.prdeliveries,
+            items_selected=filterdict.prdelivery) }}
         </div>
         <div class="col-md-2">
             <label for="filtertype">filter type:</label>
@@ -98,22 +113,27 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/queries/0?action=query" class="btn btn-block btn-success ">search</button>
+            <button type="submit" formaction="{{ url_for('filter_bp.filter', id=0, action='query') }}"
+                    class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-2">
-            <a href="/load_filter" class="btn btn-block btn-primary" role="button">load saved filter:</a>
+            <a href="{{ url_for('filter_bp.load_filter') }}"
+               class="btn btn-block btn-primary" role="button">load saved filter:</a>
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="filtername" placeholder="filter name" value="{{ filterdict.filtername }}">
+            <input type="text" class="form-control" name="filtername" placeholder="filter name"
+                   value="{{ filterdict.filtername }}">
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/queries/0?action=save" class="btn btn-block btn-danger ">save query as</button>
+            <button type="submit" formaction="{{ url_for('filter_bp.filter', id=0, action='save') }}"
+                    class="btn btn-block btn-danger ">save query as</button>
         </div>
     </div>
     {% if action == "pr_query" %}
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=run" class="btn btn-block btn-success ">create pay requests</button>
+            <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', action='run') }}"
+                    class="btn btn-block btn-success ">create pay requests</button>
         </div>
     </div>
     {% endif %}
@@ -143,7 +163,7 @@
                 <td style="width: 20.00%">{{ item.propaddr }}</td>
                 <td style="width: 8.00%"> {{ item.source }}</td>
                 <td style="width: 20.00%"> {{ item.detail }}</td>
-                <td style="width: 5.00%"><a href="/rent_/{{ item.id }}">view/edit</a></td>
+                <td style="width: 5.00%"><a href="{{ url_for('rent_bp.rent_', id=item.id) }}">view/edit</a></td>
             </tr>
             {% endfor %}
             </tbody>

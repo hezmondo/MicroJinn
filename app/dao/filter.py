@@ -4,13 +4,13 @@ from flask import request, session
 from sqlalchemy import func
 from app.dao.common import get_idlist_recent
 from app.dao.functions import strToDate, strToDec
-
 from app.models import Agent, Charge, Manager_external, Rent_ex, Jstore, Landlord, Property, Rent, Typeactype, \
     Typedoc, Typeprdelivery, Typesalegrade, Typestatus, Typetenure
 
 
 def get_filters(type):
     filters = Jstore.query.filter(Jstore.type == type).all()
+
     return filters
 
 
@@ -28,7 +28,7 @@ def get_rent_s(action, id):
         "tenantname": "",
         "filtertype": "rentprop"
     }
-    # more complex filter dictionary for queries and payrequest pages
+    # more complex filter dictionary for filter and payrequest pages
     dict_plus = {
         "actype": ["all actypes"],
         "agentmailto": "include",
@@ -71,7 +71,7 @@ def get_rent_s(action, id):
 
 
 def get_qfilter(filterdict, action):
-    # first get filter values submitted from home or queries page and insert them into the dictionary
+    # first get filter values submitted from home or filter page and insert them into the dictionary
     if request.method == "POST":
         for key, value in filterdict.items():
             if key in ("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
@@ -187,7 +187,7 @@ def get_rent_s_data(qfilter, action, runsize):
             .filter(*qfilter).order_by(Rent_ex.rentcode).limit(runsize).all()
 
     else:
-        # advanced search submitted from queries page
+        # advanced search submitted from filter page
         rent_s = \
                 Property.query \
                     .join(Rent) \

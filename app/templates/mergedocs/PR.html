@@ -1,4 +1,4 @@
-<!-- /templates/mergedocs/LTS.html  -->
+<!-- /templates/mergedocs/PR.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -7,25 +7,27 @@
 <form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="/pr_dialog/{{ rent_.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
+			<a href="{{ url_for('pr_bp.pr_dialog', id=rent_pr.id, action='view') }}"
+			   class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">
-            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save payrequest</button>
+            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip"
+					title="This will save the pay request and forward the rent">save payrequest</button>
         </div>
     </div>
 	<div id="doc_html" contenteditable="true">
 	    {% if method == "letter" %}
 			<div class="font-size-large" align="center">
-				<b>{{ rent_.managername }}</b>
+				<b>{{ rent_pr.managername }}</b>
 			</div>
 			<div class="font-size-small" align="center">
-				{{ addressdata.manageraddr }}
+				{{ rent_pr.manageraddr }}
 				<br />
-				{{ addressdata.manageraddr2 }}
+				{{ rent_pr.manageraddr2 }}
 				<br />
 			</div>
 			<div class="font-size-medium" align="right">
-				Our Ref: {{ rent_.rentcode }}
+				Our Ref: {{ rent_pr.rentcode }}
 				<br />
 				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 			</div>
@@ -36,17 +38,17 @@
 				{% endfor %}
 				<br />
 				<br />
-				Dear {{ rent_.tenantname }}
+				Dear {{ rent_pr.tenantname }}
 			</div>
 	    {% else %}
 			<div class="font-size-medium" align="left">
-				Our Ref: {{ rent_.rentcode }}
+				Our Ref: {{ rent_pr.rentcode }}
 				<br />
 				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent_.email }}
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent_pr.email }}
 				<br />
 				<br />
-				Dear {{ rent_.tenantname }}
+				Dear {{ rent_pr.tenantname }}
 			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
@@ -54,6 +56,10 @@
 			<br />
 			<br />
 			<table class="pr_table">
+				<tr class="pr_table_heading">
+					<td>Details</a></td>
+					<td>Amount</td>
+				</tr>
 			{% for statement, value in table_rows.items() %}
 				<tr>
 					<td>{{ statement }}</a></td>
@@ -66,7 +72,6 @@
 				</tr>
 			</table>
 			<br />
-			<br />
 			{{ widgets.linebreaks_for_string(block) }}
 			<br />
 			<br />
@@ -74,14 +79,11 @@
 			<br />
 			<br />
 			<br />
-		    {% if method == "email" %}
-				<b>{{ rent_.managername }}</b>
-				<br />
-				{{ addressdata.manageraddr }}
-				<br />
-				{{ addressdata.manageraddr2 }}
-				<br />
-		    {% endif %}
+			<b>{{ rent_pr.managername }}</b>
+			<br />
+			{{ rent_pr.manageraddr }}
+			<br />
+			{{ rent_pr.manageraddr2 }}
 			</div>
 		</div>
 	</div>
@@ -92,25 +94,16 @@
     </div>
     <div class="form-group row">
 		<div class="col-md-2">
-            <input type="hidden" id="rentid" name="rentid" value = "{{ rent_.id }}">
-        </div>
-		<div class="col-md-2">
-            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rent_.rentcode }}">
-        </div>
-		<div class="col-md-2">
-            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
-        </div>
-		<div class="col-md-2">
-            <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
-        </div>
-		<div class="col-md-2">
-            <input type="hidden" id="rent_date" name="rent_date" value = "{{ rent_.nextrentdate }}">
-        </div>
-		<div class="col-md-2">
-            <input type="hidden" id="totdue" name="totdue" value = "{{ totdue }}">
+            <input type="hidden" id="date" name="date" value = "{{ today_date }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" id="method" name="method" value = "{{ method }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="pr_data" name="pr_data" value = "{{ pr_data }}">
+        </div>
+		<div class="col-md-2">
+            <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
         </div>
     </div>
 </form>

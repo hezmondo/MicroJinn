@@ -7,15 +7,16 @@ from app.models import Rental, Rental_statement, Typeadvarr, Typefreq\
 
 def get_rental(id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
-    rental = Rental.query.join(Typeadvarr).join(Typefreq).with_entities(Rental.id, Rental.rentalcode, Rental.arrears,
-                                                                        Rental.startrentdate, Rental.astdate,
-                                                                        Rental.lastgastest, Rental.note,
-                                                                        Rental.propaddr, Rental.rentpa,
-                                                                        Rental.tenantname, Typeadvarr.advarrdet,
-                                                                        Typefreq.freqdet).filter(
-        Rental.id == id).one_or_none()
+    rental = Rental.query.\
+        join(Typeadvarr).\
+        join(Typefreq).\
+        with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate, Rental.astdate,
+                        Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
+                        Typeadvarr.advarrdet, Typefreq.freqdet) \
+        .filter(Rental.id == id).one_or_none()
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+
     return rental, advarrdets, freqdets
 
 
@@ -34,11 +35,11 @@ def get_rentalstatement():
     return rentalstatem
 
 
-def post_rental(id, action):
-    if action == "edit":
-        rental = Rental.query.get(id)
-    else:
+def post_rental(id):
+    if id == 0:
         rental = Rental()
+    else:
+        rental = Rental.query.get(id)
     rental.propaddr = request.form.get("propaddr")
     rental.tenantname = request.form.get("tenantname")
     rental.rentpa = request.form.get("rentpa")
@@ -55,7 +56,8 @@ def post_rental(id, action):
     rental.advarr_id = \
         Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
     db.session.add(rental)
-    db.session.commit()
+    db.session.flush()
     id_ = rental.id
+    db.session.commit()
 
     return id_

@@ -39,6 +39,9 @@ def delete_record(id):
     elif item == "moneyacc":
         Money_account.query.filter_by(id=id).delete()
         redir = "money_bp.moneyaccs"
+    elif item == "moneyitem":
+        Money_item.query.filter_by(id=id).delete()
+        redir = "money_bp.moneyitems"
     elif item == "property":
         Property.query.filter_by(id=id).delete()
         redir = "properties"

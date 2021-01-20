@@ -7,10 +7,12 @@
 <form method="POST" id="pr_main">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=filter" class="btn btn-block btn-success ">filter</button>
+            <button type="submit" formaction="{{ url_for('pr_bp.payrequests', action='filter') }}"
+                    class="btn btn-block btn-success ">filter</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="/payrequests/?action=run" class="btn btn-block btn-success ">create pay requests</button>
+            <button type="submit" formaction="{{ url_for('pr_bp.payrequests', action='run') }}"
+                    class="btn btn-block btn-success ">create pay requests</button>
         </div>
     </div>
 </form>
@@ -40,7 +42,7 @@
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 20.00%"> {{ item.detail }}</td>
-            <td style="width: 5.00%"><a href="/rent_/{{ item.id }}">view</a></td>
+            <td style="width: 5.00%"><a href="{{ url_for('rent_bp.rent_', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

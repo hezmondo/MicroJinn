@@ -1,13 +1,14 @@
+import decimal
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
+from config import Config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
-from config import Config
+from logging.handlers import SMTPHandler, RotatingFileHandler
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -16,6 +17,12 @@ login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
 mail = Mail()
 bootstrap = Bootstrap()
+
+
+def decimal_default(obj):
+    if isinstance(obj, decimal.Decimal):
+        return str(obj)
+    raise TypeError
 
 
 def create_app(config_class=Config):
@@ -40,6 +47,9 @@ def create_app(config_class=Config):
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
+
+    from .views.filter import filter_bp
+    app.register_blueprint(filter_bp, url_prefix='/views')
 
     from .views.form_letter import formletter_bp
     app.register_blueprint(formletter_bp, url_prefix='/views')

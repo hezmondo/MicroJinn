@@ -1,3 +1,4 @@
+<!-- /templates/rent_ex.html  -->
 {% extends 'base.html' %}
 
 {% block app_content %}
@@ -31,7 +32,8 @@
         </div>
         <div class="col-md-2">
             <label for="lastrentdate">lastrentdate:</label>
-            <input type="text" class="form-control" name="lastrentdate" value="{{ rent_ex.lastrentdate }}" readonly="true">
+            <input type="text" class="form-control" name="lastrentdate"
+                   value="{{ rent_ex.lastrentdate }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
@@ -41,7 +43,8 @@
     <div class="form-group row">
         <div class="col-md-10">
             <label for="agentdetail">agent details:</label>
-            <input type="text" class="form-control" name="agentdetail" value="{{ rent_ex.agentdetail }}" readonly="true">
+            <input type="text" class="form-control" name="agentdetail"
+                   value="{{ rent_ex.agentdetail }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>

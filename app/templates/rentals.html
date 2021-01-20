@@ -5,7 +5,8 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="/rental/0?action=new" class="btn btn-block btn-primary" role="button">add new rental</a>
+            <a href="{{ url_for('rental_bp.rental', id=0, action='new') }}"
+               class="btn btn-block btn-primary" role="button">add new rental</a>
         </div>
     </div>
 </form>
@@ -33,7 +34,7 @@
             <td style="width: 12.00%"> {{ item.rentpa }}</td>
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
             <td style="width: 12.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 10.00%"><a href="/rental/{{ item.id }}?action=view">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('rental_bp.rental', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         <tr>

@@ -48,22 +48,26 @@
         </div>
         <div class="col-md-2">
             <label for="lastgastest">last gas safe test:</label>
-            <input type="date" class="form-control" name="lastgastest" value="{{ rental.lastgastest }}" readonly="true">
+            <input type="date" class="form-control" name="lastgastest"
+                   value="{{ rental.lastgastest }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-2">
-            <a href="/rentals" class="btn btn-block btn-primary" role="button">back to rentals</a>
+            <a href="{{ url_for('rental_bp.rentals') }}"
+               class="btn btn-block btn-primary" role="button">back to rentals</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
         <div class="col-md-2">
-            <a href="/rental_statement/{{ rental.id }}" class="btn btn-block btn-primary" role="button">get statement</a>
+            <a href="{{ url_for('rental_bp.rental_statement', id=rental.id) }}"
+               class="btn btn-block btn-primary" role="button">get statement</a>
         </div>
         <div class="col-md-2">
             <label for="startrentdate">statement from:</label>
-            <input type="date" class="form-control" name="startrentdate" value="{{ rental.startrentdate }}" readonly="true">
+            <input type="date" class="form-control" name="startrentdate"
+                   value="{{ rental.startrentdate }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse" id="save_delete" >
@@ -71,7 +75,7 @@
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
         <div class="col-md-2">
-            <a href="/delete_item/{{ rental.id }}?item=rental"
+            <a href="{{ url_for('util_bp.delete_item', id=rental.id, item='rental') }}"
                onclick="return confirm('are you sure you want to delete this rental?');"
                class="btn btn-block btn-danger" role="button">delete this rental</a>
         </div>

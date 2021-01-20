@@ -14,14 +14,14 @@ def rentals():
 @rental_bp.route('/rental/<int:id>', methods=['GET', 'POST'])
 # @login_required
 def rental(id):
-    action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_rental(id, action)
+        id = post_rental(id)
+
+        return redirect('/rental/{}'.format(id))
 
     rental, advarrdets, freqdets = get_rental(id)
 
-    return render_template('rental.html', action=action, rental=rental,
-                           advarrdets=advarrdets, freqdets=freqdets)
+    return render_template('rental.html', rental=rental, advarrdets=advarrdets, freqdets=freqdets)
 
 
 @rental_bp.route('/rental_statement/<int:id>', methods=["GET", "POST"])

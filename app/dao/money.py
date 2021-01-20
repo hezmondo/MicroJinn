@@ -8,9 +8,7 @@ from app.models import Income, Incomealloc, Money_account, Money_category, Money
 
 def get_moneyaccount(id):
     # get values for a single account and deal with post
-    if request.method == "POST":
-        moneyacc = post_moneyaccount(id)
-    elif id == 0:
+    if id == 0:
         moneyacc = Money_account()
         moneyacc.id = 0
     else:
@@ -55,9 +53,7 @@ def get_moneydict():
 
 
 def get_moneyitem(id):
-    if request.method == "POST":
-        id = post_moneyitem(id)
-    elif id == 0:
+    if id == 0:
         moneyitem = Money_item()
         moneyitem.id = 0
         moneyitem.date = datetime.date.today()
@@ -139,7 +135,6 @@ def post_moneyaccount(id):
     # new moneyaccount:
     if id == 0:
         moneyacc = Money_account()
-        moneyacc.id = 0
     else:
         # existing moneyaccount:
         moneyacc = Money_account.query.get(id)
@@ -150,17 +145,17 @@ def post_moneyaccount(id):
     accdesc = request.form.get("accdesc")
     moneyacc.accdesc = accdesc
     db.session.add(moneyacc)
+    db.session.flush()
+    acc_id = moneyacc.id
     db.session.commit()
-    moneyacc = Money_account.query.filter(Money_account.accdesc == accdesc).one_or_none()
 
-    return moneyacc
+    return acc_id
 
 
 def post_moneyitem(id):
     if id == 0:
         # new moneyitem:
         moneyitem = Money_item()
-        moneyitem.id = 0
     else:
         # existing moneyitem:
         moneyitem = Money_item.query.get(id)
@@ -180,6 +175,8 @@ def post_moneyitem(id):
         Money_category.query.with_entities(Money_category.id).filter \
             (Money_category.cat_name == category).one()[0]
     db.session.add(moneyitem)
+    db.session.flush()
+    bank_id = moneyitem.id
     db.session.commit()
 
 

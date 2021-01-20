@@ -20,7 +20,8 @@
                 <td style="width: 10.00%"> {{ item.code }}</td>
                 <td style="width: 60.00%"> {{ item.description }}</td>
                 <td>
-                    <button type="submit" formaction="/queries/{{ item.id }}?action=pr_query" class="btn btn-danger">go</button>
+                    <button type="submit" formaction="{{ url_for('filter_bp.filter', id=item.id, action='pr_query') }}"
+                            class="btn btn-danger">go</button>
                 </td>
             </tr>
             {% endfor %}
