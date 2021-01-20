@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.dao.agent import get_agent, get_agents, post_agent
+from app.dao.agent import get_agent, get_agents, get_agent_rents, post_agent
 from app.dao.filter import get_rent_s
 from app.dao.main import get_emailaccount, get_emailaccounts, get_rent_ex, post_emailaccount
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
@@ -19,12 +19,27 @@ def agents():
 @main_bp.route('/agent/<int:id>', methods=["GET", "POST"])
 @login_required
 def agent(id):
+    rentid = int(request.args.get('rentid', "0", type=str))
     if request.method == "POST":
         id = post_agent(id)
-        return redirect(url_for('main_bp.agent', id=id))
-    agent = get_agent(id) if id != 0 else {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
 
-    return render_template('agent.html', agent=agent)
+        return redirect(url_for('main_bp.agent', id=id))
+
+    if id == 0:
+        agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
+    else:
+        agent = get_agent(id)
+
+    return render_template('agent.html', agent=agent, rentid=rentid)
+
+
+@main_bp.route('/agent_rents/<int:id>', methods=["GET"])
+@login_required
+def agent_rents(id):
+    agent = get_agent(id)
+    agent_headrents, agent_rents = get_agent_rents(id)
+
+    return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, agent_headrents=agent_headrents)
 
 
 @main_bp.route('/email_accounts', methods=['GET'])

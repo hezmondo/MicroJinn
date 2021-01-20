@@ -38,7 +38,7 @@ def get_rent_(id):
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
-                           Agent.detail, Landlord.landlordname, Manager.managername,
+                           Agent.id.label("agent_id"), Agent.detail, Landlord.landlordname, Manager.managername,
                            Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
                            Typemailto.mailtodet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            Typetenure.tenuredet) \

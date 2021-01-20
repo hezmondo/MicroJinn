@@ -19,7 +19,7 @@
             <button type="submit" class="btn btn-block btn-success">search</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agent', id=0) }}"
+            <a href="{{ url_for('main_bp.agent', id=0, rentid=0) }}"
                class="btn btn-block btn-primary" role="button">add new agent</a>
         </div>
     </div>
@@ -40,7 +40,7 @@
             <td style="width: 40.00%">{{ item.detail }}</td>
             <td style="width: 25.00%">{{ item.email }}</td>
             <td style="width: 25.00%"> {{ item.note }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('main_bp.agent', id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('main_bp.agent', id=item.id, rentid=0) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

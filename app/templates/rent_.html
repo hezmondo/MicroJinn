@@ -22,7 +22,7 @@
     <div class="form-group row align-items-end">
         <div class="col-md-10">
             <label for="propaddr">property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rent_.propaddr }}" readonly="true">
+            <textarea class="form-control" name="propaddr"  readonly="true">{{ rent_.propaddr }}</textarea>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('main_bp.properties', rentid=rent_.id) }}"
@@ -41,16 +41,27 @@
             <input type="text" class="form-control" name="email" value="{{ rent_.email }}" readonly="true">
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group row align-items-end">
         <div class="col-md-4">
             <label for="mailto">mail to:</label>
             {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent_.mailtodet) }}
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <label for="agent">agent:</label>
             <input type="text" class="form-control" name="agent" value="{{ rent_.detail }}" readonly="true">
         </div>
-    </div>
+        {% if rent_.agent_id %}
+            <div class="col-md-2">
+                <a href="{{ url_for('main_bp.agent', id=rent_.agent_id, rentid=rent_.id) }}"
+                   class="btn btn-block btn-primary" role="button">view</a>
+            </div>
+        {% else %}
+            <div class="col-md-2">
+                <a href="{{ url_for('main_bp.agent', id=0, rentid=rent_.id) }}"
+                   class="btn btn-block btn-primary" role="button">add agent</a>
+            </div>
+        {% endif %}
+   </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentpa">rent pa:</label>

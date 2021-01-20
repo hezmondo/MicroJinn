@@ -26,17 +26,29 @@
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agents') }}"
-               class="btn btn-block btn-primary" role="button">back to agents</a>
+        {% if rentid != 0 %}
+            <div class="col-md-2">
+                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                   class="btn btn-block btn-primary" role="button">back to rent</a>
+            </div>
+        {% else %}
+            <div class="col-md-2">
+                <a href="{{ url_for('main_bp.agents') }}"
+                   class="btn btn-block btn-primary" role="button">back to agents</a>
+            </div>
+        {% endif %}
+        <div class="col-md-3">
+            <a href="{{ url_for('main_bp.agent_rents', id=agent.id) }}"
+               class="btn btn-block btn-primary" role="button">view rents/headrents</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agent', id=0) }}"
-               class="btn btn-block btn-primary" role="button">new agent</a>
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="agentid" value = "{{ agent.id }}">
         </div>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete" >
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>

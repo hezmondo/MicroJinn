@@ -2,7 +2,7 @@ from app import db
 from flask import request
 from app.dao.common import get_idlist_recent, pop_idlist_recent
 from app.dao.functions import commit_to_database
-from app.models import Agent
+from app.models import Agent, Headrent, Rent
 
 
 def get_agents():
@@ -15,6 +15,7 @@ def get_agents():
     else:
         id_list = get_idlist_recent("recent_agents")
         agents = Agent.query.filter(Agent.id.in_(id_list))
+
     return agents
 
 
@@ -23,6 +24,18 @@ def get_agent(id):
     pop_idlist_recent("recent_agents", id)
 
     return agent
+
+
+def get_agent_rents(id):
+    agent_rents = Agent.query.join(Rent).with_entities(Rent.id, Rent.rentcode, Rent.tenantname) \
+        .filter(Rent.agent_id == id) \
+        .all()
+
+    agent_headrents = Agent.query.join(Headrent).with_entities(Headrent.id, Headrent.code, Headrent.propaddr) \
+        .filter(Headrent.agent_id == id) \
+        .all()
+
+    return agent_headrents, agent_rents
 
 
 def post_agent(id):
