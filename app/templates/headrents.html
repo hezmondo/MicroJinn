@@ -1,3 +1,4 @@
+<!-- /templates/headrents.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -6,8 +7,8 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="hrcode">hr code:</label>
-            <input type="text" class="form-control" name="hrcode" value="">
+            <label for="rentcode">code:</label>
+            <input type="text" class="form-control" name="rentcode" value="">
         </div>
         <div class="col-md-4">
             <label for="address">address:</label>
@@ -48,15 +49,15 @@
         <tbody>
         {% for item in headrents %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.hrcode }}</td>
+            <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 10.00%"> {{ item.rentpa }}</td>
             <td style="width: 10.00%"> {{ item.arrears }}</td>
             <td style="width: 12.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.freq_id }}</td>
             <td style="width: 10.00%"> {{ item.statusdet }}</td>
-            <td style="width: 12.00%"> {{ item.agdetails }}</td>
-            <td style="width: 8.00%"><a href="/headrent/{{ item.id }}?action=view">view</a></td>
+            <td style="width: 12.00%"> {{ item.detail }}</td>
+            <td style="width: 8.00%"><a href="{{ url_for('headrent_bp.headrent', id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

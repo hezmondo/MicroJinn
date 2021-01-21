@@ -60,30 +60,30 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="/rent_object/{{ lease.rent_id  }}" class="btn btn-block btn-primary" role="button">back to rent</a>
+            <a href="{{ url_for('rent_bp.rent_', id=lease.rent_id) }}"
+               class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         <div class="col-md-2">
-            <a href="/leases" class="btn btn-block btn-primary" role="button">back to leases</a>
+            <a href="{{ url_for('lease_bp.leases') }}"
+               class="btn btn-block btn-primary" role="button">back to leases</a>
         </div>
-        {% if action == "view" %}
-            <div class="col-md-2">
-                <a href="/lease/{{ lease.id }}?action=edit" class="btn btn-block btn-danger" role="button">edit this lease</a>
-            </div>
-            <div class="col-md-2">
-                <a href="/mail_dialog/{{ lease.rent_id }}?action=lease" class="btn btn-block btn-primary" role="button">lex quotation</a>
-            </div>
-        {% else %}
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-block btn-success">save changes</button>
-            </div>
-            {% if action == "edit" %}
-                <div class="col-md-2">
-                    <a href="/delete_item/{{ lease.id }}?item=lease"
-                       onclick="return confirm('Are you sure you want to delete this lease?');"
-                       class="btn btn-block btn-warning" role="button">delete this lease</a>
-                </div>
-            {% endif %}
-        {% endif %}
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('mail_bp.mail_dialog', id=lease.rent_id, action='lease') }}"
+               class="btn btn-block btn-primary" role="button">lex quotation</a>
+        </div>
+    </div>
+    <div class="form-group row flex-row-reverse" id="save_delete" >
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success">save changes</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('util_bp.delete_item', id=lease.id, item='lease', id_2=lease.rent_id) }}"
+               onclick="return confirm('Are you sure you want to delete this lease?');"
+               class="btn btn-block btn-warning" role="button">delete item</a>
+        </div>
     </div>
 </form>
 {% endblock %}

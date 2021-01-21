@@ -1,0 +1,153 @@
+<!-- /templates/income_.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="paydate">pay date:</label>
+            <input type="date" class="form-control" name="paydate" value="{{ income.date }}">
+        </div>
+        <div class="col-md-2">
+            <label for="amount">amount:</label>
+            <input type="text" class="form-control" name="amount" value="{{ income.amount }}">
+        </div>
+        <div class="col-md-5">
+            <label for="payer">payer:</label>
+            <input type="text" class="form-control" name="payer" value="{{ income.payer }}">
+        </div>
+    </div>
+    <div class="form-group row align-items-end">
+        <div class="col-md-3">
+            <label for="bankacc">bank account:</label>
+            {{ widgets.combobox(name="bankacc", items=income_dict.bankaccs, item_selected=income.accdesc) }}
+        </div>
+        <div class="col-md-2">
+            <label for="paytype">pay type:</label>
+            {{ widgets.combobox(name="paytype", items=income_dict.paytypes, item_selected=income.paytypedet) }}
+        </div>
+        <div class="col-md-2">
+            <label for="id">id:</label>
+            <input type="text" class="form-control" name="id" value="{{ income.id }}">
+        </div>
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('income_bp.income', id=0) }}"
+               class="btn btn-block btn-primary" role="button">back to income</a>
+        </div>
+    </div>
+    <div id="save_delete">
+        <div class="form-group row flex-row-reverse">
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-block btn-success">save changes</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{{ url_for('util_bp.delete_item', id=income.id, item='income') }}"
+                   onclick="return confirm('Are you sure you want to delete this transaction?');"
+                   class="btn btn-block btn-warning" role="button">delete item</a>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-12">
+                <h6 class="text-center">allocated as follows:</h6>
+            </div>
+        </div>
+        {% for item in incomeallocs %}
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <label for="incall_id">id:</label>
+                    <input type="text" class="form-control" name="incall_id" value="{{ item.id }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="income_id">income id:</label>
+                    <input type="text" class="form-control" name="income_id" value="{{ item.income_id }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="rentcode">rent code:</label>
+                    <input type="text" class="form-control" name="rentcode" value="{{ item.rentcode }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="alloctot">amount:</label>
+                    <input type="text" class="form-control" name="alloctot" value="{{ item.alloctot }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="chargedesc">charge type:</label>
+                    {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs,
+                    item_selected=item.chargedesc) }}
+                </div>
+                <div class="col-md-2 d-flex flex-column">
+                    <a href="{{ url_for('util_bp.delete_item', id=item.id, item='incomealloc') }}"
+                       onclick="return confirm('Are you sure you want to delete this allocation?');"
+                       class="btn btn-block btn-warning mt-auto" role="button" >delete alloc</a>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="table-fixed">
+            <table class="table" id="incomeallocs">
+                <thead>
+                <tr>
+                    <th style="width: 12.00%">Id</th>
+                    <th style="width: 12.00%">Income id</th>
+                    <th style="width: 12.00%">Rentcode</th>
+                    <th style="width: 12.00%">Amount</th>
+                    <th style="width: 26.00%">Income type</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in incomeallocs %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 12.00%">{{ item.id }}</td>
+                        <td style="width: 12.00%">{{ item.income_id }}</td>
+                        <td style="width: 12.00%"> {{ item.rentcode }}</td>
+                        <td style="width: 12.00%"> {{ item.alloctot }}</td>
+                        <td style="width: 26.00%"> {{ item.chargedesc }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            <div class="col-md-3">
+                <button type="button" id="show-xalloc" class="btn btn-block btn-primary">show extra alloc</button>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.delete_item', id=income.id, item='income') }}"
+                   onclick="return confirm('Are you sure you want to delete this income?');"
+                   class="btn btn-block btn-warning" role="button">delete this posting</a>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-block btn-success">save changes</button>
+            </div>
+    </div>
+    <div id="xalloc" class="form-group row align-items-end">
+        <div class="col-md-2">
+            <label for="incall_id">id:</label>
+            <input type="text" class="form-control" name="incall_id" value="0">
+        </div>
+        <div class="col-md-2">
+            <label for="income_id">income id:</label>
+            <input type="text" class="form-control" name="income_id" value="{{ income_id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="rentcode">rent code:</label>
+            <input type="text" class="form-control" name="rentcode" value="">
+        </div>
+        <div class="col-md-2">
+            <label for="alloctot">amount:</label>
+            <input type="text" class="form-control" name="alloctot" value="0">
+        </div>
+        <div class="col-md-2">
+            <label for="chargedesc">charge type:</label>
+            {{ widgets.combobox(name="chargedesc", items=income_dict.chargedescs,
+            item_selected=income_dict.chargedescs[0]) }}
+        </div>
+            <div class="col-md-2">
+                <button  type="button" id="add-alloc" class="btn btn-block btn-primary">add allocation</button>
+            </div>
+        </div>
+    <div id="newalloc" class="form-group row"></div>
+</form>
+{% endblock %}

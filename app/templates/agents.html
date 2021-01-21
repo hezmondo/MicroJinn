@@ -5,13 +5,13 @@
 <form method="POST" id="target">
     <div class="form-group row">
         <div class="col-md-4">
-            <input type="text" class="form-control" name="address" placeholder="agent details">
+            <input type="text" class="form-control" name="detail" placeholder="agent details">
         </div>
         <div class="col-md-4">
             <input type="text" class="form-control" name="email" placeholder="agent email">
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control" name="notes" placeholder="agent notes">
+            <input type="text" class="form-control" name="note" placeholder="agent notes">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -19,7 +19,8 @@
             <button type="submit" class="btn btn-block btn-success">search</button>
         </div>
         <div class="col-md-2">
-            <a href="/agent/0" class="btn btn-block btn-primary" role="button">add new agent</a>
+            <a href="{{ url_for('main_bp.agent', id=0, rentid=0) }}"
+               class="btn btn-block btn-primary" role="button">add new agent</a>
         </div>
     </div>
 </form>
@@ -36,10 +37,10 @@
         <tbody>
         {% for item in agents %}
         <tr id="{{ item.id }}">
-            <td style="width: 40.00%">{{ item.agdetails }}</td>
-            <td style="width: 25.00%">{{ item.agemail }}</td>
-            <td style="width: 25.00%"> {{ item.agnotes }}</td>
-            <td style="width: 10.00%"><a href="/agent/{{ item.id }}">view</a></td>
+            <td style="width: 40.00%">{{ item.detail }}</td>
+            <td style="width: 25.00%">{{ item.email }}</td>
+            <td style="width: 25.00%"> {{ item.note }}</td>
+            <td style="width: 10.00%"><a href="{{ url_for('main_bp.agent', id=item.id, rentid=0) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

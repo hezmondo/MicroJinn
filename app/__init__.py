@@ -1,14 +1,14 @@
+import decimal
 import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
-from flask import Flask, request, current_app
+from config import Config
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
-from config import Config
-import decimal
+from logging.handlers import SMTPHandler, RotatingFileHandler
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -36,14 +36,56 @@ def create_app(config_class=Config):
     mail.init_app(app)
     bootstrap.init_app(app)
 
-    from app.errors import bp as errors_bp
-    app.register_blueprint(errors_bp)
-
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
-    from app.main import bp as main_bp
+    from .views.charge import charge_bp
+    app.register_blueprint(charge_bp, url_prefix='/views')
+
+    from .views.doc_ import doc_bp
+    app.register_blueprint(doc_bp, url_prefix='/views')
+
+    from app.errors import bp as errors_bp
+    app.register_blueprint(errors_bp)
+
+    from .views.filter import filter_bp
+    app.register_blueprint(filter_bp, url_prefix='/views')
+
+    from .views.form_letter import formletter_bp
+    app.register_blueprint(formletter_bp, url_prefix='/views')
+
+    from .views.headrent import headrent_bp
+    app.register_blueprint(headrent_bp, url_prefix='/views')
+
+    from .views.income_ import  income_bp
+    app.register_blueprint(income_bp, url_prefix='/views')
+
+    from .views.lease import lease_bp
+    app.register_blueprint(lease_bp, url_prefix='/views')
+
+    from .views.loan import loan_bp
+    app.register_blueprint(loan_bp, url_prefix='/views')
+
+    from .views.main import main_bp
     app.register_blueprint(main_bp)
+
+    from .views.mail import mail_bp
+    app.register_blueprint(mail_bp, url_prefix='/views')
+
+    from .views.money import money_bp
+    app.register_blueprint(money_bp, url_prefix='/views')
+
+    from .views.payrequest import pr_bp
+    app.register_blueprint(pr_bp, url_prefix='/views')
+
+    from .views.rental import rental_bp
+    app.register_blueprint(rental_bp, url_prefix='/views')
+
+    from .views.rent_ import rent_bp
+    app.register_blueprint(rent_bp, url_prefix='/views')
+
+    from .views.utility import util_bp
+    app.register_blueprint(util_bp, url_prefix='/views')
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:

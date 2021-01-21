@@ -1,4 +1,4 @@
-<!-- /templates/mergedocs/LTS.html  -->
+<!-- /templates/mergedocs/PR.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -7,10 +7,12 @@
 <form method="POST" action="/save_html?action=payrequest">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="/pr_dialog/{{ rent_pr.id }}?action=view" class="btn btn-block btn-primary" role="button">back</a>
+			<a href="{{ url_for('pr_bp.pr_dialog', id=rent_pr.id, action='view') }}"
+			   class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">
-            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip" title="This will save the pay request and forward the rent">save payrequest</button>
+            <button id="savehtml" class="btn btn-block btn-success" data-toggle="tooltip"
+					title="This will save the pay request and forward the rent">save payrequest</button>
         </div>
     </div>
 	<div id="doc_html" contenteditable="true">
