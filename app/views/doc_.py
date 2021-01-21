@@ -43,7 +43,7 @@ def save_html():
             id_ = post_payrequestfile()
         else:
             id_ = post_docfile(0)
-
+        # TODO: url_for on redirects
         return redirect('/docfiles/{}'.format(id_))
 
         # return redirect('/docfile/{}?doc_dig_doc'.format(id_))

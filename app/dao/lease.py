@@ -60,7 +60,7 @@ def get_leases():
         lfilter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
 
     leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
-              func.samjinn.lex_unexpired(Lease.id).label('unexpired'),
+              func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
               Lease.term, Lease.upliftdate, Lease_uplift_type.uplift_type) \
         .filter(*lfilter).limit(60).all()
 
