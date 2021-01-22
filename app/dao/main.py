@@ -2,12 +2,14 @@ from flask import redirect, request, url_for
 from app import db
 from app.dao.functions import commit_to_database
 from app.models import Agent, Charge, Digfile, Emailaccount, Form_letter, Incomealloc, Landlord, Loan, \
-    Manager_external, Money_item, Property,  Rent, Rent_ex, Money_account
+    Manager_external, Money_item, Pr_history, Property,  Rent, Rent_ex, Money_account
 
 
 def delete_record(id):
     item = request.args.get('item')
     id_2 = request.args.get('id_2')
+    id_dict = {}
+    redir = ""
     if item == "agent":
         Agent.query.filter_by(id=id).delete()
         redir = "main_bp.agents"
@@ -16,7 +18,8 @@ def delete_record(id):
         redir = "views/money_items".format(id_2)
     elif item == "charge":
         Charge.query.filter_by(id=id).delete()
-        redir = "views/rent_"
+        # redir = "views/rent_"
+        redir = "rent_bp.rent_"
     elif item == "dig":
         Digfile.query.filter_by(id=id).delete()
     elif item == "emailacc":
@@ -45,6 +48,10 @@ def delete_record(id):
     elif item == "property":
         Property.query.filter_by(id=id).delete()
         redir = "properties"
+    elif item == "pr_file":
+        Pr_history.query.filter_by(id=id).delete()
+        redir = "pr_bp.pr_history"
+        id_dict = {"rent_id": id_2}
     elif item == "rent":
         Rent.query.filter_by(id=id).delete()
         redir = "main_bp.home"
@@ -52,7 +59,7 @@ def delete_record(id):
         redir = "main_bp.home"
     commit_to_database()
 
-    return redir, id_2
+    return redir, id_2, id_dict
 
 
 def get_emailaccounts():

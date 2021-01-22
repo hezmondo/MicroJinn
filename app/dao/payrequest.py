@@ -152,7 +152,7 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     charge_type = get_charge_type(chargetype_id)
     charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
     new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=date.today(),
-                        chargetotal=recovery_charge_amount, chargedetails=charge_details,
+                        chargetotal=recovery_charge_amount, chargedetail=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
 

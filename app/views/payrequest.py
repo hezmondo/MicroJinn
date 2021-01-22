@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template,  request
+from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
 from app.dao.filter import get_filters
 from app.dao.payrequest import get_pr_data, get_pr_forms, get_pr_file, get_pr_history, post_pr_file
@@ -45,8 +45,7 @@ def pr_edit(pr_form_id):
 def pr_file(pr_id):
     if request.method == "POST":
         rent_id = post_pr_file(pr_id)
-
-        return redirect('/pr_history/{}'.format(rent_id))
+        return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
 
     pr_file = get_pr_file(pr_id)
 

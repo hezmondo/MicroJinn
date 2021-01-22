@@ -117,39 +117,6 @@ def post_docfile(id):
     return id_
 
 
-# TODO: May need to be moved
-def post_payrequestfile():
-    rent_id = int(request.form.get('rentid'))
-    # doc_dig = request.form.get('doc_dig') or "doc"
-    # new file has to be doc as new digital file uses upload function
-    payrequest = Pr_history()
-    payrequest.id = 0
-    payrequest.rent_id = rent_id
-
-    payrequest.date = request.form.get('doc_date')
-    payrequest.block = request.form.get('xinput').replace("£", "&pound;")
-
-    # TODO: What information do we want to put in the docfile summary field
-    payrequest.summary = request.form.get('summary')
-
-    # payrequest.batch_id = 0
-    payrequest.rent_date = request.form.get('rent_date')
-    payrequest.total_due = request.form.get('totdue')
-
-    # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
-    payrequest.delivery_method = 1 if request.form.get('method') == "email" else 2
-
-    db.session.add(payrequest)
-
-    # TODO: Check vs db.session.commit()
-    commit_to_database()
-
-    # TODO: Check that we want to forward rent and update database here
-    forward_rent(rent_id)
-
-    return rent_id
-
-
 def post_upload():
     # new digital file uses upload function
     rentid = int(request.form.get("rentid"))

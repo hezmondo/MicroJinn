@@ -18,8 +18,8 @@ def backup():
 @util_bp.route('/delete_item/<int:id>')
 @login_required
 def delete_item(id):
-    redir, id_2 = delete_record(id)
+    redir, id_2, id_dict = delete_record(id)
     if id_2:
-        return redirect("/{}/{}".format(redir, id_2))
+        return redirect(url_for(redir, **id_dict))
     else:
-        return redirect(url_for('{}'.format(redir)))
+        return redirect(url_for(redir))
