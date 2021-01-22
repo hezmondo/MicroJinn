@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template,  request
 from flask_login import login_required
-from app.dao.common import get_combodict
+from app.dao.common import get_combodict_filter
 from app.dao.filter import get_filters, get_rent_s
 
 filter_bp = Blueprint('filter_bp', __name__)
@@ -18,7 +18,7 @@ def load_filter():
 def filter(id):
     # allows the selection of rent objects using multiple filter inputs for query and pr_query
     action = request.args.get('action', "query", type=str)
-    combodict = get_combodict("enhanced")
+    combodict = get_combodict_filter()
     #gather combobox values, with "all" added as an option, in a dictionary
     filterdict, rent_s = get_rent_s(action, id)
     #gather filter values and selected rent objects in two dictionaries

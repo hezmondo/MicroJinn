@@ -3,23 +3,41 @@ from flask import request
 from sqlalchemy import func
 from app.dao.common import get_postvals_id
 from app.dao.functions import strToDec
-from app.models import Agent, Headrent, Landlord, Typeadvarr, Typefreq, Typestatus, Typetenure\
+from app.models import Agent, Headrent, Landlord, Typeadvarr, Typefreq, Type_status_hr, Typetenure\
 
 
 def get_headrents():
-    statusdets = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
-    statusdets.insert(0, "all statuses")
-    headrents = Headrent.query.join(Typestatus).outerjoin(Agent).with_entities(Agent.detail, Headrent.id,
-                                                                               Headrent.code, Headrent.rentpa,
-                                                                               Headrent.arrears, Headrent.freq_id,
-                                                                               Headrent.lastrentdate,
-                                                                               Headrent.propaddr,
-                                                                               func.mjinn.next_date(
-                                                                                   Headrent.lastrentdate,
-                                                                                   Headrent.freq_id, 1).label(
-                                                                                   'nextrentdate'),
-                                                                               Typestatus.statusdet).limit(100).all()
-    return headrents, statusdets
+    filter = []
+    filterdict = {'rentcode': '', 'address': '', 'agent': '', 'status': 'all statuses'}
+    if request.method == "POST":
+        rentcode = request.form.get("rentcode") or ""
+        filterdict['rentcode'] = rentcode
+        if rentcode and rentcode != "":
+            filter.append(Headrent.code.startswith([rentcode]))
+        address = request.form.get("address") or ""
+        filterdict['address'] = address
+        if address and address != "":
+            filter.append(Headrent.propaddr.ilike('%{}%'.format(address)))
+        agent = request.form.get("agent") or ""
+        filterdict['agent'] = agent
+        if agent and agent != "":
+            filter.append(Agent.detail.ilike('%{}%'.format(agent)))
+        status = request.form.getlist("status") or ""
+        filterdict['status'] = status
+        if status and status != "" and status != [] and status != ['all statuses']:
+            filter.append(Type_status_hr.hr_status.in_(status))
+
+    headrents = \
+        Headrent.query \
+            .join(Type_status_hr) \
+            .outerjoin(Agent) \
+            .with_entities(Agent.detail, Headrent.id,Headrent.code, Headrent.rentpa, Headrent.arrears,
+                           Headrent.freq_id, Headrent.lastrentdate, Headrent.propaddr, Type_status_hr.hr_status,
+                   func.mjinn.next_date(Headrent.lastrentdate,Headrent.freq_id, 1).label('nextrentdate')) \
+            .filter(*filter) \
+            .limit(100).all()
+
+    return filterdict, headrents
 
 
 def get_headrent(id):
@@ -32,12 +50,12 @@ def get_headrent(id):
                 .outerjoin(Agent) \
                 .join(Typeadvarr) \
                 .join(Typefreq) \
-                .join(Typestatus) \
+                .join(Type_status_hr) \
                 .join(Typetenure) \
                 .with_entities(Headrent.id, Headrent.code, Headrent.arrears, Headrent.datecode, Headrent.lastrentdate,
                                Headrent.propaddr, Headrent.rentpa, Headrent.reference, Headrent.note, Headrent.source,
                                Landlord.landlordname, Agent.detail, Typeadvarr.advarrdet, Typefreq.freqdet,
-                               Typestatus.statusdet, Typetenure.tenuredet,
+                               Type_status_hr.hr_status, Typetenure.tenuredet,
                                # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \
                 .filter(Headrent.id == id) \

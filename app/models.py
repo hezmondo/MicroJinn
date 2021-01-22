@@ -153,7 +153,7 @@ class Headrent(db.Model):
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
+    hr_status_id = db.Column(db.Integer, db.ForeignKey('type_status_hr.id'))
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
 
@@ -552,6 +552,15 @@ class Template(db.Model):
     formletter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
 
 
+class Type_status_hr(db.Model):
+    __tablename__ = 'type_status_hr'
+
+    id = db.Column(db.Integer, primary_key=True)
+    hr_status = db.Column(db.String(45))
+
+    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
+
+
 class Typeactype(db.Model):
     __tablename__ = 'typeactype'
 
@@ -687,7 +696,6 @@ class Typestatus(db.Model):
     statusdet = db.Column(db.String(45))
 
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
-    headrent_typestatus = db.relationship('Headrent', backref='typestatus', lazy='dynamic')
 
 
 class Typetenure(db.Model):
