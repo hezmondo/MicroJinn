@@ -125,17 +125,35 @@ select:-internal-list-box option:checked {
 }
 
 
+
+/*table css*/
+
+thead {
+    background-color: #86A9DC;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+table tr td {
+    padding: 20px;
+}
+
+.table-fixed, .table-condensed{
+    box-shadow: 0 8px 16px rgba(0,0,0,.15)
+}
+
+.table thead th, .table td, .table th {
+    border-bottom: 1px solid #86A9DC;
+    border-top: 0px solid #86A9DC;
+}
+
 /*pay request table css*/
 
 .pr_table {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    border: solid #A3B9B9 1px;
-}
-
-.pr_table th, .pr_table td {
-    padding: 5px;
+    border: solid #86A9DC 1px;
 }
 
 .pr_table th {
@@ -144,9 +162,13 @@ select:-internal-list-box option:checked {
     color: white
 }
 
+.pr_table tr td {
+    padding: 5px;
+}
+
 .total {
     font-weight: bold;
-    border: solid #A3B9B9 1px;
+    border: solid #86A9DC 1px;
     background-color: #fafafa;
 }
 
@@ -155,5 +177,16 @@ select:-internal-list-box option:checked {
     width: 20%;
 }
 
-/* End of docs.css */
+.pr_table_heading {
+    background-color: #86A9DC;
+    color: #ffffff;
+    font-weight: bold;
+}
 
+/* box styles */
+.boxed-center {
+    box-shadow: 0 8px 16px rgba(0,0,0,.15);
+    padding: 20px;
+    text-align: center;
+}
+/* End of docs.css */

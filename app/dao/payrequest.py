@@ -20,7 +20,7 @@ def forward_rents(rent_prs):
 
 def forward_rent(rent_id, from_batch=False):
     rent = Rent.query.get(rent_id)
-    last_rent_date = db.session.execute(func.samjinn.next_rent_date(rent_id, 1, 1)).scalar()
+    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent_id, 1, 1)).scalar()
     arrears = rent.arrears + (rent.rentpa / rent.freq_id)
     if not from_batch:
         rent.lastrentdate = last_rent_date
@@ -35,7 +35,7 @@ def get_rent_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,
-                                                                     Charge.chargedetails, Charge.chargebalance) \
+                                                                     Charge.chargedetail, Charge.chargebalance) \
         .filter(*qfilter).all()
     return charges
 
@@ -105,7 +105,7 @@ def determine_charges_suffix(rent_pr):
     pr_exists = True if rent_pr.prexists == 1 else False
     last_arrears_level = rent_pr.lastarrearslevel if pr_exists else ""
     # TODO: This is labeled "oldestchargedate" in Jinn. Should it be "most_recent_charge_start_date"?
-    oldest_charge_date = db.session.execute(func.samjinn.oldest_charge(rent_pr.id)).scalar()
+    oldest_charge_date = db.session.execute(func.mjinn.oldest_charge(rent_pr.id)).scalar()
     charge_90_days = oldest_charge_date and date.today() - oldest_charge_date > timedelta(90)
     return get_charges_suffix(periods, charges_total, pr_exists, last_arrears_level, charge_90_days)
 
@@ -152,7 +152,7 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     charge_type = get_charge_type(chargetype_id)
     charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
     new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=date.today(),
-                        chargetotal=recovery_charge_amount, chargedetails=charge_details,
+                        chargetotal=recovery_charge_amount, chargedetail=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
 
@@ -193,10 +193,10 @@ def get_pr_history(rent_id):
 
 # TODO: Improve editing functionality. Do we want the (email) subject saved anywhere? - currently in a hidden input in PR.html
 def post_pr_file(pr_id=0):
-    pr_data = json.loads(request.form.get('pr_data'))
-    rent_id = pr_data.get("rent_id")
     # New payrequest
     if pr_id == 0:
+        pr_data = json.loads(request.form.get('pr_data'))
+        rent_id = pr_data.get("rent_id")
         pr_history = Pr_history()
         # pr_history.id = 0
         pr_history.rent_id = rent_id
@@ -211,12 +211,14 @@ def post_pr_file(pr_id=0):
     # Old payrequest
     else:
         pr_history = Pr_history.query.get(pr_id)
+        rent_id = pr_history.rent_id
 
     pr_history.summary = request.form.get('summary')
     pr_history.block = request.form.get('xinput').replace("£", "&pound;")
 
     db.session.add(pr_history)
     db.session.flush()
+
     if pr_id == 0:
         forward_rent(rent_id)
         new_charge_dict = pr_data.get("new_charge_dict")
@@ -251,17 +253,17 @@ def get_rent_pr(rent_id):
             .join(Typetenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.samjinn.check_pr_exists(Rent.id).label('prexists'),
-                           func.samjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.samjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
-                           func.samjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
-                           func.samjinn.paid_to_date(Rent.id).label('paidtodate'),
-                           func.samjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
-                           func.samjinn.prop_addr(Rent.id).label('propaddr'),
-                           func.samjinn.tot_charges(Rent.id).label('totcharges'),
+                           func.mjinn.check_pr_exists(Rent.id).label('prexists'),
+                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
+                           func.mjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
+                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
+                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
+                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            # TODO: check that arrears_level is best recorded in pr_history and where to signal if pr delivery is complete -
                            # TODO: currently if delivery_method > 3 in pr_history, then delivery is incomplete. This value is used in last_arrears_level
-                           func.samjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
+                           func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
                            Rent.rentpa, Rent.tenantname, Rent.freq_id,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
                            Money_account.bankname, Money_account.accname, Money_account.accnum, Money_account.sortcode,

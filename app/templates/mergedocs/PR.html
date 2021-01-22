@@ -4,10 +4,10 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="/save_html?action=payrequest">
+<form method="POST" action="{{ url_for('doc_bp.save_html', action='payrequest') }}">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="{{ url_for('pr_bp.pr_dialog', id=rent_pr.id, action='view') }}"
+			<a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
 			   class="btn btn-block btn-primary" role="button">back</a>
 		</div>
         <div class="col-md-3">

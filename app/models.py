@@ -429,6 +429,7 @@ class Pr_history(db.Model):
     batch_id = db.Column(db.Integer, db.ForeignKey('pr_batch.id'))
     rent_date = db.Column(db.Date)
     total_due = db.Column(db.Numeric(8, 2))
+    arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
 
 

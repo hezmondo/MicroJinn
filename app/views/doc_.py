@@ -1,7 +1,8 @@
-from flask import Blueprint, redirect, render_template, request, send_file
+from flask import Blueprint, redirect, render_template, request, send_file, url_for
 from flask_login import login_required
 from io import BytesIO
-from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_payrequestfile, post_upload
+from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_upload
+from app.dao.payrequest import post_pr_file
 
 doc_bp = Blueprint('doc_bp', __name__)
 
@@ -20,11 +21,11 @@ def docfile(id):
 
 
 @doc_bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
-def docfiles(rentid):
-    docfiles, dfoutin = get_docfiles(rentid)
+def docfiles(rent_id):
+    docfiles, dfoutin = get_docfiles(rent_id)
     outins = ["all", "out", "in"]
 
-    return render_template('docfiles.html', rentid=rentid, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
+    return render_template('docfiles.html', rentid=rent_id, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
 
 
 @doc_bp.route('/download/<int:id>')
@@ -40,13 +41,11 @@ def save_html():
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         if action == "payrequest":
-            id_ = post_payrequestfile()
+            id_ = post_pr_file()
+            return redirect(url_for('pr_bp.pr_history', rent_id=id_))
         else:
             id_ = post_docfile(0)
-
-        return redirect('/docfiles/{}'.format(id_))
-
-        # return redirect('/docfile/{}?doc_dig_doc'.format(id_))
+            return redirect(url_for('doc_bp.docfiles', rent_id=id_))
 
 
 @doc_bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])

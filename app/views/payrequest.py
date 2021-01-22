@@ -1,8 +1,10 @@
-from flask import Blueprint, redirect, render_template,  request
+from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
 from app.dao.filter import get_filters
 from app.dao.payrequest import get_pr_data, get_pr_forms, get_pr_file, get_pr_history, post_pr_file
 from app.dao.mail import write_payrequest
+from app.dao.rent_ import get_rent_mail
+
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -11,8 +13,9 @@ pr_bp = Blueprint('pr_bp', __name__)
 @login_required
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
+    rent_mail = get_rent_mail(rent_id)
 
-    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=id)
+    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id, rent_mail=rent_mail)
 
 
 @pr_bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])
@@ -42,8 +45,7 @@ def pr_edit(pr_form_id):
 def pr_file(pr_id):
     if request.method == "POST":
         rent_id = post_pr_file(pr_id)
-
-        return redirect('/pr_history/{}'.format(rent_id))
+        return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
 
     pr_file = get_pr_file(pr_id)
 

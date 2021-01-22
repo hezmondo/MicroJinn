@@ -1,0 +1,45 @@
+<!-- /templates/docfiles.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="{{ url_for('rent_bp.rent_', id=rent_id) }}" class="btn btn-block btn-primary" role="button">return to rent</a>
+        </div>
+    </div>
+  <div class="form-group row">
+    </div>
+    {% if pr_history.count() > 0 %}
+    <div class="table-fixed">
+        <table class="table" id="docfiles">
+            <thead>
+            <tr>
+                <th style="width: 10.00%">date</th>
+                <th style="width: 40.00%">summary</th>
+                <th style="width: 10.00%">rent date</th>
+                <th style="width: 10.00%">total due</th>
+                <th style="width: 10.00%">action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in pr_history %}
+            <tr id="{{ item.id }}">
+                <td style="width: 10.00%"> {{ item.date.strftime('%d-%b-%Y') if item.date else 'none' }}</td>
+                <td style="width: 40.00%"> {{ item.summary }}</td>
+                <td style="width: 10.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none' }}</td>
+                <td style="width: 10.00%"> {{ item.total_due }}</td>
+                <td style="width: 10.00%"><a href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}">view</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="boxed-center">
+        There are no previous payrequests for this rent.
+    </div>
+    {% endif %}
+{% endblock %}

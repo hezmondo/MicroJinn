@@ -190,11 +190,13 @@
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
               <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
                 <a class="dropdown-item"
+                   href="{{ url_for('pr_bp.pr_history', rent_id=rent_.id) }}">view payrequest history</a>
+                  <a class="dropdown-item"
                    href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new statement for this rent</a>
                 <a class="dropdown-item"
                    href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new account for this rent</a>
                 <a class="dropdown-item"
-                   href="{{ url_for('pr_bp.pr_start', rentid=rent_.id) }}">new payrequest for this rent</a>
+                   href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_.id) }}">new payrequest for this rent</a>
                 <a class="dropdown-item"
                    href="{{ url_for('mail_bp.mail_dialog', id=rent_.id) }}">new s166 for this rent</a>
               </div>
