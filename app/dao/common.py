@@ -5,50 +5,68 @@ from app import db
 from flask import request
 from flask_login import current_user, login_required
 from app.models import Agent, Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, \
-                        Typeprdelivery, Typesalegrade, Typestatus, Typetenure\
+                        Typeprdelivery, Typesalegrade, Typestatus, Type_status_hr, Typetenure\
 
 
 # common functions
-def get_combodict(type):
-    # first gather  values for comboboxes used for the rent object, without "all" as an option
+def get_combodict_basic():
+    # combobox values for headrent and rent, without "all" as an option
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advars = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
     freqs = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
-    mailtos = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
     tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
-    options = ("include", "exclude", "only")
 
     combo_dict = {
         "actypes": actypes,
         "advars": advars,
-        "deedcodes": deedcodes,
         "freqs": freqs,
         "landlords": landlords,
-        "mailtos": mailtos,
-        "prdeliveries": prdeliveries,
-        "salegrades": salegrades,
-        "statuses": statuses,
         "tenures": tenures,
-        "options": options
     }
-    if type == "enhanced":
-        # add "all" as an option for filters allowing selection of more than one value
-        actypes.insert(0, "all actypes")
-        landlords.insert(0, "all landlords")
-        prdeliveries.insert(0, "all prdeliveries")
-        salegrades.insert(0, "all salegrades")
-        statuses.insert(0, "all statuses")
-        tenures.insert(0, "all tenures")
-        filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
-        combo_dict["filternames"] = filternames
-        combo_dict["filtertypes"] = ("payrequest", "rentprop", "income")
 
     return combo_dict
+
+
+def get_combodict_rent():
+    # add the values unique to rent
+    combo_dict = get_combodict_basic()
+    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
+    mailtos = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
+    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
+    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
+    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    combo_dict['deedcodes'] = deedcodes
+    combo_dict['mailtos'] = mailtos
+    combo_dict['prdeliveries'] = prdeliveries
+    combo_dict['salegrades'] = salegrades
+    combo_dict['statuses'] = statuses
+
+    return combo_dict
+
+
+def get_combodict_filter():
+    # use the full rent combodict and insert "all values" for the filter functions, plus offer "options"
+    combo_dict = get_combodict_rent()
+    combo_dict['actypes'].insert(0, "all actypes")
+    combo_dict['landlords'].insert(0, "all landlords")
+    combo_dict['prdeliveries'].insert(0, "all prdeliveries")
+    combo_dict['salegrades'].insert(0, "all salegrades")
+    combo_dict['statuses'].insert(0, "all statuses")
+    combo_dict['tenures'].insert(0, "all tenures")
+    combo_dict['options'] = ("include", "exclude", "only")
+    filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
+    combo_dict["filternames"] = filternames
+    combo_dict["filtertypes"] = ("payrequest", "rentprop", "income")
+
+    return combo_dict
+
+
+def get_hr_statuses():
+    hr_statuses = [value for (value,) in Type_status_hr.query.with_entities(Type_status_hr.hr_status).all()]
+    # hr_statuses = ["active", "dormant", "suspended", "terminated"]
+
+    return hr_statuses
 
 
 def get_idlist_recent(type):
