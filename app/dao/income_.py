@@ -95,7 +95,7 @@ def post_income_(id, action):
     income.amount = request.form.get("amount")
     income.payer = request.form.get("payer")
     bankacc = request.form.get("bankacc")
-    income.bankacc_id = \
+    income.acc_id = \
         Money_account.query.with_entities(Money_account.id).filter(Money_account.accdesc == bankacc).one()[0]
     paytype = request.form.get("paytype")
     income.paytype_id = \

@@ -9,7 +9,7 @@
                class="btn btn-block btn-danger" role="button"> add new account</a>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('money_bp.money_items', id=0) }}"
+            <a href="{{ url_for('money_bp.money_items', acc_id=0) }}"
                class="btn btn-block btn-success" role="button">transactions for all accounts</a>
         </div>
         <div class="col-md-5">
@@ -34,10 +34,12 @@
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 30.00%"> {{ item.accdesc }}</td>
-            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_account', id=item.id) }}">view account</a></td>
+            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_account',
+            id=item.id) }}">view account</a></td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
-            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_items', id=item.id) }}">view transactions</a></td>
+            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_items',
+            acc_id=item.id) }}">view transactions</a></td>
         </tr>
         {% endfor %}
         <tr>

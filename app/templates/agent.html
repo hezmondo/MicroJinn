@@ -6,7 +6,7 @@
     <div class="form-group row">
         <div class="col-md-10">
             <label for="detail">agent details:</label>
-            <input type="text" class="form-control" name="detail" value="{{ agent.detail }}">
+            <input type="text" class="form-control" name="detail" value="{{ agent.detail }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="ag_id">agent id:</label>
@@ -16,13 +16,13 @@
     <div class="form-group row">
         <div class="col-md-12">
             <label for="email">agent email:</label>
-            <input type="text" class="form-control" name="email" value="{{ agent.email }}">
+            <input type="text" class="form-control" name="email" value="{{ agent.email }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-12">
             <label for="note">agent notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ agent.note }}">
+            <input type="text" class="form-control" name="note" value="{{ agent.note }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -53,7 +53,7 @@
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('util_bp.delete_item', id=agent.id, item='agent') }}"
+            <a href="{{ url_for('main_bp.agent_delete', agent_id=agent.id) }}"
                onclick="return confirm('Are you sure you want to delete this agent?');"
                class="btn btn-block btn-warning" role="button">delete agent</a>
         </div>

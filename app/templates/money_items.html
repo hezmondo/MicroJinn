@@ -13,10 +13,10 @@
             <input type="text" class="form-control" name="memo" value="{{ moneyvals.memo }}" placeholder="memo">
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="category", items=money_dict.cats_all, item_selected=moneyvals.category) }}
+            {{ widgets.combobox(name="category", items=money_dict.cats, item_selected=moneyvals.category) }}
         </div>
         <div class="col-md-2">
-            {{ widgets.combobox(name="cleared", items=money_dict.cleareds_all, item_selected=moneyvals.cleared) }}
+            {{ widgets.combobox(name="cleared", items=money_dict.cleareds, item_selected=moneyvals.cleared) }}
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -24,10 +24,11 @@
             <button type="submit" class="btn btn-block btn-danger">search</button>
         </div>
         <div class="col-md-2">
-            <a href="/money_item/0" class="btn btn-block btn-primary" role="button">new transaction</a>
+            <a href="{{ url_for('money_bp.money_item', money_item_id=0) }}"
+               class="btn btn-block btn-primary" role="button">new transaction</a>
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="accdesc", items=money_dict.bankaccs_all, item_selected=moneyvals['accdesc']) }}
+            {{ widgets.combobox(name="accdesc", items=money_dict.bankaccs, item_selected=moneyvals['accdesc']) }}
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">
@@ -63,7 +64,8 @@
             <td style="width: 14.00%">{{ item.memo }}</td>
             <td style="width: 12.00%"> {{ item.accdesc }}</td>
             <td style="width: 14.00%"> {{ item.cat_name }}</td>
-            <td style="width: 8.00%"><a href="{{ url_for('/money_bp.money_deduce', id=item.id, action=item.num) }}">view</a></td>
+            <td style="width: 8.00%"><a href="{{ url_for('money_bp.money_deduce', item_id=item.id,
+            mode=item.num) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

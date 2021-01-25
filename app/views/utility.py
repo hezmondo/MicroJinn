@@ -15,11 +15,14 @@ def backup():
     return render_template('backup.html')
 
 
-@util_bp.route('/delete_item/<int:id>')
+@util_bp.route('/delete_item/<int:item_id>')
 @login_required
-def delete_item(id):
-    redir, id_2, id_dict = delete_record(id)
-    if id_2:
-        return redirect(url_for(redir, **id_dict))
-    else:
-        return redirect(url_for(redir))
+def delete_item(item_id):
+    redir, id_dict = delete_record(item_id)
+
+    return redirect(url_for(redir, **id_dict))
+
+    # if id_dict:
+    #     return redirect(url_for(redir, **id_dict))
+    # else:
+    #     return redirect(url_for(redir))

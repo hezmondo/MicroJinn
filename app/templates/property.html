@@ -33,7 +33,7 @@
         </div>
         {% if rentid != "0" %}
         <div class="col-md-2">
-            <a href="{{ url_for('util_bp.delete_item', id=property_.id, item='property', id_2=property_.rent_id) }}"
+            <a href="{{ url_for('util_bp.delete_item', item_id=property_.id, item='property', id_2=property_.rent_id) }}"
                onclick="return confirm('Are you sure you want to delete this property?');"
                class="btn btn-block btn-danger" role="button">delete property</a>
         </div>

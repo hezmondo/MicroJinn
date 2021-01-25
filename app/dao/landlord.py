@@ -50,7 +50,7 @@ def post_landlord(id):
         Emailaccount.query.with_entities(Emailaccount.id).filter \
             (Emailaccount.smtp_server == emailacc).one()[0]
     bankacc = request.form.get("bankacc")
-    landlord.bankacc_id = \
+    landlord.acc_id = \
         Money_account.query.with_entities(Money_account.id).filter \
             (Money_account.accdesc == bankacc).one()[0]
     manager = request.form.get("manager")
