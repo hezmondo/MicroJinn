@@ -3,7 +3,13 @@ from datetime import date
 from flask import request
 from sqlalchemy import desc, func, literal
 from app import db
+from app.dao.functions import commit_to_database
 from app.models import Income, Incomealloc, Money_account, Money_category, Money_item
+
+
+def delete_money_item(money_item_id):
+    Money_item.query.filter_by(id=money_item_id).delete()
+    commit_to_database()
 
 
 def get_moneyaccount(id):
@@ -29,58 +35,47 @@ def get_moneydets():
     return accsums, moneydets
 
 
-def get_moneydict():
+def get_moneydict(type="basic"):
     # return options for multiple choice controls in money_item and money_items pages
     bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
-    bankaccs_all = bankaccs
-    bankaccs_all.insert(0, "all accounts")
     cats = [value for (value,) in Money_category.query.with_entities(Money_category.cat_name).all()]
-    cats_all = cats
-    cats_all.insert(0, "all categories")
     cleareds = ["cleared", "uncleared"]
-    cleareds_all = cleareds
-    cleareds_all.insert(0, "all cleareds")
     money_dict = {
         "bankaccs": bankaccs,
-        "bankaccs_all": bankaccs_all,
         "cats": cats,
-        "cats_all": cats_all,
         "cleareds": cleareds,
-        "cleareds_all": cleareds_all
     }
+    if type == "plus_all":
+        money_dict["bankaccs"].insert(0, "all accounts")
+        money_dict["cats"].insert(0, "all categories")
+        money_dict["cleareds"].insert(0, "all cleareds")
 
     return money_dict
 
 
-def get_moneyitem(id):
+def get_money_item(id):
     if id == 0:
-        moneyitem = Money_item()
-        moneyitem.id = 0
-        moneyitem.date = datetime.date.today()
+        money_item = Money_item()
+        money_item.id = 0
+        money_item.date = datetime.date.today()
+        money_item.acc_id = 1
         cleared = "cleared"
     else:
-        moneyitem = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id,
+        money_item = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id,
                     Money_item.num, Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
                     Money_account.id.label("acc_id"), Money_account.accdesc, Money_category.cat_name,
                     Money_item.cleared).filter(Money_item.id == id).one_or_none()
 
-        cleared = "cleared" if moneyitem.cleared == 1 else "uncleared"
+        cleared = "cleared" if money_item.cleared == 1 else "uncleared"
 
-    return moneyitem, cleared
+    return money_item, cleared
 
 
-def get_moneyitems(id):
+def get_money_items(id): # we assemble income items and money items into one display - tricky
     money_filter = []
-    income_filter = [Income.paytype_id != 1]
-    moneyvals= {
-        'accdesc': 'all accounts',
-        'payee': 'all payees',
-        'memo': 'all memos',
-        'category': 'all categories',
-        'cleared': 'all cleareds',
-        'accsums': 0.00
-    }
-    if id != 0:
+    income_filter = [Income.paytype_id != 1] # we do not want cheque income displayed, as not cleared income
+    moneyvals= {}
+    if id != 0: # filter for money account id, otherwise items for all accounts
         money_filter.append(Money_account.id == id)
         income_filter.append(Money_account.id == id)
         bankacc = Money_account.query.filter(Money_account.id == id).one_or_none()
@@ -100,7 +95,7 @@ def get_moneyitems(id):
         if accdesc != "all accounts":
             money_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
             income_filter.append(Money_account.accdesc.ilike('%{}%'.format(accdesc)))
-            moneyvals['accdesc'] = accdesc
+            moneyvals['bankacc'] = accdesc
         clearedval = request.form.get("cleared") or "all"
         moneyvals['cleared'] = clearedval
         if clearedval == "cleared":
@@ -152,34 +147,33 @@ def post_moneyaccount(id):
     return acc_id
 
 
-def post_moneyitem(id):
+def post_money_item(id):
     if id == 0:
-        # new moneyitem:
-        moneyitem = Money_item()
+        # new money item:
+        money_item = Money_item()
     else:
-        # existing moneyitem:
-        moneyitem = Money_item.query.get(id)
-    moneyitem.num = request.form.get("number")
-    moneyitem.date = request.form.get("paydate")
-    moneyitem.amount = request.form.get("amount")
-    moneyitem.payer = request.form.get("payer")
+        # existing money_item:
+        money_item = Money_item.query.get(id)
+    money_item.num = request.form.get("number")
+    money_item.date = request.form.get("paydate")
+    money_item.amount = request.form.get("amount")
+    money_item.payer = request.form.get("payer")
     bankaccount = request.form.get("bankaccount")
     bank_id = \
         Money_account.query.with_entities(Money_account.id).filter \
             (Money_account.accdesc == bankaccount).one()[0]
-    moneyitem.bankacc_id = bank_id
+    money_item.acc_id = bank_id
     cleared = request.form.get("cleared")
-    moneyitem.cleared = 1 if cleared == "cleared" else 0
+    money_item.cleared = 1 if cleared == "cleared" else 0
     category = request.form.get("category")
-    moneyitem.cat_id = \
+    money_item.cat_id = \
         Money_category.query.with_entities(Money_category.id).filter \
             (Money_category.cat_name == category).one()[0]
-    db.session.add(moneyitem)
+    db.session.add(money_item)
     db.session.flush()
-    bank_id = moneyitem.id
+    acc_id = money_item.id
     db.session.commit()
 
-
-    return bank_id
+    return acc_id
 
 

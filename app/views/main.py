@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.dao.agent import get_agent, get_agents, get_agent_rents, post_agent
+from app.dao.agent import delete_agent, get_agent, get_agents, get_agent_rents, post_agent
 from app.dao.filter import get_rent_s
 from app.dao.main import get_emailaccount, get_emailaccounts, get_rent_ex, post_emailaccount
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
@@ -12,7 +12,6 @@ main_bp = Blueprint('main_bp', __name__)
 @main_bp.route('/agents', methods=['GET', 'POST'])
 def agents():
     agents = get_agents()
-
     return render_template('agents.html', agents=agents)
 
 
@@ -22,15 +21,20 @@ def agent(id):
     rentid = int(request.args.get('rentid', "0", type=str))
     if request.method == "POST":
         id = post_agent(id)
-
         return redirect(url_for('main_bp.agent', id=id))
 
     if id == 0:
         agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
     else:
         agent = get_agent(id)
-
     return render_template('agent.html', agent=agent, rentid=rentid)
+
+
+@main_bp.route('/agent_delete/<int:agent_id>')
+@login_required
+def agent_delete(agent_id):
+    delete_agent(agent_id)
+    return redirect(url_for('main_bp.agents'))
 
 
 @main_bp.route('/agent_rents/<int:id>', methods=["GET"])
@@ -38,14 +42,12 @@ def agent(id):
 def agent_rents(id):
     agent = get_agent(id)
     agent_headrents, agent_rents = get_agent_rents(id)
-
     return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, agent_headrents=agent_headrents)
 
 
 @main_bp.route('/email_accounts', methods=['GET'])
 def email_accounts():
     emailaccs = get_emailaccounts()
-
     return render_template('email_accounts.html', emailaccs=emailaccs)
 
 
@@ -55,9 +57,7 @@ def email_account(id):
     if request.method == "POST":
         id = post_emailaccount(id)
         return redirect(url_for('main_bp.email_account', id=id))
-
     emailacc = get_emailaccount(id) if id != 0 else {"id": 0}
-
     return render_template('email_account.html', emailacc=emailacc)
 
 

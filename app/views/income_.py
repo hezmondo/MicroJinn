@@ -12,15 +12,15 @@ def income(id):
 
     return render_template('income.html', income_dict=income_dict, incomes=incomes, incomevals=incomevals)
 
-@income_bp.route('/income_object/<int:id>', methods=['GET', 'POST'])
+@income_bp.route('/income_item/<int:inc_id>', methods=['GET', 'POST'])
 @login_required
-def income_object(id):
+def income_item(inc_id):
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
-        id = post_income_(id, action)
+        id = post_income_(inc_id, action)
 
     income_dict = get_income_dict("enhanced")
-    income, incomeallocs = get_income_(id)
+    income, incomeallocs = get_income_(inc_id)
 
-    return render_template('income_.html', action=action, income=income, incomeallocs=incomeallocs,
+    return render_template('income_item.html', action=action, income=income, incomeallocs=incomeallocs,
                            income_dict=income_dict)

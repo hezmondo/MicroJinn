@@ -165,7 +165,7 @@ class Income(db.Model):
     payer = db.Column(db.String(90))
     amount = db.Column(db.Numeric(8,2))
     paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
     incomealloc_income = db.relationship('Incomealloc', backref='income', lazy='dynamic')
 
@@ -200,7 +200,7 @@ class Landlord(db.Model):
     landlordaddr = db.Column(db.String(180))
     taxdate = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
     emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
@@ -347,7 +347,7 @@ class Money_account(db.Model):
     accdesc = db.Column(db.String(30))
 
     income_moneyaccount = db.relationship('Income', backref='money_account', lazy='dynamic')
-    moneyitem_moneyaccount = db.relationship('Money_item', backref='money_account', lazy='dynamic')
+    money_item_moneyaccount = db.relationship('Money_item', backref='money_account', lazy='dynamic')
     landlord_moneyaccount = db.relationship('Landlord', backref='money_account', lazy='dynamic')
 
 
@@ -357,7 +357,7 @@ class Money_category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cat_name = db.Column(db.String(60))
 
-    moneyitem_moneycategory = db.relationship('Money_item', backref='money_category', lazy='dynamic')
+    money_item_moneycategory = db.relationship('Money_item', backref='money_category', lazy='dynamic')
 
 
 class Money_item(db.Model):
@@ -371,7 +371,7 @@ class Money_item(db.Model):
     memo = db.Column(db.String(90))
     cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
     cleared = db.Column(db.Integer)
-    bankacc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
 class Pr_arrears_matrix(db.Model):

@@ -103,7 +103,7 @@
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('util_bp.delete_item', id=emailacc.id, item=emailacc) }}"
+            <a href="{{ url_for('util_bp.delete_item', item_id=emailacc.id, item=emailacc) }}"
                onclick="return confirm('Are you sure you want to delete this email account?');"
                class="btn btn-block btn-danger" role="button">delete property</a>
         </div>
