@@ -18,7 +18,7 @@ def get_incomes(id):
         # first deal with bank account id being passed from money app
         qfilter.append(Money_account.id == id)
         bankacc = Money_account.query.filter(Money_account.id == id).one_or_none()
-        incomevals['bankacc'] = bankacc.accdesc
+        incomevals['bankacc'] = bankacc.acc_desc
     if request.method == "POST":
         payer = request.form.get("payer") or ""
         if payer and payer != "" and payer != "all payers":
@@ -30,7 +30,7 @@ def get_incomes(id):
             incomevals['rentcode'] = rentcode
         bankacc = request.form.get("bankacc") or ""
         if bankacc and bankacc != "" and bankacc != "all accounts":
-            qfilter.append(Money_account.accdesc == bankacc)
+            qfilter.append(Money_account.acc_desc == bankacc)
             incomevals['bankacc'] = bankacc
         paytype = request.form.get("paytype") or ""
         if paytype and paytype != "" and paytype != "all payment types":
@@ -45,7 +45,7 @@ def get_incomes(id):
 
     incomes = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
             .with_entities(Income.id, Income.date, Incomealloc.rent_id, Incomealloc.rentcode, Income.amount,
-                           Income.payer, Money_account.accdesc, Chargetype.chargedesc, Typepayment.paytypedet) \
+                           Income.payer, Money_account.acc_desc, Chargetype.chargedesc, Typepayment.paytypedet) \
             .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
 
     return incomes, incomevals
@@ -53,7 +53,7 @@ def get_incomes(id):
 
 def get_income_dict(type):
     # return options for multiple choice controls in income object
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.accdesc).all()]
+    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.acc_desc).all()]
     bankaccs_all = bankaccs
     bankaccs_all.insert(0, "all accounts")
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
@@ -76,7 +76,7 @@ def get_income_dict(type):
 
 def get_income_(id):
     income = Income.query.join(Money_account).join(Typepayment).with_entities(Income.id, Income.date, Income.amount,
-              Income.payer, Typepayment.paytypedet, Money_account.accdesc).filter(Income.id == id).one_or_none()
+                                                                              Income.payer, Typepayment.paytypedet, Money_account.acc_desc).filter(Income.id == id).one_or_none()
 
     incomeallocs = Incomealloc.query.join(Chargetype).join(Rent).with_entities(Incomealloc.id,
                     Incomealloc.income_id, Rent.rentcode, Incomealloc.amount.label("alloctot"),
@@ -96,7 +96,7 @@ def post_income_(id, action):
     income.payer = request.form.get("payer")
     bankacc = request.form.get("bankacc")
     income.acc_id = \
-        Money_account.query.with_entities(Money_account.id).filter(Money_account.accdesc == bankacc).one()[0]
+        Money_account.query.with_entities(Money_account.id).filter(Money_account.acc_desc == bankacc).one()[0]
     paytype = request.form.get("paytype")
     income.paytype_id = \
         Typepayment.query.with_entities(Typepayment.id).filter(Typepayment.paytypedet == paytype).one()[0]

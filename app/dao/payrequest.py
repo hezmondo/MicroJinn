@@ -266,7 +266,7 @@ def get_rent_pr(rent_id):
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
                            Rent.rentpa, Rent.tenantname, Rent.freq_id,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
-                           Money_account.bankname, Money_account.accname, Money_account.accnum, Money_account.sortcode,
+                           Money_account.bank_name, Money_account.acc_name, Money_account.acc_num, Money_account.sort_code,
                            Typeadvarr.advarrdet, Typefreq.freqdet, Typetenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
@@ -284,10 +284,10 @@ def get_pr_variables(rent_pr):
     totcharges = rent_pr.totcharges if rent_pr.totcharges else Decimal(0)
     totdue = arrears + totcharges
 
-    pr_variables = {'#accname#': rent_pr.accname if rent_pr.accname else "no accname",
-                    '#accnum#': rent_pr.accnum if rent_pr.accnum else "no accnumber",
-                    '#sortcode#': rent_pr.sortcode if rent_pr.sortcode else "no sortcode",
-                    '#bankname#': rent_pr.bankname if rent_pr.bankname else "no bankname",
+    pr_variables = {'#acc_name#': rent_pr.acc_name if rent_pr.acc_name else "no acc_name",
+                    '#acc_num#': rent_pr.acc_num if rent_pr.acc_num else "no acc_number",
+                    '#sort_code#': rent_pr.sort_code if rent_pr.sort_code else "no sort_code",
+                    '#bank_name#': rent_pr.bank_name if rent_pr.bank_name else "no bank_name",
                     '#arrears#': moneyToStr(arrears, pound=True),
                     '#lastrentdate#': dateToStr(rent_pr.lastrentdate) if rent_pr else "11/11/1111",
                     '#managername#': rent_pr.managername if rent_pr else "no manager name",
