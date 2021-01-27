@@ -15,10 +15,10 @@ def headrents():
     return render_template('headrents.html', filterdict=filterdict, headrents=headrents, hr_statuses=hr_statuses)
 
 
-@headrent_bp.route('/headrent/<int:id>', methods=["GET", "POST"])
+@headrent_bp.route('/headrent/<int:headrent_id>', methods=["GET", "POST"])
 @login_required
-def headrent(id):
-    headrent = get_headrent(id)
+def headrent(headrent_id):
+    headrent = get_headrent(headrent_id)
     combodict = get_combodict_basic()
     #gather combobox values in a dictionary
     hr_statuses = get_hr_statuses()

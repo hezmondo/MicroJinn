@@ -5,20 +5,20 @@ from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_
 
 
 def get_incomes(id):
-    #possible bank account id from money and possible param rentid as arg from rent screen
+    #possible bank account id from money and possible param rent_id as arg from rent screen
     qfilter = []
     incomevals = {
-        'bankacc': 'all accounts',
+        'acc_desc': 'all accounts',
         'payer': '',
         'rentcode': '',
-        'rentid': 0,
+        'rent_id': 0,
         'paytype': 'all payment types'
     }
     if id != 0:
         # first deal with bank account id being passed from money app
         qfilter.append(Money_account.id == id)
-        bankacc = Money_account.query.filter(Money_account.id == id).one_or_none()
-        incomevals['bankacc'] = bankacc.acc_desc
+        acc_desc = Money_account.query.filter(Money_account.id == id).one_or_none()
+        incomevals['acc_desc'] = acc_desc.acc_desc
     if request.method == "POST":
         payer = request.form.get("payer") or ""
         if payer and payer != "" and payer != "all payers":
@@ -28,20 +28,20 @@ def get_incomes(id):
         if rentcode and rentcode != "" and rentcode != "all rentcodes":
             qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
             incomevals['rentcode'] = rentcode
-        bankacc = request.form.get("bankacc") or ""
-        if bankacc and bankacc != "" and bankacc != "all accounts":
-            qfilter.append(Money_account.acc_desc == bankacc)
-            incomevals['bankacc'] = bankacc
+        acc_desc = request.form.get("acc_desc") or ""
+        if acc_desc and acc_desc != "" and acc_desc != "all accounts":
+            qfilter.append(Money_account.acc_desc == acc_desc)
+            incomevals['acc_desc'] = acc_desc
         paytype = request.form.get("paytype") or ""
         if paytype and paytype != "" and paytype != "all payment types":
             qfilter.append(Typepayment.paytypedet == paytype)
             incomevals['paytype'] = paytype
     else:
-        # now deal with rentid coming from the rent screen
-        rentid = int(request.args.get('rentid', "0", type=str))
-        if rentid != 0:
-            qfilter.append(Incomealloc.rent_id == rentid)
-            incomevals['rentid'] = rentid
+        # now deal with rent_id coming from the rent screen
+        rent_id = int(request.args.get('rent_id', "0", type=str))
+        if rent_id != 0:
+            qfilter.append(Incomealloc.rent_id == rent_id)
+            incomevals['rent_id'] = rent_id
 
     incomes = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
             .with_entities(Income.id, Income.date, Incomealloc.rent_id, Incomealloc.rentcode, Income.amount,
@@ -53,15 +53,15 @@ def get_incomes(id):
 
 def get_income_dict(type):
     # return options for multiple choice controls in income object
-    bankaccs = [value for (value,) in Money_account.query.with_entities(Money_account.acc_desc).all()]
-    bankaccs_all = bankaccs
-    bankaccs_all.insert(0, "all accounts")
+    acc_descs = [value for (value,) in Money_account.query.with_entities(Money_account.acc_desc).all()]
+    acc_descs_all = acc_descs
+    acc_descs_all.insert(0, "all accounts")
     paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
     paytypes_all = paytypes
     paytypes_all.insert(0, "all payment types")
     income_dict = {
-        "bankaccs": bankaccs,
-        "bankaccs_all": bankaccs_all,
+        "acc_descs": acc_descs,
+        "acc_descs_all": acc_descs_all,
         "paytypes": paytypes,
         "paytypes_all": paytypes_all
     }
@@ -94,9 +94,9 @@ def post_income_(id, action):
     income.paydate = request.form.get("paydate")
     income.amount = request.form.get("amount")
     income.payer = request.form.get("payer")
-    bankacc = request.form.get("bankacc")
+    acc_desc = request.form.get("acc_desc")
     income.acc_id = \
-        Money_account.query.with_entities(Money_account.id).filter(Money_account.acc_desc == bankacc).one()[0]
+        Money_account.query.with_entities(Money_account.id).filter(Money_account.acc_desc == acc_desc).one()[0]
     paytype = request.form.get("paytype")
     income.paytype_id = \
         Typepayment.query.with_entities(Typepayment.id).filter(Typepayment.paytypedet == paytype).one()[0]

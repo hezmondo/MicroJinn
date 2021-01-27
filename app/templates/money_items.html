@@ -24,11 +24,11 @@
             <button type="submit" class="btn btn-block btn-danger">search</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('money_bp.money_item', money_item_id=0) }}"
+            <a href="{{ url_for('money_bp.money_item', money_item_id=0, acc_desc=moneyvals.acc_desc) }}"
                class="btn btn-block btn-primary" role="button">new transaction</a>
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="acc_desc", items=money_dict.bankaccs, item_selected=moneyvals['acc_desc']) }}
+            {{ widgets.combobox(name="acc_desc", items=money_dict.acc_descs, item_selected=moneyvals['acc_desc']) }}
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="balance" value="{{ accsums.cbalance }}">

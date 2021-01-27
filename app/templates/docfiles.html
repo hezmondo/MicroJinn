@@ -6,7 +6,7 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
-        {% if rentid == 0 %}
+        {% if rent_id == 0 %}
             <div class="col-md-2">
                 <button type="submit" class="btn btn-block btn-success">search</button>
             </div>
@@ -28,19 +28,19 @@
             </div>
         {% else %}
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                <a href="{{ url_for('rent_bp.rent_', rent_id=rent_id) }}"
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.docfiles', rentid=0) }}"
+                <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
                    class="btn btn-block btn-primary" role="button">view all docfiles</a>
             </div>
             <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.docfile', id=0, doc_dig='doc', rentid=rentid) }}"
+                <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
                    class="btn btn-block btn-primary" role="button">new doc in</a>
             </div>
             <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.upload_file', rentid=rentid, rentcode=docfiles.rentcode) }}"
+                <a href="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=docfiles.rentcode) }}"
                    class="btn btn-block btn-primary" role="button">new digfile</a>
             </div>
         {% endif %}
@@ -69,7 +69,8 @@
                 <td style="width: 10.00%"> {{ item.desc }}</td>
                 <td style="width: 10.00%"> {{ item.doc_dig }}</td>
                 <td style="width: 10.00%"> {{ item.out_in }}</td>
-                <td style="width: 10.00%"><a href="{{ url_for('doc_bp.docfile', id=item.id, doc_dig=item.doc_dig) }}">view</a></td>
+                <td style="width: 10.00%"><a href="{{ url_for('doc_bp.docfile',
+                doc_id=item.id, doc_dig=item.doc_dig) }}">view</a></td>
             </tr>
             {% endfor %}
             </tbody>

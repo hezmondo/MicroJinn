@@ -65,7 +65,7 @@
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('loan_bp.loanstat_dialog', id=loan.id) }}"
+            <a href="{{ url_for('loan_bp.loanstat_dialog', loan_id=loan.id) }}"
                class="btn btn-block btn-primary" role="button">Produce statement for this loan</a>
         </div>
     </div>

@@ -1,21 +1,18 @@
-from flask import Blueprint, redirect, render_template,  request
+from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
 from app.dao.lease import get_lease, get_leases, post_lease
 
 lease_bp = Blueprint('lease_bp', __name__)
 
-@lease_bp.route('/lease/<int:id>', methods=['GET', 'POST'])
+@lease_bp.route('/lease/<int:lease_id>', methods=['GET', 'POST'])
 @login_required
-def lease(id):
-    # id can be actual lease id or 0 (for new lease or for id unknown as coming from rent)
+def lease(lease_id):
     if request.method == "POST":
-        rentid = post_lease(id)
+        rent_id = post_lease(lease_id)
+        return redirect(url_for('bp_rent.rent_', rent_id=rent_id))
+    lease, uplift_types = get_lease(lease_id)
 
-        return redirect('/rent_/{}'.format(rentid))
-
-    action, lease, uplift_types = get_lease(id)
-
-    return render_template('lease.html', action=action, lease=lease, uplift_types=uplift_types)
+    return render_template('lease.html', lease=lease, uplift_types=uplift_types)
 
 
 @lease_bp.route('/leases', methods=['GET', 'POST'])

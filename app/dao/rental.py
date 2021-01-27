@@ -27,12 +27,12 @@ def getrentals():
     return rentals, rentsum
 
 
-def get_rentalstatement():
-    db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": id})
+def get_rentalstatement(rental_id):
+    db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": rental_id})
     db.session.commit()
-    rentalstatem = Rental_statement.query.all()
+    rentalstatement = Rental_statement.query.all()
 
-    return rentalstatem
+    return rentalstatement
 
 
 def post_rental(id):

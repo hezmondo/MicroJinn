@@ -18,7 +18,7 @@
             <label>produce redemption statement for the above date:</label>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="{{ url_for('loan_bp.loan_statement', id=loanid) }}"
+            <button type="submit" formaction="{{ url_for('loan_bp.loan_statement', loan_id=loanid) }}"
                     class="btn btn-block btn-success">go</button>
         </div>
     </div>
