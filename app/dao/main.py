@@ -16,7 +16,7 @@ def delete_record(item, item_id):
         redir = "main_bp.email_accounts"
     elif item == "formletter":
         Form_letter.query.filter_by(id=item_id).delete()
-        redir = "formletter_bp.form_, id={}".format(id_2)
+        redir = "formletter_bp.form_, form_id={}".format(item_id)
     elif item == "incomealloc":
         Incomealloc.query.filter_by(id=item_id).delete()
     elif item == "landlord":

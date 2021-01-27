@@ -16,7 +16,7 @@
         </div>
         {% if doc_dig == "dig" %}
             <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.download', id=docfile.id) }}"
+                <a href="{{ url_for('doc_bp.download', doc_id=docfile.id) }}"
                    class="btn btn-block btn-danger" role="button">view dig file</a>
             </div>
         {% endif %}
