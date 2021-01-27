@@ -4,13 +4,13 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
-        {% if rentid != "0" %}
+        {% if rent_id != "0" %}
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                <a href="{{ url_for('rent_bp.rent_', rent_id=rent_id) }}"
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('charge_bp.charge', id=0, rentid=rentid, rentcode=rentcode) }}"
+                <a href="{{ url_for('charge_bp.charge', charge_id=0, rent_id=rent_id, rentcode=rentcode) }}"
                    class="btn btn-block btn-danger" role="button">new charge for this rent</a>
             </div>
         {% endif %}
@@ -46,7 +46,7 @@
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
             <td style="width: 25.00%"> {{ charge.chargedetail }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
-            <td style="width: 5.00%"><a href="{{ url_for('charge_bp.charge', id=charge.id) }}">view</a></td>
+            <td style="width: 5.00%"><a href="{{ url_for('charge_bp.charge', charge_id=charge.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

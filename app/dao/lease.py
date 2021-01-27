@@ -9,23 +9,20 @@ from app.models import Lease, Lease_uplift_type, Rent
 
 
 # leases
-def get_lease(id):
-    # id can be actual lease id or 0 (for new lease or for id unknown as coming from rent)
-    action = request.args.get('action', "view", type=str)
+def get_lease(lease_id):
     rentcode = request.args.get('rentcode', "DUMMY" , type=str)
-    rentid = int(request.args.get('rentid', "0", type=str))
+    rent_id = int(request.args.get('rent_id', "0", type=str))
     lease_filter = []
-    if id == 0 and action == "new":
+    if lease_id == 0:
         lease = {
             'id': 0,
-            'rent_id': rentid,
+            'rent_id': rent_id,
             'rentcode': rentcode
         }
+    if rent_id != 0:
+        lease_filter.append(Lease.rent_id == rent_id)
     else:
-        if id == 0:
-            lease_filter.append(Lease.rent_id == rentid)
-        else:
-            lease_filter.append(Lease.id == id)
+        lease_filter.append(Lease.id == lease_id)
         lease = \
             Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
                  Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
@@ -34,7 +31,7 @@ def get_lease(id):
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
 
-    return action, lease, uplift_types
+    return lease, uplift_types
 
 
 def get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high):
@@ -99,18 +96,18 @@ def get_lease_variables(rent_id):
     return leasedata, lease_variables
 
 
-def post_lease(id):
-    rentid = int(request.form.get("rent_id"))
+def post_lease(lease_id):
+    rent_id = int(request.form.get("rent_id"))
     # new lease for id 0, otherwise existing lease:
-    if id == 0:
+    if lease_id == 0:
         lease = Lease()
         lease.id = 0
-        lease.rent_id = rentid
+        lease.rent_id = rent_id
         lease.startdate = "1991-01-01"
         lease.upliftdate = "1991-01-01"
         lease.lastvaluedate = "1991-01-01"
     else:
-        lease = Lease.query.get(id)
+        lease = Lease.query.get(lease_id)
     lease.term = request.form.get("term")
     lease.startdate = request.form.get("startdate")
     lease.startrent = request.form.get("startrent")
@@ -120,7 +117,7 @@ def post_lease(id):
     lease.rentcap = request.form.get("rentcap")
     lease.lastvalue = request.form.get("lastvalue")
     lease.lastvaluedate = request.form.get("lastvaluedate")
-    lease.rent_id = rentid
+    lease.rent_id = rent_id
     uplift_type = request.form.get("uplift_type")
     lease.uplift_type_id = \
         Lease_uplift_type.query.with_entities(Lease_uplift_type.id).filter \
@@ -129,6 +126,6 @@ def post_lease(id):
     db.session.add(lease)
     db.session.commit()
 
-    return rentid
+    return rent_id
 
 

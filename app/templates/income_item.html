@@ -21,8 +21,8 @@
     </div>
     <div class="form-group row align-items-end">
         <div class="col-md-3">
-            <label for="bankacc">bank account:</label>
-            {{ widgets.combobox(name="bankacc", items=income_dict.bankaccs, item_selected=income.accdesc) }}
+            <label for="acc_desc">bank account:</label>
+            {{ widgets.combobox(name="acc_desc", items=income_dict.acc_descs, item_selected=income.acc_desc) }}
         </div>
         <div class="col-md-2">
             <label for="paytype">pay type:</label>
@@ -36,7 +36,7 @@
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('income_bp.income', id=0) }}"
+            <a href="{{ url_for('income_bp.income', income_id=0) }}"
                class="btn btn-block btn-primary" role="button">back to income</a>
         </div>
     </div>

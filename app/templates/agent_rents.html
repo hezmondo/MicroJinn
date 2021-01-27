@@ -27,7 +27,7 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.agent', id=agent.id) }}"
+            <a href="{{ url_for('main_bp.agent', agent_id=agent.id) }}"
                class="btn btn-block btn-primary" role="button">back to agent</a>
         </div>
     </div>
@@ -48,7 +48,7 @@
             <td style="width: 10.00%">{{ rent.id }}</td>
             <td style="width: 20.00%">{{ rent.rentcode }}</td>
             <td style="width: 60.00%"> {{ rent.note }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('rent_bp.rent_', id=rent.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('rent_bp.rent_', rent_id=rent.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

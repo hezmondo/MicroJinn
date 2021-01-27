@@ -1,3 +1,4 @@
+import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
@@ -50,15 +51,6 @@ def get_loans(action):
     return loans, loansum
 
 
-def get_loanstatement():
-    loanstatement = Loan_statement.query.with_entities(Loan_statement.id, Loan_statement.date, Loan_statement.memo,
-                                                       Loan_statement.transaction, Loan_statement.rate,
-                                                       Loan_statement.interest,
-                                                       Loan_statement.add_interest, Loan_statement.balance).all()
-
-    return loanstatement
-
-
 def post_loan(id):
     loan = Loan.query.get(id) or Loan()
     loan.code = request.form.get("loancode")
@@ -81,3 +73,19 @@ def post_loan(id):
     commit_to_database()
 
     return _id
+
+
+def get_loan_statement(loan_id):
+    stat_date = request.form.get("statdate")
+    rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"),
+                                params={"x": loan_id, "y": stat_date})
+    checksums = rproxy.fetchall()
+    db.session.commit()
+    loanstatement = Loan_statement.query.with_entities(Loan_statement.id, Loan_statement.date, Loan_statement.memo,
+                                                       Loan_statement.transaction, Loan_statement.rate,
+                                                       Loan_statement.interest,
+                                                       Loan_statement.add_interest, Loan_statement.balance).all()
+    loan = Loan.query.get(loan_id)
+    loancode = loan.code
+
+    return checksums, loancode, loanstatement

@@ -4,10 +4,10 @@ from app.dao.functions import commit_to_database
 from app.models import Property, Rent, Typeproperty
 
 
-def get_properties(rentid):
+def get_properties(rent_id):
     qfilter = []
-    if rentid != 0:
-        qfilter.append(Property.rent_id == rentid)
+    if rent_id != 0:
+        qfilter.append(Property.rent_id == rent_id)
     if request.method == "POST":
         rentcode = request.form.get("rentcode")
         if rentcode and rentcode != "":
@@ -27,11 +27,11 @@ def get_properties(rentid):
     return properties, proptypes
 
 
-def get_property(id, rentid):
+def get_property(id, rent_id):
     if id == 0:
         rentcode = Rent.query.with_entities(Rent.rentcode) \
-            .filter(Rent.id==rentid).one_or_none()[0]
-        property_ = {"id": 0, "rentcode": rentcode, "rent_id": rentid, "typeprop_id": 4}
+            .filter(Rent.id==rent_id).one_or_none()[0]
+        property_ = {"id": 0, "rentcode": rentcode, "rent_id": rent_id, "typeprop_id": 4}
     else:
         property_ = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
                                    Property.rent_id, Rent.rentcode, ) \
@@ -49,10 +49,10 @@ def get_proptypes(type):
     return proptypes
 
 
-def post_property(id, rentid):
+def post_property(id, rent_id):
     if id == 0:
         property = Property()
-        property.rent_id = rentid
+        property.rent_id = rent_id
     else:
         property = Property.query.get(id)
     propaddr = request.form.get("propaddr")
