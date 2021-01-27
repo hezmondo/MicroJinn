@@ -5,9 +5,7 @@ from app import db
 from flask import request
 from sqlalchemy import desc, literal
 from werkzeug.utils import secure_filename
-from app.dao.functions import commit_to_database
-from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
-from app.dao.payrequest_ import forward_rent
+from app.models import Digfile, Docfile, Rent, Typedoc
 
 
 def get_digfile(doc_id):

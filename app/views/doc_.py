@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, send_file, url_
 from flask_login import login_required
 from io import BytesIO
 from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_upload
-from app.dao.payrequest_ import post_pr_file
+from app.dao.payrequest_ import post_payrequest
 
 doc_bp = Blueprint('doc_bp', __name__)
 
@@ -41,7 +41,7 @@ def save_html():
     action = request.args.get('action', "view", type=str)
     if request.method == "POST":
         if action == "payrequest":
-            id_ = post_pr_file()
+            id_ = post_payrequest()
             return redirect(url_for('pr_bp.pr_history', rent_id=id_))
         else:
             id_ = post_docfile(0)

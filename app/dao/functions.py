@@ -41,6 +41,12 @@ def commit_to_database():
         abort(500, err)
 
 
+def doReplace(dict, clause):
+    for key, value in dict.items():
+        clause = clause.replace(key, value)
+    return clause
+
+
 def hashCode(rentcode):
     salt = "230498slkdfn348975ejhsoadjflkj"
     code = rentcode
