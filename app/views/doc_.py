@@ -7,30 +7,30 @@ from app.dao.payrequest_ import post_pr_file
 doc_bp = Blueprint('doc_bp', __name__)
 
 
-@doc_bp.route('/docfile/<int:id>', methods=['GET', 'POST'])
+@doc_bp.route('/docfile/<int:doc_id>', methods=['GET', 'POST'])
 @login_required
-def docfile(id):
+def docfile(doc_id):
     if request.method == "POST":
-        rentid = post_docfile(id)
+        rent_id = post_docfile(doc_id)
 
-        return redirect("/views/rent_/{}".format(rentid))
+        return redirect("/views/rent_/{}".format(rent_id))
 
-    docfile, doc_dig = get_docfile(id)
+    docfile, doc_dig = get_docfile(doc_id)
 
     return render_template('docfile.html', docfile=docfile, doc_dig=doc_dig)
 
 
-@doc_bp.route('/docfiles/<int:rentid>', methods=['GET', 'POST'])
+@doc_bp.route('/docfiles/<int:rent_id>', methods=['GET', 'POST'])
 def docfiles(rent_id):
     docfiles, dfoutin = get_docfiles(rent_id)
     outins = ["all", "out", "in"]
 
-    return render_template('docfiles.html', rentid=rent_id, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
+    return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
 
 
-@doc_bp.route('/download/<int:id>')
+@doc_bp.route('/download/<int:doc_id>')
 @login_required
-def download(id):
+def download(doc_id):
     digfile = get_digfile(id)
     return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True,
                      mimetype='application/pdf')
@@ -48,16 +48,16 @@ def save_html():
             return redirect(url_for('doc_bp.docfiles', rent_id=id_))
 
 
-@doc_bp.route('/upload_file/<int:rentid>', methods=["GET", "POST"])
+@doc_bp.route('/upload_file/<int:rent_id>', methods=["GET", "POST"])
 @login_required
-def upload_file(rentid):
+def upload_file(rent_id):
     rentcode = request.args.get('rentcode', "dummy", type=str)
     if request.method == "POST":
         post_upload()
 
-        return redirect('/rent_/{}'.format(rentid))
+        return redirect('/rent_/{}'.format(rent_id))
 
-    return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rentid)
+    return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rent_id)
 
 # @doc_bp.route('/uploads/<filename>')
 # def upload(filename):

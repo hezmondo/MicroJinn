@@ -30,9 +30,9 @@ def getmaildata(rent_id, income_id=0):
     #                     Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
     #                     Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
     allocdata = None
-    bankdata = Money_account.query.join(Landlord).join(Rent).with_entities(Money_account.accname, Money_account.accnum,
-                                                                           Money_account.sortcode,
-                                                                           Money_account.bankname).filter(
+    bankdata = Money_account.query.join(Landlord).join(Rent).with_entities(Money_account.acc_name, Money_account.acc_num,
+                                                                           Money_account.sort_code,
+                                                                           Money_account.bank_name).filter(
         Rent.id == rent_id) \
         .one_or_none()
     addressdata = Landlord.query.join(Rent).join(Manager).with_entities(
@@ -134,10 +134,10 @@ def get_word_variables(rent_id, income_id=0):
     totdue = arrears + totcharges
 
     word_variables = {'#advarr#': rentobj.advarrdet if rentobj else "no advarr",
-                      '#accname#': bankdata.accname if bankdata else "no accname",
-                      '#accnum#': bankdata.accnum if bankdata else "no accnumber",
-                      '#sortcode#': bankdata.sortcode if bankdata else "no sortcode",
-                      '#bankname#': bankdata.bankname if bankdata else "no bankname",
+                      '#acc_name#': bankdata.acc_name if bankdata else "no acc_name",
+                      '#acc_num#': bankdata.acc_num if bankdata else "no acc_number",
+                      '#sort_code#': bankdata.sort_code if bankdata else "no sort_code",
+                      '#bank_name#': bankdata.bank_name if bankdata else "no bank_name",
                       '#arrears#': moneyToStr(arrears, pound=True),
                       '#hashcode#': hashCode(rentobj.rentcode) if rentobj else "no hashcode",
                       '#landlordaddr#': addressdata.landlordaddr if addressdata else "no landlord address",

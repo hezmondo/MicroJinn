@@ -15,19 +15,19 @@ def agents():
     return render_template('agents.html', agents=agents)
 
 
-@main_bp.route('/agent/<int:id>', methods=["GET", "POST"])
+@main_bp.route('/agent/<int:agent_id>', methods=["GET", "POST"])
 @login_required
-def agent(id):
-    rentid = int(request.args.get('rentid', "0", type=str))
+def agent(agent_id):
+    rent_id = int(request.args.get('rent_id', "0", type=str))
     if request.method == "POST":
-        id = post_agent(id)
-        return redirect(url_for('main_bp.agent', id=id))
+        id_ = post_agent(agent_id)
+        return redirect(url_for('main_bp.agent', agent_id=id_))
 
     if id == 0:
         agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
     else:
-        agent = get_agent(id)
-    return render_template('agent.html', agent=agent, rentid=rentid)
+        agent = get_agent(agent_id)
+    return render_template('agent.html', agent=agent, rent_id=rent_id)
 
 
 @main_bp.route('/agent_delete/<int:agent_id>')
@@ -37,11 +37,11 @@ def agent_delete(agent_id):
     return redirect(url_for('main_bp.agents'))
 
 
-@main_bp.route('/agent_rents/<int:id>', methods=["GET"])
+@main_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
 @login_required
-def agent_rents(id):
-    agent = get_agent(id)
-    agent_headrents, agent_rents = get_agent_rents(id)
+def agent_rents(agent_id):
+    agent = get_agent(agent_id)
+    agent_headrents, agent_rents = get_agent_rents(agent_id)
     return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, agent_headrents=agent_headrents)
 
 
@@ -51,13 +51,13 @@ def email_accounts():
     return render_template('email_accounts.html', emailaccs=emailaccs)
 
 
-@main_bp.route('/email_account/<int:id>', methods=['GET', 'POST'])
+@main_bp.route('/email_account/<int:email_account_id>', methods=['GET', 'POST'])
 @login_required
-def email_account(id):
+def email_account(email_account_id):
     if request.method == "POST":
-        id = post_emailaccount(id)
-        return redirect(url_for('main_bp.email_account', id=id))
-    emailacc = get_emailaccount(id) if id != 0 else {"id": 0}
+        id_ = post_emailaccount(email_account_id)
+        return redirect(url_for('main_bp.email_account', email_account_id=id_))
+    emailacc = get_emailaccount(email_account_id) if email_account_id != 0 else {"id": 0}
     return render_template('email_account.html', emailacc=emailacc)
 
 
@@ -70,15 +70,15 @@ def home():
     return render_template('home.html', filterdict=filterdict, rent_s=rent_s)
 
 
-@main_bp.route('/landlord/<int:id>', methods=['GET', 'POST'])
+@main_bp.route('/landlord/<int:landlord_id>', methods=['GET', 'POST'])
 @login_required
-def landlord(id):
+def landlord(landlord_id):
     if request.method == "POST":
-        id = post_landlord(id)
+        id_ = post_landlord(landlord_id)
 
-        return redirect(url_for('landlord_bp.property', id=id))
+        return redirect(url_for('landlord_bp.property', landlord_id=id_))
 
-    landlord = get_landlord(id) if id != 0 else {"id": 0}
+    landlord = get_landlord(landlord_id) if landlord_id != 0 else {"id": 0}
     landlord_dict = get_landlord_dict()
 
     return render_template('landlord.html', landlord=landlord, landlord_dict=landlord_dict)
@@ -91,34 +91,34 @@ def landlords():
     return render_template('landlords.html', landlords=landlords)
 
 
-@main_bp.route('/properties/<int:rentid>', methods=['GET', 'POST'])
+@main_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
 # @login_required
-def properties(rentid):
-    properties, proptypes = get_properties(rentid)
-    print(rentid)
+def properties(rent_id):
+    properties, proptypes = get_properties(rent_id)
+    print(rent_id)
 
-    return render_template('properties.html', rentid=rentid, properties=properties, proptypes=proptypes)
+    return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
 
 
-@main_bp.route('/property/<int:id>', methods=["GET", "POST"])
+@main_bp.route('/property/<int:property_id>', methods=["GET", "POST"])
 # @login_required
-def property(id):
-    rentid = int(request.args.get('rentid', "0", type=str))
+def property(property_id):
+    rent_id = int(request.args.get('rent_id', "0", type=str))
     if request.method == "POST":
-        id = post_property(id, rentid)
+        id = post_property(property_id, rent_id)
 
-        return redirect(url_for('main_bp.property', id=id))
+        return redirect(url_for('main_bp.property', property_id=id))
 
-    property_ = get_property(id, rentid)
+    property_ = get_property(property_id, rent_id)
     proptypes = get_proptypes("basic")
 
     return render_template('property.html', property_=property_, proptypes=proptypes)
 
 
-@main_bp.route('/rent_ex/<int:id>', methods=["GET"])
+@main_bp.route('/rent_ex/<int:rent_ex_id>', methods=["GET"])
 @login_required
-def rent_ex(id):
-    rent_ex = get_rent_ex(id)
+def rent_ex(rent_ex_id):
+    rent_ex = get_rent_ex(rent_ex_id)
 
     return render_template('rent_ex.html', rent_ex=rent_ex)
 

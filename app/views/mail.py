@@ -7,24 +7,24 @@ from app.dao.mail import writeMail
 mail_bp = Blueprint('mail_bp', __name__)
 
 
-@mail_bp.route('/mail_dialog/<int:id>', methods=["GET", "POST"])
+@mail_bp.route('/mail_dialog/<int:rent_id>', methods=["GET", "POST"])
 @login_required
-def mail_dialog(id):
+def mail_dialog(rent_id):
     action = request.args.get('action', "normal", type=str)
     formletters = get_formletters(action)
-    rent_mail = get_rent_mail(id)
+    rent_mail = get_rent_mail(rent_id)
 
     return render_template('mail_dialog.html', action=action, formletters=formletters, rent_mail=rent_mail)
 
 
-@mail_bp.route('/mail_edit/<int:id>', methods=["GET", "POST"])
+@mail_bp.route('/mail_edit/<int:form_id>', methods=["GET", "POST"])
 @login_required
-def mail_edit(id):
+def mail_edit(form_id):
     method = request.args.get('method', "email", type=str)
     action = request.args.get('action', "normal", type=str)
     if request.method == "POST":
             # print(request.form)
-        formletter_id = id
+        formletter_id = form_id
         rent_id = request.form.get('rent_id')
         addressdata, block, leasedata, rent_, subject, doctype, dcode = writeMail(rent_id, 0, formletter_id,
                                                                                     action)

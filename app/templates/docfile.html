@@ -4,14 +4,14 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="{{ url_for('doc_bp.docfile', id=docfile.id) }}">
+<form method="POST" action="{{ url_for('doc_bp.docfile', doc_id=docfile.id) }}">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="{{ url_for('doc_bp.docfiles', rentid=docfile.rent_id) }}"
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=docfile.rent_id) }}"
                class="btn btn-block btn-primary" role="button">back to docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('rent_bp.rent_', id=docfile.rent_id) }}"
+            <a href="{{ url_for('rent_bp.rent_', rent_id=docfile.rent_id) }}"
                class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         {% if doc_dig == "dig" %}
@@ -48,7 +48,7 @@
             <input type="hidden" id="xinput" name="xinput" value = "xyz">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" class="form-control" name="rentid" value = "{{ docfile.rent_id }}">
+            <input type="hidden" class="form-control" name="rent_id" value = "{{ docfile.rent_id }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="doc_dig" value = "{{ doc_dig }}">

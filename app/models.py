@@ -340,11 +340,11 @@ class Money_account(db.Model):
     __tablename__ = 'money_account'
 
     id = db.Column(db.Integer, primary_key=True)
-    bankname = db.Column(db.String(45))
-    accname = db.Column(db.String(60))
-    sortcode = db.Column(db.String(10))
-    accnum = db.Column(db.String(15))
-    accdesc = db.Column(db.String(30))
+    bank_name = db.Column(db.String(45))
+    acc_name = db.Column(db.String(60))
+    sort_code = db.Column(db.String(10))
+    acc_num = db.Column(db.String(15))
+    acc_desc = db.Column(db.String(30))
 
     income_moneyaccount = db.relationship('Income', backref='money_account', lazy='dynamic')
     money_item_moneyaccount = db.relationship('Money_item', backref='money_account', lazy='dynamic')

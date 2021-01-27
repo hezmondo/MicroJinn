@@ -10,21 +10,21 @@ from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
 from app.dao.payrequest_ import forward_rent
 
 
-def get_digfile(id):
-    digfile = Digfile.query.filter(Digfile.id == id).one_or_none()
+def get_digfile(doc_id):
+    digfile = Digfile.query.filter(Digfile.id == doc_id).one_or_none()
     return digfile
 
 
-def get_docfile(id):
+def get_docfile(doc_id):
     doc_dig = request.args.get('doc_dig', "doc", type=str)
-    rentid = int(request.args.get('rentid', "0", type=str))
+    rent_id = int(request.args.get('rent_id', "0", type=str))
     # new file has to be doc as new digital file uses upload function
-    if id == 0:
+    if doc_id == 0:
         docfile = Docfile()
         docfile.id = 0
-        docfile.rent_id = int(rentid)
+        docfile.rent_id = int(rent_id)
         docfile.out_in = 1
-        docfile.rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == rentid).one()[0]
+        docfile.rentcode = Rent.query.with_entities(Rent.rentcode).filter(Rent.id == rent_id).one()[0]
         docfile.summary = "email in"
         docfile.doc_text = ""
         docfile.doctype_id = 1
@@ -33,17 +33,17 @@ def get_docfile(id):
             docfile = Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.summary, Docfile.out_in,
                            Docfile.doc_text, Docfile.doc_date, literal("doc").label('doc_dig'),
                                Rent.rentcode, Rent.id.label("rent_id"), Typedoc.desc) \
-                        .filter(Docfile.id == id).one_or_none()
+                        .filter(Docfile.id == doc_id).one_or_none()
         else:
             docfile = Digfile.query.join(Rent).join(Typedoc).with_entities(Digfile.id, Digfile.summary, Digfile.out_in,
                            Digfile.doc_date, literal("dig").label('doc_dig'),
                                Rent.rentcode, Rent.id.label("rent_id"), Typedoc.desc) \
-                        .filter(Digfile.id == id).one_or_none()
+                        .filter(Digfile.id == doc_id).one_or_none()
 
     return docfile, doc_dig
 
 
-def get_docfiles(rentid):
+def get_docfiles(rent_id):
     digfile_filter = []
     docfile_filter = []
     dfoutin = "all"
@@ -70,9 +70,9 @@ def get_docfiles(rentid):
         elif dfoutin == "in":
             digfile_filter.append(Digfile.out_in == 1)
             docfile_filter.append(Docfile.out_in == 1)
-    if rentid > 0:
-        digfile_filter.append(Digfile.rent_id == rentid)
-        docfile_filter.append(Docfile.rent_id == rentid)
+    if rent_id > 0:
+        digfile_filter.append(Digfile.rent_id == rent_id)
+        docfile_filter.append(Docfile.rent_id == rent_id)
 
     docfiles = \
         Docfile.query.join(Rent).join(Typedoc).with_entities(Docfile.id, Docfile.doc_date,
@@ -88,16 +88,16 @@ def get_docfiles(rentid):
     return docfiles, dfoutin
 
 
-def post_docfile(id):
-    rentid = int(request.form.get('rentid'))
+def post_docfile(doc_id):
+    rent_id = int(request.form.get('rent_id'))
     doc_dig = request.form.get('doc_dig') or "doc"
     # new file for id 0, otherwise existing dig or doc file:
-    if id == 0:
+    if doc_id == 0:
         # new file has to be doc as new digital file uses upload function
         docfile = Docfile()
     else:
-        docfile = Docfile.query.get(id) if doc_dig == "doc" else Digfile.query.get(id)
-    docfile.rent_id = rentid
+        docfile = Docfile.query.get(doc_id) if doc_dig == "doc" else Digfile.query.get(doc_id)
+    docfile.rent_id = rent_id
     docfile.doc_date = request.form.get('doc_date')
     if doc_dig == "doc":
         docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
@@ -119,7 +119,7 @@ def post_docfile(id):
 
 def post_upload():
     # new digital file uses upload function
-    rentid = int(request.form.get("rentid"))
+    rent_id = int(request.form.get("rent_id"))
     rentcode = request.form.get("rentcode")
     doctype = request.form.get("doc_type")
     doc_date = request.form.get("doc_date")
@@ -139,7 +139,7 @@ def post_upload():
         digfile.dig_data = uploaded_file.read()
         digfile.doctype_id = \
             Typedoc.query.with_entities(Typedoc.id).filter(Typedoc.desc == doctype).one()[0]
-        digfile.rent_id = rentid
+        digfile.rent_id = rent_id
         digfile.out_in = 0 if outin == "out" else 1
         db.session.add(digfile)
         db.session.commit()

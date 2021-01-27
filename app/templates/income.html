@@ -15,7 +15,7 @@
                    value="{{ incomevals.rentcode }}" placeholder="all rentcodes">
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="bankacc", items=income_dict.bankaccs_all, item_selected=incomevals.bankacc) }}
+            {{ widgets.combobox(name="acc_desc", items=income_dict.acc_descs_all, item_selected=incomevals.acc_desc) }}
         </div>
         <div class="col-md-3">
             {{ widgets.combobox(name="paytype", items=income_dict.paytypes_all, item_selected=incomevals.paytype) }}
@@ -24,14 +24,14 @@
             <button type="submit" class="btn btn-block btn-success">search</button>
         </div>
     </div>
-    {% if incomevals.rentid != 0 %}
+    {% if incomevals.rent_id != 0 %}
         <div class="form-group row flex-row-reverse">
             <div class="col-md-3">
-                <a href="{{ url_for('income_bp.income_item', id=item.id, rentid=incomevals.rentid) }}"
+                <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
                    class="btn btn-block btn-primary" role="button">post income for this rent</a>
             </div>
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', id=incomevals.rentid) }}"
+                <a href="{{ url_for('rent_bp.rent_', rent_id=incomevals.rent_id) }}"
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
         </div>
@@ -57,9 +57,9 @@
             <td style="width: 15.00%"> {{ item.payer }}</td>
             <td style="width: 10.00%"> {{ item.amount }}</td>
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
-            <td style="width: 20.00%"> {{ item.accdesc }}</td>
+            <td style="width: 20.00%"> {{ item.acc_desc }}</td>
             <td style="width: 20.00%"> {{ item.paytypedet }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('income_bp.income_item', inc_id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('income_bp.income_item', income_id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

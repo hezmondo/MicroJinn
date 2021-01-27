@@ -24,30 +24,30 @@ def get_agents():
     return agents
 
 
-def get_agent(id):
-    agent = Agent.query.get(id)
-    pop_idlist_recent("recent_agents", id)
+def get_agent(agent_id):
+    agent = Agent.query.get(agent_id)
+    pop_idlist_recent("recent_agents", agent_id)
 
     return agent
 
 
-def get_agent_rents(id):
+def get_agent_rents(agent_id):
     agent_rents = Agent.query.join(Rent).with_entities(Rent.id, Rent.rentcode, Rent.tenantname) \
-        .filter(Rent.agent_id == id) \
+        .filter(Rent.agent_id == agent_id) \
         .all()
 
     agent_headrents = Agent.query.join(Headrent).with_entities(Headrent.id, Headrent.code, Headrent.propaddr) \
-        .filter(Headrent.agent_id == id) \
+        .filter(Headrent.agent_id == agent_id) \
         .all()
 
     return agent_headrents, agent_rents
 
 
-def post_agent(id):
-    if id == 0:
+def post_agent(agent_id):
+    if agent_id == 0:
         agent = Agent()
     else:
-        agent = Agent.query.get(id)
+        agent = Agent.query.get(agent_id)
     agent.detail = request.form.get("detail")
     agent.email = request.form.get("email")
     agent.note = request.form.get("note")

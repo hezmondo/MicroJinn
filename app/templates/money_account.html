@@ -7,24 +7,24 @@
 <form method="POST" id="money_account">
     <div class="form-group row">
         <div class="col-md-2">
-            <label for="bankname">bank name:</label>
-            <input type="text" class="form-control" name="bankname" value="{{ moneyacc.bankname }}" readonly="true">
+            <label for="bank_name">bank name:</label>
+            <input type="text" class="form-control" name="bank_name" value="{{ moneyacc.bank_name }}" readonly="true">
         </div>
         <div class="col-md-3">
-            <label for="accname">account name:</label>
-            <input type="text" class="form-control" name="accname" value="{{ moneyacc.accname }}" readonly="true">
+            <label for="acc_name">account name:</label>
+            <input type="text" class="form-control" name="acc_name" value="{{ moneyacc.acc_name }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="sortcode">sort code:</label>
-            <input type="text" class="form-control" name="sortcode" value="{{ moneyacc.sortcode }}" readonly="true">
+            <label for="sort_code">sort code:</label>
+            <input type="text" class="form-control" name="sort_code" value="{{ moneyacc.sort_code }}" readonly="true">
         </div>
         <div class="col-md-2">
-            <label for="accnum">account number:</label>
-            <input type="text" class="form-control" name="accnum" value="{{ moneyacc.accnum }}" readonly="true">
+            <label for="acc_num">account number:</label>
+            <input type="text" class="form-control" name="acc_num" value="{{ moneyacc.acc_num }}" readonly="true">
         </div>
         <div class="col-md-3">
-            <label for="accdesc">account description:</label>
-            <input type="text" class="form-control" name="accdesc" value="{{ moneyacc.accdesc }}" readonly="true">
+            <label for="acc_desc">account description:</label>
+            <input type="text" class="form-control" name="acc_desc" value="{{ moneyacc.acc_desc }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
@@ -33,7 +33,7 @@
                class="btn btn-block btn-primary" role="button">back to money</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('money_bp.money_account', id=0) }}"
+            <a href="{{ url_for('money_bp.money_account', acc_id=0) }}"
                class="btn btn-block btn-primary" role="button">new account</a>
         </div>
         <div class="col-md-2">

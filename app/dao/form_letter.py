@@ -3,13 +3,13 @@ from flask import request
 from app.models import Form_letter, Pr_form, Template, Typedoc\
 
 
-def get_formletter(id):
+def get_formletter(form_id):
     formletter = Form_letter.query.join(Typedoc).join(Template).with_entities(Form_letter.id, Form_letter.code,
                                                                               Form_letter.description,
                                                                               Form_letter.subject, Form_letter.block,
                                                                               Typedoc.desc,
                                                                               Template.desc.label("template")) \
-        .filter(Form_letter.id == id).one_or_none()
+        .filter(Form_letter.id == form_id).one_or_none()
 
     return formletter
 
@@ -37,9 +37,9 @@ def get_templates():
     return templates
 
 
-def post_formletter(id, action):
+def post_formletter(form_id, action):
     if action == "edit":
-        formletter = Form_letter.query.get(id)
+        formletter = Form_letter.query.get(form_id)
     else:
         formletter = Form_letter()
     formletter.code = request.form.get("code")
@@ -62,8 +62,8 @@ def post_formletter(id, action):
     return id_
 
 
-def get_formpayrequest(id):
-    formpayrequest = Pr_form.query.filter(Pr_form.id == id).one_or_none()
+def get_formpayrequest(form_id):
+    formpayrequest = Pr_form.query.filter(Pr_form.id == form_id).one_or_none()
     return formpayrequest
 
 

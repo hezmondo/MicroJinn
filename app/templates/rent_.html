@@ -25,7 +25,7 @@
             <textarea class="form-control" name="propaddr"  readonly="true">{{ rent_.propaddr }}</textarea>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.properties', rentid=rent_.id) }}"
+            <a href="{{ url_for('main_bp.properties', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">view</a>
         </div>
     </div>
@@ -52,12 +52,12 @@
         </div>
         {% if rent_.agent_id %}
             <div class="col-md-2">
-                <a href="{{ url_for('main_bp.agent', id=rent_.agent_id, rentid=rent_.id) }}"
+                <a href="{{ url_for('main_bp.agent', agent_id=rent_.agent_id, rent_id=rent_.id) }}"
                    class="btn btn-block btn-primary" role="button">view</a>
             </div>
         {% else %}
             <div class="col-md-2">
-                <a href="{{ url_for('main_bp.agent', id=0, rentid=rent_.id) }}"
+                <a href="{{ url_for('main_bp.agent', agent_id=0, rent_id=rent_.id) }}"
                    class="btn btn-block btn-primary" role="button">add agent</a>
             </div>
         {% endif %}
@@ -139,19 +139,19 @@
             <button type="button" id="more_less" class="btn btn-block btn-danger">more</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('charge_bp.charges', rentid=rent_.id, rentcode=rent_.rentcode) }}"
+            <a href="{{ url_for('charge_bp.charges', rent_id=rent_.id, rentcode=rent_.rentcode) }}"
                class="btn btn-block btn-primary" role="button">charges</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('income_bp.income', id=0, rentid=rent_.id) }}"
+            <a href="{{ url_for('income_bp.income', income_id=0, rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">income</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('mail_bp.mail_dialog', id=rent_.id) }}"
+            <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">mail</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('doc_bp.docfiles', rentid=rent_.id) }}"
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">docfiles</a>
         </div>
         <div class="col-md-2">
@@ -168,20 +168,20 @@
                class="btn btn-block btn-warning" role="button">delete item</a>
         </div>
 		<div class="col-md-2">
-            <input type="text" class="form-control" name="rentid" value = "{{ rent_.id }}">
+            <input type="text" class="form-control" name="rent_id" value = "{{ rent_.id }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse" id="more_buttons">
         <div class="col-md-2">
-            <a href="{{ url_for('lease_bp.lease', id=rent_.id) }}"
+            <a href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">leaseinfo</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('doc_bp.docfiles', rentid=rent_.id) }}"
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.properties', rentid=rent_.id) }}"
+            <a href="{{ url_for('main_bp.properties', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">something</a>
         </div>
         <div class="col-md-2">
@@ -192,13 +192,13 @@
                 <a class="dropdown-item"
                    href="{{ url_for('pr_bp.pr_history', rent_id=rent_.id) }}">view payrequest history</a>
                   <a class="dropdown-item"
-                   href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new statement for this rent</a>
+                   href="{{ url_for('rent_bp.rent_', rent_id=rent_.id) }}">new statement for this rent</a>
                 <a class="dropdown-item"
-                   href="{{ url_for('rent_bp.rent_', id=rent_.id) }}">new account for this rent</a>
+                   href="{{ url_for('rent_bp.rent_', rent_id=rent_.id) }}">new account for this rent</a>
                 <a class="dropdown-item"
                    href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_.id) }}">new payrequest for this rent</a>
                 <a class="dropdown-item"
-                   href="{{ url_for('mail_bp.mail_dialog', id=rent_.id) }}">new s166 for this rent</a>
+                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent_.id) }}">new s166 for this rent</a>
               </div>
             </div>
         </div>
@@ -207,7 +207,7 @@
               <button class="btn btn-primary dropdown-toggle" style="width:100%" type="button" id="otherMenuButton"
                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">other actions</button>
               <div class="dropdown-menu" aria-labelledby="otherMenuButton">
-                <a class="dropdown-item" href="{{ url_for('lease_bp.lease', id=0, rentid=rent_.id,
+                <a class="dropdown-item" href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent_.id,
                 rentcode=rent_.rentcode) }}" >add lease for this rent</a>
               </div>
             </div>

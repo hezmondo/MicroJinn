@@ -13,10 +13,10 @@ def create_new_rent():
     return 23
 
 
-def get_rent_(id):
-    if id == 0:
+def get_rent_(rent_id):
+    if rent_id == 0:
         # take the user to create new rent function:
-        id = create_new_rent()
+        rent_id = create_new_rent()
     rent_ = \
         Rent.query \
             .join(Landlord) \
@@ -42,37 +42,37 @@ def get_rent_(id):
                            Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
                            Typemailto.mailtodet, Typesalegrade.salegradedet, Typestatus.statusdet,
                            Typetenure.tenuredet) \
-            .filter(Rent.id == id) \
+            .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_ is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
     else:
-        pop_idlist_recent("recent_rents", id)
+        pop_idlist_recent("recent_rents", rent_id)
 
     return rent_
 
 
-def get_rent_mail(id):
+def get_rent_mail(rent_id):
     rent_mail = \
         Rent.query.join(Typemailto).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,
                            func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Typemailto.mailtodet) \
-            .filter(Rent.id == id) \
+            .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_mail is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
     else:
-        pop_idlist_recent("recent_rents", id)
+        pop_idlist_recent("recent_rents", rent_id)
 
     return rent_mail
 
 
-def post_rent(id):
-    rent = Rent.query.get(id)
+def post_rent(rent_id):
+    rent = Rent.query.get(rent_id)
     postvals_id = get_postvals_id()
     # we need the post values with the class id generated for the actual combobox values:
     rent.actype_id = postvals_id["actype"]

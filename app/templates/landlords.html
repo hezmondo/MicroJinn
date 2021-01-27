@@ -5,7 +5,7 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="{{ url_for('landlord_bp.landlord', id=0) }}"
+            <a href="{{ url_for('main_bp.landlord', landlord_id=0) }}"
                class="btn btn-block btn-primary" role="button">new landlord</a>
         </div>
     </div>
@@ -28,7 +28,7 @@
             <td style="width: 30.00%"> {{ item.landlordaddr }}</td>
             <td style="width: 10.00%"> {{ item.taxdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 25.00%"> {{ item.managername }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('landlord_bp.landlord', id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('main_bp.landlord', landlord_id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

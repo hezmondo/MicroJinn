@@ -26,9 +26,9 @@
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
-        {% if rentid != 0 %}
+        {% if rent_id != 0 %}
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', id=rentid) }}"
+                <a href="{{ url_for('rent_bp.rent_', rent_id=rent_id) }}"
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
         {% else %}
@@ -38,7 +38,7 @@
             </div>
         {% endif %}
         <div class="col-md-3">
-            <a href="{{ url_for('main_bp.agent_rents', id=agent.id) }}"
+            <a href="{{ url_for('main_bp.agent_rents', agent_id=agent.id) }}"
                class="btn btn-block btn-primary" role="button">view rents/headrents</a>
         </div>
         <div class="col-md-2">

@@ -14,7 +14,7 @@ def get_filters(type):
     return filters
 
 
-def get_rent_s(action, id):
+def get_rent_s(action, filter_id):
     # collect doctypes to hold in session, as this is the first trip to the server
     session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
     # get filter dictionary and filtered rent objects
@@ -48,7 +48,7 @@ def get_rent_s(action, id):
     filterdict = dict_basic if action in ("basic", "external") else {**dict_basic, **dict_plus}
     if action == "load":
         # load predefined filter dictionary from jstore
-        jdict = Jstore.query.with_entities(Jstore.content).filter(Jstore.id == id).one_or_none()[0]
+        jdict = Jstore.query.with_entities(Jstore.content).filter(Jstore.id == filter_id).one_or_none()[0]
         jdict = json.loads(jdict)
         for key, value in jdict.items():
             filterdict[key] = value
