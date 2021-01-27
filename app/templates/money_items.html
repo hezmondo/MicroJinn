@@ -24,7 +24,8 @@
             <button type="submit" class="btn btn-block btn-danger">search</button>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('money_bp.money_item', money_item_id=0, acc_desc=moneyvals.acc_desc) }}"
+            <a href="{{ url_for('money_bp.money_item', money_item_id=0,
+            acc_id=moneyvals.acc_id, acc_desc=moneyvals.acc_desc) }}"
                class="btn btn-block btn-primary" role="button">new transaction</a>
         </div>
         <div class="col-md-3">

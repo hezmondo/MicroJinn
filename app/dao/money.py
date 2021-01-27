@@ -53,19 +53,34 @@ def get_moneydict(type="basic"):
     return money_dict
 
 
-def get_money_item(money_item_id, acc_desc):
+def get_money_item(money_item_id):
     if money_item_id == 0:
-        money_item = {'date': datetime.date.today(), 'acc_desc': acc_desc, 'cat_name': 'Miscellaneous'}
+        money_item = get_money_item_new()
         cleared = "cleared"
     else:
         money_item = Money_item.query.join(Money_account).join(Money_category).with_entities(Money_item.id,
-                                                                                             Money_item.num, Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
-                                                                                             Money_account.id.label("acc_id"), Money_account.acc_desc, Money_category.cat_name,
-                                                                                             Money_item.cleared).filter(Money_item.id == money_item_id).one_or_none()
+                             Money_item.num, Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
+                             Money_account.id.label("acc_id"), Money_account.acc_desc, Money_category.cat_name,
+                             Money_item.cleared) \
+            .filter(Money_item.id == money_item_id).one_or_none()
 
         cleared = "cleared" if money_item.cleared == 1 else "uncleared"
 
     return money_item, cleared
+
+
+def get_money_item_new():
+    acc_id = request.args.get('acc_id', 1, type=int)
+    acc_desc = request.args.get('acc_desc', "Santander RHDM", type=str)
+    money_item = {'id': 0,
+                  'num': 0,
+                  'date': datetime.date.today(),
+                  'acc_id': acc_id,
+                  'acc_desc': acc_desc,
+                  'cat_name': 'Fuel'
+                  }
+
+    return money_item
 
 
 def get_money_items(acc_id): # we assemble income items and money items into one display - tricky
