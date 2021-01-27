@@ -7,7 +7,7 @@ from sqlalchemy import desc, literal
 from werkzeug.utils import secure_filename
 from app.dao.functions import commit_to_database
 from app.models import Digfile, Docfile, Rent, Typedoc, Pr_history
-from app.dao.payrequest import forward_rent
+from app.dao.payrequest_ import forward_rent
 
 
 def get_digfile(id):

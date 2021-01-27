@@ -75,7 +75,7 @@ def create_app(config_class=Config):
     from .views.money import money_bp
     app.register_blueprint(money_bp, url_prefix='/views')
 
-    from .views.payrequest import pr_bp
+    from .views.payrequest_ import pr_bp
     app.register_blueprint(pr_bp, url_prefix='/views')
 
     from .views.rental import rental_bp

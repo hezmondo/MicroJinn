@@ -6,9 +6,9 @@ from app.models import Income, Incomealloc, Landlord, Manager, Money_account, Re
 from app.dao.form_letter import get_formletter, get_formpayrequest
 from app.dao.functions import dateToStr, hashCode, moneyToStr
 from app.dao.lease import get_lease_variables
-from app.dao.payrequest import create_pr_charges_table, get_rent_pr, \
-    get_rent_statement, get_arrears_statement, get_pr_form, get_pr_variables
+from app.dao.payrequest_ import get_rent_pr, get_rent_statement, get_arrears_statement, get_pr_form, get_pr_variables
 from app.dao.rent_ import get_rent_
+from app.views.payrequest_ import create_pr_charges_table
 
 
 # mail

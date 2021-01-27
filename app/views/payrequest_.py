@@ -1,9 +1,12 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
 from app.dao.filter import get_filters
-from app.dao.payrequest import get_pr_data, get_pr_forms, get_pr_file, get_pr_history, post_pr_file
+from app.dao.functions import moneyToStr, dateToStr
+from app.dao.payrequest_ import check_recovery_in_charges, determine_charges_suffix, get_new_arrears_level, \
+    get_pr_data, get_pr_forms, get_pr_file, get_pr_history, get_recovery_info, get_rent_charge_details, post_pr_file
 from app.dao.mail import write_payrequest
 from app.dao.rent_ import get_rent_mail
+from datetime import date
 
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -80,3 +83,36 @@ def pr_start():
     filters = get_filters(1)
 
     return render_template('pr_start.html', filters=filters)
+
+
+def calculate_arrears(arrears, freq_id, rentpa):
+    return arrears + (rentpa / freq_id)
+
+
+def calculate_periods(arrears, freq_id, rentpa):
+    return arrears * freq_id / rentpa
+
+
+def create_pr_charges_table(rent_pr):
+    charges = get_rent_charge_details(rent_pr.id)
+    charge_table_items = {}
+    new_charge_dict = {}
+    total_charges = 0
+    for charge in charges:
+        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
+        charge_total = charge.chargetotal
+        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
+        total_charges = total_charges + charge_total
+    suffix = determine_charges_suffix(rent_pr)
+    arrears_clause, create_case, recovery_charge_amount = get_recovery_info(suffix)
+    new_arrears_level = get_new_arrears_level(suffix)
+    if recovery_charge_amount > 0 and not check_recovery_in_charges(charges, recovery_charge_amount):
+        charge_details = "{} added on {}:".format("Recovery costs", dateToStr(date.today()))
+        charge_table_items.update({charge_details: moneyToStr(recovery_charge_amount, pound=True)})
+        total_charges = total_charges + recovery_charge_amount
+        new_charge_dict = {
+            'rent_id': rent_pr.id,
+            'charge_total': recovery_charge_amount,
+            'charge_type_id': 10
+        }
+    return arrears_clause, charge_table_items, create_case, total_charges, new_charge_dict, new_arrears_level

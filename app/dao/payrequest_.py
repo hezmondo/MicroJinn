@@ -4,6 +4,7 @@ from sqlalchemy import func, literal
 from app.models import Case, Charge, Chargetype, Landlord, Manager, Money_account, Pr_arrears_matrix, \
                         Pr_form, Pr_history, Rent, Typeadvarr, Typefreq, Typetenure
 from app import db, decimal_default
+from app.views.payrequest_ import calculate_arrears, calculate_periods
 from app.dao.functions import dateToStr, commit_to_database, moneyToStr
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -21,7 +22,7 @@ def forward_rents(rent_prs):
 def forward_rent(rent_id, from_batch=False):
     rent = Rent.query.get(rent_id)
     last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent_id, 1, 1)).scalar()
-    arrears = rent.arrears + (rent.rentpa / rent.freq_id)
+    arrears = calculate_arrears(rent.arrears, rent.freq_id, rent.rentpa)
     if not from_batch:
         rent.lastrentdate = last_rent_date
         rent.arrears = arrears
@@ -30,7 +31,6 @@ def forward_rent(rent_id, from_batch=False):
         return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
-# TODO: Decide if database queries should have their own module (probably)
 def get_rent_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
@@ -46,38 +46,6 @@ def check_recovery_in_charges(charges, recovery_charge_amount):
         if charge.chargetotal == recovery_charge_amount and charge.chargedesc == "recovery costs":
             includes_recovery = True
     return includes_recovery
-
-
-def create_pr_charges_table(rent_pr):
-    charges = get_rent_charge_details(rent_pr.id)
-    charge_table_items = {}
-    new_charge_dict = {}
-    total_charges = 0
-    for charge in charges:
-        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
-        charge_total = charge.chargetotal
-        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
-        total_charges = total_charges + charge_total
-    suffix = determine_charges_suffix(rent_pr)
-    arrears_clause, create_case, recovery_charge_amount = get_recovery_info(suffix)
-    new_arrears_level = get_new_arrears_level(suffix)
-    if recovery_charge_amount > 0 and not check_recovery_in_charges(charges, recovery_charge_amount):
-        charge_details = "{} added on {}:".format("Recovery costs", dateToStr(date.today()))
-        charge_table_items.update({charge_details: moneyToStr(recovery_charge_amount, pound=True)})
-        total_charges = total_charges + recovery_charge_amount
-        new_charge_dict = {
-            'rent_id': rent_pr.id,
-            'charge_total': recovery_charge_amount,
-            'charge_type_id': 10
-        }
-
-    return arrears_clause, charge_table_items, create_case, total_charges, new_charge_dict, new_arrears_level
-
-
-# def check_charge_exists(rent_id, charge_total, charge_type_id):
-#     return db.session.query(literal(True)).filter(Charge.rent_id == rent_id,
-#                                                   Charge.chargetype_id == charge_type_id,
-#                                                   Charge.chargetotal == charge_total)
 
 
 def merge_case(rent_id, pr_id):
@@ -99,8 +67,9 @@ def get_recovery_info(suffix):
     return arrears_clause, create_case, recovery_charge
 
 
+# TODO: Finish seperation of dao and views
 def determine_charges_suffix(rent_pr):
-    periods = rent_pr.arrears * rent_pr.freq_id / rent_pr.rentpa
+    periods = calculate_periods(rent_pr.arrears, rent_pr.freq_id, rent_pr.rentpa)
     charges_total = rent_pr.totcharges if rent_pr.totcharges else 0
     pr_exists = True if rent_pr.prexists == 1 else False
     last_arrears_level = rent_pr.lastarrearslevel if pr_exists else ""
@@ -174,7 +143,6 @@ def get_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
 
 def get_pr_data(pr_data):
     pr_data = json.dumps(pr_data, default=decimal_default)
-
     return pr_data
 
 
@@ -183,7 +151,6 @@ def get_pr_file(pr_id):
                                                         Pr_history.date, Rent.rentcode,
                                                         Rent.id.label("rent_id")) \
         .filter(Pr_history.id == pr_id).one_or_none()
-
     return pr_file
 
 
@@ -229,7 +196,6 @@ def post_pr_file(pr_id=0):
             merge_case(rent_id, pr_history.id)
 
     commit_to_database()
-
     return rent_id
 
 
@@ -270,7 +236,6 @@ def get_rent_pr(rent_id):
                            Typeadvarr.advarrdet, Typefreq.freqdet, Typetenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
-
     return rent_pr
 
 
@@ -305,7 +270,6 @@ def get_pr_variables(rent_pr):
                     '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due",
                     '#today#': dateToStr(date.today())
                     }
-
     return pr_variables
 
 
