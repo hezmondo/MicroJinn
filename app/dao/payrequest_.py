@@ -21,31 +21,36 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     db.session.add(new_charge)
 
 
-def add_forward_rent(rent_id, from_batch=False):
+def calculate_arrears(arrears, freq_id, rent_pa):
+    return arrears + (rent_pa / freq_id)
+
+
+def forward_rent(rent_id, from_batch=False):
     rent = Rent.query.get(rent_id)
     last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent_id, 1, 1)).scalar()
     arrears = calculate_arrears(rent.arrears, rent.freq_id, rent.rentpa)
     if not from_batch:
         rent.lastrentdate = last_rent_date
         rent.arrears = arrears
-        # TODO: Does add() need to be called if we do not commit here
-        # db.session.add(rent)
-        # commit_to_database()
     else:
         return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
-def add_forward_rents(rent_prs):
+def forward_rents(rent_prs):
     update_vals = []
     for rent_prop in rent_prs:
-        update_vals.append(add_forward_rent(rent_prop.id, True))
-    # TODO: Does add() need to be called if we do not commit here
+        update_vals.append(forward_rent(rent_prop.id, True))
     db.session.bulk_update_mappings(Rent, update_vals)
-    # commit_to_database()
 
 
-def calculate_arrears(arrears, freq_id, rent_pa):
-    return arrears + (rent_pa / freq_id)
+def forward_rent_case_and_charges(pr_history, pr_data, rent_id):
+    forward_rent(rent_id)
+    new_charge_dict = pr_data.get("new_charge_dict")
+    if len(new_charge_dict) > 0:
+        add_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
+                   new_charge_dict.get("charge_type_id"))
+    if pr_data.get("create_case"):
+        merge_case(rent_id, pr_history.id)
 
 
 def get_charge_start_date(rent_id):
@@ -147,40 +152,6 @@ def merge_case(rent_id, pr_id):
     db.session.merge(case)
 
 
-# # TODO: Improve editing functionality. Do we want the (email) subject saved anywhere? - currently in a hidden input in PR.html
-# def post_pr_history(pr_id=0):
-#     # New payrequest
-#     if pr_id == 0:
-#         pr_data = json.loads(request.form.get('pr_data'))
-#         rent_id = pr_data.get("rent_id")
-#         pr_history = Pr_history()
-#         pr_history.rent_id = rent_id
-#         pr_history.date = request.form.get('date')
-#         pr_history.rent_date = datetime.strptime(pr_data.get("rent_date_string"), '%Y-%m-%d')
-#         pr_history.total_due = pr_data.get("tot_due")
-#         pr_history.arrears_level = pr_data.get("new_arrears_level")
-#         # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
-#         pr_history.delivery_method = 1 if request.form.get('method') == "email" else 2
-#     # Old payrequest
-#     else:
-#         pr_history = Pr_history.query.get(pr_id)
-#         rent_id = pr_history.rent_id
-#     pr_history.summary = request.form.get('summary')
-#     pr_history.block = request.form.get('xinput').replace("£", "&pound;")
-#     db.session.add(pr_history)
-#     db.session.flush()
-#     if pr_id == 0:
-#         post_forward_rent(rent_id)
-#         new_charge_dict = pr_data.get("new_charge_dict")
-#         if len(new_charge_dict) > 0:
-#             add_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
-#                        new_charge_dict.get("charge_type_id"))
-#         if pr_data.get("create_case"):
-#             merge_case(rent_id, pr_history.id)
-#     commit_to_database()
-#     return rent_id
-
-
 def post_payrequest(pr_id=0):
     # TODO: Improve editing functionality. Do we want the (email) subject saved anywhere? \
     #  - currently in a hidden input in PR.html
@@ -192,8 +163,7 @@ def post_payrequest(pr_id=0):
     db.session.add(pr_history)
     db.session.flush()
     if pr_id == 0:
-        add_forward_rent_case_and_charges(pr_history, pr_data, rent_id)
-    # TODO test if forward_rents changes are committed to the db without add being called on
+        forward_rent_case_and_charges(pr_history, pr_data, rent_id)
     commit_to_database()
     return rent_id
 
@@ -216,12 +186,3 @@ def prepare_summary_block_entry(pr_history):
     pr_history.summary = request.form.get('summary')
     pr_history.block = request.form.get('xinput').replace("£", "&pound;")
 
-
-def add_forward_rent_case_and_charges(pr_history, pr_data, rent_id):
-    add_forward_rent(rent_id)
-    new_charge_dict = pr_data.get("new_charge_dict")
-    if len(new_charge_dict) > 0:
-        add_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
-                   new_charge_dict.get("charge_type_id"))
-    if pr_data.get("create_case"):
-        merge_case(rent_id, pr_history.id)
