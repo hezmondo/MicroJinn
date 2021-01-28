@@ -54,7 +54,7 @@ def forward_rent_case_and_charges(pr_history, pr_data, rent_id):
 
 
 def get_charge_start_date(rent_id):
-    return db.session.execute(func.mjinn.oldest_charge(rent_id)).scalar()
+    return db.session.execute(func.mjinn.newest_charge(rent_id)).scalar()
 
 
 def get_charge_type(chargetype_id):

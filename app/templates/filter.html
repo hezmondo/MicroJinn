@@ -113,7 +113,7 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <button type="submit" formaction="{{ url_for('filter_bp.filter', filter_id=0, action='query') }}"
+            <button type="submit" formaction="{{ url_for('filter_bp.filter', filter_id=filter_id, action=action) }}"
                     class="btn btn-block btn-success ">search</button>
         </div>
         <div class="col-md-2">
@@ -133,7 +133,7 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('pr_bp.pr_edit',
-            pr_form_id=filterdict.filtername, action='run') }}"
+            pr_form_id=filter_id, action='run') }}"
                     class="btn btn-block btn-success ">create pay requests</button>
         </div>
     </div>
