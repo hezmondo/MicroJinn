@@ -431,6 +431,7 @@ class Pr_history(db.Model):
     total_due = db.Column(db.Numeric(8, 2))
     arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
+    delivered = db.Column(db.Boolean)
 
 
 class Property(db.Model):
