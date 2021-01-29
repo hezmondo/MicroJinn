@@ -15,7 +15,7 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id):
     today_string = dateToStr(date.today())
     charge_type = get_charge_type(chargetype_id)
     charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
-    new_charge = Charge(id=0, chargetype_id=chargetype_id, chargestartdate=date.today(),
+    new_charge = Charge(chargetype_id=chargetype_id, chargestartdate=date.today(),
                         chargetotal=recovery_charge_amount, chargedetail=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
@@ -132,8 +132,7 @@ def get_rent_pr(rent_id):
                            func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                           # TODO: check that arrears_level is best recorded in pr_history and where to signal if pr delivery is complete -
-                           # TODO: currently if delivery_method > 3 in pr_history, then delivery is incomplete. This value is used in last_arrears_level
+                           # TODO: check that arrears_level is best recorded in pr_history
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
                            Rent.rentpa, Rent.tenantname, Rent.freq_id,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
@@ -179,6 +178,8 @@ def prepare_new_pr_history_entry():
     pr_history.arrears_level = pr_data.get("new_arrears_level")
     # TODO: Hardcoded check of delivery method, must be changed if new delivery methods are added (emailed and mailed)
     pr_history.delivery_method = 1 if request.form.get('method') == "email" else 2
+    # TODO: Add pending / complete functionality
+    pr_history.delivered = True
     return pr_data, pr_history, rent_id
 
 

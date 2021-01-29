@@ -29,7 +29,6 @@ def pr_edit(pr_form_id):
         method = request.args.get('method', "email", type=str)
         rent_id = request.form.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
-        # TODO: All hidden variables can be passed in a single json object
         block, pr_data, rent_pr, table_rows, totdue_string = write_payrequest(rent_id, pr_form_id)
         mailaddr = request.form.get('mailaddr')
         summary = pr_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
@@ -258,7 +257,6 @@ def write_payrequest(rent_id, pr_form_id):
         'tot_due': totdue
     }
     return block, pr_data, rent_pr, table_rows, totdue_string
-
 
 
 class ArrearsLevel:
