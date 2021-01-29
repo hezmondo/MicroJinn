@@ -29,13 +29,13 @@ def pr_edit(pr_form_id):
         method = request.args.get('method', "email", type=str)
         rent_id = request.form.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
-        block, pr_data, rent_pr, table_rows, totdue_string = write_payrequest(rent_id, pr_form_id)
+        block, pr_data, rent_pr, subject, table_rows, totdue_string = write_payrequest(rent_id, pr_form_id)
         mailaddr = request.form.get('mailaddr')
-        summary = pr_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
+        summary = pr_data.get('pr_code') + "-" + method + "-" + mailaddr[0:55]
         mailaddr = mailaddr.split(", ")
         pr_data = get_pr_data(pr_data)
-        return render_template('mergedocs/PR.html', pr_data=pr_data, block=block, mailaddr=mailaddr,
-                               method=method, rent_pr=rent_pr, summary=summary, table_rows=table_rows,
+        return render_template('mergedocs/PR.html', pr_data=pr_data, block=block, mailaddr=mailaddr, method=method,
+                               rent_pr=rent_pr, subject=subject, summary=summary, table_rows=table_rows,
                                totdue_string=totdue_string)
 
 
@@ -169,7 +169,7 @@ def build_pr_variables(rent_pr):
 
 
 def build_rent_statement(rent_pr, rent_type):
-    statement = "The {0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_type, rent_pr.advarrdet,
+    statement = "{0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_type, rent_pr.advarrdet,
                                                                  dateToStr(rent_pr.nextrentdate))
     return statement
 
@@ -256,7 +256,7 @@ def write_payrequest(rent_id, pr_form_id):
         'subject': subject,
         'tot_due': totdue
     }
-    return block, pr_data, rent_pr, table_rows, totdue_string
+    return block, pr_data, rent_pr, subject, table_rows, totdue_string
 
 
 class ArrearsLevel:
