@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, TextAreaField, IntegerField, DecimalField, DateField
+from wtforms import SelectField, StringField, SubmitField, TextAreaField, IntegerField, DecimalField, DateField, validators
 from wtforms.validators import DataRequired
 
 
@@ -33,3 +33,20 @@ class RentForm(FlaskForm):
     propaddr = TextAreaField('Propaddr')
     agent = TextAreaField('Agent')
     submit = SubmitField('Submit')
+
+
+class PrEmailForm(FlaskForm):
+    email = StringField('email', [validators.Email(message='Include an email address'), DataRequired()],
+                        render_kw={"placeholder": "enter email to"})
+    subject = StringField('subject', [validators.DataRequired(message='Include an email subject')],
+                          render_kw={"placeholder": "enter email subject"})
+    submit = SubmitField('save and send payrequest', id='savehtml')
+
+
+class PrPostForm(FlaskForm):
+    mailaddr = SelectField('mailaddr')
+    submit = SubmitField('save and post payrequest', id='savehtml')
+
+
+class PrNewPostForm(FlaskForm):
+    new_mailaddr = StringField('new_mailaddr', [DataRequired()], render_kw={"placeholder": "enter new address"})

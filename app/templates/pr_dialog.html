@@ -5,63 +5,39 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
+    <div class="d-flex">
+        <div class="mr-auto p-2">
+            Choose a payrequest and delivery option below
+        </div>
+        <div class="p-2">
             <a href="{{ url_for('rent_bp.rent_', rent_id=rent_id) }}" class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-md-4">
-            Use the pre-set mailaddr option on the right, or choose another pre-set option:
-        </div>
-        <div class="col-md-8">
-            <select class="form-control" name="mailaddr">
-              <option value="{{ rent_mail.mailaddr }}" selected>{{ rent_mail.mailaddr }}</option>
-              <option value="{{ rent_mail.tenantname }}, {{ rent_mail.propaddr }}">{{ rent_mail.tenantname }},
-                  {{ rent_mail.propaddr }}</option>
-              <option value="The owner/occupier, {{ rent_mail.propaddr }}">The owner/occupier,
-                  {{ rent_mail.propaddr }}</option>
-            </select>
-        </div>
-    </div>
-    <div class="form-group row">
-    </div>
-    <div class="form-group row">
-		<div class="col-md-3">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rent_id }}">
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-4">
-            Or mail to a different existing or new agent:
-        </div>
-        <div class="col-md-8">
-            <a href="{{ url_for('main_bp.agents') }}"
-               class="btn btn-block btn-primary" role="button">find existing or add new agent</a>
-        </div>
-    </div>
-    <div class="form-group row">
-    </div>
+    <hr/>
     <table class="table table-condensed">
         <thead>
         <tr>
-            <th style="width: 70.00%">Description</th>
-            <th style="width: 10.00%">Action</th>
-            <th style="width: 10.00%">Action</th>
+            <th style="width: 60.00%">Description</th>
+            <th style="width: 10.00%"></th>
+            <th style="width: 10.00%"></th>
+            <th style="width: 20.00%"></th>
         </tr>
         </thead>
         <tbody>
         {% for item in pr_forms %}
         <tr>
-<!--            <td style="width: 10.00%">{{ item.code }}</td>-->
-            <td style="width: 70.00%">{{ item.description}}</td>
+            <td style="width: 60.00%">{{ item.description }}</td>
             <td>
-                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, method='email',
-                action=action) }}" class="btn btn-danger">email</button>
+                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id, method='email') }}"
+                        class="btn btn-success">email</button>
             </td>
             <td>
-                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, method='letter',
-                action=action) }}" class="btn btn-danger">post</button>
+                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id, method='post') }}"
+                        class="btn btn-success">post</button>
+            </td>
+            <td>
+                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id, method='email and post') }}"
+                        class="btn btn-success">email and post</button>
             </td>
         </tr>
         {% endfor %}

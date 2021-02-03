@@ -5,6 +5,7 @@ from app.dao.loan import get_loan, get_loans, get_loan_options, get_loan_stateme
 
 loan_bp = Blueprint('loan_bp', __name__)
 
+
 @loan_bp.route('/loan/<int:loan_id>', methods=['GET', 'POST'])
 @login_required
 def loan(loan_id):

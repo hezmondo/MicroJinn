@@ -2,6 +2,9 @@ $(document).ready(function(){
     $("#save_delete").hide();
     $("#more_buttons").hide();
     $("#xalloc").hide();
+    $("#new_address_fields").hide();
+    $("#new_address_fields").attr('disabled', '');
+
 //    if ($("#item_id").text() == "0") {
 //       $("#toggleview").click();
 //            }
@@ -41,6 +44,22 @@ $(document).ready(function(){
         else {
             $(this).text("more");
             $("#more_buttons").hide();
+        }
+    });
+        $("#add_remove_address").click(function(){
+        if ($(this).text() == "manually change address") {
+            $(this).text("use original address");
+            $("#new_address_fields").show();
+            $("#new_address_fields").removeAttr('disabled');
+            $("#address_fields").hide();
+            $("#address_fields").attr('disabled', '');
+            }
+        else {
+            $(this).text("manually change address");
+            $("#new_address_fields").hide();
+            $("#new_address_fields").attr('disabled', '');
+            $("#address_fields").show();
+            $("#address_fields").removeAttr('disabled');
         }
     });
     $(".custom-file-input").on("change", function() {
