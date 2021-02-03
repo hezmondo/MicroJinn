@@ -1,5 +1,4 @@
-from flask import Blueprint, redirect, render_template,  request
-from flask_login import login_required
+from flask import Blueprint, render_template,  request
 from app.dao.common import get_combodict_filter
 from app.dao.filter import get_filters, get_rent_s
 
@@ -23,5 +22,5 @@ def filter(filter_id):
     filterdict, rent_s = get_rent_s(action, filter_id)
     #gather filter values and selected rent objects in two dictionaries
 
-    return render_template('filter.html', action=action, combodict=combodict, filterdict=filterdict,
-                                             rent_s=rent_s)
+    return render_template('filter.html', action=action, combodict=combodict, filter_id=filter_id,
+                           filterdict=filterdict, rent_s=rent_s)

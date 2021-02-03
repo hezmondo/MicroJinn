@@ -77,7 +77,7 @@ def get_qfilter(filterdict, action):
             if key in ("actype", "landlord", "prdelivery", "salegrade", "status", "tenure"):
                 actval = request.form.getlist(key)
             else:
-                actval = request.form.get(key)
+                actval = request.form.get(key) or ""
             print(key, actval)
             filterdict[key] = actval
     print(filterdict)
@@ -119,8 +119,8 @@ def get_qfilter(filterdict, action):
             elif key == "agentmailto" and value and value == "only":
                 filter.append(Rent.mailto_id.in_(1, 2))
             else: filterdict[key] = "include"
-        elif key == "arrears" and value and value != "":
-            filter.append(Rent.arrears == strToDec('{}'.format(value)))
+        # elif key == "arrears" and value and value != "":
+        #     filter.append(Rent.arrears == strToDec('{}'.format(value)))
         # I will get to this when I do
         # elif key == "charges" and value == "exclude":
         #     filter.append(Rent.mailto_id.notin_(1, 2))
@@ -140,10 +140,10 @@ def get_qfilter(filterdict, action):
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
                 filter.append(Typeprdelivery.prdeliverydet.in_(value))
             else: filterdict[key] = ["all prdeliveries"]
-        elif key == "rentpa" and value and value != "":
-            filter.append(Rent.rentpa == strToDec('{}'.format(value)))
-        elif key == "rentperiods" and value and value != "":
-            filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+        # elif key == "rentpa" and value and value != "":
+        #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
+        # elif key == "rentperiods" and value and value != "":
+        #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
         elif key == "salegrade":
             if value and value != "" and value != "list" and value != [] and value != ["all salegrades"]:
                 filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
