@@ -20,6 +20,8 @@
 #doc_html {
     background-color: 	#EDEDED !important;
     padding: 10px;
+    box-shadow: 0 8px 16px rgba(0,0,0,.15);
+
 }
 .btn-danger
 {
@@ -71,7 +73,7 @@ $mynewcolor:teal;
 .btn-primary:not(:disabled):not(.disabled):active:focus,
 .btn-primary:not(:disabled):not(.disabled).active:focus,
 .show>.btn-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem rgba(0,90,90,0.5)}
-.btn-success{background-color: #159e34 !important;border-color: #2f080e}
+.btn-success{border-color: #2f080e}
 .mt-100 {margin-top: 100px}
 table tr td {padding: 20px;}
 .warning {background: #76A0D3 !important;}
@@ -135,6 +137,7 @@ thead {
 }
 
 table tr td {
+    background-color: #d0dde1;
     padding: 20px;
 }
 
@@ -164,6 +167,7 @@ table tr td {
 
 .pr_table tr td {
     padding: 5px;
+    background-color: #0000;
 }
 
 .total {
@@ -189,4 +193,12 @@ table tr td {
     padding: 20px;
     text-align: center;
 }
+
+/* blank horizontal line */
+hr {
+ border-top:0px;
+}
+
+
+
 /* End of docs.css */
