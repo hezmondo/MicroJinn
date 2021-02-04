@@ -4,6 +4,11 @@ from app.dao.functions import commit_to_database
 from app.models import Property, Rent, Typeproperty
 
 
+def delete_property(property_id):
+    Property.query.filter_by(id=property_id).delete()
+    commit_to_database()
+
+
 def get_properties(rent_id):
     qfilter = []
     if rent_id != 0:
@@ -49,12 +54,12 @@ def get_proptypes(type):
     return proptypes
 
 
-def post_property(id, rent_id):
-    if id == 0:
+def post_property(property_id, rent_id):
+    if property_id == 0:
         property = Property()
         property.rent_id = rent_id
     else:
-        property = Property.query.get(id)
+        property = Property.query.get(property_id)
     propaddr = request.form.get("propaddr")
     property.propaddr = propaddr
     proptype = request.form.get("proptype")
@@ -62,10 +67,10 @@ def post_property(id, rent_id):
             (Typeproperty.detail == proptype).one()[0]
     db.session.add(property)
     db.session.flush()
-    _id = property.id
+    property_id = property.id
     commit_to_database()
 
-    return _id
+    return property_id
 
 
 

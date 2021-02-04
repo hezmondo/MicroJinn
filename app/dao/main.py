@@ -14,9 +14,6 @@ def delete_record(item, item_id):
     elif item == "emailacc":
         Emailaccount.query.filter_by(id=item_id).delete()
         redir = "main_bp.email_accounts"
-    elif item == "formletter":
-        Form_letter.query.filter_by(id=item_id).delete()
-        redir = "formletter_bp.form_, form_id={}".format(item_id)
     elif item == "incomealloc":
         Incomealloc.query.filter_by(id=item_id).delete()
     elif item == "landlord":
@@ -34,9 +31,6 @@ def delete_record(item, item_id):
     elif item == "money_item":
         Money_item.query.filter_by(id=item_id).delete()
         redir = "money_bp.money_items"
-    elif item == "property":
-        Property.query.filter_by(id=item_id).delete()
-        redir = "properties"
     elif item == "pr_file":
         Pr_history.query.filter_by(id=item_id).delete()
         redir = "pr_bp.pr_history"

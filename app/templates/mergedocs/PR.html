@@ -13,7 +13,7 @@
     </div>
 	{% if method == "email" %}
 		<div class="form-group row">
-			<div class="col-md-3">
+			<div class="col-md-8">
 				{{ pr_form.email(class_="form-control") }}
 				{% if pr_form.email.errors %}
 					<ul class="errors">
@@ -22,9 +22,6 @@
 						{% endfor %}
 					</ul>
 				{% endif %}
-			</div>
-			<div class="col-md-5">
-				{{ pr_form.subject(class_="form-control") }}
 			</div>
 			<div class="col-md-4" align="bottom">
 				{{ pr_form.submit(class_="btn btn-block btn-success") }}
@@ -72,6 +69,9 @@
 	    {% else %}
 			<div class="font-size-medium" align="left">
 				Our Ref: {{ rent_pr.rentcode }}
+				<br />
+				<br />
+				email {{ today_date.strftime('%d-%b-%Y') }} to {{ rent_pr.email }}
 				<br />
 				<br />
 				Dear {{ rent_pr.tenantname }}

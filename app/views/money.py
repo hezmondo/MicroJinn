@@ -33,8 +33,8 @@ def money_deduce(item_id, mode='Y'):    #determines if table item is income or m
 @money_bp.route('/money_item/<int:money_item_id>', methods=['GET', 'POST'])
 def money_item(money_item_id):
     if request.method == "POST":
-        id_ = post_money_item(money_item_id)
-        return redirect(url_for('money_bp.money_item', money_item_id=id_))
+        money_item_id = post_money_item(money_item_id)
+        return redirect(url_for('money_bp.money_item', money_item_id=money_item_id))
     money_dict = get_moneydict()
     money_item, cleared = get_money_item(money_item_id)
     return render_template('money_item.html', cleared=cleared, money_dict=money_dict, money_item=money_item)

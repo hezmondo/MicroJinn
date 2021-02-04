@@ -77,16 +77,18 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in formletters %}
+        {% for item in form_letters %}
         <tr>
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 70.00%">{{ item.description}}</td>
             <td>
-                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit', form_id=item.id, method='email',
+                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit',
+                form_letter_id=item.id, method='email',
                 action=action) }}" class="btn btn-danger">email</button>
             </td>
             <td>
-                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit', form_id=item.id, method='letter',
+                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit',
+                form_letter_id=item.id, method='letter',
                 action=action) }}" class="btn btn-danger">post</button>
             </td>
         </tr>

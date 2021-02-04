@@ -3,7 +3,7 @@ from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import desc
 from app.models import Income, Incomealloc, Landlord, Manager, Money_account, Rent, Typepayment
-from app.dao.form_letter import get_formletter
+from app.dao.form_letter import get_form_letter
 from app.dao.functions import dateToStr, doReplace, hashCode, moneyToStr
 from app.dao.lease import get_lease_variables
 from app.dao.payrequest_ import get_pr_form, get_rent_pr
@@ -42,9 +42,9 @@ def getmaildata(rent_id, income_id=0):
     return incomedata, allocdata, bankdata, addressdata
 
 
-def writeMail(rent_id, income_id, formletter_id, action):
+def writeMail(rent_id, income_id, form_letter_id, action):
     addressdata, rentobj, word_variables = get_word_variables(rent_id, income_id)
-    formletter = get_formletter(formletter_id)
+    form_letter = get_form_letter(form_letter_id)
 
     if action == "lease":
         leasedata, lease_variables = get_lease_variables(rent_id)
@@ -52,10 +52,10 @@ def writeMail(rent_id, income_id, formletter_id, action):
     else:
         leasedata = None
 
-    subject = formletter.subject
-    block = formletter.block if formletter.block else ""
-    doctype = formletter.desc
-    dcode = formletter.code
+    subject = form_letter.subject
+    block = form_letter.block if form_letter.block else ""
+    doctype = form_letter.desc
+    dcode = form_letter.code
 
     subject = doReplace(word_variables, subject)
     block = doReplace(word_variables, block)

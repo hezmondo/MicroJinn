@@ -28,7 +28,7 @@
                 <a class="nav-link" href="{{ url_for('headrent_bp.headrents') }}">headrents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('income_bp.income', income_id=0) }}">income</a>
+                <a class="nav-link" href="{{ url_for('income_bp.income', acc_id=0) }}">income</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('loan_bp.loans') }}">loans</a>
@@ -53,7 +53,7 @@
                       <a class="dropdown-item" href="{{ url_for('doc_bp.docfiles', rent_id=0) }}">docfiles</a>
                       <a class="dropdown-item" href="{{ url_for('main_bp.email_accounts') }}">email accounts</a>
                       <a class="dropdown-item" href="{{ url_for('main_bp.rents_ex') }}">external rents</a>
-                      <a class="dropdown-item" href="{{ url_for('formletter_bp.form_letters') }}">form_letters</a>
+                      <a class="dropdown-item" href="{{ url_for('form_letter_bp.form_letters') }}">form_letters</a>
                       <a class="dropdown-item" href="{{ url_for('lease_bp.leases') }}">leases</a>
                       <a class="dropdown-item" href="{{ url_for('main_bp.landlords') }}">landlords</a>
                       <a class="dropdown-item" href="{{ url_for('main_bp.properties', rent_id=0) }}">properties</a>

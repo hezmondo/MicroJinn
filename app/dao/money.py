@@ -12,13 +12,13 @@ def delete_money_item(money_item_id):
     commit_to_database()
 
 
-def get_moneyaccount(id):
+def get_moneyaccount(acc_id):
     # get values for a single account and deal with post
-    if id == 0:
+    if acc_id == 0:
         moneyacc = Money_account()
         moneyacc.id = 0
     else:
-        moneyacc = Money_account.query.filter(Money_account.id == id).one_or_none()
+        moneyacc = Money_account.query.filter(Money_account.id == acc_id).one_or_none()
     return moneyacc
 
 
@@ -178,8 +178,8 @@ def post_money_item(money_item_id):
     money_item.cat_id = cat_id
     db.session.add(money_item)
     db.session.flush()
-    id_ = money_item.id
+    money_item = money_item.id
     commit_to_database()
-    return id_
+    return money_item
 
 

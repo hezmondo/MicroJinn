@@ -551,7 +551,7 @@ class Template(db.Model):
     code = db.Column(db.String(15))
     desc = db.Column(db.String(60))
 
-    formletter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
+    form_letter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
 
 
 class Type_status_hr(db.Model):
@@ -619,7 +619,7 @@ class Typedoc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(30))
 
-    formletter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
+    form_letter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('Digfile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
 
