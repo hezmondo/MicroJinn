@@ -54,7 +54,7 @@ def post_agent(agent_id):
     agent.code = request.form.get("code")
     db.session.add(agent)
     db.session.flush()
-    _id = agent.id
+    agent_id = agent.id
     commit_to_database()
 
-    return _id
+    return agent_id

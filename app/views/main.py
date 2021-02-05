@@ -3,8 +3,8 @@ from flask_login import login_required
 from app.dao.agent import delete_agent, get_agent, get_agents, get_agent_rents, post_agent
 from app.dao.filter import get_rent_s
 from app.dao.main import get_emailaccount, get_emailaccounts, get_rent_ex, post_emailaccount
-from app.dao.property import get_properties, get_property, get_proptypes, post_property
-from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
+from app.dao.property import delete_property, get_properties, get_property, get_proptypes, post_property
+from app.dao.landlord import delete_landlord, get_landlord, get_landlords, get_landlord_dict, post_landlord
 
 main_bp = Blueprint('main_bp', __name__)
 
@@ -20,10 +20,10 @@ def agents():
 def agent(agent_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     if request.method == "POST":
-        id_ = post_agent(agent_id)
-        return redirect(url_for('main_bp.agent', agent_id=id_))
+        agent_id = post_agent(agent_id)
+        return redirect(url_for('main_bp.agent', agent_id=agent_id))
 
-    if id == 0:
+    if agent_id == 0:
         agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
     else:
         agent = get_agent(agent_id)
@@ -34,7 +34,7 @@ def agent(agent_id):
 @login_required
 def agent_delete(agent_id):
     delete_agent(agent_id)
-    return redirect(url_for('main_bp.agents'))
+    return redirect(url_for('main_bp.landlords'))
 
 
 @main_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
@@ -66,7 +66,6 @@ def email_account(email_account_id):
 # @login_required
 def home():
     filterdict, rent_s = get_rent_s("basic", 0)
-
     return render_template('home.html', filterdict=filterdict, rent_s=rent_s)
 
 
@@ -75,19 +74,23 @@ def home():
 def landlord(landlord_id):
     if request.method == "POST":
         id_ = post_landlord(landlord_id)
-
-        return redirect(url_for('landlord_bp.property', landlord_id=id_))
+        return redirect(url_for('main_bp.landlords', landlord_id=id_))
 
     landlord = get_landlord(landlord_id) if landlord_id != 0 else {"id": 0}
     landlord_dict = get_landlord_dict()
-
     return render_template('landlord.html', landlord=landlord, landlord_dict=landlord_dict)
+
+
+@main_bp.route('/landlord_delete/<int:landlord_id>')
+@login_required
+def landlord_delete(landlord_id):
+    delete_landlord(landlord_id)
+    return redirect(url_for('main_bp.landlords'))
 
 
 @main_bp.route('/landlords', methods=['GET'])
 def landlords():
     landlords = get_landlords()
-
     return render_template('landlords.html', landlords=landlords)
 
 
@@ -96,7 +99,6 @@ def landlords():
 def properties(rent_id):
     properties, proptypes = get_properties(rent_id)
     print(rent_id)
-
     return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
 
 
@@ -105,26 +107,28 @@ def properties(rent_id):
 def property(property_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     if request.method == "POST":
-        id = post_property(property_id, rent_id)
-
-        return redirect(url_for('main_bp.property', property_id=id))
-
+        property_id = post_property(property_id, rent_id)
+        return redirect(url_for('main_bp.property', property_id=property_id))
     property_ = get_property(property_id, rent_id)
     proptypes = get_proptypes("basic")
-
     return render_template('property.html', property_=property_, proptypes=proptypes)
+
+
+@main_bp.route('/property_delete/<int:property_id>')
+@login_required
+def property_delete(property_id):
+    delete_property(property_id)
+    return redirect(url_for('main_bp.properties'))
 
 
 @main_bp.route('/rent_ex/<int:rent_ex_id>', methods=["GET"])
 @login_required
 def rent_ex(rent_ex_id):
     rent_ex = get_rent_ex(rent_ex_id)
-
     return render_template('rent_ex.html', rent_ex=rent_ex)
 
 
 @main_bp.route('/rents_ex', methods=['GET', 'POST'])
 def rents_ex():
     filterdict, rent_s = get_rent_s("external", 0)
-
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)

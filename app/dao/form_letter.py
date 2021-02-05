@@ -1,35 +1,39 @@
 from app import db
 from flask import request
-from app.models import Form_letter, Pr_form, Template, Typedoc\
+from app.models import Form_letter, Pr_form, Template, Typedoc
+from app.dao.functions import commit_to_database
 
 
-def get_formletter(form_id):
-    formletter = Form_letter.query.join(Typedoc).join(Template).with_entities(Form_letter.id, Form_letter.code,
+def delete_form_letter(form_letter_id):
+    Form_letter.query.filter_by(id=form_letter_id).delete()
+    commit_to_database()
+
+
+def get_form_letter(form_letter_id):
+    form_letter = Form_letter.query.join(Typedoc).join(Template).with_entities(Form_letter.id, Form_letter.code,
                                                                               Form_letter.description,
                                                                               Form_letter.subject, Form_letter.block,
                                                                               Typedoc.desc,
                                                                               Template.desc.label("template")) \
-        .filter(Form_letter.id == form_id).one_or_none()
+        .filter(Form_letter.id == form_letter_id).one_or_none()
+    return form_letter
 
-    return formletter
 
-
-def get_formletters(action):
+def get_form_letters(action):
     if request.method == "POST":
         code = request.form.get("code") or ""
         description = request.form.get("description") or ""
         subject = request.form.get("subject") or ""
         block = request.form.get("block") or ""
-        formletters = Form_letter.query.filter(Form_letter.code.ilike('%{}%'.format(code)),
+        form_letters = Form_letter.query.filter(Form_letter.code.ilike('%{}%'.format(code)),
                                                Form_letter.description.ilike('%{}%'.format(description)),
                                                Form_letter.subject.ilike('%{}%'.format(subject)),
                                                Form_letter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
-        formletters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))
+        form_letters = Form_letter.query.filter(Form_letter.code.ilike('LEQ-%'))
     else:
-        formletters = Form_letter.query.all()
-
-    return formletters
+        form_letters = Form_letter.query.all()
+    return form_letters
 
 
 def get_templates():
@@ -37,33 +41,33 @@ def get_templates():
     return templates
 
 
-def post_formletter(form_id, action):
-    if action == "edit":
-        formletter = Form_letter.query.get(form_id)
+def post_form_letter(form_letter_id):
+    if form_letter_id == 0:
+        form_letter = Form_letter()
     else:
-        formletter = Form_letter()
-    formletter.code = request.form.get("code")
-    formletter.description = request.form.get("description")
-    formletter.subject = request.form.get("subject")
-    formletter.block = request.form.get("block")
-    formletter.bold = request.form.get("bold")
+        form_letter = Form_letter.query.get(form_letter_id)
+    form_letter.code = request.form.get("code")
+    form_letter.description = request.form.get("description")
+    form_letter.subject = request.form.get("subject")
+    form_letter.block = request.form.get("block")
+    form_letter.bold = request.form.get("bold")
     doctype = request.form.get("doc_type")
-    formletter.doctype_id = \
+    form_letter.doctype_id = \
         Typedoc.query.with_entities(Typedoc.id).filter \
             (Typedoc.desc == doctype).one()[0]
     template = request.form.get("template")
-    formletter.template_id = \
+    form_letter.template_id = \
         Template.query.with_entities(Template.id).filter \
             (Template.code == template).one()[0]
-    db.session.add(formletter)
-    db.session.commit()
-    id_ = formletter.id
+    db.session.add(form_letter)
+    db.session.flush()
+    form_letter_id = form_letter.id
+    commit_to_database()
+    return form_letter_id
 
-    return id_
 
-
-def get_formpayrequest(form_id):
-    formpayrequest = Pr_form.query.filter(Pr_form.id == form_id).one_or_none()
+def get_formpayrequest(form_letter_id):
+    formpayrequest = Pr_form.query.filter(Pr_form.id == form_letter_id).one_or_none()
     return formpayrequest
 
 

@@ -1,9 +1,14 @@
 from app import db
 from datetime import date
 from flask import request
-from app.dao.functions import strToDec
+from app.dao.functions import commit_to_database, strToDec
 
 from app.models import Charge, Chargetype, Rent\
+
+
+def delete_charge(charge_id):
+    Charge.query.filter_by(id=charge_id).delete()
+    commit_to_database()
 
 
 def get_charge(charge_id):

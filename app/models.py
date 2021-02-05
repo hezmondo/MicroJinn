@@ -84,8 +84,8 @@ class Docfile(db.Model):
     out_in = db.Column(db.SmallInteger, nullable=False)
 
 
-class Emailaccount(db.Model):
-    __tablename__ = 'emailaccount'
+class EmailAcc(db.Model):
+    __tablename__ = 'email_acc'
 
     id = db.Column(db.Integer, primary_key=True)
     smtp_server = db.Column(db.String(60))
@@ -104,7 +104,7 @@ class Emailaccount(db.Model):
     imap_sentfolder = db.Column(db.String(60))
     imap_draftfolder = db.Column(db.String(60))
 
-    landlord_emailacc = db.relationship('Landlord', backref='emailaccount', lazy='dynamic')
+    landlord_emailacc = db.relationship('Landlord', backref='email_acc', lazy='dynamic')
 
 
 class Emailad(db.Model):
@@ -196,12 +196,12 @@ class Landlord(db.Model):
     __tablename__ = 'landlord'
 
     id = db.Column(db.Integer, primary_key=True)
-    landlordname = db.Column(db.String(90))
-    landlordaddr = db.Column(db.String(180))
-    taxdate = db.Column(db.Date)
+    name = db.Column(db.String(90))
+    address = db.Column(db.String(180))
+    tax_date = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
     acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
-    emailacc_id = db.Column(db.Integer, db.ForeignKey('emailaccount.id'))
+    email_acc_id = db.Column(db.Integer, db.ForeignKey('email_acc.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
     headrent_landlord = db.relationship('Headrent', backref='landlord', lazy='dynamic')
@@ -215,15 +215,15 @@ class Lease(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     term = db.Column(db.Integer)
-    startdate = db.Column(db.Date)
-    startrent = db.Column(db.Numeric(8, 2))
+    start_date = db.Column(db.Date)
+    start_rent = db.Column(db.Numeric(8, 2))
     info = db.Column(db.String(180))
-    upliftdate = db.Column(db.Date)
-    impvaluek = db.Column(db.Numeric(10, 2))
+    uplift_date = db.Column(db.Date)
+    sale_value_k = db.Column(db.Numeric(10, 2))
     uplift_type_id = db.Column(db.Integer, db.ForeignKey('lease_uplift_type.id'))
-    rentcap = db.Column(db.Numeric(8, 2))
-    lastvalue = db.Column(db.Numeric(8, 2))
-    lastvaluedate = db.Column(db.Date)
+    rent_cap = db.Column(db.Numeric(8, 2))
+    value = db.Column(db.Numeric(8, 2))
+    value_date = db.Column(db.Date)
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
 
@@ -280,8 +280,8 @@ class Loan_interest_rate(db.Model):
     __tablename__ = 'loan_interest_rate'
 
     id = db.Column(db.Integer, primary_key=True)
-    intrate = db.Column(db.Numeric(8, 2))
-    datestarts = db.Column(db.Date)
+    rate = db.Column(db.Numeric(8, 2))
+    start_date = db.Column(db.Date)
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
 
@@ -551,7 +551,7 @@ class Template(db.Model):
     code = db.Column(db.String(15))
     desc = db.Column(db.String(60))
 
-    formletter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
+    form_letter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
 
 
 class Type_status_hr(db.Model):
@@ -619,7 +619,7 @@ class Typedoc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(30))
 
-    formletter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
+    form_letter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('Digfile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
 

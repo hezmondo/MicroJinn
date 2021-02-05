@@ -25,9 +25,6 @@
 					</ul>
 				{% endif %}
 			</div>
-			<div class="col-md-5">
-				{{ pr_form.subject(class_="form-control") }}
-			</div>
 			<div class="col-md-4" align="bottom">
 				{{ pr_form.submit(class_="btn btn-block btn-success") }}
 			</div>
@@ -70,7 +67,7 @@
 				<br />
 				<br />
 				<div id="email_input">Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span id="email_span">{{ rent_pr.email }}</span></div>
-				<br />
+  			<br />
 				<br />
 				Dear {{ rent_pr.tenantname }}
 			</div>

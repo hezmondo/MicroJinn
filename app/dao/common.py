@@ -14,7 +14,7 @@ def get_combodict_basic():
     actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
     advars = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     freqs = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
+    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
 
     combo_dict = {
@@ -114,7 +114,7 @@ def get_postvals_id():
             elif key == "frequency":
                 actval = Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == actval).one()[0]
             elif key == "landlord":
-                actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == actval).one()[0]
+                actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.name == actval).one()[0]
             elif key == "mailto":
                 actval = Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == actval).one()[0]
             elif key == "salegrade":

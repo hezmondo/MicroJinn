@@ -4,38 +4,46 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
 from sqlalchemy import func
-from app.dao.functions import moneyToStr
+from app.dao.functions import commit_to_database, moneyToStr
 from app.models import Lease, Lease_uplift_type, Rent
 
 
-# leases
+def delete_lease(lease_id):
+    Lease.query.filter_by(id=lease_id).delete()
+    commit_to_database()
+
+
 def get_lease(lease_id):
-    rentcode = request.args.get('rentcode', "DUMMY" , type=str)
     rent_id = int(request.args.get('rent_id', "0", type=str))
-    lease_filter = []
-    if lease_id == 0:
-        lease = {
-            'id': 0,
-            'rent_id': rent_id,
-            'rentcode': rentcode
-        }
-    if rent_id != 0:
-        lease_filter.append(Lease.rent_id == rent_id)
-    else:
-        lease_filter.append(Lease.id == lease_id)
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
+    if lease_id != 0:
         lease = \
-            Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Lease.id, Rent.rentcode, Lease.term,
-                 Lease.startdate, Lease.startrent, Lease.info, Lease.upliftdate, Lease_uplift_type.uplift_type,
-                 Lease.lastvaluedate, Lease.lastvalue, Lease.impvaluek, Lease.rent_id, Lease.rentcap) \
-                .filter(*lease_filter).one_or_none()
-
+            Lease.query.join(Rent) \
+                .join(Lease_uplift_type) \
+                .with_entities(Lease.id, Rent.rentcode, Lease.term, Lease.start_date, Lease.start_rent, Lease.info,
+                               Lease.uplift_date, Lease_uplift_type.uplift_type, Lease.value_date, Lease.value,
+                               Lease.sale_value_k, Lease.rent_id, Lease.rent_cap) \
+                .filter(Lease.id == lease_id).one_or_none()
+    else:
+        lease = \
+            Lease.query.join(Rent) \
+                .join(Lease_uplift_type) \
+                .with_entities(Lease.id, Rent.rentcode, Lease.term, Lease.start_date, Lease.start_rent, Lease.info,
+                               Lease.uplift_date, Lease_uplift_type.uplift_type, Lease.value_date, Lease.value,
+                               Lease.sale_value_k, Lease.rent_id, Lease.rent_cap) \
+                .filter(Lease.rent_id == rent_id).one_or_none()
+    if not lease:
+        lease = {
+                    'id': 0,
+                    'rent_id': rent_id,
+                    'rentcode': rentcode
+                }
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
-
     return lease, uplift_types
 
 
-def get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high):
-    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e, :f, :g)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": new_gr_a, "e": new_gr_b, "f": yp_low, "g": yp_high})
+def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_high):
+    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_high})
     leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
     db.session.commit()
 
@@ -52,13 +60,13 @@ def get_leases():
     if uld and uld != "":
         uld = int(uld)
         enddate = date.today() + relativedelta(days=uld)
-        lfilter.append(Lease.upliftdate <= enddate)
+        lfilter.append(Lease.uplift_date <= enddate)
     if ult and ult != "" and ult != "all uplift types":
         lfilter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
 
     leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
-              func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
-              Lease.term, Lease.upliftdate, Lease_uplift_type.uplift_type) \
+                                                                          func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
+                                                                          Lease.term, Lease.uplift_date, Lease_uplift_type.uplift_type) \
         .filter(*lfilter).limit(60).all()
 
     uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
@@ -70,27 +78,21 @@ def get_leases():
 def get_lease_variables(rent_id):
     fh_rate = request.form.get('fh_rate')
     gr_rate = request.form.get('gr_rate')
-    new_gr_a = request.form.get('new_gr_a')
-    new_gr_b = request.form.get('new_gr_b')
-    yp_low = request.form.get('yp_low')
+    gr_new = request.form.get('gr_new')
     yp_high = request.form.get('yp_high')
 
-    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, new_gr_a, new_gr_b, yp_low, yp_high)
+    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_high)
     impval = leasedata["impvalk"] * 1000
     unimpval = leasedata["impvalk"] * leasedata["realty"] * 10 if leasedata["realty"] > 0 else impval
     lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
                        '#rent_code#': leasedata["rent_code"] if leasedata else "some rentcode",
                        '#relativity#': str(leasedata["realty"]) if leasedata else "some relativity",
-                       '#totval#': str(leasedata["totval"]) if leasedata else "some total value",
+                       '#tot_val#': moneyToStr(leasedata["totval"] if leasedata else 55555.55, pound=True),
                        '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
                        '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
-                       '#leq99a#': moneyToStr(leasedata["leq99a"] if leasedata else 55555.55, pound=True),
-                       '#grnewa#': moneyToStr(leasedata["grnew1"] if leasedata else 555.55, pound=True),
-                       '#grnewb#': moneyToStr(leasedata["grnew2"] if leasedata else 555.55, pound=True),
-                       '#leq125a#': moneyToStr(leasedata["leq125a"] if leasedata else 55555.55, pound=True),
-                       '#leq175a#': moneyToStr(leasedata["leq175a"] if leasedata else 55555.55, pound=True),
-                       '#leq175f#': moneyToStr(leasedata["leq175f"] if leasedata else 55555.55, pound=True),
-                       '#leq175p#': moneyToStr(leasedata["leq175p"] if leasedata else 55555.55, pound=True),
+                       '#leq200R#': moneyToStr(leasedata["leq200R"] if leasedata else 55555.55, pound=True),
+                       '#leq200P#': moneyToStr(leasedata["leq200P"] if leasedata else 55555.55, pound=True),
+                       '#gr_new#': moneyToStr(leasedata["gr_new"] if leasedata else 555.55, pound=True)
                        }
 
     return leasedata, lease_variables
@@ -103,20 +105,20 @@ def post_lease(lease_id):
         lease = Lease()
         lease.id = 0
         lease.rent_id = rent_id
-        lease.startdate = "1991-01-01"
-        lease.upliftdate = "1991-01-01"
-        lease.lastvaluedate = "1991-01-01"
+        lease.start_date = "1991-01-01"
+        lease.uplift_date = "1991-01-01"
+        lease.value_date = "1991-01-01"
     else:
         lease = Lease.query.get(lease_id)
     lease.term = request.form.get("term")
-    lease.startdate = request.form.get("startdate")
-    lease.startrent = request.form.get("startrent")
+    lease.start_date = request.form.get("start_date")
+    lease.start_rent = request.form.get("start_rent")
     lease.info = request.form.get("info")
-    lease.upliftdate = request.form.get("upliftdate")
-    lease.impvaluek = request.form.get("impvaluek")
-    lease.rentcap = request.form.get("rentcap")
-    lease.lastvalue = request.form.get("lastvalue")
-    lease.lastvaluedate = request.form.get("lastvaluedate")
+    lease.uplift_date = request.form.get("uplift_date")
+    lease.sale_value_k = request.form.get("sale_value_k")
+    lease.rent_cap = request.form.get("rent_cap")
+    lease.value = request.form.get("value")
+    lease.value_date = request.form.get("value_date")
     lease.rent_id = rent_id
     uplift_type = request.form.get("uplift_type")
     lease.uplift_type_id = \

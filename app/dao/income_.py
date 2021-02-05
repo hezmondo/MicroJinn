@@ -66,7 +66,7 @@ def get_income_dict(type):
     }
     if type == "enhanced":
         chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
-        landlords = [value for (value,) in Landlord.query.with_entities(Landlord.landlordname).all()]
+        landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
         income_dict["chargedescs"] = chargedescs
         income_dict["landlords"] = landlords
     return income_dict
@@ -119,7 +119,7 @@ def post_income_(income_id):
     #             Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
     #         print(incalloc.chargetype_id)
     #         incalloc.landlord_id = \
-    #             Landlord.query.with_entities(Landlord.id).filter(Landlord.landlordname == landlord).one()[0]
+    #             Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
     #         # having set the column values, we add each incomealloc record to the session using the ORM relationship
     #         income.incomealloc_income.append(incalloc)
     #         # now we have to deal with updating or deleting existing charges
