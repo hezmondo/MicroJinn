@@ -4,7 +4,7 @@ from app.dao.agent import delete_agent, get_agent, get_agents, get_agent_rents, 
 from app.dao.filter import get_rent_s
 from app.dao.main import get_emailaccount, get_emailaccounts, get_rent_ex, post_emailaccount
 from app.dao.property import delete_property, get_properties, get_property, get_proptypes, post_property
-from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
+from app.dao.landlord import delete_landlord, get_landlord, get_landlords, get_landlord_dict, post_landlord
 
 main_bp = Blueprint('main_bp', __name__)
 
@@ -34,7 +34,7 @@ def agent(agent_id):
 @login_required
 def agent_delete(agent_id):
     delete_agent(agent_id)
-    return redirect(url_for('main_bp.agents'))
+    return redirect(url_for('main_bp.landlords'))
 
 
 @main_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
@@ -74,11 +74,18 @@ def home():
 def landlord(landlord_id):
     if request.method == "POST":
         id_ = post_landlord(landlord_id)
-        return redirect(url_for('landlord_bp.property', landlord_id=id_))
+        return redirect(url_for('main_bp.landlords', landlord_id=id_))
 
     landlord = get_landlord(landlord_id) if landlord_id != 0 else {"id": 0}
     landlord_dict = get_landlord_dict()
     return render_template('landlord.html', landlord=landlord, landlord_dict=landlord_dict)
+
+
+@main_bp.route('/landlord_delete/<int:landlord_id>')
+@login_required
+def landlord_delete(landlord_id):
+    delete_landlord(landlord_id)
+    return redirect(url_for('main_bp.landlords'))
 
 
 @main_bp.route('/landlords', methods=['GET'])

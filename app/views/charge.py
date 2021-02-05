@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.charge import get_charges, get_charge, post_charge
 
@@ -16,6 +16,13 @@ def charge(charge_id):
     charge, chargedescs = get_charge(charge_id)
 
     return render_template('charge.html', charge=charge, chargedescs=chargedescs)
+
+
+@charge_bp.route('/charge_delete/<int:charge_id>')
+@login_required
+def charge_delete(charge_id):
+    delete_charge(charge_id)
+    return redirect(url_for('main_bp.landlords'))
 
 
 @charge_bp.route('/charges', methods=['GET', 'POST'])

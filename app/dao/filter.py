@@ -134,7 +134,7 @@ def get_qfilter(filterdict, action):
             filter.append(Rent.lastrentdate <= strToDate('{}'.format(value)))
         elif key == "landlord":
             if value and value != "" and value != [] and value != ["all landlords"]:
-                filter.append(Landlord.landlordname.in_(value))
+                filter.append(Landlord.name.in_(value))
             else: filterdict[key] = ["all landlords"]
         elif key == "prdelivery":
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
@@ -203,7 +203,7 @@ def get_rent_s_data(qfilter, action, runsize):
                                    # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                    func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                    func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                                   Landlord.landlordname, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                                   Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
                                    Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
                                    Typetenure.tenuredet) \
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()

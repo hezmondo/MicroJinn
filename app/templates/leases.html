@@ -36,7 +36,7 @@
             {% for item in leases %}
                 <tr id="{{ item.id }}">
                     <td style="width: 10.00%">{{ item.rentcode }}</td>
-                    <td style="width: 12.00%">{{ item.upliftdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 12.00%">{{ item.uplift_date.strftime('%d-%b-%Y') }}</td>
                     <td style="width: 10.00%"> {{ item.unexpired }}</td>
                     <td style="width: 60.00%"> {{ item.info }}</td>
                     <td style="width: 8.00%"><a href="{{ url_for('lease_bp.lease', lease_id=item.id) }}">view</a></td>

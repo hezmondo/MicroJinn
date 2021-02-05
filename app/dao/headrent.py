@@ -54,7 +54,7 @@ def get_headrent(id):
                 .join(Typetenure) \
                 .with_entities(Headrent.id, Headrent.code, Headrent.arrears, Headrent.datecode, Headrent.lastrentdate,
                                Headrent.propaddr, Headrent.rentpa, Headrent.reference, Headrent.note, Headrent.source,
-                               Landlord.landlordname, Agent.detail, Typeadvarr.advarrdet, Typefreq.freqdet,
+                               Landlord.name, Agent.detail, Typeadvarr.advarrdet, Typefreq.freqdet,
                                Type_status_hr.hr_status, Typetenure.tenuredet,
                                # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                func.mjinn.next_rent_date(Headrent.id, 2, 1).label('nextrentdate')) \

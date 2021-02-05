@@ -1,24 +1,15 @@
 from flask import redirect, request, url_for
 from app import db
 from app.dao.functions import commit_to_database
-from app.models import Agent, Charge, Digfile, Emailaccount, Form_letter, Incomealloc, Landlord, Loan, \
+from app.models import Agent, Charge, Digfile, EmailAcc, Form_letter, Incomealloc, Landlord, Loan, \
     Manager_external, Money_item, Pr_history, Property,  Rent, Rent_ex, Money_account
 
 
 def delete_record(item, item_id):
-    if item == "charge":
-        Charge.query.filter_by(id=item_id).delete()
-        redir = "rent_bp.rent_"
-    elif item == "dig":
+    if item == "dig":
         Digfile.query.filter_by(id=item_id).delete()
-    elif item == "emailacc":
-        Emailaccount.query.filter_by(id=item_id).delete()
-        redir = "main_bp.email_accounts"
     elif item == "incomealloc":
         Incomealloc.query.filter_by(id=item_id).delete()
-    elif item == "landlord":
-        Landlord.query.filter_by(id=item_id).delete()
-        redir = "landlord_bp.landlords"
     elif item == "loan":
         Loan.query.filter_by(id=item_id).delete()
         # delete_loan_trans = Loan_trans.query.filter(Loan_trans.loan_id == id).all()
@@ -42,14 +33,19 @@ def delete_record(item, item_id):
     return redir
 
 
+def delete_email_acc(email_acc_id):
+    EmailAcc.query.filter_by(id=email_acc_id).delete()
+    commit_to_database()
+
+
 def get_emailaccounts():
-    emailaccs = Emailaccount.query.all()
+    emailaccs = EmailAcc.query.all()
 
     return emailaccs
 
 
 def get_emailaccount(id):
-    emailacc = Emailaccount.query.filter(Emailaccount.id == id).one_or_none()
+    emailacc = EmailAcc.query.filter(EmailAcc.id == id).one_or_none()
 
     return emailacc
 
@@ -66,9 +62,9 @@ def get_rent_ex(id):
 
 def post_emailaccount(id):
     if id == 0:
-        emailacc = Emailaccount()
+        emailacc = EmailAcc()
     else:
-        emailacc = Emailaccount.query.get(id)
+        emailacc = EmailAcc.query.get(id)
     emailacc.smtp_server = request.form.get("smtp_server")
     emailacc.smtp_port = request.form.get("smtp_port")
     emailacc.smtp_timeout = request.form.get("smtp_timeout")

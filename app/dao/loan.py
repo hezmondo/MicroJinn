@@ -38,14 +38,14 @@ def get_loans(action):
                                          Loan.borrower,
                                          Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa) \
             .filter(Loan.lender.ilike('%NJL%')).all()
-        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
+        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('tot_val'),
                                            func.sum(Loan.interestpa).label('totint')) \
             .filter(Loan.lender.ilike('%NJL%')).first()
     else:
         loans = Loan.query.with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender,
                                          Loan.borrower,
                                          Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa).all()
-        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('totval'),
+        loansum = Loan.query.with_entities(func.sum(Loan.valuation).label('tot_val'),
                                            func.sum(Loan.interestpa).label('totint')).filter().first()
 
     return loans, loansum
