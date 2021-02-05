@@ -14,7 +14,9 @@
 	{% if method == "email" %}
 		<div class="form-group row">
 			<div class="col-md-3">
-				{{ pr_form.email(class_="form-control") }}
+				<div id="email_field">
+					{{ pr_form.email(class_="form-control") }}
+				</div>
 				{% if pr_form.email.errors %}
 					<ul class="errors">
 						{% for error in pr_form.email.errors %}
@@ -35,20 +37,10 @@
 			<div id="address_fields" class="col-md-8">
 				{{ pr_form.mailaddr(class_="form-control") }}
 			</div>
-			<div id="new_address_fields" class="col-md-8">
-				{{ pr_form_new_addr.new_mailaddr(class_="form-control") }}
-			</div>
 			<div class="col-md-4" align="bottom">
 				{{ pr_form.submit(class_="btn btn-block btn-success") }}
 			</div>
 		</div>
-
-		<div class="form-group row flex-row-reverse">
-			<div class="col-md-4">
-            	<button type="button" id="add_remove_address" class="btn btn-block btn-danger">manually change address</button>
-			</div>
-		</div>
-
 	{% endif %}
 	<div id="doc_html" contenteditable="true">
 	    {% if method != "email" %}
@@ -67,6 +59,9 @@
 				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 			</div>
 			<div class="font-size-medium" align="left">
+				<div id="mailaddr_input"><span></span></div>
+				<br />
+				<br />
 				Dear {{ rent_pr.tenantname }}
 			</div>
 	    {% else %}
@@ -74,11 +69,15 @@
 				Our Ref: {{ rent_pr.rentcode }}
 				<br />
 				<br />
+				<div id="email_input">Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span id="email_span">{{ rent_pr.email }}</span></div>
+				<br />
+				<br />
 				Dear {{ rent_pr.tenantname }}
 			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
-			<b>{{ widgets.linebreaks_for_string(subject) }}</b>
+			<br />
+			<b><span id="subject_span">{{ subject }}</span></b>
 			<br />
 			<br />
 			<table class="pr_table">

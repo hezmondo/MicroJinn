@@ -2,8 +2,6 @@ $(document).ready(function(){
     $("#save_delete").hide();
     $("#more_buttons").hide();
     $("#xalloc").hide();
-    $("#new_address_fields").hide();
-    $("#new_address_fields").attr('disabled', '');
 
 //    if ($("#item_id").text() == "0") {
 //       $("#toggleview").click();
@@ -46,22 +44,6 @@ $(document).ready(function(){
             $("#more_buttons").hide();
         }
     });
-        $("#add_remove_address").click(function(){
-        if ($(this).text() == "manually change address") {
-            $(this).text("use original address");
-            $("#new_address_fields").show();
-            $("#new_address_fields").removeAttr('disabled');
-            $("#address_fields").hide();
-            $("#address_fields").attr('disabled', '');
-            }
-        else {
-            $(this).text("manually change address");
-            $("#new_address_fields").hide();
-            $("#new_address_fields").attr('disabled', '');
-            $("#address_fields").show();
-            $("#address_fields").removeAttr('disabled');
-        }
-    });
     $(".custom-file-input").on("change", function() {
       var fileName = $(this).val().split("\\").pop();
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
@@ -70,6 +52,20 @@ $(document).ready(function(){
         var mysave = $('#doc_html').html();
         $('#xinput').val(mysave);
     });
+    $('#address_fields').click(function() {
+        var addr = $('#address_fields option:selected').text();
+        var addr_split = addr.replace(/,/g, "<br />")
+        $('#mailaddr_input span').html(addr_split)
+    });
+    $("#email").on("paste keyup", function() {
+        $("#email_span").html(this.value);
+    });
+    $("#subject").on("paste keyup", function() {
+        $("#subject_span").html(this.value);
+    });
+//    $("#email_span").on('change', function() {
+//        $("#email").val(this.value);
+//    });
 });
 $(function() {
   // Sidebar toggle behavior
