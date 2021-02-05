@@ -31,7 +31,7 @@ def docfiles(rent_id):
 @doc_bp.route('/download/<int:doc_id>')
 @login_required
 def download(doc_id):
-    digfile = get_digfile(id)
+    digfile = get_digfile(doc_id)
     return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True,
                      mimetype='application/pdf')
 

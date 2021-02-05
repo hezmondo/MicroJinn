@@ -19,19 +19,17 @@ def get_moneyaccount(id):
         moneyacc.id = 0
     else:
         moneyacc = Money_account.query.filter(Money_account.id == id).one_or_none()
-
     return moneyacc
 
 
 def get_moneydets():
-    moneydets = Money_account.query.with_entities(Money_account.id, Money_account.bank_name, Money_account.acc_name,
-                                                  Money_account.sort_code, Money_account.acc_num, Money_account.acc_desc,
-                                                  func.mjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
-                                                  func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).all()
-
+    moneydets = Money_account.query \
+        .with_entities(Money_account.id, Money_account.bank_name, Money_account.acc_name, Money_account.sort_code,
+                       Money_account.acc_num, Money_account.acc_desc,
+                       func.mjinn.acc_balance(Money_account.id, 1, date.today()).label('cbalance'),
+                       func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).all()
     accsums = Money_account.query.with_entities(func.mjinn.acc_total(1).label('cleared'),
                                             func.mjinn.acc_total(0).label('uncleared')).filter().first()
-
     return accsums, moneydets
 
 
@@ -49,7 +47,6 @@ def get_moneydict(type="basic"):
         money_dict["acc_descs"].insert(0, "all accounts")
         money_dict["cats"].insert(0, "all categories")
         money_dict["cleareds"].insert(0, "all cleareds")
-
     return money_dict
 
 
@@ -65,7 +62,6 @@ def get_money_item(money_item_id):
             .filter(Money_item.id == money_item_id).one_or_none()
 
         cleared = "cleared" if money_item.cleared == 1 else "uncleared"
-
     return money_item, cleared
 
 
@@ -79,7 +75,6 @@ def get_money_item_new():
                   'acc_desc': acc_desc,
                   'cat_name': 'Fuel'
                   }
-
     return money_item
 
 
@@ -120,32 +115,33 @@ def get_money_items(acc_id): # we assemble income items and money items into one
             if catval != "Jinn BACS income":
                 income_filter.append(Income.id == 0)
         moneyvals['category'] = catval
-
     transitems = \
-        Money_item.query.join(Money_account).join(Money_category) .with_entities(Money_item.id, Money_item.num,
-                                                                                 Money_item.date, Money_item.payer, Money_item.amount, Money_item.memo,
-                                                                                 Money_account.acc_desc, Money_category.cat_name, Money_item.cleared) \
-            .filter(*money_filter).union\
-            (Income.query.join(Money_account).join(Incomealloc).with_entities(Income.id, literal("X").label('num'),
-                                                                              Income.date, Income.payer, Income.amount, Incomealloc.rentcode.label('memo'), Money_account.acc_desc,
-                                                                              literal("BACS income").label('cat_name'), literal("1").label('cleared')) \
-             .filter(*income_filter)) \
+        Money_item.query.join(Money_account) \
+            .join(Money_category) \
+            .with_entities(Money_item.id, Money_item.num, Money_item.date, Money_item.payer, Money_item.amount,
+                           Money_item.memo, Money_account.acc_desc, Money_category.cat_name, Money_item.cleared) \
+            .filter(*money_filter) \
+            .union_all(
+            (Income.query.join(Money_account)
+             .join(Incomealloc)
+             .with_entities(Income.id, literal("X").label('num'), Income.date, Income.payer, Income.amount,
+                            Incomealloc.rentcode.label('memo'), Money_account.acc_desc,
+                            literal("BACS income").label('cat_name'), literal("1").label('cleared'))
+             .filter(*income_filter))) \
              .order_by(desc(Money_item.date), desc(Income.date), Money_item.memo, Incomealloc.rentcode).limit(100)
-
     accsums = Money_item.query.with_entities\
         (func.mjinn.acc_balance(acc_id, 1, date.today()).label('cbalance'),
             func.mjinn.acc_balance(Money_account.id, 0, date.today()).label('ubalance')).filter().first()
-
     return accsums, moneyvals, transitems
 
 
-def post_moneyaccount(id):
+def post_moneyaccount(acc_id):
     # new moneyaccount:
-    if id == 0:
+    if acc_id == 0:
         moneyacc = Money_account()
     else:
         # existing moneyaccount:
-        moneyacc = Money_account.query.get(id)
+        moneyacc = Money_account.query.get(acc_id)
     moneyacc.bank_name = request.form.get("bank_name")
     moneyacc.acc_name = request.form.get("acc_name")
     moneyacc.sort_code = request.form.get("sort_code")
@@ -156,7 +152,6 @@ def post_moneyaccount(id):
     db.session.flush()
     acc_id = moneyacc.id
     commit_to_database()
-
     return acc_id
 
 
@@ -185,7 +180,6 @@ def post_money_item(money_item_id):
     db.session.flush()
     id_ = money_item.id
     commit_to_database()
-
     return id_
 
 
