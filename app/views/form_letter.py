@@ -1,23 +1,29 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required
-from app.dao.form_letter import get_formletter, get_formletters, get_templates, post_formletter
+from app.dao.form_letter import delete_form_letter, get_form_letter, get_form_letters, get_templates, post_form_letter
 
-formletter_bp = Blueprint('formletter_bp', __name__)
+form_letter_bp = Blueprint('form_letter_bp', __name__)
 
-@formletter_bp.route('/form_letter/<int:form_id>', methods=['GET', 'POST'])
+
+@form_letter_bp.route('/form_letter/<int:form_letter_id>', methods=['GET', 'POST'])
 @login_required
-def form_letter(form_id):
-    action = request.args.get('action', "view", type=str)
+def form_letter(form_letter_id):
     if request.method == "POST":
-        id_ = post_formletter(form_id, action)
-        return redirect('/form_letter/{}?action=view'.format(id_))
-    formletter = get_formletter(form_id)
+        form_letter_id = post_form_letter(form_letter_id)
+        return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id))
+    form_letter = get_form_letter(form_letter_id)
     templates = get_templates()
+    return render_template('form_letter.html', form_letter=form_letter, templates=templates)
 
-    return render_template('form_letter.html', action=action, formletter=formletter, templates=templates)
 
-@formletter_bp.route('/form_letters', methods=['GET'])
+@form_letter_bp.route('/form_letter_delete/<int:form_letter_id>')
+@login_required
+def form_letter_delete(form_letter_id):
+    delete_form_letter(form_letter_id)
+    return redirect(url_for('form_letter_bp.form_letters'))
+
+
+@form_letter_bp.route('/form_letters', methods=['GET'])
 def form_letters():
-    formletters = get_formletters("normal")
-
-    return render_template('form_letters.html', formletters=formletters)
+    form_letters = get_form_letters("normal")
+    return render_template('form_letters.html', form_letters=form_letters)

@@ -51,8 +51,8 @@ def create_app(config_class=Config):
     from .views.filter import filter_bp
     app.register_blueprint(filter_bp, url_prefix='/views')
 
-    from .views.form_letter import formletter_bp
-    app.register_blueprint(formletter_bp, url_prefix='/views')
+    from .views.form_letter import form_letter_bp
+    app.register_blueprint(form_letter_bp, url_prefix='/views')
 
     from .views.headrent import headrent_bp
     app.register_blueprint(headrent_bp, url_prefix='/views')

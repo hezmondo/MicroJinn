@@ -5,7 +5,7 @@ from sqlalchemy import func
 from app.models import Rental, Rental_statement, Typeadvarr, Typefreq\
 
 
-def get_rental(id):
+def get_rental(rental_id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
     rental = Rental.query.\
         join(Typeadvarr).\
@@ -13,7 +13,7 @@ def get_rental(id):
         with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate, Rental.astdate,
                         Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
                         Typeadvarr.advarrdet, Typefreq.freqdet) \
-        .filter(Rental.id == id).one_or_none()
+        .filter(Rental.id == rental_id).one_or_none()
     advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
     freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
 
