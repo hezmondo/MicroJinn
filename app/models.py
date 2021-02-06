@@ -41,14 +41,14 @@ class Charge(db.Model):
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
     
-class Chargetype(db.Model):
+class ChargeType(db.Model):
     __tablename__ = 'chargetype'
 
     id = db.Column(db.Integer, primary_key=True)
     chargedesc = db.Column(db.String(60))
 
     charge_chargetype = db.relationship('Charge', backref='chargetype', lazy='dynamic')
-    incomealloc_chargetype = db.relationship('Incomealloc', backref='chargetype', lazy='dynamic')
+    incomealloc_chargetype = db.relationship('IncomeAlloc', backref='chargetype', lazy='dynamic')
 
 
 class Dates(db.Model):
@@ -60,7 +60,7 @@ class Dates(db.Model):
     day = db.Column(db.Integer)
 
 
-class Digfile(db.Model):
+class DigFile(db.Model):
     __tablename__ = 'digfile'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -72,7 +72,7 @@ class Digfile(db.Model):
     out_in = db.Column(db.SmallInteger, nullable=False)
 
 
-class Docfile(db.Model):
+class DocFile(db.Model):
     __tablename__ = 'docfile'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -107,7 +107,7 @@ class EmailAcc(db.Model):
     landlord_emailacc = db.relationship('Landlord', backref='email_acc', lazy='dynamic')
 
 
-class Emailad(db.Model):
+class EmailAddr(db.Model):
     __tablename__ = 'emailad'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -124,7 +124,7 @@ class Event(db.Model):
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
 
 
-class Form_letter(db.Model):
+class FormLetter(db.Model):
     __tablename__ = 'form_letter'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -165,12 +165,12 @@ class Income(db.Model):
     payer = db.Column(db.String(90))
     amount = db.Column(db.Numeric(8,2))
     paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
 
-    incomealloc_income = db.relationship('Incomealloc', backref='income', lazy='dynamic')
+    incomealloc_income = db.relationship('IncomeAlloc', backref='income', lazy='dynamic')
 
 
-class Incomealloc(db.Model):
+class IncomeAlloc(db.Model):
     __tablename__ = 'incomealloc'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -200,7 +200,7 @@ class Landlord(db.Model):
     address = db.Column(db.String(180))
     tax_date = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
     email_acc_id = db.Column(db.Integer, db.ForeignKey('email_acc.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
@@ -227,7 +227,7 @@ class Lease(db.Model):
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
 
-class Lease_extension(db.Model):
+class LeaseExt(db.Model):
     __tablename__ = 'lease_extension'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -236,7 +236,7 @@ class Lease_extension(db.Model):
     value = db.Column(db.Integer)
 
 
-class Lease_relativity(db.Model):
+class LeaseRel(db.Model):
     __tablename__ = 'lease_relativity'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -244,7 +244,7 @@ class Lease_relativity(db.Model):
     relativity = db.Column(db.Numeric(8, 2))
 
 
-class Lease_uplift_type(db.Model):
+class LeaseUpType(db.Model):
     __tablename__ = 'lease_uplift_type'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -253,7 +253,7 @@ class Lease_uplift_type(db.Model):
     method = db.Column(db.String(15))
     uplift_value = db.Column(db.Numeric(8, 2))
 
-    lease_uplift_type = db.relationship('Lease', backref='Lease_uplift_type', lazy='dynamic')
+    lease_uplift_type = db.relationship('Lease', backref='LeaseUpType', lazy='dynamic')
 
 
 class Loan(db.Model):
@@ -272,11 +272,11 @@ class Loan(db.Model):
     valuation = db.Column(db.Numeric(8,2))
     interestpa = db.Column(db.Numeric(8,2))
 
-    loan_trans_loan = db.relationship('Loan_trans', backref='loan', lazy='dynamic')
-    loan_interest_rate_loan = db.relationship('Loan_interest_rate', backref='loan', lazy='dynamic')
+    loan_trans_loan = db.relationship('LoanTran', backref='loan', lazy='dynamic')
+    loan_interest_rate_loan = db.relationship('LoanIntRate', backref='loan', lazy='dynamic')
 
 
-class Loan_interest_rate(db.Model):
+class LoanIntRate(db.Model):
     __tablename__ = 'loan_interest_rate'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -285,7 +285,7 @@ class Loan_interest_rate(db.Model):
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
 
-class Loan_statement(db.Model):
+class LoanStat(db.Model):
     __tablename__ = 'loan_statement'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -299,7 +299,7 @@ class Loan_statement(db.Model):
     balance = db.Column(db.Numeric(8, 2))
 
 
-class Loan_trans(db.Model):
+class LoanTran(db.Model):
     __tablename__ = 'loan_trans'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -323,21 +323,21 @@ class Manager(db.Model):
         return '<Manager {}>'.format(self.name)
 
         
-class Manager_external(db.Model):
+class ManagerExt(db.Model):
     __tablename__ = 'manager_external'
 
     id = db.Column(db.Integer, primary_key=True)
     codename = db.Column(db.String(15))
     detail = db.Column(db.String(180))
 
-    rentext_managerext = db.relationship('Rent_ex', backref='manager_external', lazy='dynamic')
+    rentext_managerext = db.relationship('RentExt', backref='manager_external', lazy='dynamic')
 
     def __repr__(self):
-        return '<Manager_external {}>'.format(self.codename)
+        return '<ManagerExt {}>'.format(self.codename)
 
 
-class Money_account(db.Model):
-    __tablename__ = 'money_account'
+class MoneyAcc(db.Model):
+    __tablename__ = 'money_acc'
 
     id = db.Column(db.Integer, primary_key=True)
     bank_name = db.Column(db.String(45))
@@ -346,21 +346,21 @@ class Money_account(db.Model):
     acc_num = db.Column(db.String(15))
     acc_desc = db.Column(db.String(30))
 
-    income_moneyaccount = db.relationship('Income', backref='money_account', lazy='dynamic')
-    money_item_moneyaccount = db.relationship('Money_item', backref='money_account', lazy='dynamic')
-    landlord_moneyaccount = db.relationship('Landlord', backref='money_account', lazy='dynamic')
+    income_moneyaccount = db.relationship('Income', backref='money_acc', lazy='dynamic')
+    money_item_moneyaccount = db.relationship('MoneyItem', backref='money_acc', lazy='dynamic')
+    landlord_moneyaccount = db.relationship('Landlord', backref='money_acc', lazy='dynamic')
 
 
-class Money_category(db.Model):
+class MoneyCat(db.Model):
     __tablename__ = 'money_category'
 
     id = db.Column(db.Integer, primary_key=True)
     cat_name = db.Column(db.String(60))
 
-    money_item_moneycategory = db.relationship('Money_item', backref='money_category', lazy='dynamic')
+    money_item_moneycategory = db.relationship('MoneyItem', backref='money_category', lazy='dynamic')
 
 
-class Money_item(db.Model):
+class MoneyItem(db.Model):
     __tablename__ = 'money_item'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -371,10 +371,10 @@ class Money_item(db.Model):
     memo = db.Column(db.String(90))
     cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
     cleared = db.Column(db.Integer)
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
 
 
-class Pr_arrears_matrix(db.Model):
+class PrArrearsMatrix(db.Model):
     __tablename__ = 'pr_arrears_matrix'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -386,7 +386,7 @@ class Pr_arrears_matrix(db.Model):
     force_mail = db.Column(db.Boolean, nullable=True)
 
 
-class Pr_batch(db.Model):
+class PrBatch(db.Model):
     __tablename__ = 'pr_batch'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -396,10 +396,10 @@ class Pr_batch(db.Model):
     status = db.Column(db.Integer, db.ForeignKey('typebatchstatus.id'))
     is_account = db.Column(db.Boolean)
 
-    payrequests = db.relationship('Pr_history', backref='batch', lazy='dynamic')
+    payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
 
 
-class Pr_filter(db.Model):
+class PrFilter(db.Model):
     __tablename__ = 'pr_filter'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -408,7 +408,7 @@ class Pr_filter(db.Model):
     content = db.Column(db.Text)
 
 
-class Pr_form(db.Model):
+class PrForm(db.Model):
     __tablename__ = 'pr_form'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -418,7 +418,7 @@ class Pr_form(db.Model):
     block = db.Column(db.Text, nullable=True)
 
 
-class Pr_history(db.Model):
+class PrHistory(db.Model):
     __tablename__ = 'pr_history'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -483,13 +483,13 @@ class Rent(db.Model):
 
     case_rent = db.relationship('Case', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
-    digfile_rent = db.relationship('Digfile', backref='rent', lazy='dynamic')
-    docfile_rent = db.relationship('Docfile', backref='rent', lazy='dynamic')
+    digfile_rent = db.relationship('DigFile', backref='rent', lazy='dynamic')
+    docfile_rent = db.relationship('DocFile', backref='rent', lazy='dynamic')
     event_rent = db.relationship('Event', backref='rent', lazy='dynamic')
-    incomealloc_rent = db.relationship('Incomealloc', backref='rent', lazy='dynamic')
+    incomealloc_rent = db.relationship('IncomeAlloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
     prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
-    payrequest_rent = db.relationship('Pr_history', backref='rent', lazy='dynamic')
+    payrequest_rent = db.relationship('PrHistory', backref='rent', lazy='dynamic')
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
@@ -512,7 +512,7 @@ class Rental(db.Model):
     lastgastest = db.Column(db.Date)
 
 
-class Rental_statement(db.Model):
+class RentalStat(db.Model):
     __tablename__ = 'rental_statement'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -523,7 +523,7 @@ class Rental_statement(db.Model):
     balance = db.Column(db.Numeric(8, 2))
 
 
-class Rent_ex(db.Model):
+class RentExt(db.Model):
     __tablename__ = 'rent_ex'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -541,7 +541,7 @@ class Rent_ex(db.Model):
     extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
 
     def __repr__(self):
-        return '<Rent_ex {}>'.format(self.rentcode)
+        return '<RentExt {}>'.format(self.rentcode)
 
 
 class Template(db.Model):
@@ -551,10 +551,10 @@ class Template(db.Model):
     code = db.Column(db.String(15))
     desc = db.Column(db.String(60))
 
-    form_letter_template = db.relationship('Form_letter', backref='template', lazy='dynamic')
+    form_letter_template = db.relationship('FormLetter', backref='template', lazy='dynamic')
 
 
-class Type_status_hr(db.Model):
+class TypeStatusHr(db.Model):
     __tablename__ = 'type_status_hr'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -563,7 +563,7 @@ class Type_status_hr(db.Model):
     headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
 
 
-class Typeactype(db.Model):
+class TypeAcType(db.Model):
     __tablename__ = 'typeactype'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -572,7 +572,7 @@ class Typeactype(db.Model):
     rent_typeactype = db.relationship('Rent', backref='typeactype', lazy='dynamic')
 
 
-class Typeadvarr(db.Model):
+class TypeAdvArr(db.Model):
     __tablename__ = 'typeadvarr'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -584,16 +584,16 @@ class Typeadvarr(db.Model):
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
 
 
-class Typebatchstatus(db.Model):
+class TypeStatusBatch(db.Model):
     __tablename__ = 'typebatchstatus'
 
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(30))
 
-    batches = db.relationship('Pr_batch', backref='typebatchstatus', lazy='dynamic')
+    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
 
 
-class Typedeed(db.Model):
+class TypeDeed(db.Model):
     __tablename__ = 'typedeed'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -613,18 +613,18 @@ class Typedeed(db.Model):
     rent_typedeed = db.relationship('Rent', backref='typedeed', lazy='dynamic')
 
 
-class Typedoc(db.Model):
+class TypeDoc(db.Model):
     __tablename__ = 'typedoc'
 
     id = db.Column(db.Integer, primary_key=True)
     desc = db.Column(db.String(30))
 
-    form_letter_typedoc = db.relationship('Form_letter', backref='typedoc', lazy='dynamic')
-    digfile_typedoc = db.relationship('Digfile', backref='typedoc', lazy='dynamic')
-    docfile_typedoc = db.relationship('Docfile', backref='typedoc', lazy='dynamic')
+    form_letter_typedoc = db.relationship('FormLetter', backref='typedoc', lazy='dynamic')
+    digfile_typedoc = db.relationship('DigFile', backref='typedoc', lazy='dynamic')
+    docfile_typedoc = db.relationship('DocFile', backref='typedoc', lazy='dynamic')
 
 
-class Typeevent(db.Model):
+class TypeEvent(db.Model):
     __tablename__ = 'typeevent'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -633,7 +633,7 @@ class Typeevent(db.Model):
     event_typedoc = db.relationship('Event', backref='typeevent', lazy='dynamic')
 
 
-class Typefreq(db.Model):
+class TypeFreq(db.Model):
     __tablename__ = 'typefreq'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -645,7 +645,7 @@ class Typefreq(db.Model):
     rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
     
-class Typemailto(db.Model):
+class TypeMailTo(db.Model):
     __tablename__ = 'typemailto'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -654,7 +654,7 @@ class Typemailto(db.Model):
     rent_typemailto = db.relationship('Rent', backref='typemailto', lazy='dynamic')
 
 
-class Typepayment(db.Model):
+class TypePayment(db.Model):
     __tablename__ = 'typepayment'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -663,17 +663,17 @@ class Typepayment(db.Model):
     income_paytype = db.relationship('Income', backref='typepayment', lazy='dynamic')
 
 
-class Typeprdelivery(db.Model):
+class TypePrDelivery(db.Model):
     __tablename__ = 'typeprdelivery'
 
     id = db.Column(db.Integer, primary_key=True)
     prdeliverydet = db.Column(db.String(45))
 
-    pr_typeprdelivery = db.relationship('Pr_history', backref='typeprdelivery', lazy='dynamic')
+    pr_typeprdelivery = db.relationship('PrHistory', backref='typeprdelivery', lazy='dynamic')
     rent_typeprdelivery = db.relationship('Rent', backref='typeprdelivery', lazy='dynamic')
 
 
-class Typeproperty(db.Model):
+class TypeProperty(db.Model):
     __tablename__ = 'typeproperty'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -682,7 +682,7 @@ class Typeproperty(db.Model):
     property_typeproperty = db.relationship('Property', backref='typeproperty', lazy='dynamic')
 
 
-class Typesalegrade(db.Model):
+class TypeSaleGrade(db.Model):
     __tablename__ = 'typesalegrade'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -691,7 +691,7 @@ class Typesalegrade(db.Model):
     rent_typesalegrade = db.relationship('Rent', backref='typesalegrade', lazy='dynamic')
 
 
-class Typestatus(db.Model):
+class TypeStatus(db.Model):
     __tablename__ = 'typestatus'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -700,7 +700,7 @@ class Typestatus(db.Model):
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
 
 
-class Typetenure(db.Model):
+class TypeTenure(db.Model):
     __tablename__ = 'typetenure'
 
     id = db.Column(db.Integer, primary_key=True)

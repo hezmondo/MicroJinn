@@ -2,7 +2,6 @@ from flask import Blueprint, redirect, render_template, request, send_file, url_
 from flask_login import login_required
 from io import BytesIO
 from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_upload
-from app.dao.payrequest_ import post_new_payrequest
 
 doc_bp = Blueprint('doc_bp', __name__)
 

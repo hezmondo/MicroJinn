@@ -1,4 +1,4 @@
-<!-- /templates/email_account.html  -->
+<!-- /templates/email_acc.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -91,7 +91,7 @@
     </div>
     <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-3">
-            <a href="{{ url_for('main_bp.email_accounts') }}"
+            <a href="{{ url_for('util_bp.email_accounts') }}"
                class="btn btn-block btn-primary" role="button">back to email accounts</a>
         </div>
         <div class="col-md-3">
@@ -103,7 +103,7 @@
             <button type="submit" class="btn btn-block btn-success">save changes</button>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('util_bp.delete_item', item_id=emailacc.id, item=emailacc) }}"
+            <a href="{{ url_for('util_bp.delete_item', item_id=emailacc.id, item='email_acc') }}"
                onclick="return confirm('Are you sure you want to delete this email account?');"
                class="btn btn-block btn-danger" role="button">delete property</a>
         </div>

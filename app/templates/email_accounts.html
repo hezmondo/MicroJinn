@@ -5,7 +5,7 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="{{ url_for('main_bp.email_account', email_account_id=0) }}" class="btn btn-block btn-primary"
+            <a href="{{ url_for('util_bp.email_acc', email_acc_id=0) }}" class="btn btn-block btn-primary"
                role="button">add email account</a>
         </div>
     </div>
@@ -32,8 +32,8 @@
             <td style="width: 22.00%">{{ item.smtp_user }}</td>
             <td style="width: 22.00%">{{ item.smtp_sendfrom }}</td>
             <td style="width: 17.00%">{{ item.imap_server }}</td>
-            <td style="width: 7.00%"><a href="{{ url_for('main_bp.email_account',
-            email_account_id=item.id) }}">view</a></td>
+            <td style="width: 7.00%"><a href="{{ url_for('util_bp.email_acc',
+            email_acc_id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

@@ -2,8 +2,8 @@ import json
 
 from app import db, decimal_default
 from app.dao.functions import dateToStr, commit_to_database
-from app.models import Case, Charge, Chargetype, Landlord, Manager, Money_account, Pr_arrears_matrix, \
-                        Pr_form, Pr_history, Rent, Typeadvarr, Typefreq, Typeprdelivery, Typetenure
+from app.models import Case, Charge, ChargeType, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
+                        PrForm, PrHistory, Rent, TypeAdvArr, TypeFreq, TypePrDelivery, TypeTenure
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
@@ -58,48 +58,48 @@ def get_charge_start_date(rent_id):
 
 
 def get_charge_type(chargetype_id):
-    return db.session.query(Chargetype.chargedesc).filter_by(id=chargetype_id).scalar()
+    return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
 
 
 def get_typeprdelivery(typeprdelivery_id=1):
-    return db.session.query(Typeprdelivery.prdeliverydet).filter_by(id=typeprdelivery_id).scalar()
+    return db.session.query(TypePrDelivery.prdeliverydet).filter_by(id=typeprdelivery_id).scalar()
 
 
 def get_typeprdelivery_id(prdeliverydet='email'):
-    return db.session.query(Typeprdelivery.id).filter_by(prdeliverydet=prdeliverydet).scalar()
+    return db.session.query(TypePrDelivery.id).filter_by(prdeliverydet=prdeliverydet).scalar()
 
 
 def get_pr_form(pr_form_id):
-    pr_form = Pr_form.query.filter(Pr_form.id == pr_form_id).one_or_none()
+    pr_form = PrForm.query.filter(PrForm.id == pr_form_id).one_or_none()
     return pr_form
 
 
 def get_pr_forms():
-    return Pr_form.query.all()
+    return PrForm.query.all()
 
 
 def get_pr_file(pr_id):
-    pr_file = Pr_history.query.join(Rent).with_entities(Pr_history.id, Pr_history.summary, Pr_history.block,
-                                                        Pr_history.date, Rent.rentcode,
-                                                        Rent.id.label("rent_id")) \
-        .filter(Pr_history.id == pr_id).one_or_none()
+    pr_file = PrHistory.query.join(Rent).with_entities(PrHistory.id, PrHistory.summary, PrHistory.block,
+                                                       PrHistory.date, Rent.rentcode,
+                                                       Rent.id.label("rent_id")) \
+        .filter(PrHistory.id == pr_id).one_or_none()
     return pr_file
 
 
 def get_pr_history(rent_id):
-    return Pr_history.query.filter_by(rent_id=rent_id)
+    return PrHistory.query.filter_by(rent_id=rent_id)
 
 
 def get_previous_pr_history_entry(pr_id):
-    pr_history = Pr_history.query.get(pr_id)
+    pr_history = PrHistory.query.get(pr_id)
     rent_id = pr_history.rent_id
     return pr_history, rent_id
 
 
 def get_recovery_info(suffix):
-    recovery_info = Pr_arrears_matrix.query.with_entities(Pr_arrears_matrix.arrears_clause,
-                                                          Pr_arrears_matrix.recovery_charge,
-                                                          Pr_arrears_matrix.create_case). \
+    recovery_info = PrArrearsMatrix.query.with_entities(PrArrearsMatrix.arrears_clause,
+                                                        PrArrearsMatrix.recovery_charge,
+                                                        PrArrearsMatrix.create_case). \
         filter_by(suffix=suffix).one_or_none()
     arrears_clause = recovery_info.arrears_clause
     create_case = recovery_info.create_case
@@ -109,7 +109,7 @@ def get_recovery_info(suffix):
 
 def get_rent_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
-    charges = Charge.query.join(Rent).join(Chargetype).with_entities(Charge.id, Rent.rentcode, Chargetype.chargedesc,
+    charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,
                                                                      Charge.chargedetail, Charge.chargebalance) \
         .filter(*qfilter).all()
@@ -121,10 +121,10 @@ def get_rent_pr(rent_id):
         Rent.query \
             .join(Landlord) \
             .join(Manager) \
-            .join(Money_account) \
-            .join(Typeadvarr) \
-            .join(Typefreq) \
-            .join(Typetenure) \
+            .join(MoneyAcc) \
+            .join(TypeAdvArr) \
+            .join(TypeFreq) \
+            .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.check_pr_exists(Rent.id).label('prexists'),
@@ -138,8 +138,8 @@ def get_rent_pr(rent_id):
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
                            Rent.rentpa, Rent.tenantname, Rent.freq_id,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
-                           Money_account.bank_name, Money_account.acc_name, Money_account.acc_num, Money_account.sort_code,
-                           Typeadvarr.advarrdet, Typefreq.freqdet, Typetenure.tenuredet) \
+                           MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
+                           TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
     return rent_pr
@@ -173,7 +173,7 @@ def post_updated_payrequest(pr_id):
 def prepare_new_pr_history_entry(method='email'):
     pr_save_data = json.loads(request.form.get('pr_save_data'))
     rent_id = request.args.get('rent_id', type=int)
-    pr_history = Pr_history()
+    pr_history = PrHistory()
     pr_history.rent_id = rent_id
     if method == 'email':
         pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + \

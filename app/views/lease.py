@@ -1,15 +1,8 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.dao.lease import delete_lease, get_lease, get_leases, post_lease
+from app.dao.lease import get_lease, get_leases, post_lease
 
 lease_bp = Blueprint('lease_bp', __name__)
-
-@lease_bp.route('/lease_delete/<int:lease_id>')
-@login_required
-def lease_delete(lease_id):
-    delete_lease(lease_id)
-    return redirect(url_for('lease_bp.leases'))
-
 
 @lease_bp.route('/lease/<int:lease_id>', methods=['GET', 'POST'])
 @login_required

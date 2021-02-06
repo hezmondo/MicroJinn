@@ -12,7 +12,7 @@
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('main_bp.property', property_id=0, rent_id=rent_id) }}"
+                <a href="{{ url_for('util_bp.property', property_id=0, rent_id=rent_id) }}"
                    class="btn btn-block btn-danger" role="button">new property for this rent</a>
             </div>
         {% else %}
@@ -48,7 +48,7 @@
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 75.00%"> {{ item.propaddr }}</td>
             <td style="width: 15.00%"> {{ item.detail }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('main_bp.property', property_id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"><a href="{{ url_for('util_bp.property', property_id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

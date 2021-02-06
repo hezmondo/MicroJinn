@@ -5,12 +5,7 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from sqlalchemy import func
 from app.dao.functions import commit_to_database, moneyToStr
-from app.models import Lease, Lease_uplift_type, Rent
-
-
-def delete_lease(lease_id):
-    Lease.query.filter_by(id=lease_id).delete()
-    commit_to_database()
+from app.models import Lease, LeaseUpType, Rent
 
 
 def get_lease(lease_id):
@@ -19,17 +14,17 @@ def get_lease(lease_id):
     if lease_id != 0:
         lease = \
             Lease.query.join(Rent) \
-                .join(Lease_uplift_type) \
+                .join(LeaseUpType) \
                 .with_entities(Lease.id, Rent.rentcode, Lease.term, Lease.start_date, Lease.start_rent, Lease.info,
-                               Lease.uplift_date, Lease_uplift_type.uplift_type, Lease.value_date, Lease.value,
+                               Lease.uplift_date, LeaseUpType.uplift_type, Lease.value_date, Lease.value,
                                Lease.sale_value_k, Lease.rent_id, Lease.rent_cap) \
                 .filter(Lease.id == lease_id).one_or_none()
     else:
         lease = \
             Lease.query.join(Rent) \
-                .join(Lease_uplift_type) \
+                .join(LeaseUpType) \
                 .with_entities(Lease.id, Rent.rentcode, Lease.term, Lease.start_date, Lease.start_rent, Lease.info,
-                               Lease.uplift_date, Lease_uplift_type.uplift_type, Lease.value_date, Lease.value,
+                               Lease.uplift_date, LeaseUpType.uplift_type, Lease.value_date, Lease.value,
                                Lease.sale_value_k, Lease.rent_id, Lease.rent_cap) \
                 .filter(Lease.rent_id == rent_id).one_or_none()
     if not lease:
@@ -38,7 +33,7 @@ def get_lease(lease_id):
                     'rent_id': rent_id,
                     'rentcode': rentcode
                 }
-    uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
+    uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
     return lease, uplift_types
 
 
@@ -62,14 +57,14 @@ def get_leases():
         enddate = date.today() + relativedelta(days=uld)
         lfilter.append(Lease.uplift_date <= enddate)
     if ult and ult != "" and ult != "all uplift types":
-        lfilter.append(Lease_uplift_type.uplift_type.ilike('%{}%'.format(ult)) )
+        lfilter.append(LeaseUpType.uplift_type.ilike('%{}%'.format(ult)))
 
-    leases = Lease.query.join(Rent).join(Lease_uplift_type).with_entities(Rent.rentcode, Lease.id, Lease.info,
-                                                                          func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
-                                                                          Lease.term, Lease.uplift_date, Lease_uplift_type.uplift_type) \
+    leases = Lease.query.join(Rent).join(LeaseUpType).with_entities(Rent.rentcode, Lease.id, Lease.info,
+                                                                    func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
+                                                                    Lease.term, Lease.uplift_date, LeaseUpType.uplift_type) \
         .filter(*lfilter).limit(60).all()
 
-    uplift_types = [value for (value,) in Lease_uplift_type.query.with_entities(Lease_uplift_type.uplift_type).all()]
+    uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")
 
     return leases, uplift_types, rcd, uld, ult
@@ -122,12 +117,11 @@ def post_lease(lease_id):
     lease.rent_id = rent_id
     uplift_type = request.form.get("uplift_type")
     lease.uplift_type_id = \
-        Lease_uplift_type.query.with_entities(Lease_uplift_type.id).filter \
-            (Lease_uplift_type.uplift_type == uplift_type).one()[0]
+        LeaseUpType.query.with_entities(LeaseUpType.id).filter \
+            (LeaseUpType.uplift_type == uplift_type).one()[0]
     print(request.form)
     db.session.add(lease)
-    db.session.commit()
-
+    commit_to_database()
     return rent_id
 
 

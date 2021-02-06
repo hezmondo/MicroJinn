@@ -5,7 +5,7 @@
 <form method="POST" id="money_form">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="{{ url_for('money_bp.money_account', acc_id=0) }}"
+            <a href="{{ url_for('money_bp.money_acc', acc_id=0) }}"
                class="btn btn-block btn-danger" role="button"> add new account</a>
         </div>
         <div class="col-md-3">
@@ -34,7 +34,7 @@
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 30.00%"> {{ item.acc_desc }}</td>
-            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_account',
+            <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_acc',
             acc_id=item.id) }}">view account</a></td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>

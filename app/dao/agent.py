@@ -5,11 +5,6 @@ from app.dao.functions import commit_to_database
 from app.models import Agent, Headrent, Rent
 
 
-def delete_agent(agent_id):
-    Agent.query.filter_by(id=agent_id).delete()
-    commit_to_database()
-
-
 def get_agents():
     if request.method == "POST":
         detail = request.form.get("detail") or ""

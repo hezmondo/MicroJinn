@@ -1,7 +1,7 @@
 from flask import request
 from sqlalchemy import desc
 from app import db
-from app.models import Charge, Chargetype, Income, Incomealloc, Landlord, Money_account, Rent, Typepayment
+from app.models import Charge, ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent, TypePayment
 from app.dao.functions import commit_to_database
 
 def get_incomes(acc_id):
@@ -17,8 +17,8 @@ def get_incomes(acc_id):
     }
     if acc_id != 0:
         # first deal with bank account id being passed from money app
-        qfilter.append(Money_account.id == id)
-        acc_desc = Money_account.query.filter(Money_account.id == id).one_or_none()
+        qfilter.append(MoneyAcc.id == id)
+        acc_desc = MoneyAcc.query.filter(MoneyAcc.id == id).one_or_none()
         incomevals['acc_desc'] = acc_desc.acc_desc
     # now deal with the user clicking search button to filter ibcome postings
     if request.method == "POST":
@@ -28,34 +28,34 @@ def get_incomes(acc_id):
             incomevals['payer'] = payer
         rentcode = request.form.get("rentcode") or ""
         if rentcode and rentcode != "" and rentcode != "all rentcodes":
-            qfilter.append(Incomealloc.rentcode.startswith([rentcode]))
+            qfilter.append(IncomeAlloc.rentcode.startswith([rentcode]))
             incomevals['rentcode'] = rentcode
         acc_desc = request.form.get("acc_desc") or ""
         if acc_desc and acc_desc != "" and acc_desc != "all accounts":
-            qfilter.append(Money_account.acc_desc == acc_desc)
+            qfilter.append(MoneyAcc.acc_desc == acc_desc)
             incomevals['acc_desc'] = acc_desc
         paytype = request.form.get("paytype") or ""
         if paytype and paytype != "" and paytype != "all payment types":
-            qfilter.append(Typepayment.paytypedet == paytype)
+            qfilter.append(TypePayment.paytypedet == paytype)
             incomevals['paytype'] = paytype
     else:
         # now deal with rent_id coming from the rent screen
         if rent_id != 0:
-            qfilter.append(Incomealloc.rent_id == rent_id)
+            qfilter.append(IncomeAlloc.rent_id == rent_id)
             incomevals['rent_id'] = rent_id
-    incomes = Incomealloc.query.join(Income).join(Chargetype).join(Money_account).join(Typepayment) \
-            .with_entities(Income.id, Income.date, Incomealloc.rent_id, Incomealloc.rentcode, Income.amount,
-                           Income.payer, Money_account.acc_desc, Chargetype.chargedesc, Typepayment.paytypedet) \
+    incomes = IncomeAlloc.query.join(Income).join(ChargeType).join(MoneyAcc).join(TypePayment) \
+            .with_entities(Income.id, Income.date, IncomeAlloc.rent_id, IncomeAlloc.rentcode, Income.amount,
+                           Income.payer, MoneyAcc.acc_desc, ChargeType.chargedesc, TypePayment.paytypedet) \
             .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
     return incomes, incomevals
 
 
 def get_income_dict(type):
     # return options for multiple choice controls in income object
-    acc_descs = [value for (value,) in Money_account.query.with_entities(Money_account.acc_desc).all()]
+    acc_descs = [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
     acc_descs_all = acc_descs
     acc_descs_all.insert(0, "all accounts")
-    paytypes = [value for (value,) in Typepayment.query.with_entities(Typepayment.paytypedet).all()]
+    paytypes = [value for (value,) in TypePayment.query.with_entities(TypePayment.paytypedet).all()]
     paytypes_all = paytypes
     paytypes_all.insert(0, "all payment types")
     income_dict = {
@@ -65,7 +65,7 @@ def get_income_dict(type):
         "paytypes_all": paytypes_all
     }
     if type == "enhanced":
-        chargedescs = [value for (value,) in Chargetype.query.with_entities(Chargetype.chargedesc).all()]
+        chargedescs = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
         landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
         income_dict["chargedescs"] = chargedescs
         income_dict["landlords"] = landlords
@@ -74,14 +74,14 @@ def get_income_dict(type):
 
 def get_income_(income_id):
     income = Income.query \
-        .join(Money_account) \
-        .join(Typepayment) \
-        .with_entities(Income.id, Income.date, Income.amount, Income.payer, Typepayment.paytypedet,
-                       Money_account.acc_desc) \
+        .join(MoneyAcc) \
+        .join(TypePayment) \
+        .with_entities(Income.id, Income.date, Income.amount, Income.payer, TypePayment.paytypedet,
+                       MoneyAcc.acc_desc) \
         .filter(Income.id == income_id).one_or_none()
-    incomeallocs = Incomealloc.query.join(Chargetype).join(Rent).with_entities(Incomealloc.id,
-                    Incomealloc.income_id, Rent.rentcode, Incomealloc.amount.label("alloctot"),
-                    Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
+    incomeallocs = IncomeAlloc.query.join(ChargeType).join(Rent).with_entities(IncomeAlloc.id,
+                                                                               IncomeAlloc.income_id, Rent.rentcode, IncomeAlloc.amount.label("alloctot"),
+                                                                               ChargeType.chargedesc).filter(IncomeAlloc.income_id == income_id).all()
     return income, incomeallocs
 
 
@@ -96,10 +96,10 @@ def post_income_(income_id):
     income.payer = request.form.get("payer")
     acc_desc = request.form.get("acc_desc")
     income.acc_id = \
-        Money_account.query.with_entities(Money_account.id).filter(Money_account.acc_desc == acc_desc).one()[0]
+        MoneyAcc.query.with_entities(MoneyAcc.id).filter(MoneyAcc.acc_desc == acc_desc).one()[0]
     paytype = request.form.get("paytype")
     income.paytype_id = \
-        Typepayment.query.with_entities(Typepayment.id).filter(Typepayment.paytypedet == paytype).one()[0]
+        TypePayment.query.with_entities(TypePayment.id).filter(TypePayment.paytypedet == paytype).one()[0]
     # having set the column values, we add this single income record to the db session
     db.session.add(income)
     # next bit of code needs complete restructuring as bonkers!
@@ -111,12 +111,12 @@ def post_income_(income_id):
     #         print(rentcode, alloctot, c_id, chargedesc, landlord)
     #         if alloctot == "0" or alloctot == "0.00":
     #             continue
-    #         incalloc = Incomealloc()
+    #         incalloc = IncomeAlloc()
     #         incalloc.rentcode = rentcode
     #         incalloc.amount = alloctot
     #         print(incalloc.amount)
     #         incalloc.chargetype_id = \
-    #             Chargetype.query.with_entities(Chargetype.id).filter(Chargetype.chargedesc == chargedesc).one()[0]
+    #             ChargeType.query.with_entities(ChargeType.id).filter(ChargeType.chargedesc == chargedesc).one()[0]
     #         print(incalloc.chargetype_id)
     #         incalloc.landlord_id = \
     #             Landlord.query.with_entities(Landlord.id).filter(Landlord.name == landlord).one()[0]
@@ -135,16 +135,16 @@ def post_income_(income_id):
     #             if alloctot == "0" or alloctot == "0.00":
     #                 continue
     #             if incall_id and int(incall_id) > 0:
-    #                 incalloc = Incomealloc.query.get(int(incall_id))
+    #                 incalloc = IncomeAlloc.query.get(int(incall_id))
     #             else:
-    #                 incalloc = Incomealloc()
+    #                 incalloc = IncomeAlloc()
     #             incalloc.rentcode = rentcode
     #             incalloc.amount = alloctot
     #             print(incalloc.amount)
     #             incalloc.chargetype_id = \
-    #                 Chargetype.query \
-    #                 .with_entities(Chargetype.id) \
-    #                 .filter(Chargetype.chargedesc == chargedesc).one()[0]
+    #                 ChargeType.query \
+    #                 .with_entities(ChargeType.id) \
+    #                 .filter(ChargeType.chargedesc == chargedesc).one()[0]
     #             print(incalloc.chargetype_id)
     #             incalloc.landlord_id = \
     #                 Landlord.query.join(Rent).with_entities(Landlord.id).filter(Rent.rentcode == rentcode).one()[0]

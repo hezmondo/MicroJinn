@@ -66,9 +66,6 @@ def create_app(config_class=Config):
     from .views.loan import loan_bp
     app.register_blueprint(loan_bp, url_prefix='/views')
 
-    from .views.main import main_bp
-    app.register_blueprint(main_bp)
-
     from .views.mail import mail_bp
     app.register_blueprint(mail_bp, url_prefix='/views')
 
@@ -85,7 +82,7 @@ def create_app(config_class=Config):
     app.register_blueprint(rent_bp, url_prefix='/views')
 
     from .views.utility import util_bp
-    app.register_blueprint(util_bp, url_prefix='/views')
+    app.register_blueprint(util_bp)
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
