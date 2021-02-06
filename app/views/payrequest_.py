@@ -1,5 +1,4 @@
 from werkzeug.datastructures import MultiDict
-
 from app.dao.filter import get_filters
 from app.dao.functions import doReplace, moneyToStr, dateToStr
 from app.dao.payrequest_ import get_charge_start_date, serialize_pr_save_data, get_pr_form, get_pr_forms, get_pr_file, \
@@ -11,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.forms import PrEmailForm, PrPostForm, PrNewPostForm
+from app.forms import PrEmailForm, PrPostForm
 
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -22,7 +21,6 @@ pr_bp = Blueprint('pr_bp', __name__)
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
     rent_mail = get_rent_mail(rent_id)
-
     return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id, rent_mail=rent_mail)
 
 
@@ -42,11 +40,6 @@ def pr_edit(pr_form_id):
             rent_mail = get_rent_mail(rent_id)
             pr_form.mailaddr.choices = [rent_mail.mailaddr, (rent_mail.tenantname + ', ' + rent_mail.propaddr),
                                         ('The owner/occupier, ' + rent_mail.propaddr)]
-            pr_form_new_addr = PrNewPostForm(formdata=MultiDict({'new_mailaddr': rent_mail.mailaddr}))
-            pr_save_data = serialize_pr_save_data(pr_save_data)
-            return render_template('mergedocs/PR.html', pr_save_data=pr_save_data, pr_form=pr_form,
-                                   block=block, method=method, rent_pr=rent_pr, subject=subject, pr_form_new_addr=pr_form_new_addr,
-                                   table_rows=table_rows, totdue_string=totdue_string)
         # email and post
         else:
             pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email}))
@@ -65,16 +58,13 @@ def pr_file(pr_id):
     if request.method == "POST":
         rent_id = post_updated_payrequest(pr_id)
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
-
     pr_file = get_pr_file(pr_id)
-
     return render_template('pr_file.html', pr_file=pr_file)
 
 
 @pr_bp.route('/pr_history/<int:rent_id>', methods=['GET', 'POST'])
 def pr_history(rent_id):
     pr_history = get_pr_history(rent_id)
-
     return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history)
 
 
@@ -105,7 +95,6 @@ def pr_save_send():
 @login_required
 def pr_start():
     filters = get_filters(1)
-
     return render_template('pr_start.html', filters=filters)
 
 
@@ -170,7 +159,6 @@ def build_pr_variables(rent_pr):
     rent_type = "rent charge" if rent_pr.tenuredet == "Rentcharge" else "ground rent"
     totcharges = rent_pr.totcharges if rent_pr.totcharges else Decimal(0)
     totdue = arrears + totcharges
-
     pr_variables = {'#acc_name#': rent_pr.acc_name if rent_pr.acc_name else "no acc_name",
                     '#acc_num#': rent_pr.acc_num if rent_pr.acc_num else "no acc_number",
                     '#sort_code#': rent_pr.sort_code if rent_pr.sort_code else "no sort_code",
