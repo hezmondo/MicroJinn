@@ -55,14 +55,20 @@ $(document).ready(function(){
     $('#address_fields').click(function() {
         var addr = $('#address_fields option:selected').text();
         var addr_split = addr.replace(/,/g, "<br />")
-        $('#mailaddr_input span').html(addr_split)
+        $('#mailaddr_span').html(addr_split)
     });
-    $("#email").on("paste keyup", function() {
-        $("#email_span").html(this.value);
+    $('#radio_email').click(function() {
+        $('#email_html').show();
     });
-    $("#subject").on("paste keyup", function() {
-        $("#subject_span").html(this.value);
+    $('#radio_post').click(function() {
+        $('#email_html').hide();
     });
+//    $("#email").on("paste keyup", function() {
+//        $("#email_span").html(this.value);
+//    });
+//    $("#subject").on("paste keyup", function() {
+//        $("#subject_span").html(this.value);
+//    });
 //    $("#email_span").on('change', function() {
 //        $("#email").val(this.value);
 //    });

@@ -3,6 +3,17 @@
 @import "bootstrap";
 */
 
+/*.center-text {
+    display: flex;
+    justify-content: center; *//* align horizontal *//*
+    align-items: center; *//* align vertical *//*
+}*/
+
+/* even sizes for 3 radio buttons in group for pr delivery*/
+.btn-fixed-width {
+    width: 33%;
+}
+
 .dropdown-menu {
   margin: 0;
 }

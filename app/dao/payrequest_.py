@@ -9,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from flask import request
 from sqlalchemy import func
+from app.dao.doc_ import convert_html_to_pdf
 
 
 def add_charge(rent_id, recovery_charge_amount, chargetype_id):
@@ -198,6 +199,7 @@ def prepare_new_pr_history_entry(method='email'):
 
 def prepare_block_entry(pr_history):
     pr_history.block = request.form.get('xinput').replace("£", "&pound;")
+    convert_html_to_pdf(pr_history.block, 'pr')
 
 
 def serialize_pr_save_data(pr_save_data):

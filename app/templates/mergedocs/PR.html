@@ -6,72 +6,66 @@
 {% block app_content %}
 <form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}">
     <div class="form-group row flex-row-reverse">
-		<div class="col-md-2">
+		<div class="col-md-3">
 			<a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
-			   class="btn btn-block btn-primary" role="button">back</a>
+			   class="btn btn-block btn-primary" role="button">back to pr selection</a>
+		</div>
+		<div class="col-md-9">
+			<span>Choose address, delivery method and edit the payrequest below </span>
 		</div>
     </div>
-	{% if method == "email" %}
-		<div class="form-group row">
-			<div class="col-md-3">
-				<div id="email_field">
-					{{ pr_form.email(class_="form-control") }}
-				</div>
-				{% if pr_form.email.errors %}
-					<ul class="errors">
-						{% for error in pr_form.email.errors %}
-							<li>{{ error }}</li>
-						{% endfor %}
-					</ul>
-				{% endif %}
-			</div>
-			<div class="col-md-4" align="bottom">
-				{{ pr_form.submit(class_="btn btn-block btn-success") }}
-			</div>
+	<div class="form-group row">
+		<div id="address_fields" class="col-md-12">
+			{{ pr_form.mailaddr(class_="form-control") }}
 		</div>
-	{% elif method == "post" %}
-		<div class="form-group row">
-			<div id="address_fields" class="col-md-8">
-				{{ pr_form.mailaddr(class_="form-control") }}
-			</div>
-			<div class="col-md-4" align="bottom">
-				{{ pr_form.submit(class_="btn btn-block btn-success") }}
-			</div>
+	</div>
+	<div class="form-group row">
+		<div class="col-md-4" align="bottom">
+			<button id="savehtml" type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+			   class="btn btn-block btn-primary" role="button">post</button>
 		</div>
-	{% endif %}
+		<div class="col-md-4" align="bottom">
+			<a href="{{ url_for('pr_bp.pr_email_edit', method='email_post') }}"
+			   class="btn btn-block btn-primary" role="button">email and post</a>
+		</div>
+		<div class="col-md-4" align="bottom">
+			<a href="{{ url_for('pr_bp.pr_email_edit', method='email') }}"
+			   class="btn btn-block btn-primary" role="button">email</a>
+		</div>
+	</div>
 	<div id="doc_html" contenteditable="true">
-	    {% if method != "email" %}
-			<div class="font-size-large" align="center">
-				<b>{{ rent_pr.managername }}</b>
+		<div class="font-size-large" align="center">
+			<b>{{ rent_pr.managername }}</b>
+		</div>
+		<div class="font-size-small" align="center">
+			{{ rent_pr.manageraddr }}
+			<br />
+			{{ rent_pr.manageraddr2 }}
+			<br />
+		</div>
+		<div class="font-size-medium" align="right">
+			Our Ref: {{ rent_pr.rentcode }}
+			<br />
+			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
+		</div>
+		<div class="font-size-medium" align="left">
+			<div>
+				<span id="mailaddr_span">
+					{% for item in mailaddr %}
+						{{ item }}
+						<br />
+					{% endfor %}
+				</span>
 			</div>
-			<div class="font-size-small" align="center">
-				{{ rent_pr.manageraddr }}
+			<div id="email_html">
 				<br />
-				{{ rent_pr.manageraddr2 }}
 				<br />
+				<div id="email_input">Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span class="span_highlight" id="email_span"> {{ rent_pr.email }} </span></div>
 			</div>
-			<div class="font-size-medium" align="right">
-				Our Ref: {{ rent_pr.rentcode }}
-				<br />
-				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
-			</div>
-			<div class="font-size-medium" align="left">
-				<div id="mailaddr_input"><span></span></div>
-				<br />
-				<br />
-				Dear {{ rent_pr.tenantname }}
-			</div>
-	    {% else %}
-			<div class="font-size-medium" align="left">
-				Our Ref: {{ rent_pr.rentcode }}
-				<br />
-				<br />
-				<div id="email_input">Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span id="email_span">{{ rent_pr.email }}</span></div>
-  			<br />
-				<br />
-				Dear {{ rent_pr.tenantname }}
-			</div>
-		{% endif %}
+			<br />
+			<br />
+			Dear {{ rent_pr.tenantname }}
+		</div>
 		<div class="font-size-medium" align="left">
 			<br />
 			<b><span id="subject_span">{{ subject }}</span></b>

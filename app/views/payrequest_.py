@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.forms import PrEmailForm, PrPostForm
+from app.forms import PrPostForm
 
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -28,27 +28,32 @@ def pr_dialog(rent_id):
 @login_required
 def pr_edit(pr_form_id):
     if request.method == "POST":
-        method = request.args.get('method', 'email', type=str)
+        # method = request.args.get('method', 'post', type=str)
         rent_id = request.args.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
         block, pr_save_data, rent_pr, subject, table_rows, \
             totdue_string = write_payrequest(rent_id, pr_form_id)
-        if method == 'email':
-            pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email, 'subject': subject}))
-        elif method == 'post':
-            pr_form = PrPostForm()
-            rent_mail = get_rent_mail(rent_id)
-            pr_form.mailaddr.choices = [rent_mail.mailaddr, (rent_mail.tenantname + ', ' + rent_mail.propaddr),
-                                        ('The owner/occupier, ' + rent_mail.propaddr)]
-        # email and post
-        else:
-            pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email}))
+        # if method == 'email':
+        #     pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email, 'subject': subject}))
+        # elif method == 'post':
+        pr_form = PrPostForm()
+        rent_mail = get_rent_mail(rent_id)
+        mailaddr = rent_mail.mailaddr.split(", ")
+        pr_form.mailaddr.choices = [rent_mail.mailaddr, (rent_mail.tenantname + ', ' + rent_mail.propaddr),
+                                    ('The owner/occupier, ' + rent_mail.propaddr)]
         if pr_form.validate_on_submit():
-            return redirect(url_for('pr_save_send', method=method, rent_id=rent_pr.id))
+            return redirect(url_for('pr_save_send', rent_id=rent_pr.id))
         pr_save_data = serialize_pr_save_data(pr_save_data)
-        return render_template('mergedocs/PR.html', pr_save_data=pr_save_data, pr_form=pr_form, block=block,
-                               method=method, rent_pr=rent_pr, subject=subject,
+        return render_template('mergedocs/PR.html', mailaddr=mailaddr, pr_save_data=pr_save_data, pr_form=pr_form,
+                               block=block, rent_pr=rent_pr, subject=subject,
                                table_rows=table_rows, totdue_string=totdue_string)
+
+
+@pr_bp.route('/pr_email_edit', methods=["GET", "POST"])
+@login_required
+def pr_email_edit(pr_form_id):
+    if request.method == "POST":
+        return render_template('mergedocs/PR.html')
 
 
 # TODO: improve pr_file editing functionality (beyond edit summary/block)
