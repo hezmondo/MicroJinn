@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import desc
-from app.models import Income, Incomealloc, Landlord, Manager, Money_account, Rent, Typepayment
+from app.models import Income, IncomeAlloc, Landlord, Manager, MoneyAcc, Rent, TypePayment
 from app.dao.form_letter import get_form_letter
 from app.dao.functions import dateToStr, doReplace, hashCode, moneyToStr
 from app.dao.lease import get_lease_variables
@@ -15,28 +15,28 @@ from app.views.payrequest_ import build_arrears_statement, build_rent_statement,
 def getmaildata(rent_id, income_id=0):
     if income_id == 0:
         incomedata = Income.query. \
-            join(Incomealloc) \
-            .join(Typepayment) \
+            join(IncomeAlloc) \
+            .join(TypePayment) \
             .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
-                           Typepayment.paytypedet) \
-            .filter(Incomealloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
+                           TypePayment.paytypedet) \
+            .filter(IncomeAlloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
         # income_id = incomedata.id
     else:
         incomedata = Income.query \
-            .join(Incomealloc) \
-            .join(Typepayment) \
+            .join(IncomeAlloc) \
+            .join(TypePayment) \
             .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
-                           Typepayment.paytypedet) \
+                           TypePayment.paytypedet) \
             .filter(Income.id == income_id).first()
-    # allocdata = Incomealloc.join(Chargetype).with_entities(Incomealloc.id, Incomealloc.income_id,
-    #                     Incomealloc.rentcode, Incomealloc.amount.label("alloctot"),
-    #                     Chargetype.chargedesc).filter(Incomealloc.income_id == income_id).all()
+    # allocdata = IncomeAlloc.join(ChargeType).with_entities(IncomeAlloc.id, IncomeAlloc.income_id,
+    #                     IncomeAlloc.rentcode, IncomeAlloc.amount.label("alloctot"),
+    #                     ChargeType.chargedesc).filter(IncomeAlloc.income_id == income_id).all()
     allocdata = None
-    bankdata = Money_account.query \
+    bankdata = MoneyAcc.query \
         .join(Landlord) \
         .join(Rent) \
-        .with_entities(Money_account.acc_name, Money_account.acc_num, Money_account.sort_code,
-                       Money_account.bank_name) \
+        .with_entities(MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
+                       MoneyAcc.bank_name) \
         .filter(Rent.id == rent_id) \
         .one_or_none()
     addressdata = Landlord.query. \

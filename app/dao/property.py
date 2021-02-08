@@ -1,12 +1,7 @@
 from app import db
 from flask import request
 from app.dao.functions import commit_to_database
-from app.models import Property, Rent, Typeproperty
-
-
-def delete_property(property_id):
-    Property.query.filter_by(id=property_id).delete()
-    commit_to_database()
+from app.models import Property, Rent, TypeProperty
 
 
 def get_properties(rent_id):
@@ -22,10 +17,10 @@ def get_properties(rent_id):
             qfilter.append(Property.propaddr.ilike('%{}%'.format(address)))
         proptype = request.form.get("proptype")
         if rentcode and rentcode != "":
-            qfilter.append(Typeproperty.detail.ilike('%{}%'.format(proptype)))
+            qfilter.append(TypeProperty.detail.ilike('%{}%'.format(proptype)))
 
-    properties = Property.query.join(Rent).join(Typeproperty).with_entities(Property.id, Property.rent_id,
-                    Rent.rentcode, Property.propaddr, Typeproperty.detail) \
+    properties = Property.query.join(Rent).join(TypeProperty).with_entities(Property.id, Property.rent_id,
+                                                                            Rent.rentcode, Property.propaddr, TypeProperty.detail) \
             .filter(*qfilter).order_by(Property.propaddr).limit(50).all()
     proptypes = get_proptypes("plus")
 
@@ -38,15 +33,15 @@ def get_property(id, rent_id):
             .filter(Rent.id==rent_id).one_or_none()[0]
         property_ = {"id": 0, "rentcode": rentcode, "rent_id": rent_id, "typeprop_id": 4}
     else:
-        property_ = Property.query.join(Rent).join(Typeproperty).with_entities(Property.propaddr, Property.id, Typeproperty.detail,
-                                   Property.rent_id, Rent.rentcode, ) \
+        property_ = Property.query.join(Rent).join(TypeProperty).with_entities(Property.propaddr, Property.id, TypeProperty.detail,
+                                                                               Property.rent_id, Rent.rentcode, ) \
             .filter(Property.id == id).one_or_none()
 
     return property_
 
 
 def get_proptypes(type):
-    proptypes = [value for (value,) in Typeproperty.query.with_entities(Typeproperty.detail).all()]
+    proptypes = [value for (value,) in TypeProperty.query.with_entities(TypeProperty.detail).all()]
     if type == "plus":
         # add "all" as an option
         proptypes.insert(0, "all proptypes")
@@ -63,8 +58,8 @@ def post_property(property_id, rent_id):
     propaddr = request.form.get("propaddr")
     property.propaddr = propaddr
     proptype = request.form.get("proptype")
-    property.typeprop_id = Typeproperty.query.with_entities(Typeproperty.id).filter \
-            (Typeproperty.detail == proptype).one()[0]
+    property.typeprop_id = TypeProperty.query.with_entities(TypeProperty.id).filter \
+            (TypeProperty.detail == proptype).one()[0]
     db.session.add(property)
     db.session.flush()
     property_id = property.id

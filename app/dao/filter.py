@@ -4,8 +4,8 @@ from flask import request, session
 from sqlalchemy import func
 from app.dao.common import get_idlist_recent
 from app.dao.functions import strToDate, strToDec
-from app.models import Agent, Charge, Manager_external, Rent_ex, Jstore, Landlord, Property, Rent, Typeactype, \
-    Typedoc, Typeprdelivery, Typesalegrade, Typestatus, Typetenure
+from app.models import Agent, Charge, ManagerExt, RentExt, Jstore, Landlord, Property, Rent, TypeAcType, \
+    TypeDoc, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def get_filters(type):
@@ -16,7 +16,7 @@ def get_filters(type):
 
 def get_rent_s(action, filter_id):
     # collect doctypes to hold in session, as this is the first trip to the server
-    session['doc_types'] = [value for (value,) in Typedoc.query.with_entities(Typedoc.desc).all()]
+    session['doc_types'] = [value for (value,) in TypeDoc.query.with_entities(TypeDoc.desc).all()]
     # get filter dictionary and filtered rent objects
     qfilter = []
     # simple filter dictionary for home page
@@ -86,32 +86,32 @@ def get_qfilter(filterdict, action):
     for key, value in filterdict.items():
         if key == "rentcode" and value and value != "":
             if action == "external":
-                filter.append(Rent_ex.rentcode.startswith([value]))
+                filter.append(RentExt.rentcode.startswith([value]))
             else:
                 filter.append(Rent.rentcode.startswith([value]))
         elif key == "agentdetail" and value and value != "":
             if action == "external":
-                filter.append(Rent_ex.agentdetail.ilike('%{}%'.format(value)))
+                filter.append(RentExt.agentdetail.ilike('%{}%'.format(value)))
             else:
                 filter.append(Agent.detail.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
             if action == "external":
-                filter.append(Rent_ex.propaddr.ilike('%{}%'.format(value)))
+                filter.append(RentExt.propaddr.ilike('%{}%'.format(value)))
             else:
                 filter.append(Property.propaddr.ilike('%{}%'.format(value)))
         elif key == "source" and value and value != "":
             if action == "external":
-                filter.append(Rent_ex.source.ilike('%{}%'.format(value)))
+                filter.append(RentExt.source.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.source.ilike('%{}%'.format(value)))
         elif key == "tenantname" and value and value != "":
             if action == "external":
-                filter.append(Rent_ex.tenantname.ilike('%{}%'.format(value)))
+                filter.append(RentExt.tenantname.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":
             if value and value != "" and value != [] and value != ["all actypes"]:
-                filter.append(Typeactype.actypedet.in_(value))
+                filter.append(TypeAcType.actypedet.in_(value))
             else: filterdict[key] = ["all actypes"]
         elif key == "agentmailto":
             if value and value == "exclude":
@@ -138,7 +138,7 @@ def get_qfilter(filterdict, action):
             else: filterdict[key] = ["all landlords"]
         elif key == "prdelivery":
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
-                filter.append(Typeprdelivery.prdeliverydet.in_(value))
+                filter.append(TypePrDelivery.prdeliverydet.in_(value))
             else: filterdict[key] = ["all prdeliveries"]
         # elif key == "rentpa" and value and value != "":
         #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
@@ -146,17 +146,17 @@ def get_qfilter(filterdict, action):
         #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
         elif key == "salegrade":
             if value and value != "" and value != "list" and value != [] and value != ["all salegrades"]:
-                filter.append(Typesalegrade.salegradedet.in_('{}'.format(value)))
+                filter.append(TypeSaleGrade.salegradedet.in_('{}'.format(value)))
             else:
                 filterdict[key] = ["all salegrades"]
         elif key == "status":
             if value and value != "" and value != [] and value != ["all statuses"]:
-                filter.append(Typestatus.statusdet.in_(value))
+                filter.append(TypeStatus.statusdet.in_(value))
             else:
                 filterdict[key] = ["all statuses"]
         elif key == "tenure":
             if value and value != "" and value != [] and value != ["all tenures"]:
-                filter.append(Typetenure.tenuredet.in_(value))
+                filter.append(TypeTenure.tenuredet.in_(value))
             else:
                 filterdict[key] = ["all tenures"]
 
@@ -179,12 +179,12 @@ def get_rent_s_data(qfilter, action, runsize):
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed
         rent_s = \
-            Rent_ex.query \
-            .join(Manager_external) \
-            .with_entities(Rent_ex.id, Rent_ex.rentcode, Rent_ex.propaddr, Rent_ex.tenantname, Rent_ex.owner,
-                           Rent_ex.rentpa, Rent_ex.arrears, Rent_ex.lastrentdate, Rent_ex.source, Rent_ex.status,
-                           Manager_external.codename, Rent_ex.agentdetail) \
-            .filter(*qfilter).order_by(Rent_ex.rentcode).limit(runsize).all()
+            RentExt.query \
+            .join(ManagerExt) \
+            .with_entities(RentExt.id, RentExt.rentcode, RentExt.propaddr, RentExt.tenantname, RentExt.owner,
+                           RentExt.rentpa, RentExt.arrears, RentExt.lastrentdate, RentExt.source, RentExt.status,
+                           ManagerExt.codename, RentExt.agentdetail) \
+            .filter(*qfilter).order_by(RentExt.rentcode).limit(runsize).all()
 
     else:
         # advanced search submitted from filter page
@@ -194,18 +194,18 @@ def get_rent_s_data(qfilter, action, runsize):
                     .join(Landlord) \
                     .outerjoin(Agent) \
                     .outerjoin(Charge) \
-                    .join(Typeactype) \
-                    .join(Typeprdelivery) \
-                    .join(Typestatus) \
-                    .join(Typesalegrade) \
-                    .join(Typetenure) \
-                    .with_entities(Rent.id, Typeactype.actypedet, Agent.detail, Rent.arrears, Rent.lastrentdate,
+                    .join(TypeAcType) \
+                    .join(TypePrDelivery) \
+                    .join(TypeStatus) \
+                    .join(TypeSaleGrade) \
+                    .join(TypeTenure) \
+                    .with_entities(Rent.id, TypeAcType.actypedet, Agent.detail, Rent.arrears, Rent.lastrentdate,
                                    # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                    func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                    func.mjinn.tot_charges(Rent.id).label('totcharges'),
                                    Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-                                   Typeprdelivery.prdeliverydet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                                   Typetenure.tenuredet) \
+                                   TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
+                                   TypeTenure.tenuredet) \
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
     return rent_s

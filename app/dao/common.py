@@ -4,18 +4,18 @@ import os
 from app import db
 from flask import request
 from flask_login import current_user, login_required
-from app.models import Agent, Jstore, Landlord, Typeactype, Typeadvarr, Typedeed, Typefreq, Typemailto, \
-                        Typeprdelivery, Typesalegrade, Typestatus, Type_status_hr, Typetenure\
+from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
+                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure\
 
 
 # common functions
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
-    actypes = [value for (value,) in Typeactype.query.with_entities(Typeactype.actypedet).all()]
-    advars = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    freqs = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+    actypes = [value for (value,) in TypeAcType.query.with_entities(TypeAcType.actypedet).all()]
+    advars = [value for (value,) in TypeAdvArr.query.with_entities(TypeAdvArr.advarrdet).all()]
+    freqs = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    tenures = [value for (value,) in Typetenure.query.with_entities(Typetenure.tenuredet).all()]
+    tenures = [value for (value,) in TypeTenure.query.with_entities(TypeTenure.tenuredet).all()]
 
     combo_dict = {
         "actypes": actypes,
@@ -31,11 +31,11 @@ def get_combodict_basic():
 def get_combodict_rent():
     # add the values unique to rent
     combo_dict = get_combodict_basic()
-    deedcodes = [value for (value,) in Typedeed.query.with_entities(Typedeed.deedcode).all()]
-    mailtos = [value for (value,) in Typemailto.query.with_entities(Typemailto.mailtodet).all()]
-    prdeliveries = [value for (value,) in Typeprdelivery.query.with_entities(Typeprdelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in Typesalegrade.query.with_entities(Typesalegrade.salegradedet).all()]
-    statuses = [value for (value,) in Typestatus.query.with_entities(Typestatus.statusdet).all()]
+    deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
+    mailtos = [value for (value,) in TypeMailTo.query.with_entities(TypeMailTo.mailtodet).all()]
+    prdeliveries = [value for (value,) in TypePrDelivery.query.with_entities(TypePrDelivery.prdeliverydet).all()]
+    salegrades = [value for (value,) in TypeSaleGrade.query.with_entities(TypeSaleGrade.salegradedet).all()]
+    statuses = [value for (value,) in TypeStatus.query.with_entities(TypeStatus.statusdet).all()]
     combo_dict['deedcodes'] = deedcodes
     combo_dict['mailtos'] = mailtos
     combo_dict['prdeliveries'] = prdeliveries
@@ -63,7 +63,7 @@ def get_combodict_filter():
 
 
 def get_hr_statuses():
-    hr_statuses = [value for (value,) in Type_status_hr.query.with_entities(Type_status_hr.hr_status).all()]
+    hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
 
     return hr_statuses
@@ -104,25 +104,25 @@ def get_postvals_id():
         actval = request.form.get(key)
         if actval and actval != "":
             if key == "actype":
-                actval = Typeactype.query.with_entities(Typeactype.id).filter(Typeactype.actypedet == actval).one()[0]
+                actval = TypeAcType.query.with_entities(TypeAcType.id).filter(TypeAcType.actypedet == actval).one()[0]
             elif key == "advarr":
-                actval = Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == actval).one()[0]
+                actval = TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == actval).one()[0]
             elif key == "agent":
                 actval = Agent.query.with_entities(Agent.id).filter(Agent.detail == actval).one()[0]
             elif key == "deedtype":
-                actval = Typedeed.query.with_entities(Typedeed.id).filter(Typedeed.deedcode == actval).one()[0]
+                actval = TypeDeed.query.with_entities(TypeDeed.id).filter(TypeDeed.deedcode == actval).one()[0]
             elif key == "frequency":
-                actval = Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == actval).one()[0]
+                actval = TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == actval).one()[0]
             elif key == "landlord":
                 actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.name == actval).one()[0]
             elif key == "mailto":
-                actval = Typemailto.query.with_entities(Typemailto.id).filter(Typemailto.mailtodet == actval).one()[0]
+                actval = TypeMailTo.query.with_entities(TypeMailTo.id).filter(TypeMailTo.mailtodet == actval).one()[0]
             elif key == "salegrade":
-                actval = Typesalegrade.query.with_entities(Typesalegrade.id).filter(Typesalegrade.salegradedet == actval).one()[0]
+                actval = TypeSaleGrade.query.with_entities(TypeSaleGrade.id).filter(TypeSaleGrade.salegradedet == actval).one()[0]
             elif key == "status":
-                actval = Typestatus.query.with_entities(Typestatus.id).filter(Typestatus.statusdet == actval).one()[0]
+                actval = TypeStatus.query.with_entities(TypeStatus.id).filter(TypeStatus.statusdet == actval).one()[0]
             elif key == "tenure":
-                actval = Typetenure.query.with_entities(Typetenure.id).filter(Typetenure.tenuredet == actval).one()[0]
+                actval = TypeTenure.query.with_entities(TypeTenure.id).filter(TypeTenure.tenuredet == actval).one()[0]
             postvals_id[key] = actval
             print(key, value)
 

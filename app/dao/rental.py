@@ -1,21 +1,21 @@
-import  sqlalchemy
+import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.models import Rental, Rental_statement, Typeadvarr, Typefreq\
+from app.models import Rental, RentalStat, TypeAdvArr, TypeFreq\
 
 
 def get_rental(rental_id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
     rental = Rental.query.\
-        join(Typeadvarr).\
-        join(Typefreq).\
+        join(TypeAdvArr).\
+        join(TypeFreq).\
         with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate, Rental.astdate,
-                        Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
-                        Typeadvarr.advarrdet, Typefreq.freqdet) \
+                      Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
+                      TypeAdvArr.advarrdet, TypeFreq.freqdet) \
         .filter(Rental.id == rental_id).one_or_none()
-    advarrdets = [value for (value,) in Typeadvarr.query.with_entities(Typeadvarr.advarrdet).all()]
-    freqdets = [value for (value,) in Typefreq.query.with_entities(Typefreq.freqdet).all()]
+    advarrdets = [value for (value,) in TypeAdvArr.query.with_entities(TypeAdvArr.advarrdet).all()]
+    freqdets = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
 
     return rental, advarrdets, freqdets
 
@@ -30,7 +30,7 @@ def getrentals():
 def get_rentalstatement(rental_id):
     db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": rental_id})
     db.session.commit()
-    rentalstatement = Rental_statement.query.all()
+    rentalstatement = RentalStat.query.all()
 
     return rentalstatement
 
@@ -51,10 +51,10 @@ def post_rental(id):
     rental.note = request.form.get("note")
     frequency = request.form.get("frequency")
     rental.freq_id = \
-        Typefreq.query.with_entities(Typefreq.id).filter(Typefreq.freqdet == frequency).one()[0]
+        TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == frequency).one()[0]
     advarr = request.form.get("advarr")
     rental.advarr_id = \
-        Typeadvarr.query.with_entities(Typeadvarr.id).filter(Typeadvarr.advarrdet == advarr).one()[0]
+        TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == advarr).one()[0]
     db.session.add(rental)
     db.session.flush()
     id_ = rental.id

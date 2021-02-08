@@ -4,8 +4,8 @@ from sqlalchemy import func
 from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
-from app.models import Agent, Landlord, Manager, Property, Rent, Typeactype, Typeadvarr, Typedeed, Typefreq, \
-    Typemailto, Typeproperty, Typesalegrade, Typestatus, Typetenure
+from app.models import Agent, Landlord, Manager, Property, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
+    TypeMailTo, TypeProperty, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def create_new_rent():
@@ -22,14 +22,14 @@ def get_rent_(rent_id):
             .join(Landlord) \
             .join(Manager) \
             .outerjoin(Agent) \
-            .join(Typeactype) \
-            .join(Typeadvarr) \
-            .join(Typedeed) \
-            .join(Typefreq) \
-            .join(Typemailto) \
-            .join(Typesalegrade) \
-            .join(Typestatus) \
-            .join(Typetenure) \
+            .join(TypeAcType) \
+            .join(TypeAdvArr) \
+            .join(TypeDeed) \
+            .join(TypeFreq) \
+            .join(TypeMailTo) \
+            .join(TypeSaleGrade) \
+            .join(TypeStatus) \
+            .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
@@ -39,9 +39,9 @@ def get_rent_(rent_id):
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
-                           Typeactype.actypedet, Typeadvarr.advarrdet, Typedeed.deedcode, Typefreq.freqdet,
-                           Typemailto.mailtodet, Typesalegrade.salegradedet, Typestatus.statusdet,
-                           Typetenure.tenuredet) \
+                           TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
+                           TypeMailTo.mailtodet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
+                           TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_ is None:
@@ -55,11 +55,11 @@ def get_rent_(rent_id):
 
 def get_rent_mail(rent_id):
     rent_mail = \
-        Rent.query.join(Typemailto).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
-                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
-                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                           Typemailto.mailtodet) \
+        Rent.query.join(TypeMailTo).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,
+                                                  func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                                                  func.mjinn.prop_addr(Rent.id).label('propaddr'),
+                                                  func.mjinn.tot_charges(Rent.id).label('totcharges'),
+                                                  TypeMailTo.mailtodet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_mail is None:

@@ -25,7 +25,7 @@
             <textarea class="form-control" name="propaddr"  readonly="true">{{ rent_.propaddr }}</textarea>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.properties', rent_id=rent_.id) }}"
+            <a href="{{ url_for('util_bp.properties', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">view</a>
         </div>
     </div>
@@ -52,12 +52,12 @@
         </div>
         {% if rent_.agent_id %}
             <div class="col-md-2">
-                <a href="{{ url_for('main_bp.agent', agent_id=rent_.agent_id, rent_id=rent_.id) }}"
+                <a href="{{ url_for('util_bp.agent', agent_id=rent_.agent_id, rent_id=rent_.id) }}"
                    class="btn btn-block btn-primary" role="button">view</a>
             </div>
         {% else %}
             <div class="col-md-2">
-                <a href="{{ url_for('main_bp.agent', agent_id=0, rent_id=rent_.id) }}"
+                <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=rent_.id) }}"
                    class="btn btn-block btn-primary" role="button">add agent</a>
             </div>
         {% endif %}
@@ -182,7 +182,7 @@
                class="btn btn-block btn-primary" role="button">docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('main_bp.properties', rent_id=rent_.id) }}"
+            <a href="{{ url_for('util_bp.properties', rent_id=rent_.id) }}"
                class="btn btn-block btn-primary" role="button">something</a>
         </div>
         <div class="col-md-2">

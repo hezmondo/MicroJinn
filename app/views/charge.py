@@ -18,13 +18,6 @@ def charge(charge_id):
     return render_template('charge.html', charge=charge, chargedescs=chargedescs)
 
 
-@charge_bp.route('/charge_delete/<int:charge_id>')
-@login_required
-def charge_delete(charge_id):
-    delete_charge(charge_id)
-    return redirect(url_for('main_bp.landlords'))
-
-
 @charge_bp.route('/charges', methods=['GET', 'POST'])
 def charges():
     rent_id = request.args.get('rent_id', "0", type=str)
