@@ -27,6 +27,9 @@
             {{ email_block|safe }}
         </div>
         <hr>
+        <div id="doc_html" contenteditable="true" style="display: none;">
+            {{ pr_file.block|safe}}
+        </div>
     {% else %}
         <div class="form-group row flex-row-reverse">
             <div class="col-md-2">
@@ -67,9 +70,10 @@
                 <input type="text" class="form-control" name="summary" value="{{ pr_file.summary }}" readonly="true">
             </div>
         </div>
+        <div id="doc_html" contenteditable="true">
+            {{ pr_file.block|safe}}
+        </div>
     {% endif %}
-    <div id="doc_html" contenteditable="true" style="display: none;">
-        {{ pr_file.block|safe}}
-    </div>
+
 </form>
 {% endblock %}
