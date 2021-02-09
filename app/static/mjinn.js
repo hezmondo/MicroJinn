@@ -55,14 +55,51 @@ $(document).ready(function(){
     $('#address_fields').click(function() {
         var addr = $('#address_fields option:selected').text();
         var addr_split = addr.replace(/,/g, "<br />")
-        $('#mailaddr_input span').html(addr_split)
+        $('#addr_span').html(addr_split)
     });
-    $("#email").on("paste keyup", function() {
-        $("#email_span").html(this.value);
+    $('.save_pr').click(function() {
+        var pr_block = $('#doc_html').html();
+        $('#pr_block').val(pr_block);
+        var pr_addr = $('#addr_span').text().trim();
+        var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "")
+        $('#pr_addr').val(pr_addr_strip);
+
+//        var pr_email = $('#email_span').text();
+//        $('#pr_email').val(pr_email);
+//        var pr_subject = $('#subject_span').text();
+//        $('#pr_subject').val(pr_subject);
     });
-    $("#subject").on("paste keyup", function() {
-        $("#subject_span").html(this.value);
+    $('#pr_email').click(function() {
+        $('.post_div').hide();
+        $('.email_div').show();
+        $('#doc_html').show();
+        var salutation_subject = $('#salutation_subject_span').html();
+        $('#email_salutation_subject_span').html(salutation_subject);
+        $('#send_email').prop('disabled', false);
     });
+    $('#pr_attachment').click(function() {
+        $('.post_div').show();
+        $('.email_div').hide();
+        $('#doc_html').show();
+        var salutation_subject = $('#salutation_subject_span').html();
+        var ref_email = $('#ref_email').html();
+        $('#email_header_span').html(ref_email);
+        $('#email_header_span').append(salutation_subject);
+        $('#salutation_subject_span').html(salutation_subject);
+        $('#send_email').prop('disabled', false);
+    });
+//    $('#radio_email').click(function() {
+//        $('#email_html').show();
+//    });
+//    $('#radio_post').click(function() {
+//        $('#email_html').hide();
+//    });
+//    $("#email").on("paste keyup", function() {
+//        $("#email_span").html(this.value);
+//    });
+//    $("#subject").on("paste keyup", function() {
+//        $("#subject_span").html(this.value);
+//    });
 //    $("#email_span").on('change', function() {
 //        $("#email").val(this.value);
 //    });

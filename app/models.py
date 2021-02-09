@@ -165,7 +165,7 @@ class Income(db.Model):
     payer = db.Column(db.String(90))
     amount = db.Column(db.Numeric(8,2))
     paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
     incomealloc_income = db.relationship('IncomeAlloc', backref='income', lazy='dynamic')
 
@@ -200,7 +200,7 @@ class Landlord(db.Model):
     address = db.Column(db.String(180))
     tax_date = db.Column(db.Date)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'))
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
     email_acc_id = db.Column(db.Integer, db.ForeignKey('email_acc.id'))
 
     rent_landlord = db.relationship('Rent', backref='landlord', lazy='dynamic')
@@ -337,7 +337,7 @@ class ManagerExt(db.Model):
 
 
 class MoneyAcc(db.Model):
-    __tablename__ = 'money_acc'
+    __tablename__ = 'money_account'
 
     id = db.Column(db.Integer, primary_key=True)
     bank_name = db.Column(db.String(45))
@@ -346,9 +346,9 @@ class MoneyAcc(db.Model):
     acc_num = db.Column(db.String(15))
     acc_desc = db.Column(db.String(30))
 
-    income_moneyaccount = db.relationship('Income', backref='money_acc', lazy='dynamic')
-    money_item_moneyaccount = db.relationship('MoneyItem', backref='money_acc', lazy='dynamic')
-    landlord_moneyaccount = db.relationship('Landlord', backref='money_acc', lazy='dynamic')
+    income_moneyaccount = db.relationship('Income', backref='money_account', lazy='dynamic')
+    money_item_moneyaccount = db.relationship('MoneyItem', backref='money_account', lazy='dynamic')
+    landlord_moneyaccount = db.relationship('Landlord', backref='money_account', lazy='dynamic')
 
 
 class MoneyCat(db.Model):
@@ -371,7 +371,7 @@ class MoneyItem(db.Model):
     memo = db.Column(db.String(90))
     cat_id = db.Column(db.Integer, db.ForeignKey('money_category.id'))
     cleared = db.Column(db.Integer)
-    acc_id = db.Column(db.Integer, db.ForeignKey('money_acc.id'))
+    acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
 
 class PrArrearsMatrix(db.Model):

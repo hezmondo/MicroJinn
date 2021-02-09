@@ -1,16 +1,16 @@
 from werkzeug.datastructures import MultiDict
 from app.dao.filter import get_filters
 from app.dao.functions import doReplace, moneyToStr, dateToStr
-from app.dao.payrequest_ import get_charge_start_date, serialize_pr_save_data, get_pr_form, get_pr_forms, get_pr_file, \
-    get_pr_history, get_recovery_info, get_rent_charge_details, get_rent_pr, post_new_payrequest, \
-    post_updated_payrequest
+from app.dao.payrequest_ import get_charge_start_date, serialize_pr_save_data, get_email_form_by_code, get_pr_form, \
+    get_pr_forms, get_pr_file, get_pr_history, get_recovery_info, get_rent_charge_details, get_rent_pr, \
+    post_new_payrequest, post_updated_payrequest
 from app.dao.rent_ import get_rent_mail
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from flask import Blueprint, redirect, render_template,  request, url_for
+from flask import Blueprint, redirect, render_template,  request, url_for, json
 from flask_login import login_required
-from app.forms import PrEmailForm, PrPostForm
+from app.forms import PrPostForm
 
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -28,26 +28,20 @@ def pr_dialog(rent_id):
 @login_required
 def pr_edit(pr_form_id):
     if request.method == "POST":
-        method = request.args.get('method', 'email', type=str)
         rent_id = request.args.get('rent_id')
         # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
         block, pr_save_data, rent_pr, subject, table_rows, \
             totdue_string = write_payrequest(rent_id, pr_form_id)
-        if method == 'email':
-            pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email, 'subject': subject}))
-        elif method == 'post':
-            pr_form = PrPostForm()
-            rent_mail = get_rent_mail(rent_id)
-            pr_form.mailaddr.choices = [rent_mail.mailaddr, (rent_mail.tenantname + ', ' + rent_mail.propaddr),
-                                        ('The owner/occupier, ' + rent_mail.propaddr)]
-        # email and post
-        else:
-            pr_form = PrEmailForm(formdata=MultiDict({'email': rent_pr.email}))
+        pr_form = PrPostForm()
+        rent_mail = get_rent_mail(rent_id)
+        mailaddr = rent_mail.mailaddr.split(", ")
+        pr_form.mailaddr.choices = [rent_mail.mailaddr, (rent_mail.tenantname + ', ' + rent_mail.propaddr),
+                                    ('The owner/occupier, ' + rent_mail.propaddr)]
         if pr_form.validate_on_submit():
-            return redirect(url_for('pr_save_send', method=method, rent_id=rent_pr.id))
+            return redirect(url_for('pr_save_send', rent_id=rent_pr.id))
         pr_save_data = serialize_pr_save_data(pr_save_data)
-        return render_template('mergedocs/PR.html', pr_save_data=pr_save_data, pr_form=pr_form, block=block,
-                               method=method, rent_pr=rent_pr, subject=subject,
+        return render_template('mergedocs/PR.html', mailaddr=mailaddr, pr_save_data=pr_save_data, pr_form=pr_form,
+                               block=block, rent_pr=rent_pr, subject=subject,
                                table_rows=table_rows, totdue_string=totdue_string)
 
 
@@ -55,10 +49,15 @@ def pr_edit(pr_form_id):
 @pr_bp.route('/pr_file/<int:pr_id>', methods=['GET', 'POST'])
 @login_required
 def pr_file(pr_id):
+    method = request.args.get('method', type=str)
     if request.method == "POST":
         rent_id = post_updated_payrequest(pr_id)
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
     pr_file = get_pr_file(pr_id)
+    if method == 'email':
+        pr_save_data = json.loads(request.args.get('pr_save_data'))
+        email_block = write_payrequest_email(pr_save_data)
+        return render_template('pr_file.html', email_block=email_block, method=method, pr_file=pr_file)
     return render_template('pr_file.html', pr_file=pr_file)
 
 
@@ -86,9 +85,13 @@ def pr_history(rent_id):
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
 def pr_save_send():
     method = request.args.get('method', type=str)
-    if request.method == "POST":
-        id_ = post_new_payrequest(method)
-        return redirect(url_for('pr_bp.pr_history', rent_id=id_))
+    if request.method == 'POST':
+        pr_id, pr_save_data, rent_id = post_new_payrequest(method)
+        if method == 'post':
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
+        else:
+            pr_save_data = serialize_pr_save_data(pr_save_data)
+            return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, pr_save_data=pr_save_data, method='email'))
 
 
 @pr_bp.route('/pr_start', methods=['GET', 'POST'])
@@ -159,11 +162,13 @@ def build_pr_variables(rent_pr):
     rent_type = "rent charge" if rent_pr.tenuredet == "Rentcharge" else "ground rent"
     totcharges = rent_pr.totcharges if rent_pr.totcharges else Decimal(0)
     totdue = arrears + totcharges
-    pr_variables = {'#acc_name#': rent_pr.acc_name if rent_pr.acc_name else "no acc_name",
+    pr_variables = {'#advarr#': rent_pr.advarrdet if rent_pr else "no advarr",
+                    '#acc_name#': rent_pr.acc_name if rent_pr.acc_name else "no acc_name",
                     '#acc_num#': rent_pr.acc_num if rent_pr.acc_num else "no acc_number",
                     '#sort_code#': rent_pr.sort_code if rent_pr.sort_code else "no sort_code",
                     '#bank_name#': rent_pr.bank_name if rent_pr.bank_name else "no bank_name",
                     '#arrears#': moneyToStr(arrears, pound=True),
+                    '#periodly#': rent_pr.freqdet if rent_pr else "no periodly",
                     '#lastrentdate#': dateToStr(rent_pr.lastrentdate) if rent_pr else "11/11/1111",
                     '#managername#': rent_pr.managername if rent_pr else "no manager name",
                     '#manageraddr#': rent_pr.manageraddr if rent_pr else "no manager address",
@@ -259,15 +264,25 @@ def write_payrequest(rent_id, pr_form_id):
     pr_form = get_pr_form(pr_form_id)
     arrears_clause = doReplace(pr_variables, arrears_clause) + '\n\n' if arrears_clause else ""
     block = arrears_clause.capitalize() + doReplace(pr_variables, pr_form.block) if pr_form.block else ""
+    # TODO: pr_save_data can be cleaned up if we are passing all pr_variables in the dictionary
     pr_save_data = {
         'create_case': create_case,
         'new_arrears_level': new_arrears_level,
         'new_charge_dict': new_charge_dict,
         'pr_code': pr_form.code,
         'rent_date_string': str(rent_pr.nextrentdate),
-        'tot_due': totdue
+        'tot_due': totdue,
+        'pr_variables': pr_variables
     }
     return block, pr_save_data, rent_pr, subject, table_rows, totdue_string
+
+
+def write_payrequest_email(pr_save_data):
+    # TODO: Currently hardcoded access to email form EPR in letter_form - change if users can save and use their
+    #  own templates
+    email_form = get_email_form_by_code('EPR')
+    email_block = doReplace(pr_save_data.get('pr_variables'), email_form.block)
+    return email_block
 
 
 class ArrearsLevel:
