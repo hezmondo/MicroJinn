@@ -2,7 +2,7 @@ import json
 
 from app import db, decimal_default
 from app.dao.functions import dateToStr, commit_to_database
-from app.models import Case, Charge, ChargeType, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
+from app.models import Case, Charge, ChargeType, FormLetter, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
                         PrForm, PrHistory, Rent, TypeAdvArr, TypeFreq, TypePrDelivery, TypeTenure
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
@@ -52,6 +52,7 @@ def forward_rent_case_and_charges(pr_history, pr_save_data, rent_id):
                    new_charge_dict.get("charge_type_id"))
     if pr_save_data.get("create_case"):
         merge_case(rent_id, pr_history.id)
+    return pr_history.id
 
 
 def get_charge_start_date(rent_id):
@@ -60,6 +61,11 @@ def get_charge_start_date(rent_id):
 
 def get_charge_type(chargetype_id):
     return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
+
+
+def get_email_form_by_code(code):
+    email_form = FormLetter.query.filter(FormLetter.code == code).one_or_none()
+    return email_form
 
 
 def get_typeprdelivery(typeprdelivery_id=1):
@@ -127,8 +133,8 @@ def get_rent_pr(rent_id):
             .join(TypeFreq) \
             .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.check_pr_exists(Rent.id).label('prexists'),
+                           # the following function takes id, renttype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
                            func.mjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
@@ -159,9 +165,9 @@ def post_new_payrequest(method):
     prepare_block_entry(pr_history)
     db.session.add(pr_history)
     db.session.flush()
-    forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
+    pr_id = forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
     commit_to_database()
-    return rent_id
+    return pr_id, pr_save_data, rent_id
 
 
 def post_updated_payrequest(pr_id):
@@ -176,15 +182,8 @@ def prepare_new_pr_history_entry(method='email'):
     rent_id = request.args.get('rent_id', type=int)
     pr_history = PrHistory()
     pr_history.rent_id = rent_id
-    if method == 'email':
-        pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + \
-                             request.form.get('email')
-    elif method == 'post':
-        mailaddr = request.form.get('mailaddr') if request.form.get('mailaddr') else request.form.get('new_mailaddr')
-        pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
-    else:
-        pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + \
-                             request.form.get('email') + "-" + request.form.get('mailaddr')[0:25]
+    mailaddr = request.form.get('pr_addr')
+    pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
     pr_history.date = date.today()
     pr_history.rent_date = datetime.strptime(pr_save_data.get("rent_date_string"), '%Y-%m-%d')
     pr_history.total_due = pr_save_data.get("tot_due")
@@ -199,7 +198,7 @@ def prepare_new_pr_history_entry(method='email'):
 
 def prepare_block_entry(pr_history):
     pr_history.block = request.form.get('xinput').replace("£", "&pound;")
-    convert_html_to_pdf(pr_history.block, 'pr')
+    convert_html_to_pdf(pr_history.block, 'pr.pdf')
 
 
 def serialize_pr_save_data(pr_save_data):

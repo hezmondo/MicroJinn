@@ -170,5 +170,3 @@ def convert_html_to_pdf(source_html, output_filename):
     result_file.close()                 # close output file
     # return False on success and True on errors
     return pisa_status.err
-
-

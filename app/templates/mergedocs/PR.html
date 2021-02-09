@@ -21,57 +21,73 @@
 	</div>
 	<div class="form-group row">
 		<div class="col-md-4" align="bottom">
-			<button id="savehtml" type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
-			   class="btn btn-block btn-primary" role="button">post</button>
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+			   class="btn btn-block btn-success save_pr" role="button">post</button>
 		</div>
 		<div class="col-md-4" align="bottom">
-			<a href="{{ url_for('pr_bp.pr_email_edit', method='email_post') }}"
-			   class="btn btn-block btn-primary" role="button">email and post</a>
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post_email', rent_id=rent_pr.id) }}"
+			   class="btn btn-block btn-success save_pr" role="button">post and email</button>
 		</div>
 		<div class="col-md-4" align="bottom">
-			<a href="{{ url_for('pr_bp.pr_email_edit', method='email') }}"
-			   class="btn btn-block btn-primary" role="button">email</a>
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
+			   class="btn btn-block btn-success save_pr" role="button">email</button>
 		</div>
 	</div>
 	<div id="doc_html" contenteditable="true">
-		<div class="font-size-large" align="center">
-			<b>{{ rent_pr.managername }}</b>
-		</div>
-		<div class="font-size-small" align="center">
-			{{ rent_pr.manageraddr }}
-			<br />
-			{{ rent_pr.manageraddr2 }}
-			<br />
-		</div>
-		<div class="font-size-medium" align="right">
-			Our Ref: {{ rent_pr.rentcode }}
-			<br />
-			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
+		<style type="text/css">
+			{% include "mergedocs/pr_table_styles.css" %}
+		</style>
+		<div class="post_div">
+			<div class="font-size-large" align="center">
+				<b>{{ rent_pr.managername }}</b>
+			</div>
+			<div class="font-size-small" align="center">
+				{{ rent_pr.manageraddr }}
+				<br />
+				{{ rent_pr.manageraddr2 }}
+				<br />
+			</div>
+			<div class="font-size-medium" align="right">
+				<span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
+				<br />
+				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
+			</div>
 		</div>
 		<div class="font-size-medium" align="left">
-			<div>
-				<span id="mailaddr_span">
+			<div class="post_div">
+				<span id="addr_span" class="span-highlight" contenteditable="true">
 					{% for item in mailaddr %}
 						{{ item }}
 						<br />
 					{% endfor %}
 				</span>
-			</div>
-			<div id="email_html">
 				<br />
-				<br />
-				<div id="email_input">Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span class="span_highlight" id="email_span"> {{ rent_pr.email }} </span></div>
+				<span id="salutation_subject_span">
+					Dear {{ rent_pr.tenantname }}
+					<br />
+					<br />
+					<span><b> {{ subject }} </b></span>
+					<br />
+					<br />
+				</span>
 			</div>
-			<br />
-			<br />
-			Dear {{ rent_pr.tenantname }}
+			<div class="email_div" style="display: none;">
+				<div id="ref_email">
+					Our Ref: {{ rent_pr.rentcode }}
+					<br />
+					<br />
+					<div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to <span class="span-highlight" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email else 'example@gmail.com; example2@gmail.com'}} </span></div>
+					<br />
+				</div>
+				<span id="email_salutation_subject_span"></span>
+			</div>
 		</div>
 		<div class="font-size-medium" align="left">
-			<br />
-			<b><span id="subject_span">{{ subject }}</span></b>
-			<br />
-			<br />
 			<table class="pr_table">
+				<colgroup>
+					<col style="width:80%">
+					<col style="width:20%">
+				</colgroup>
 				<tr class="pr_table_heading">
 					<td>Details</a></td>
 					<td>Amount</td>
@@ -105,13 +121,17 @@
 	</div>
     <div class="form-group row">
 		<div class="col-md-3">
-            <input type="hidden" id="xinput" name="xinput" value = "xyz">
+            <input type="hidden" id="pr_block" name="xinput" value = "xyz">
         </div>
-    </div>
-    <div class="form-group row">
+		<div class="col-md-3">
+            <input type="hidden" id="pr_addr" name="pr_addr" value = "">
+        </div>
 		<div class="col-md-2">
             <input type="hidden" id="pr_save_data" name="pr_save_data" value = "{{ pr_save_data }}">
         </div>
+    </div>
+    <div class="form-group row">
+
     </div>
 </form>
 {% endblock %}

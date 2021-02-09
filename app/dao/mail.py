@@ -6,10 +6,7 @@ from app.models import Income, IncomeAlloc, Landlord, Manager, MoneyAcc, Rent, T
 from app.dao.form_letter import get_form_letter
 from app.dao.functions import dateToStr, doReplace, hashCode, moneyToStr
 from app.dao.lease import get_lease_variables
-from app.dao.payrequest_ import get_pr_form, get_rent_pr
 from app.dao.rent_ import get_rent_
-from app.views.payrequest_ import build_arrears_statement, build_rent_statement, build_pr_variables, \
-    build_pr_charges_table
 
 
 def getmaildata(rent_id, income_id=0):
