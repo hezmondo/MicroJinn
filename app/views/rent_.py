@@ -11,8 +11,8 @@ rent_bp = Blueprint('rent_bp', __name__)
 # @login_required
 def rent_(rent_id):
     if request.method == "POST":
-        id_ = post_rent(rent_id)
-        return redirect(url_for('rental_bp.rent_', rent_id=id_))
+        rent_id = post_rent(rent_id)
+        return redirect(url_for('rent_bp.rent_', rent_id=rent_id))
 
     combodict = get_combodict_rent()
     # gather rent combobox values

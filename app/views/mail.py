@@ -2,7 +2,7 @@ from flask import Blueprint, render_template,  request
 from flask_login import login_required
 from app.dao.rent_ import get_rent_mail
 from app.dao.form_letter import get_form_letters
-from app.dao.mail import writeMail
+from app.main.mail import writeMail
 
 mail_bp = Blueprint('mail_bp', __name__)
 

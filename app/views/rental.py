@@ -15,8 +15,8 @@ def rentals():
 # @login_required
 def rental(rental_id):
     if request.method == "POST":
-        id_ = post_rental(rental_id)
-        return redirect(url_for('bp_rental.rental', rental_id=id_))
+        rental_id = post_rental(rental_id)
+        return redirect(url_for('bp_rental.rental', rental_id=rental_id))
 
     rental, advarrdets, freqdets = get_rental(rental_id)
 

@@ -35,11 +35,11 @@ def get_rentalstatement(rental_id):
     return rentalstatement
 
 
-def post_rental(id):
-    if id == 0:
+def post_rental(rental_id):
+    if rental_id == 0:
         rental = Rental()
     else:
-        rental = Rental.query.get(id)
+        rental = Rental.query.get(rental_id)
     rental.propaddr = request.form.get("propaddr")
     rental.tenantname = request.form.get("tenantname")
     rental.rentpa = request.form.get("rentpa")
@@ -57,7 +57,7 @@ def post_rental(id):
         TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == advarr).one()[0]
     db.session.add(rental)
     db.session.flush()
-    id_ = rental.id
+    rental_id = rental.id
     db.session.commit()
 
-    return id_
+    return rental_id

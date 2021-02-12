@@ -5,7 +5,7 @@ from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
 from app.models import Agent, Landlord, Manager, Property, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
-    TypeMailTo, TypeProperty, TypeSaleGrade, TypeStatus, TypeTenure
+    TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def create_new_rent():
@@ -27,6 +27,7 @@ def get_rent_(rent_id):
             .join(TypeDeed) \
             .join(TypeFreq) \
             .join(TypeMailTo) \
+            .join(TypePrDelivery) \
             .join(TypeSaleGrade) \
             .join(TypeStatus) \
             .join(TypeTenure) \
@@ -40,8 +41,8 @@ def get_rent_(rent_id):
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
                            TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
-                           TypeMailTo.mailtodet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
-                           TypeTenure.tenuredet) \
+                           TypeMailTo.mailtodet, TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet,
+                           TypeStatus.statusdet, TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_ is None:
@@ -77,7 +78,7 @@ def post_rent(rent_id):
     # we need the post values with the class id generated for the actual combobox values:
     rent.actype_id = postvals_id["actype"]
     rent.advarr_id = postvals_id["advarr"]
-    rent.arrears = strToDec(postvals_id["arrears"])
+    rent.arrears = strToDec(request.form.get("arrears"))
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")
     rent.deed_id = request.form.get("deedcode")
@@ -99,7 +100,7 @@ def post_rent(rent_id):
     rent.tenure_id = postvals_id["tenure"]
     db.session.add(rent)
     db.session.flush()
-    _id = rent.id
+    rent_id = rent.id
     db.session.commit()
 
-    return _id
+    return rent_id

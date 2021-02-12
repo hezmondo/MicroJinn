@@ -92,6 +92,7 @@ def get_postvals_id():
         "actype": "",
         "advarr": "",
         "agent": "",
+        "deedtype": "",
         "frequency": "",
         "landlord": "",
         "mailto": "",
@@ -102,7 +103,7 @@ def get_postvals_id():
     }
     for key, value in postvals_id.items():
         actval = request.form.get(key)
-        if actval and actval != "":
+        if actval and actval != "" and actval!= "None":
             if key == "actype":
                 actval = TypeAcType.query.with_entities(TypeAcType.id).filter(TypeAcType.actypedet == actval).one()[0]
             elif key == "advarr":
@@ -117,6 +118,8 @@ def get_postvals_id():
                 actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.name == actval).one()[0]
             elif key == "mailto":
                 actval = TypeMailTo.query.with_entities(TypeMailTo.id).filter(TypeMailTo.mailtodet == actval).one()[0]
+            elif key == "prdelivery":
+                actval = TypePrDelivery.query.with_entities(TypePrDelivery.id).filter(TypePrDelivery.prdeliverydet == actval).one()[0]
             elif key == "salegrade":
                 actval = TypeSaleGrade.query.with_entities(TypeSaleGrade.id).filter(TypeSaleGrade.salegradedet == actval).one()[0]
             elif key == "status":
