@@ -9,14 +9,18 @@
     align-items: center; *//* align vertical *//*
 }*/
 
+.block-text {
+    display: block;
+}
+
+.btn-secondary, .btn-secondary:focus, .btn-secondary.focus {
+    color: #514B64;
+    background-color: transparent;
+}
+
 /*margin at bottom of app*/
 .container-main {
     margin-bottom: 20px;
-}
-
-/*important editable text in payrequest html*/
-.span-highlight {
-    background: #ffffff;
 }
 
 /* even sizes for 2 radio buttons in group for pr email delivery*/
@@ -38,11 +42,11 @@
   /*Without this, clicking will make it sticky*/
     pointer-events: none;
 }
-#doc_html, #email_html {
+#doc_html, #email_html, #form_letter_block {
     background-color: 	#EDEDED !important;
     padding: 10px;
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
-
+    min-height: 100px;
 }
 .btn-danger
 {
@@ -96,7 +100,6 @@ $mynewcolor:teal;
 .show>.btn-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem rgba(0,90,90,0.5)}
 .btn-success{border-color: #2f080e}
 .mt-100 {margin-top: 100px}
-table tr td {padding: 20px;}
 .warning {background: #76A0D3 !important;}
 body {
     background: #CDDBD9;
@@ -151,15 +154,25 @@ select:-internal-list-box option:checked {
 
 /*table css*/
 
+table {
+  border-collapse: collapse;
+  border-radius: 5px;
+  overflow: hidden;
+  font-size: 11pt;
+}
+
 thead {
     background-color: #86A9DC;
     color: #ffffff;
     font-weight: bold;
 }
 
-table tr td {
-    background-color: #d0dde1;
-    padding: 20px;
+tbody tr:nth-child(odd) td   { background-color:#d0dde1; }
+
+tbody tr:nth-child(even) td   { background-color:#e3eaed; }
+
+.table {
+    color: #3f4c59;
 }
 
 .table-fixed, .table-condensed{
@@ -167,7 +180,7 @@ table tr td {
 }
 
 .table thead th, .table td, .table th {
-    border-bottom: 1px solid #86A9DC;
+    border-bottom: 0px solid #86A9DC;
     border-top: 0px solid #86A9DC;
 }
 
@@ -181,10 +194,23 @@ table tr td {
 }
 
 /* blank horizontal line */
-hr {
- border-top:0px;
+.hr-invisible {
+    border-top:0px;
 }
 
+span.span-input {
+    position: absolute;
+    min-width: 100px;
+}
 
+span.emboldened {
+  font-weight: bold;
+}
+span.italic {
+  font-style: italic;
+}
+span.highlighted {
+  background-color: yellow;
+}
 
 /* End of docs.css */

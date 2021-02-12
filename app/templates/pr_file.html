@@ -7,28 +7,36 @@
 <form method="POST" id="pr_file">
     {% if method == 'email' %}
         <div class="form-group row">
-            <div class="col-md-4">
-                <span>Choose the email type, then send</span>
+            <div class="col-md-7">
+                <span>Edit the email address(es), subject and email below </span>
             </div>
-            <div class="btn-group btn-group-toggle col-md-6" data-toggle="buttons">
-                <label class="btn btn-secondary active">
-                    <input type="radio" name="pr_options" id="pr_email" autocomplete="off"> pr in email body
-                </label>
+            <div class="btn-group btn-group-toggle col-md-3" data-toggle="buttons">
                 <label class="btn btn-secondary">
-                    <input type="radio" name="pr_options" id="pr_attachment" autocomplete="off"> pr as attachment
+                    <input type="checkbox" name="pr_attached" id="pr_attached" autocomplete="off"> include pr as attachment
                 </label>
             </div>
             <div class="col-md-2">
-                <button class="btn btn-block btn-success" id="send_email" role="button" disabled>send email</button>
+                <button class="btn btn-block btn-success" id="send_email" role="button" disabled> send email &#10141; </button>
             </div>
         </div>
-        <div id="email_html" class="post_div font-size-medium" style="display: none;" contenteditable="true">
-            <span id="email_header_span"></span>
-            {{ email_block|safe }}
-        </div>
-        <hr>
-        <div id="doc_html" contenteditable="true" style="display: none;">
-            {{ pr_file.block|safe}}
+        <div id="email_html" class="post_div font-size-medium" contenteditable="false">
+            <span id="email_dets_span" class="block-text" contenteditable="false"></span>
+            <br />
+            <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
+            <br />
+            <span id="email_owings_span" class="block-text" contenteditable="true"></span>
+            <br />
+            <span id="email_body_span" class="block-text" contenteditable="true">
+                {{ email_block|safe }}
+            </span>
+            <br />
+            <span id="email_manager_span" class="block-text" contenteditable="true"></span>
+            <br />
+            <div class="font-size-medium" contenteditable="false">
+                <hr class="hr-thick">
+                {{ pr_file.block|safe}}
+            </div>
+            <input type="hidden" id="email_dict" name="email_dict" value = "">
         </div>
     {% else %}
         <div class="form-group row flex-row-reverse">
@@ -74,6 +82,12 @@
             {{ pr_file.block|safe}}
         </div>
     {% endif %}
-
 </form>
 {% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    {% include "pr_file.js" %}
+</script>
+{% endblock %}
+
+

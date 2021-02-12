@@ -1,8 +1,9 @@
 from werkzeug.datastructures import MultiDict
 from app.dao.filter import get_filters
 from app.dao.functions import doReplace, moneyToStr, dateToStr
-from app.dao.payrequest_ import get_charge_start_date, serialize_pr_save_data, get_email_form_by_code, get_pr_form, \
-    get_pr_forms, get_pr_file, get_pr_history, get_recovery_info, get_rent_charge_details, get_rent_pr, \
+from app.dao.form_letter import get_pr_form, get_pr_forms
+from app.dao.payrequest_ import get_charge_start_date, serialize_pr_save_data, get_email_form_by_code, \
+    get_pr_file, get_pr_history, get_recovery_info, get_rent_charge_details, get_rent_pr, \
     post_new_payrequest, post_updated_payrequest
 from app.dao.rent_ import get_rent_mail
 from datetime import date, timedelta
@@ -191,6 +192,7 @@ def build_pr_variables(rent_pr):
 def build_rent_statement(rent_pr, rent_type):
     statement = "{0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_type, rent_pr.advarrdet,
                                                                  dateToStr(rent_pr.nextrentdate))
+    statement = statement[0].upper() + statement[1:]
     return statement
 
 

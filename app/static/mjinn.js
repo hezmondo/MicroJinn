@@ -2,10 +2,6 @@ $(document).ready(function(){
     $("#save_delete").hide();
     $("#more_buttons").hide();
     $("#xalloc").hide();
-
-//    if ($("#item_id").text() == "0") {
-//       $("#toggleview").click();
-//            }
     $("#show-xalloc").click(function(){
         $("#xalloc").toggle();
         if ($(this).text() == "show extra alloc") {
@@ -54,8 +50,9 @@ $(document).ready(function(){
     });
     $('#address_fields').click(function() {
         var addr = $('#address_fields option:selected').text();
-        var addr_split = addr.replace(/,/g, "<br />")
-        $('#addr_span').html(addr_split)
+        var addr_split = addr.replace(/,/g, "<br />");
+        $('#addr_span').html(addr_split);
+        $('#addr_span').append("<br />");
     });
     $('.save_pr').click(function() {
         var pr_block = $('#doc_html').html();
@@ -63,46 +60,39 @@ $(document).ready(function(){
         var pr_addr = $('#addr_span').text().trim();
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "")
         $('#pr_addr').val(pr_addr_strip);
+    });
 
-//        var pr_email = $('#email_span').text();
-//        $('#pr_email').val(pr_email);
-//        var pr_subject = $('#subject_span').text();
-//        $('#pr_subject').val(pr_subject);
+    $('#bold_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '**' + highlight + '**';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
     });
-    $('#pr_email').click(function() {
-        $('.post_div').hide();
-        $('.email_div').show();
-        $('#doc_html').show();
-        var salutation_subject = $('#salutation_subject_span').html();
-        $('#email_salutation_subject_span').html(salutation_subject);
-        $('#send_email').prop('disabled', false);
+        $('#italic_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '^^' + highlight + '^^';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
     });
-    $('#pr_attachment').click(function() {
-        $('.post_div').show();
-        $('.email_div').hide();
-        $('#doc_html').show();
-        var salutation_subject = $('#salutation_subject_span').html();
-        var ref_email = $('#ref_email').html();
-        $('#email_header_span').html(ref_email);
-        $('#email_header_span').append(salutation_subject);
-        $('#salutation_subject_span').html(salutation_subject);
-        $('#send_email').prop('disabled', false);
+        $('#highlight_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '||' + highlight + '||';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
     });
-//    $('#radio_email').click(function() {
-//        $('#email_html').show();
-//    });
-//    $('#radio_post').click(function() {
-//        $('#email_html').hide();
-//    });
-//    $("#email").on("paste keyup", function() {
-//        $("#email_span").html(this.value);
-//    });
-//    $("#subject").on("paste keyup", function() {
-//        $("#subject_span").html(this.value);
-//    });
-//    $("#email_span").on('change', function() {
-//        $("#email").val(this.value);
-//    });
+    $('.save_form').click(function() {
+        var mysave = $('#form_letter_block').html();
+        $('#xinput').val(mysave);
+    });
+    $('#doc_html').html(function(i, html) {
+      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
+    });
+    $('#doc_html').html(function(i, html2) {
+      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
+    });
+    $('#doc_html').html(function(i, html3) {
+      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
+    });
 });
 $(function() {
   // Sidebar toggle behavior

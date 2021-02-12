@@ -3,7 +3,7 @@ import json
 from app import db, decimal_default
 from app.dao.functions import dateToStr, commit_to_database
 from app.models import Case, Charge, ChargeType, FormLetter, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
-                        PrForm, PrHistory, Rent, TypeAdvArr, TypeFreq, TypePrDelivery, TypeTenure
+                        PrHistory, Rent, TypeAdvArr, TypeFreq, TypePrDelivery, TypeTenure
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
@@ -74,15 +74,6 @@ def get_typeprdelivery(typeprdelivery_id=1):
 
 def get_typeprdelivery_id(prdeliverydet='email'):
     return db.session.query(TypePrDelivery.id).filter_by(prdeliverydet=prdeliverydet).scalar()
-
-
-def get_pr_form(pr_form_id):
-    pr_form = PrForm.query.filter(PrForm.id == pr_form_id).one_or_none()
-    return pr_form
-
-
-def get_pr_forms():
-    return PrForm.query.all()
 
 
 def get_pr_file(pr_id):

@@ -1,6 +1,6 @@
 from app import db
 from flask import request
-from app.models import FormLetter, PrForm, Template, TypeDoc
+from app.models import FormLetter, Template, TypeDoc
 from app.dao.functions import commit_to_database
 
 
@@ -31,6 +31,15 @@ def get_form_letters(action):
     return form_letters
 
 
+def get_pr_form(pr_form_id):
+    pr_form = FormLetter.query.filter(FormLetter.id == pr_form_id).one_or_none()
+    return pr_form
+
+
+def get_pr_forms():
+    return FormLetter.query.filter(FormLetter.doctype_id == 2).all()
+
+
 def get_templates():
     templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
     return templates
@@ -44,7 +53,7 @@ def post_form_letter(form_letter_id):
     form_letter.code = request.form.get("code")
     form_letter.description = request.form.get("description")
     form_letter.subject = request.form.get("subject")
-    form_letter.block = request.form.get("block")
+    form_letter.block = request.form.get("xinput")
     form_letter.bold = request.form.get("bold")
     doctype = request.form.get("doc_type")
     form_letter.doctype_id = \
@@ -60,11 +69,3 @@ def post_form_letter(form_letter_id):
     commit_to_database()
     return form_letter_id
 
-
-def get_formpayrequest(form_letter_id):
-    formpayrequest = PrForm.query.filter(PrForm.id == form_letter_id).one_or_none()
-    return formpayrequest
-
-
-def get_formpayrequests():
-    return PrForm.query.all()
