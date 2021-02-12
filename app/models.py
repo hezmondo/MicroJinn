@@ -408,16 +408,6 @@ class PrFilter(db.Model):
     content = db.Column(db.Text)
 
 
-class PrForm(db.Model):
-    __tablename__ = 'pr_form'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    description = db.Column(db.String(60))
-    subject = db.Column(db.String(150))
-    block = db.Column(db.Text, nullable=True)
-
-
 class PrHistory(db.Model):
     __tablename__ = 'pr_history'
 

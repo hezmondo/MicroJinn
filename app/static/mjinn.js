@@ -50,9 +50,9 @@ $(document).ready(function(){
     });
     $('#address_fields').click(function() {
         var addr = $('#address_fields option:selected').text();
-        var addr_split = addr.replace(/,/g, "<br />")
-        $('#addr_span').html(addr_split)
-        $('#addr_span').append("<br />")
+        var addr_split = addr.replace(/,/g, "<br />");
+        $('#addr_span').html(addr_split);
+        $('#addr_span').append("<br />");
     });
     $('.save_pr').click(function() {
         var pr_block = $('#doc_html').html();
@@ -60,6 +60,38 @@ $(document).ready(function(){
         var pr_addr = $('#addr_span').text().trim();
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "")
         $('#pr_addr').val(pr_addr_strip);
+    });
+
+    $('#bold_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '**' + highlight + '**';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
+    });
+        $('#italic_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '^^' + highlight + '^^';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
+    });
+        $('#highlight_text').click(function(){
+        var highlight = window.getSelection();
+        var spn = '||' + highlight + '||';
+        var text = $('#form_letter_block').html();
+        $('#form_letter_block').html(text.replace(highlight, spn));
+    });
+    $('.save_form').click(function() {
+        var mysave = $('#form_letter_block').html();
+        $('#xinput').val(mysave);
+    });
+    $('#doc_html').html(function(i, html) {
+      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
+    });
+    $('#doc_html').html(function(i, html2) {
+      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
+    });
+    $('#doc_html').html(function(i, html3) {
+      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
     });
 });
 $(function() {

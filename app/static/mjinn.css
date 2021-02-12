@@ -42,11 +42,11 @@
   /*Without this, clicking will make it sticky*/
     pointer-events: none;
 }
-#doc_html, #email_html {
+#doc_html, #email_html, #form_letter_block {
     background-color: 	#EDEDED !important;
     padding: 10px;
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
-
+    min-height: 100px;
 }
 .btn-danger
 {
@@ -201,6 +201,16 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
 span.span-input {
     position: absolute;
     min-width: 100px;
+}
+
+span.emboldened {
+  font-weight: bold;
+}
+span.italic {
+  font-style: italic;
+}
+span.highlighted {
+  background-color: yellow;
 }
 
 /* End of docs.css */
