@@ -191,6 +191,7 @@ def build_pr_variables(rent_pr):
 def build_rent_statement(rent_pr, rent_type):
     statement = "{0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_type, rent_pr.advarrdet,
                                                                  dateToStr(rent_pr.nextrentdate))
+    statement = statement[0].upper() + statement[1:]
     return statement
 
 

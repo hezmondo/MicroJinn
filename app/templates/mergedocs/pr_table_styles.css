@@ -1,4 +1,15 @@
+.pr_table thead {
+    background-color: #86A9DC;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.pr_table tbody tr:nth-child(odd) td   { background-color:transparent; }
+
+.pr_table tbody tr:nth-child(even) td   { background-color:transparent; }
+
 .pr_table {
+    font-size: 10.5pt;
     table-layout: fixed;
     width: 100%;
     margin-left: auto;
@@ -13,7 +24,6 @@
 .pr_table tr td {
     padding: 5px;
     background-color: transparent;
-
 }
 .total {
     font-weight: bold;
@@ -28,4 +38,8 @@
     background-color: #86A9DC;
     color: #ffffff;
     font-weight: bold;
+}
+.hr-thick {
+    border: 3px solid rgba(0,0,0,.15);
+    border-radius: 5px;
 }
