@@ -65,22 +65,25 @@ def get_combodict_filter():
 def get_hr_statuses():
     hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
-
     return hr_statuses
 
 
 def get_idlist_recent(type):
-    id_list = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
-    id_list = json.loads(getattr(current_user, type)) if getattr(current_user, type) else id_list
-
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
     return id_list
 
 
 def pop_idlist_recent(type, id):
-    id_list = json.loads(getattr(current_user, type))
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
     if id not in id_list:
         id_list.insert(0, id)
-        if len(id_list) > 30:
+        if len(id_list) > 20:
             id_list.pop()
         setattr(current_user, type, json.dumps(id_list))
         db.session.commit()

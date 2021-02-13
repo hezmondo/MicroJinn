@@ -91,28 +91,21 @@ Eventually I discovered that MySQL server is now set up to restrict access to lo
     sudo nano etc/mysql/mysql.conf.d/mysqld.cnf
 
 
-### How to use sed to clean up a MySQL dump created in workbench rather than one created by the wonderful Jinn backup utility created by JB 
+### Problems in importing mysql functions and procedures using a mysql dump created in workbench by another user
 
-If you attempt to import sql dump created in workbench you may get one or all of these errors:
+The import of functions and procedures seems to fail every time.  Assuming you are trying to import a single sql file containing all the functions and procedures, 
+you first need to replace all occurrences of  CREATE DEFINER=**** FUNCTION with CREATE FUNCTION and then remove all occurrences of NO_AUTO_CREATE_USER within the whole sql file. 
+The import of functions and procedures will probably still fail with an error mentioning "log_bin_trust_function_creators".  
+If so, either in mysql console or in workbench, run this command/query:  set global log_bin_trust_function_creators = 1; and then try again.  
+That setting only lasts for the workbench setting
 
-ERROR 1231 (42000) at line 1454: Variable 'sql_mode' can't be set to the value of 'NO_AUTO_CREATE_USER'
+**Hez favoured simple solution to data import issues:**
+ 
+Create two sql dump folders, one being just all the tables, named TablesDump, and the other being just the teeny user table along with the functions and procedures, named UserFuncProcDump
 
-ERROR because MySQL dumps functions containing text such as this: CREATE DEFINER=`root`@`localhost` FUNCTION
+The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
 
-Run these commands in a terminal opened in the folder containing your sql dump file eg "mydump.sql"
-  
-	sed -i 's/NO_AUTO_CREATE_USER//' mydump.sql 
-	sed -i 's/DEFINER=`root`@`localhost`//' mydump.sql 
-
-If you get an error because of text containing SET TIME_ZONE=, then I suggest you remove this line, which is a few lines up from the very end of the sql file.  I will ask JB if sed can do this.
-
-
-### If you still get a problem importing dump files, you may need to do this:
-
-Login to the MySQL shell (see detailed instructions above) and run this command:
-
-    set log_bin_trust_function_creators = 1; 
-
+So, after refreshing, you should now see all the tables and all the functions and procedures.
 
 ### If you need to get into MySQL server as root and you do not know your password:
 

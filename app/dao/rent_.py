@@ -1,10 +1,10 @@
 from app import db
-from flask import flash, redirect, url_for, request, session
+from flask import flash, redirect, url_for, request
 from sqlalchemy import func
 from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
-from app.models import Agent, Landlord, Manager, Property, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
+from app.models import Agent, Landlord, Manager, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
     TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 

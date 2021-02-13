@@ -1,7 +1,7 @@
 from flask import request
 from app.dao.functions import commit_to_database
 from app.models import Agent, Charge, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, Landlord, Loan, \
-    ManagerExt, MoneyItem, Property, PrHistory, Rent, RentExt, MoneyAcc
+    MoneyItem, Property, PrHistory, Rent, RentExt, MoneyAcc
 
 
 def delete_record(item_id, item):

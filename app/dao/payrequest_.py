@@ -1,5 +1,4 @@
 import json
-
 from app import db, decimal_default
 from app.dao.functions import dateToStr, commit_to_database
 from app.models import Case, Charge, ChargeType, FormLetter, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
@@ -134,7 +133,7 @@ def get_rent_pr(rent_id):
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
-                           Rent.rentpa, Rent.tenantname, Rent.freq_id,
+                           Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
                            MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
                            TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeTenure.tenuredet) \

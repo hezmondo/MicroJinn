@@ -104,6 +104,29 @@ then click the `Pull` button.
 
 You are now connected to the sammjinn branch and all subsequent pushes and pulls will link to that branch.
 
+**How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):**
+
+File > Open > select mjinn directory. That loads it as a project.
+
+Run > Edit Configurations > Select Flask/mjinn.py > defaults should be fine - use python interpreter
+
+Find the Before launch near bottom of tab > click the green "+" beneath it > select desired Browser, for Url enter: http://127.0.0.1:5000/
+
+Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically. 
+
+Output/debug messages will go to the PyCharm Console tab.
+
+### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
+
+File > Open ..., select mjinn directory.  That loads it as a project.
+
+Run > Edit Configurations ....  Find the Before launch near bottom of tab, click the green "+" beneath it.
+
+Select desired Browser, for Url enter: http://127.0.0.1:5000/
+
+Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically.  Output/debug messages go to PyCharm Console tab.
+
+
 **How to count lines of code in project**  Open powershell window in Code folder and try this:
 
     dir -Recurse *.py | Get-Content | Measure-Object -Line
