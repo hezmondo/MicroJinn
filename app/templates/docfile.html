@@ -11,7 +11,7 @@
                class="btn btn-block btn-primary" role="button">back to docfiles</a>
         </div>
         <div class="col-md-2">
-            <a href="{{ url_for('rent_bp.rent_', rent_id=docfile.rent_id) }}"
+            <a href="{{ url_for('rent_bp.rent', rent_id=docfile.rent_id) }}"
                class="btn btn-block btn-primary" role="button">back to rent</a>
         </div>
         {% if doc_dig == "dig" %}

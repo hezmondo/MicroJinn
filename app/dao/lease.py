@@ -34,6 +34,7 @@ def get_lease(lease_id):
                     'rentcode': rentcode
                 }
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
+
     return lease, uplift_types
 
 
@@ -122,6 +123,7 @@ def post_lease(lease_id):
     print(request.form)
     db.session.add(lease)
     commit_to_database()
+
     return rent_id
 
 

@@ -4,16 +4,17 @@ from sqlalchemy import func
 from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
-from app.models import Agent, Landlord, Manager, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
+from app.models import Agent, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
     TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def create_new_rent():
     # create new rent and property function not yet built, so return id for dummy rent:
+
     return 23
 
 
-def get_rent_(rent_id):
+def get_rent(rent_id):
     if rent_id == 0:
         # take the user to create new rent function:
         rent_id = create_new_rent()
@@ -34,8 +35,6 @@ def get_rent_(rent_id):
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
@@ -54,8 +53,8 @@ def get_rent_(rent_id):
     return rent_
 
 
-def get_rent_mail(rent_id):
-    rent_mail = \
+def get_rent_addrs(rent_id):
+    rent_addrs = \
         Rent.query.join(TypeMailTo).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,
                                                   func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
                                                   func.mjinn.prop_addr(Rent.id).label('propaddr'),
@@ -63,11 +62,41 @@ def get_rent_mail(rent_id):
                                                   TypeMailTo.mailtodet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
-    if rent_mail is None:
+    if rent_addrs is None:
         flash('Invalid rent code')
+
         return redirect(url_for('auth.login'))
-    else:
-        pop_idlist_recent("recent_rents", rent_id)
+
+    return rent_addrs
+
+
+def get_rent_mail(rent_id):
+    rent_mail = \
+        Rent.query \
+            .join(Landlord) \
+            .join(Manager) \
+            .join(MoneyAcc) \
+            .join(TypeAdvArr) \
+            .join(TypeFreq) \
+            .join(TypeStatus) \
+            .join(TypeTenure) \
+            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+                           func.mjinn.check_pr_exists(Rent.id).label('prexists'),
+                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                           # the following functions take id, renttype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
+                           func.mjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
+                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
+                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
+                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
+                           func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
+                           Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
+                           Manager.managername, Manager.manageraddr, Manager.manageraddr2,
+                           MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
+                           TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeStatus.statusdet, TypeTenure.tenuredet) \
+            .filter(Rent.id == rent_id) \
+            .one_or_none()
 
     return rent_mail
 

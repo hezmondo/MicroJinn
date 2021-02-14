@@ -18,5 +18,5 @@ def form_letter(form_letter_id):
 
 @form_letter_bp.route('/form_letters', methods=['GET'])
 def form_letters():
-    form_letters = get_form_letters("normal")
+    form_letters = get_form_letters("all")
     return render_template('form_letters.html', form_letters=form_letters)

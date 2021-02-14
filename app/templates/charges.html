@@ -6,7 +6,7 @@
     <div class="form-group row flex-row-reverse">
         {% if rent_id != "0" %}
             <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent_', rent_id=rent_id) }}"
+                <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
                    class="btn btn-block btn-primary" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
