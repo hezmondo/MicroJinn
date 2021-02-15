@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
 from app.dao.functions import commit_to_database, dateToStr, doReplace, moneyToStr
 from app.dao.payrequest import add_pr_history, get_recovery_info, \
-    prepare_new_pr_history_entry, prepare_block_entry
+    prepare_new_pr_history_entry
 from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_rent_charge_details
 from app.dao.rent import get_rent, get_rent_mail, update_roll_rent
 from app.main.mail import get_mail_variables
@@ -166,8 +166,9 @@ def save_charge(rent_id, recovery_charge_amount, chargetype_id):
 
 
 def save_new_payrequest(method):
-    pr_save_data, pr_history, rent_id = save_new_pr_history_entry(method)
-    save_block_entry_and_pdf(pr_history)
+    block, pr_save_data, pr_history, rent_id = save_new_pr_history_entry(method)
+    if method != 'email':
+        convert_html_to_pdf(block, 'pr.pdf')
     add_pr_history(pr_history)
     pr_id = forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
     commit_to_database()
@@ -175,17 +176,12 @@ def save_new_payrequest(method):
 
 
 def save_new_pr_history_entry(method):
+    block = request.form.get('xinput').replace("£", "&pound;")
     pr_save_data = json.loads(request.form.get('pr_save_data'))
     rent_id = request.args.get('rent_id', type=int)
     mailaddr = request.form.get('pr_addr')
-    pr_history = prepare_new_pr_history_entry(pr_save_data, rent_id, mailaddr, method)
-    return pr_save_data, pr_history, rent_id
-
-
-def save_block_entry_and_pdf(pr_history):
-    block = request.form.get('xinput').replace("£", "&pound;")
-    prepare_block_entry(block, pr_history)
-    convert_html_to_pdf(block, 'pr.pdf')
+    pr_history = prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method)
+    return block, pr_save_data, pr_history, rent_id
 
 
 def serialize_pr_save_data(pr_save_data):

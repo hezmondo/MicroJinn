@@ -48,12 +48,9 @@ def post_updated_payrequest(block, pr_id):
     return rent_id
 
 
-def prepare_block_entry(block, pr_history):
-    pr_history.block = block
-
-
-def prepare_new_pr_history_entry(pr_save_data, rent_id, mailaddr, method='email'):
+def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method='email'):
     pr_history = PrHistory()
+    pr_history.block = block
     pr_history.rent_id = rent_id
     pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
     pr_history.date = date.today()
