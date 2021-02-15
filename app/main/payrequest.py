@@ -1,11 +1,18 @@
 import json
 from app import decimal_default
 from datetime import date, timedelta
-from app.dao.form_letter import get_pr_form
-from app.dao.functions import dateToStr, doReplace, moneyToStr
-from app.dao.payrequest import get_charge_start_date, get_email_form_by_code, get_recovery_info, get_rent_charge_details
-from app.dao.rent import get_rent_mail
+from decimal import Decimal
+from flask import request
+from dateutil.relativedelta import relativedelta
+from app.dao.form_letter import get_email_form_by_code, get_pr_form
+from app.dao.functions import commit_to_database, dateToStr, doReplace, moneyToStr
+from app.dao.payrequest import add_pr_history, get_recovery_info, \
+    prepare_new_pr_history_entry, prepare_block_entry
+from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_rent_charge_details
+from app.dao.rent import get_rent, get_rent_mail, update_roll_rent
 from app.main.mail import get_mail_variables
+from app.dao.case import merge_case
+from app.dao.doc_ import convert_html_to_pdf
 
 
 def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
@@ -125,9 +132,66 @@ def check_recovery_in_charges(charges, recovery_charge_amount):
     return includes_recovery
 
 
+def create_case(rent_id, pr_id):
+    case_details = "Automatically created by payrequest {} on {}".format(pr_id, dateToStr(date.today()))
+    case_nad = date.today() + relativedelta(days=30)
+    merge_case(case_details, case_nad, rent_id)
+
+
+def forward_rent(rent_id):
+    rent = get_rent(rent_id)
+    arrears = rent.arrears + (rent.rentpa / rent.freq_id)
+    update_roll_rent(rent_id, arrears)
+    # if not from_batch:
+    # else:
+    #     return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
+
+
+def forward_rent_case_and_charges(pr_history, pr_save_data, rent_id):
+    forward_rent(rent_id)
+    new_charge_dict = pr_save_data.get("new_charge_dict")
+    if len(new_charge_dict) > 0:
+        save_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
+                   new_charge_dict.get("charge_type_id"))
+    if pr_save_data.get("create_case"):
+        create_case(rent_id, pr_history.id)
+    return pr_history.id
+
+
+def save_charge(rent_id, recovery_charge_amount, chargetype_id):
+    today_string = dateToStr(date.today())
+    charge_type = get_charge_type(chargetype_id)
+    charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
+    add_charge(rent_id, recovery_charge_amount, chargetype_id, charge_details)
+
+
+def save_new_payrequest(method):
+    pr_save_data, pr_history, rent_id = save_new_pr_history_entry(method)
+    save_block_entry_and_pdf(pr_history)
+    add_pr_history(pr_history)
+    pr_id = forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
+    commit_to_database()
+    return pr_id, pr_save_data, rent_id
+
+
+def save_new_pr_history_entry(method):
+    pr_save_data = json.loads(request.form.get('pr_save_data'))
+    rent_id = request.args.get('rent_id', type=int)
+    mailaddr = request.form.get('pr_addr')
+    pr_history = prepare_new_pr_history_entry(pr_save_data, rent_id, mailaddr, method)
+    return pr_save_data, pr_history, rent_id
+
+
+def save_block_entry_and_pdf(pr_history):
+    block = request.form.get('xinput').replace("£", "&pound;")
+    prepare_block_entry(block, pr_history)
+    convert_html_to_pdf(block, 'pr.pdf')
+
+
 def serialize_pr_save_data(pr_save_data):
     pr_save_data = json.dumps(pr_save_data, default=decimal_default)
     return pr_save_data
+
 
 def write_payrequest(rent_id, pr_form_id):
     rent_mail = get_rent_mail(rent_id)

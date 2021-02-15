@@ -1,13 +1,20 @@
 from app import db
 from datetime import date
 from flask import request
-from app.dao.functions import commit_to_database, strToDec
+from app.dao.functions import strToDec
+from sqlalchemy import func
+from app.models import Charge, ChargeType, Rent
 
-from app.models import Charge, ChargeType, Rent\
+
+def add_charge(rent_id, recovery_charge_amount, chargetype_id, charge_details):
+    new_charge = Charge(chargetype_id=chargetype_id, chargestartdate=date.today(),
+                        chargetotal=recovery_charge_amount, chargedetail=charge_details,
+                        chargebalance=recovery_charge_amount, rent_id=rent_id)
+    db.session.add(new_charge)
 
 
 def get_charge(charge_id):
-    rentcode = request.args.get('rentcode', "XNEWX" , type=str)
+    rentcode = request.args.get('rentcode', "XNEWX", type=str)
     rent_id = int(request.args.get('rent_id', "0", type=str))
     # new charge has id = 0
     if charge_id == 0:
@@ -21,9 +28,10 @@ def get_charge(charge_id):
     else:
         charge = \
             Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.id.label("rent_id"), Rent.rentcode,
-                                                                   ChargeType.chargedesc, Charge.chargestartdate, Charge.chargetotal, Charge.chargedetail,
+                                                                   ChargeType.chargedesc, Charge.chargestartdate,
+                                                                   Charge.chargetotal, Charge.chargedetail,
                                                                    Charge.chargebalance) \
-                    .filter(Charge.id == charge_id).one_or_none()
+                .filter(Charge.id == charge_id).one_or_none()
     chargedescs = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
 
     return charge, chargedescs
@@ -40,9 +48,27 @@ def get_charges(rent_id):
         qfilter.append(Charge.rent_id == rent_id)
 
     charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
-                                                                     Charge.chargestartdate, Charge.chargetotal, Charge.chargedetail, Charge.chargebalance) \
-            .filter(*qfilter).order_by(Rent.rentcode).all()
+                                                                     Charge.chargestartdate, Charge.chargetotal,
+                                                                     Charge.chargedetail, Charge.chargebalance) \
+        .filter(*qfilter).order_by(Rent.rentcode).all()
 
+    return charges
+
+
+def get_charge_start_date(rent_id):
+    return db.session.execute(func.mjinn.newest_charge(rent_id)).scalar()
+
+
+def get_charge_type(chargetype_id):
+    return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
+
+
+def get_rent_charge_details(rent_id):
+    qfilter = [Charge.rent_id == rent_id]
+    charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
+                                                                     Charge.chargestartdate, Charge.chargetotal,
+                                                                     Charge.chargedetail, Charge.chargebalance) \
+        .filter(*qfilter).all()
     return charges
 
 
