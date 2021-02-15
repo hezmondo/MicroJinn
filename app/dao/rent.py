@@ -5,7 +5,7 @@ from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
 from app.models import Agent, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
-    TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
+    TypeMailTo, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def create_new_rent():
@@ -28,7 +28,6 @@ def get_rent(rent_id):
             .join(TypeDeed) \
             .join(TypeFreq) \
             .join(TypeMailTo) \
-            .join(TypePrDelivery) \
             .join(TypeSaleGrade) \
             .join(TypeStatus) \
             .join(TypeTenure) \
@@ -40,7 +39,7 @@ def get_rent(rent_id):
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
                            TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
-                           TypeMailTo.mailtodet, TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet,
+                           TypeMailTo.mailtodet, TypeSaleGrade.salegradedet,
                            TypeStatus.statusdet, TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
@@ -133,3 +132,17 @@ def post_rent(rent_id):
     db.session.commit()
 
     return rent_id
+
+
+def update_roll_rent(rent_id, arrears):
+    rent = Rent.query.get(rent_id)
+    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
+    rent.lastrentdate = last_rent_date
+    rent.arrears = arrears
+
+
+# def update_roll_rents(rent_mails):
+#     update_vals = []
+#     for rent_mailop in rent_mails:
+#         update_vals.append(update_roll_rent(rent_mailop.id))
+#     db.session.bulk_update_mappings(Rent, update_vals)

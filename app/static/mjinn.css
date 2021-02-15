@@ -191,6 +191,7 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
     padding: 20px;
     text-align: center;
+    border-radius: 5px;
 }
 
 /* blank horizontal line */

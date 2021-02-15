@@ -1,69 +1,12 @@
-import json
 from datetime import date, datetime
-from flask import request
-from decimal import Decimal
-from dateutil.relativedelta import relativedelta
-from sqlalchemy import func
 from app import db
-from app.dao.doc_ import convert_html_to_pdf
-from app.models import Case, Charge, ChargeType, FormLetter, PrArrearsMatrix, PrHistory, Rent, TypePrDelivery
-from app.dao.functions import dateToStr, commit_to_database
+from app.models import PrArrearsMatrix, PrHistory, Rent, TypePrDelivery
+from app.dao.functions import commit_to_database
 
 
-def add_charge(rent_id, recovery_charge_amount, chargetype_id):
-    today_string = dateToStr(date.today())
-    charge_type = get_charge_type(chargetype_id)
-    charge_details = "£{} {} added on {}".format(recovery_charge_amount, charge_type.capitalize(), today_string)
-    new_charge = Charge(chargetype_id=chargetype_id, chargestartdate=date.today(),
-                        chargetotal=recovery_charge_amount, chargedetail=charge_details,
-                        chargebalance=recovery_charge_amount, rent_id=rent_id)
-    db.session.add(new_charge)
-
-
-def calculate_arrears(arrears, freq_id, rent_pa):
-    return arrears + (rent_pa / freq_id)
-
-
-def forward_rent(rent_id, from_batch=False):
-    rent = Rent.query.get(rent_id)
-    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent_id, 1, 1)).scalar()
-    arrears = calculate_arrears(rent.arrears, rent.freq_id, rent.rentpa)
-    if not from_batch:
-        rent.lastrentdate = last_rent_date
-        rent.arrears = arrears
-    else:
-        return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
-
-
-def forward_rents(rent_mails):
-    update_vals = []
-    for rent_mailop in rent_mails:
-        update_vals.append(forward_rent(rent_mailop.id, True))
-    db.session.bulk_update_mappings(Rent, update_vals)
-
-
-def forward_rent_case_and_charges(pr_history, pr_save_data, rent_id):
-    forward_rent(rent_id)
-    new_charge_dict = pr_save_data.get("new_charge_dict")
-    if len(new_charge_dict) > 0:
-        add_charge(new_charge_dict.get("rent_id"), Decimal(new_charge_dict.get("charge_total")),
-                   new_charge_dict.get("charge_type_id"))
-    if pr_save_data.get("create_case"):
-        merge_case(rent_id, pr_history.id)
-    return pr_history.id
-
-
-def get_charge_start_date(rent_id):
-    return db.session.execute(func.mjinn.newest_charge(rent_id)).scalar()
-
-
-def get_charge_type(chargetype_id):
-    return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
-
-
-def get_email_form_by_code(code):
-    email_form = FormLetter.query.filter(FormLetter.code == code).one_or_none()
-    return email_form
+def add_pr_history(pr_history):
+    db.session.add(pr_history)
+    db.session.flush()
 
 
 def get_typeprdelivery(typeprdelivery_id=1):
@@ -86,12 +29,6 @@ def get_pr_history(rent_id):
     return PrHistory.query.filter_by(rent_id=rent_id)
 
 
-def get_previous_pr_history_entry(pr_id):
-    pr_history = PrHistory.query.get(pr_id)
-    rent_id = pr_history.rent_id
-    return pr_history, rent_id
-
-
 def get_recovery_info(suffix):
     recovery_info = PrArrearsMatrix.query.with_entities(PrArrearsMatrix.arrears_clause,
                                                         PrArrearsMatrix.recovery_charge,
@@ -103,53 +40,18 @@ def get_recovery_info(suffix):
     return arrears_clause, create_case, recovery_charge
 
 
-def get_rent_charge_details(rent_id):
-    qfilter = [Charge.rent_id == rent_id]
-    charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
-                                                                     Charge.chargestartdate, Charge.chargetotal,
-                                                                     Charge.chargedetail, Charge.chargebalance) \
-        .filter(*qfilter).all()
-
-    return charges
-
-
-def merge_case(rent_id, pr_id):
-    case = Case()
-    case.id = rent_id
-    case.case_details = "Automatically created by payrequest {} on {}".format(pr_id, dateToStr(date.today()))
-    case.case_nad = date.today() + relativedelta(days=30)
-    db.session.merge(case)
-
-
-def post_new_payrequest(method):
-    pr_save_data, pr_history, rent_id = prepare_new_pr_history_entry(method)
-    prepare_block_entry(pr_history)
-    db.session.add(pr_history)
-    db.session.flush()
-    pr_id = forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
+def post_updated_payrequest(block, pr_id):
+    pr_history = PrHistory.query.get(pr_id)
+    rent_id = pr_history.rent_id
+    pr_history.block = block
     commit_to_database()
-
-    return pr_id, pr_save_data, rent_id
-
-
-def post_updated_payrequest(pr_id):
-    pr_history, rent_id = get_previous_pr_history_entry(pr_id)
-    prepare_block_entry(pr_history)
-    commit_to_database()
-
     return rent_id
 
 
-def prepare_block_entry(pr_history):
-    pr_history.block = request.form.get('xinput').replace("£", "&pound;")
-    convert_html_to_pdf(pr_history.block, 'pr.pdf')
-
-def prepare_new_pr_history_entry(method='email'):
-    pr_save_data = json.loads(request.form.get('pr_save_data'))
-    rent_id = request.args.get('rent_id', type=int)
+def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method='email'):
     pr_history = PrHistory()
+    pr_history.block = block
     pr_history.rent_id = rent_id
-    mailaddr = request.form.get('pr_addr')
     pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
     pr_history.date = date.today()
     pr_history.rent_date = datetime.strptime(pr_save_data.get("rent_date_string"), '%Y-%m-%d')
@@ -157,9 +59,10 @@ def prepare_new_pr_history_entry(method='email'):
     pr_history.arrears_level = pr_save_data.get("new_arrears_level")
     # TODO: We are not using the typeprdelivery table yet in any meaningful way
     #  - should we remove it and make delivery_method in pr_history a string column?
+    #  - We'd have to hard code the method strings in any combodict filters
     pr_history.delivery_method = get_typeprdelivery_id(method)
     # TODO: Add pending / delivered functionality
     pr_history.delivered = True
-    return pr_save_data, pr_history, rent_id
+    return pr_history
 
 

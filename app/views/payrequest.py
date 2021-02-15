@@ -1,11 +1,12 @@
-from app.dao.filter import get_filters
-from app.dao.form_letter import get_pr_forms
-from app.dao.payrequest import get_pr_file, get_pr_history, post_new_payrequest, post_updated_payrequest
-from app.dao.rent import get_rent_addrs
-from app.main.payrequest import serialize_pr_save_data, write_payrequest, write_payrequest_email
 from flask import Blueprint, redirect, render_template,  request, url_for, json
 from flask_login import login_required
 from app.forms import PrPostForm
+from app.dao.filter import get_filters
+from app.dao.form_letter import get_pr_forms
+from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
+from app.dao.rent import get_rent_addrs
+from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, write_payrequest, write_payrequest_email
+
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -15,7 +16,6 @@ pr_bp = Blueprint('pr_bp', __name__)
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
     rent_addrs = get_rent_addrs(rent_id)
-
     return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id, rent_addrs=rent_addrs)
 
 
@@ -24,7 +24,6 @@ def pr_dialog(rent_id):
 def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        # TODO: Avoid passing both totdue and totdue_string - include money formatting in html template?
         block, pr_save_data, rent_mail, subject, table_rows, \
             totdue_string = write_payrequest(rent_id, pr_form_id)
         pr_form = PrPostForm()
@@ -35,7 +34,6 @@ def pr_edit(pr_form_id):
         if pr_form.validate_on_submit():
             return redirect(url_for('pr_save_send', rent_id=rent_mail.id))
         pr_save_data = serialize_pr_save_data(pr_save_data)
-
         return render_template('mergedocs/PR.html', mailaddr=mailaddr, pr_save_data=pr_save_data, pr_form=pr_form,
                                block=block, rent_mail=rent_mail, subject=subject,
                                table_rows=table_rows, totdue_string=totdue_string)
@@ -47,21 +45,20 @@ def pr_edit(pr_form_id):
 def pr_file(pr_id):
     method = request.args.get('method', type=str)
     if request.method == "POST":
-        rent_id = post_updated_payrequest(pr_id)
+        block = request.form.get('xinput').replace("£", "&pound;")
+        rent_id = post_updated_payrequest(block, pr_id)
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
     pr_file = get_pr_file(pr_id)
     if method == 'email':
         pr_save_data = json.loads(request.args.get('pr_save_data'))
         email_block = write_payrequest_email(pr_save_data)
         return render_template('pr_file.html', email_block=email_block, method=method, pr_file=pr_file)
-
     return render_template('pr_file.html', pr_file=pr_file)
 
 
 @pr_bp.route('/pr_history/<int:rent_id>', methods=['GET', 'POST'])
 def pr_history(rent_id):
     pr_history = get_pr_history(rent_id)
-
     return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history)
 
 
@@ -84,12 +81,11 @@ def pr_history(rent_id):
 def pr_save_send():
     method = request.args.get('method', type=str)
     if request.method == 'POST':
-        pr_id, pr_save_data, rent_id = post_new_payrequest(method)
+        pr_id, pr_save_data, rent_id = save_new_payrequest(method)
         if method == 'post':
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
         else:
             pr_save_data = serialize_pr_save_data(pr_save_data)
-
             return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, pr_save_data=pr_save_data, method='email'))
 
 
@@ -97,5 +93,4 @@ def pr_save_send():
 @login_required
 def pr_start():
     filters = get_filters(1)
-
     return render_template('pr_start.html', filters=filters)

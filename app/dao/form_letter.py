@@ -36,6 +36,11 @@ def get_form_letters(action='all'):
     return form_letters
 
 
+def get_email_form_by_code(code):
+    email_form = FormLetter.query.filter(FormLetter.code == code).one_or_none()
+    return email_form
+
+
 def get_pr_form(pr_form_id):
     pr_form = FormLetter.query.filter(FormLetter.id == pr_form_id).one_or_none()
 
@@ -61,7 +66,7 @@ def post_form_letter(form_letter_id):
     form_letter.code = request.form.get("code")
     form_letter.description = request.form.get("description")
     form_letter.subject = request.form.get("subject")
-    form_letter.block = request.form.get("xinput")
+    form_letter.block = request.form.get("block")
     form_letter.bold = request.form.get("bold")
     doctype = request.form.get("doc_type")
     form_letter.doctype_id = \
