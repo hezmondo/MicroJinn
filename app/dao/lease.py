@@ -34,11 +34,12 @@ def get_lease(lease_id):
                     'rentcode': rentcode
                 }
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
+
     return lease, uplift_types
 
 
-def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_high):
-    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_high})
+def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val):
+    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_val})
     leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
     db.session.commit()
 
@@ -74,9 +75,9 @@ def get_lease_variables(rent_id):
     fh_rate = request.form.get('fh_rate')
     gr_rate = request.form.get('gr_rate')
     gr_new = request.form.get('gr_new')
-    yp_high = request.form.get('yp_high')
+    yp_val = request.form.get('yp_val')
 
-    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_high)
+    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val)
     impval = leasedata["impvalk"] * 1000
     unimpval = leasedata["impvalk"] * leasedata["realty"] * 10 if leasedata["realty"] > 0 else impval
     lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
@@ -122,6 +123,7 @@ def post_lease(lease_id):
     print(request.form)
     db.session.add(lease)
     commit_to_database()
+
     return rent_id
 
 

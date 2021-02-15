@@ -31,32 +31,17 @@ Another issue is if you have installed MySQLWorkbench as a Snap package. You wan
 
     sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
 
-### Problems in importing mysql functions and procedures from one installation to another
+### Problems in importing mysql functions and procedures using a mysql dump created in workbench by another user
 
-You may get some or all of these errors, but **NB:- all the tables will very likely have imported fine**, before the error when it gets to procedures and functions:
-
-1.  ERROR 1231 (42000) at line 1454: Variable 'sql_mode' can't be set to the value of 'NO_AUTO_CREATE_USER'
-
-2.  ERROR because MySQL dumps functions containing text such as this: CREATE DEFINER=`root`@`localhost` FUNCTION
-
-3.  ERROR because MySQL dumps functions containing text such as this: SET TIME ZONE =
-
-It is simple to get around this in windows by opening the offeding sql file (should be named routines) in notepad++ and replace the problem text with ""
-  
-	replace "/NO_AUTO_CREATE_USER//" with "" 
-	replace "/DEFINER=`root`@`localhost`//"  with ""
-
-You may also need to remove any lines from the very end of your sql dump file containing the text "TIME ZONE".
-
-Lastly you may get an error mentioning log_bin_trust_function_creators.  If so, either in mysql console or in workbench, run this:
-
-    set global log_bin_trust_function_creators = 1; 
-
-Now try the import again and you should be good to go
+The import of functions and procedures seems to fail every time.  Assuming you are trying to import a single sql file containing all the functions and procedures, 
+you first need to replace all occurrences of  CREATE DEFINER=**** FUNCTION with CREATE FUNCTION and then remove all occurrences of NO_AUTO_CREATE_USER within the whole sql file. 
+The import of functions and procedures will probably still fail with an error mentioning "log_bin_trust_function_creators".  
+If so, either in mysql console or in workbench, run this command/query:  set global log_bin_trust_function_creators = 1; and then try again.  
+That setting only lasts for the workbench setting
 
 **Hez favoured simple solution to data import issues:**
  
-Create two sql dump files, one being just all the tables, named TablesDump, and the other being just the teeny user table along with the functions and procedures, named UserFuncProcDump
+Create two sql dump folders, one being just all the tables, named TablesDump, and the other being just the teeny user table along with the functions and procedures, named UserFuncProcDump
 
 The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
 

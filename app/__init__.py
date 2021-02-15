@@ -57,7 +57,7 @@ def create_app(config_class=Config):
     from .views.headrent import headrent_bp
     app.register_blueprint(headrent_bp, url_prefix='/views')
 
-    from .views.income_ import  income_bp
+    from .views.income import  income_bp
     app.register_blueprint(income_bp, url_prefix='/views')
 
     from .views.lease import lease_bp
@@ -72,13 +72,13 @@ def create_app(config_class=Config):
     from .views.money import money_bp
     app.register_blueprint(money_bp, url_prefix='/views')
 
-    from .views.payrequest_ import pr_bp
+    from .views.payrequest import pr_bp
     app.register_blueprint(pr_bp, url_prefix='/views')
 
     from .views.rental import rental_bp
     app.register_blueprint(rental_bp, url_prefix='/views')
 
-    from .views.rent_ import rent_bp
+    from .views.rent import rent_bp
     app.register_blueprint(rent_bp, url_prefix='/views')
 
     from .views.utility import util_bp

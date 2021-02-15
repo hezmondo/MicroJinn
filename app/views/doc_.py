@@ -12,7 +12,7 @@ def docfile(doc_id):
     if request.method == "POST":
         rent_id = post_docfile(doc_id)
 
-        return redirect("/views/rent_/{}".format(rent_id))
+        return redirect("/views/rent/{}".format(rent_id))
 
     docfile, doc_dig = get_docfile(doc_id)
 
@@ -49,7 +49,7 @@ def upload_file(rent_id):
     if request.method == "POST":
         post_upload()
 
-        return redirect('/rent_/{}'.format(rent_id))
+        return redirect('/rent/{}'.format(rent_id))
 
     return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rent_id)
 

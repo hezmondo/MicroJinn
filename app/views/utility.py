@@ -85,8 +85,8 @@ def home():
 @login_required
 def landlord(landlord_id):
     if request.method == "POST":
-        id_ = post_landlord(landlord_id)
-        return redirect(url_for('util_bp.landlords', landlord_id=id_))
+        landlord_id = post_landlord(landlord_id)
+        return redirect(url_for('util_bp.landlords', landlord_id=landlord_id))
 
     landlord = get_landlord(landlord_id) if landlord_id != 0 else {"id": 0}
     landlord_dict = get_landlord_dict()

@@ -8,13 +8,14 @@ def get_form_letter(form_letter_id):
     form_letter = FormLetter.query.join(TypeDoc).join(Template).with_entities(FormLetter.id, FormLetter.code,
                                                                               FormLetter.description,
                                                                               FormLetter.subject, FormLetter.block,
-                                                                              TypeDoc.desc,
+                                                                              TypeDoc.desc.label("doctype"),
                                                                               Template.desc.label("template")) \
         .filter(FormLetter.id == form_letter_id).one_or_none()
+
     return form_letter
 
 
-def get_form_letters(action):
+def get_form_letters(action='all'):
     if request.method == "POST":
         code = request.form.get("code") or ""
         description = request.form.get("description") or ""
@@ -26,22 +27,29 @@ def get_form_letters(action):
                                                FormLetter.block.ilike('%{}%'.format(block))).all()
     elif action == "lease":
         form_letters = FormLetter.query.filter(FormLetter.code.ilike('LEQ-%'))
-    else:
+    elif action == "all":
         form_letters = FormLetter.query.all()
+    else:
+        form_letters = FormLetter.query.filter(FormLetter.code.notilike('PR-%'),
+                           FormLetter.code.notilike('AC-%'), FormLetter.code.notilike('LEQ-%')).all()
+
     return form_letters
 
 
 def get_pr_form(pr_form_id):
     pr_form = FormLetter.query.filter(FormLetter.id == pr_form_id).one_or_none()
+
     return pr_form
 
 
 def get_pr_forms():
+
     return FormLetter.query.filter(FormLetter.doctype_id == 2).all()
 
 
 def get_templates():
     templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
+
     return templates
 
 
@@ -67,5 +75,6 @@ def post_form_letter(form_letter_id):
     db.session.flush()
     form_letter_id = form_letter.id
     commit_to_database()
+
     return form_letter_id
 

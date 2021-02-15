@@ -54,15 +54,17 @@ The app will only start if:
 4. the mjinn schema has been populated sufficiently - please see the new mjinn user guide and my new mysql server and workbench installation guide
 
  
-### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
+**How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):**
 
-File > Open ..., select mjinn directory.  That loads it as a project.
+File > Open > select mjinn directory. That loads it as a project.
 
-Run > Edit Configurations ....  Find the Before launch near bottom of tab, click the green "+" beneath it.
+Run > Edit Configurations > Select Flask/mjinn.py > defaults should be fine - use python interpreter
 
-Select desired Browser, for Url enter: http://127.0.0.1:5000/
+Find the Before launch near bottom of tab > click the green "+" beneath it > select desired Browser, for Url enter: http://127.0.0.1:5000/
 
-Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically.  Output/debug messages go to PyCharm Console tab.
+Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically. 
+
+Output/debug messages will go to the PyCharm Console tab.
 
 
 ### How to install Chrome in Ubuntu 20.04:  In a terminal:

@@ -1,7 +1,7 @@
 from flask import request
 from app.dao.functions import commit_to_database
 from app.models import Agent, Charge, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, Landlord, Loan, \
-    ManagerExt, MoneyItem, Property, PrHistory, Rent, RentExt, MoneyAcc
+    MoneyItem, Property, PrHistory, Rent, RentExt, MoneyAcc
 
 
 def delete_record(item_id, item):
@@ -13,7 +13,7 @@ def delete_record(item_id, item):
         redir = "util_bp.agents"
     elif item == "charge":
         Charge.query.filter_by(id=item_id).delete()
-        redir = "rent_bp.rent_"
+        redir = "rent_bp.rent"
         id_dict = {"id": id_2}
     elif item == "doc":
         DocFile.query.filter_by(id=item_id).delete()

@@ -65,22 +65,25 @@ def get_combodict_filter():
 def get_hr_statuses():
     hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
-
     return hr_statuses
 
 
 def get_idlist_recent(type):
-    id_list = [1, 51, 101, 151, 201, 251, 301, 351, 401, 451, 501]
-    id_list = json.loads(getattr(current_user, type)) if getattr(current_user, type) else id_list
-
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
     return id_list
 
 
 def pop_idlist_recent(type, id):
-    id_list = json.loads(getattr(current_user, type))
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
     if id not in id_list:
         id_list.insert(0, id)
-        if len(id_list) > 30:
+        if len(id_list) > 20:
             id_list.pop()
         setattr(current_user, type, json.dumps(id_list))
         db.session.commit()
@@ -92,6 +95,7 @@ def get_postvals_id():
         "actype": "",
         "advarr": "",
         "agent": "",
+        "deedtype": "",
         "frequency": "",
         "landlord": "",
         "mailto": "",
@@ -102,7 +106,7 @@ def get_postvals_id():
     }
     for key, value in postvals_id.items():
         actval = request.form.get(key)
-        if actval and actval != "":
+        if actval and actval != "" and actval!= "None":
             if key == "actype":
                 actval = TypeAcType.query.with_entities(TypeAcType.id).filter(TypeAcType.actypedet == actval).one()[0]
             elif key == "advarr":
@@ -117,6 +121,8 @@ def get_postvals_id():
                 actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.name == actval).one()[0]
             elif key == "mailto":
                 actval = TypeMailTo.query.with_entities(TypeMailTo.id).filter(TypeMailTo.mailtodet == actval).one()[0]
+            elif key == "prdelivery":
+                actval = TypePrDelivery.query.with_entities(TypePrDelivery.id).filter(TypePrDelivery.prdeliverydet == actval).one()[0]
             elif key == "salegrade":
                 actval = TypeSaleGrade.query.with_entities(TypeSaleGrade.id).filter(TypeSaleGrade.salegradedet == actval).one()[0]
             elif key == "status":

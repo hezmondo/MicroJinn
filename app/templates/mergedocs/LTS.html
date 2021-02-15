@@ -7,7 +7,7 @@
 <form method="POST" action="/save_html">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
-			<a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent_.id) }}"
+			<a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}"
 			   class="btn btn-block btn-primary" role="button">back to mail</a>
 		</div>
         <div class="col-md-3">
@@ -17,16 +17,16 @@
 	<div id="doc_html" contenteditable="true">
 	    {% if method == "letter" %}
 			<div class="font-size-large" align="center">
-				<b>{{ rent_.managername }}</b>
+				<b>{{ rent.managername }}</b>
 			</div>
 			<div class="font-size-small" align="center">
-				{{ addressdata.manageraddr }}
+				{{ rent.manageraddr }}
 				<br />
-				{{ addressdata.manageraddr2 }}
+				{{ rent.manageraddr2 }}
 				<br />
 			</div>
 			<div class="font-size-medium" align="right">
-				Our Ref: {{ rent_.rentcode }}
+				Our Ref: {{ rent.rentcode }}
 				<br />
 				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 			</div>
@@ -37,17 +37,17 @@
 				{% endfor %}
 				<br />
 				<br />
-				Dear {{ rent_.tenantname }}
+				Dear {{ rent.tenantname }}
 			</div>
 	    {% else %}
 			<div class="font-size-medium" align="left">
-				Our Ref: {{ rent_.rentcode }}
+				Our Ref: {{ rent.rentcode }}
 				<br />
 				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent_.email }}
+				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent.email }}
 				<br />
 				<br />
-				Dear {{ rent_.tenantname }}
+				Dear {{ rent.tenantname }}
 			</div>
 		{% endif %}
 		<div class="font-size-medium" align="left">
@@ -61,11 +61,11 @@
 			<br />
 			<br />
 		    {% if method == "email" %}
-				<b>{{ rent_.managername }}</b>
+				<b>{{ rent.managername }}</b>
 				<br />
-				{{ addressdata.manageraddr }}
+				{{ rent.manageraddr }}
 				<br />
-				{{ addressdata.manageraddr2 }}
+				{{ rent.manageraddr2 }}
 				<br />
 		    {% endif %}
 			</div>
@@ -78,10 +78,10 @@
     </div>
     <div class="form-group row">
 		<div class="col-md-2">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rent_.id }}">
+            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rent.id }}">
         </div>
 		<div class="col-md-2">
-            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rent_.rentcode }}">
+            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rent.rentcode }}">
         </div>
 		<div class="col-md-2">
             <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">

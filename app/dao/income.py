@@ -85,6 +85,29 @@ def get_income_(income_id):
     return income, incomeallocs
 
 
+def get_income_item(rent_id, income_id=0):
+    if income_id == 0:           # return most recent income posting for this rent_id
+        income_item = Income.query. \
+            join(IncomeAlloc) \
+            .join(TypePayment) \
+            .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
+                           TypePayment.paytypedet) \
+            .filter(IncomeAlloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
+        # income_id = income_item.id
+    else:           # return income posting for a specific income id
+        income_item = Income.query \
+            .join(IncomeAlloc) \
+            .join(TypePayment) \
+            .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
+                           TypePayment.paytypedet) \
+            .filter(Income.id == income_id).first()
+    # allocdata = IncomeAlloc.join(ChargeType).with_entities(IncomeAlloc.id, IncomeAlloc.income_id,
+    #                     IncomeAlloc.rentcode, IncomeAlloc.amount.label("alloctot"),
+    #                     ChargeType.chargedesc).filter(IncomeAlloc.income_id == income_id).all()
+    allocdata = None
+    return income_item, allocdata
+
+
 def post_income_(income_id):
     # this object comprises 1 income record plus 1 or more incomealloc records. First, we do the income record
     if income_id == 0:

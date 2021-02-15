@@ -1,15 +1,13 @@
 import json
-
-from app import db, decimal_default
-from app.dao.functions import dateToStr, commit_to_database
-from app.models import Case, Charge, ChargeType, FormLetter, Landlord, Manager, MoneyAcc, PrArrearsMatrix, \
-                        PrHistory, Rent, TypeAdvArr, TypeFreq, TypePrDelivery, TypeTenure
 from datetime import date, datetime
-from dateutil.relativedelta import relativedelta
-from decimal import Decimal
 from flask import request
+from decimal import Decimal
+from dateutil.relativedelta import relativedelta
 from sqlalchemy import func
+from app import db
 from app.dao.doc_ import convert_html_to_pdf
+from app.models import Case, Charge, ChargeType, FormLetter, PrArrearsMatrix, PrHistory, Rent, TypePrDelivery
+from app.dao.functions import dateToStr, commit_to_database
 
 
 def add_charge(rent_id, recovery_charge_amount, chargetype_id):
@@ -37,10 +35,10 @@ def forward_rent(rent_id, from_batch=False):
         return dict(id=rent_id, lastrentdate=last_rent_date, arrears=arrears)
 
 
-def forward_rents(rent_prs):
+def forward_rents(rent_mails):
     update_vals = []
-    for rent_prop in rent_prs:
-        update_vals.append(forward_rent(rent_prop.id, True))
+    for rent_mailop in rent_mails:
+        update_vals.append(forward_rent(rent_mailop.id, True))
     db.session.bulk_update_mappings(Rent, update_vals)
 
 
@@ -111,36 +109,8 @@ def get_rent_charge_details(rent_id):
                                                                      Charge.chargestartdate, Charge.chargetotal,
                                                                      Charge.chargedetail, Charge.chargebalance) \
         .filter(*qfilter).all()
+
     return charges
-
-
-def get_rent_pr(rent_id):
-    rent_pr = \
-        Rent.query \
-            .join(Landlord) \
-            .join(Manager) \
-            .join(MoneyAcc) \
-            .join(TypeAdvArr) \
-            .join(TypeFreq) \
-            .join(TypeTenure) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           func.mjinn.check_pr_exists(Rent.id).label('prexists'),
-                           # the following function takes id, renttype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
-                           func.mjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
-                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
-                           func.mjinn.prop_addr(Rent.id).label('propaddr'),
-                           func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                           func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
-                           Rent.rentpa, Rent.tenantname, Rent.freq_id,
-                           Manager.managername, Manager.manageraddr, Manager.manageraddr2,
-                           MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
-                           TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeTenure.tenuredet) \
-            .filter(Rent.id == rent_id) \
-            .one_or_none()
-    return rent_pr
 
 
 def merge_case(rent_id, pr_id):
@@ -158,6 +128,7 @@ def post_new_payrequest(method):
     db.session.flush()
     pr_id = forward_rent_case_and_charges(pr_history, pr_save_data, rent_id)
     commit_to_database()
+
     return pr_id, pr_save_data, rent_id
 
 
@@ -165,8 +136,13 @@ def post_updated_payrequest(pr_id):
     pr_history, rent_id = get_previous_pr_history_entry(pr_id)
     prepare_block_entry(pr_history)
     commit_to_database()
+
     return rent_id
 
+
+def prepare_block_entry(pr_history):
+    pr_history.block = request.form.get('xinput').replace("£", "&pound;")
+    convert_html_to_pdf(pr_history.block, 'pr.pdf')
 
 def prepare_new_pr_history_entry(method='email'):
     pr_save_data = json.loads(request.form.get('pr_save_data'))
@@ -187,11 +163,3 @@ def prepare_new_pr_history_entry(method='email'):
     return pr_save_data, pr_history, rent_id
 
 
-def prepare_block_entry(pr_history):
-    pr_history.block = request.form.get('xinput').replace("£", "&pound;")
-    convert_html_to_pdf(pr_history.block, 'pr.pdf')
-
-
-def serialize_pr_save_data(pr_save_data):
-    pr_save_data = json.dumps(pr_save_data, default=decimal_default)
-    return pr_save_data
