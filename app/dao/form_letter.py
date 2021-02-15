@@ -61,7 +61,7 @@ def post_form_letter(form_letter_id):
     form_letter.code = request.form.get("code")
     form_letter.description = request.form.get("description")
     form_letter.subject = request.form.get("subject")
-    form_letter.block = request.form.get("xinput")
+    form_letter.block = request.form.get("block")
     form_letter.bold = request.form.get("bold")
     doctype = request.form.get("doc_type")
     form_letter.doctype_id = \

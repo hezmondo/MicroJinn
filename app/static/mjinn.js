@@ -61,28 +61,14 @@ $(document).ready(function(){
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "")
         $('#pr_addr').val(pr_addr_strip);
     });
-
     $('#bold_text').click(function(){
-        var highlight = window.getSelection();
-        var spn = '**' + highlight + '**';
-        var text = $('#form_letter_block').html();
-        $('#form_letter_block').html(text.replace(highlight, spn));
+        add_markup('**');
     });
         $('#italic_text').click(function(){
-        var highlight = window.getSelection();
-        var spn = '^^' + highlight + '^^';
-        var text = $('#form_letter_block').html();
-        $('#form_letter_block').html(text.replace(highlight, spn));
+        add_markup('^^');
     });
         $('#highlight_text').click(function(){
-        var highlight = window.getSelection();
-        var spn = '||' + highlight + '||';
-        var text = $('#form_letter_block').html();
-        $('#form_letter_block').html(text.replace(highlight, spn));
-    });
-    $('.save_form').click(function() {
-        var mysave = $('#form_letter_block').html();
-        $('#xinput').val(mysave);
+        add_markup('||');
     });
     $('#doc_html').html(function(i, html) {
       return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
@@ -100,3 +86,14 @@ $(function() {
     $('#sidebar, #content').toggleClass('active');
   });
 });
+
+function add_markup(markup) {
+    var txtarea = $('#form_letter_block');
+    var caretStart = txtarea[0].selectionStart;
+    var caretEnd = txtarea[0].selectionEnd;
+    var front = (txtarea.text()).substring(0, caretStart);
+    var text = (txtarea.text()).substring(caretStart, caretEnd);
+    var back = (txtarea.text()).substring(caretEnd, txtarea.text().length);
+    txtarea.html(front + markup + text + markup + back);
+    txtarea.focus();
+}
