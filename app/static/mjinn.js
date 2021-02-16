@@ -58,34 +58,8 @@ $(document).ready(function(){
         var pr_block = $('#doc_html').html();
         $('#pr_block').val(pr_block);
         var pr_addr = $('#addr_span').text().trim();
-        var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "")
+        var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
         $('#pr_addr').val(pr_addr_strip);
-    });
-    $('#bold_text').click(function(){
-        add_markup('**');
-    });
-        $('#italic_text').click(function(){
-        add_markup('^^');
-    });
-        $('#highlight_text').click(function(){
-        add_markup('||');
-    });
-    $('#doc_html').html(function(i, html) {
-      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
-    });
-    $('#doc_html').html(function(i, html2) {
-      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
-    });
-    $('#doc_html').html(function(i, html3) {
-      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
-    });
-    $('[name = "lease_variables"]').on('change', function() {
-        var selected = $('[name = "lease_variables"]').val();
-        add_word(selected);
-    });
-    $('[name = "mail_variables"]').on('change', function() {
-        var selected = $('[name = "mail_variables"]').val();
-        add_word(selected)
     });
 });
 $(function() {
@@ -94,23 +68,6 @@ $(function() {
     $('#sidebar, #content').toggleClass('active');
   });
 });
-
-function add_markup(markup) {
-    var txtarea = $('#form_letter_block');
-    var caretStart = txtarea[0].selectionStart;
-    var caretEnd = txtarea[0].selectionEnd;
-    var front = (txtarea.text()).substring(0, caretStart);
-    var text = (txtarea.text()).substring(caretStart, caretEnd);
-    var back = (txtarea.text()).substring(caretEnd, txtarea.text().length);
-    txtarea.html(front + markup + text + markup + back);
-    txtarea.focus();
-}
-function add_word(word) {
-    var txtarea = $('#form_letter_block');
-    var caretStart = txtarea[0].selectionStart;
-    var caretEnd = txtarea[0].selectionEnd;
-    var front = (txtarea.text()).substring(0, caretStart);
-    var back = (txtarea.text()).substring(caretEnd, txtarea.text().length);
-    txtarea.html(front + word + back);
-    txtarea.focus();
-}
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});

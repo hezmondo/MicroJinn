@@ -29,31 +29,43 @@
 			<input type="text" class="form-control" name="subject" value="{{ form_letter.subject }}">
 		</div>
 	</div>
-	<div class="form-group row">
-		<div class="col-md-12">
-			<div class="form-group row align-items-end">
-				<div class="col-md-2">
-					<label for="block">block:</label>
-				</div>
-				<div class="col-md-2">
-					<label for="lease_variables">lease vars:</label>
-					{{ widgets.combobox(name="lease_variables", items=variables.lease_variables) }}
-				</div>
-				<div class="col-md-2">
-					<label for="mail_variables">mail vars:</label>
-					{{ widgets.combobox(name="mail_variables", items=variables.mail_variables) }}
-				</div>
-				<div class="col-md-2">
-					<button type="button" id="bold_text" class="btn btn-block btn-primary">bold</button>
-				</div>
-				<div class="col-md-2">
-					<button type="button" id="italic_text" class="btn btn-block btn-primary">italic</button>
-				</div>
-				<div class="col-md-2">
-					<button type="button" id="highlight_text" class="btn btn-block btn-primary">highlight</button>
-				</div>
+	<div class="boxed">
+		<div class="form-group row">
+			<div class="col-md-12">
+				<label for="block">block:</label>
 			</div>
-			<textarea id="form_letter_block" class="form-control" rows="24" name="block" >{{ form_letter.block }}</textarea>
+		</div>
+		<div class="form-group row">
+			<div class="col-md-12">
+				<div class="form-group row align-items-end">
+					<div class="col-md-2" data-toggle="tooltip" title="First choose where you want to insert the variable in the block, then select the variable from the list">
+						<label for="mail_variables">mail variables:</label>
+						{{ widgets.combobox(name="mail_variables", items=variables.mail_variables) }}
+					</div>
+					<div class="btn-group btn-group-toggle col-md-1 mr-auto" id="more_vars" data-toggle="buttons">
+						<label class="btn btn-secondary">
+							<input type="checkbox" name="more_vars" autocomplete="off"> more
+						</label>
+					</div>
+					<div class="col-md-2" id="lease_vars" style="display:none;">
+						<label for="lease_variables">extra variables:</label>
+						{{ widgets.combobox(name="lease_variables", items=variables.lease_variables) }}
+					</div>
+					<div class="col-md-2">
+						<button type="button" id="bold_text" class="btn btn-block btn-primary" data-toggle="tooltip" title="Select a word or phrase in the block to add bold markup">bold</button>
+					</div>
+					<div class="col-md-2">
+						<button type="button" id="italic_text" class="btn btn-block btn-primary">italic</button>
+					</div>
+					<div class="col-md-2">
+						<button type="button" id="highlight_text" class="btn btn-block btn-primary">highlight</button>
+					</div>
+					<div class="col-md-2">
+						<button type="button" id="remove_markup" class="btn btn-block btn-warning" data-toggle="tooltip" title="Select the text that includes the markup you want to remove">remove markup</button>
+					</div>
+				</div>
+				<textarea id="form_letter_block" class="form-control" rows="24" name="block" >{{ form_letter.block }}</textarea>
+			</div>
 		</div>
 	</div>
     <div class="form-group row flex-row-reverse">
@@ -78,4 +90,8 @@
 	<input type="hidden" id="xinput" name="xinput" value = "xyz">
 </form>
 {% endblock %}
-
+{% block javascript %}
+<script type="text/javascript">
+    {% include "form_letter.js" %}
+</script>
+{% endblock %}
