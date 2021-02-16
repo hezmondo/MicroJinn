@@ -61,6 +61,22 @@ $(document).ready(function(){
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
         $('#pr_addr').val(pr_addr_strip);
     });
+    $(window).resize(function(){
+        var viewportwidth;
+        if(typeof window.innerWidth!='undefined'){
+              viewportwidth=window.innerWidth;
+        }
+       $('#nav_aside').removeClass("fixed-top");
+       $('#nav_bar').removeClass("navbar-expand");
+       if(viewportwidth >= 768){
+           $('#nav_aside').addClass("fixed-top");
+           $('#nav_bar').removeClass("navbar-expand");
+       }
+       else {//if(viewportwidth >= 640){
+           $('#nav_bar').addClass("navbar-expand");
+        }
+    });
+
 });
 $(function() {
   // Sidebar toggle behavior

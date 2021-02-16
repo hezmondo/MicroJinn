@@ -12,15 +12,16 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     </head>
     {% block navbar %}
-    <div class="container">
-        <nav class="navbar navbar-expand-md navbar-light" style=" background-color: #ededed;">
+    <aside id="nav_aside" class="col-12 col-md-2 bg-dark fixed-top full-height">
+        <nav class="navbar navbar-dark bg-dark" id="nav_bar">
             <a class="navbar-brand" href="{{ url_for('util_bp.home') }}">mjinn</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse text-center" id="navbarResponsive">
+<!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"-->
+<!--                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
+<!--                <span class="navbar-toggler-icon"></span>-->
+<!--            </button>-->
+            <div class="navbar-collapse" id="navbarResponsive">
               <ul class="nav navbar-nav mr-auto">
+                  <hr/>
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('util_bp.agents') }}">agents</a>
                 </li>
@@ -42,12 +43,12 @@
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('rental_bp.rentals') }}">rentals</a>
                 </li>
-                <li class="nav-item dropdown">
+                <a class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       data-toggle="collapse" data-target="#dd" aria-haspopup="true" aria-expanded="false">
                     utilities
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <div class="dropdown-menu collapse" id="dd" aria-labelledby="navbarDropdownMenuLink">
                       <a class="dropdown-item" href="{{ url_for('util_bp.backup') }}">backup or restore mjinn</a>
                       <a class="dropdown-item" href="{{ url_for('charge_bp.charges') }}">charges</a>
                       <a class="dropdown-item" href="{{ url_for('doc_bp.docfiles', rent_id=0) }}">docfiles</a>
@@ -58,7 +59,7 @@
                       <a class="dropdown-item" href="{{ url_for('util_bp.landlords') }}">landlords</a>
                       <a class="dropdown-item" href="{{ url_for('util_bp.properties', rent_id=0) }}">properties</a>
                     </div>
-                  </li>
+                  </a>
                  {% if current_user.is_anonymous %}
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">login</a>
@@ -74,11 +75,11 @@
                 </ul>
             </div>
         </nav>
-    </div>
+    </aside>
     {% endblock %}
     {% block content %}
     <body>
-    <div class="container container-main">
+    <div class="container container-main col-md-10 offset-md-2 bg-faded justify-content-center">
         <h6>&nbsp;</h6>
         <div class="row align-items-center">
             <div class="col">
@@ -96,6 +97,7 @@
             </div>
         </div>
     </div>
+
     <!-- javascript files -- jquery first, then popper, bootstrap, then mjinn -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
