@@ -24,8 +24,8 @@
         <tbody>
         {% for item in landlords %}
         <tr id="{{ item.id }}">
-            <td style="width: 25.00%">{{ item.landlordname }}</td>
-            <td style="width: 30.00%"> {{ item.landlordaddr }}</td>
+            <td style="width: 25.00%">{{ item.name }}</td>
+            <td style="width: 30.00%"> {{ item.address }}</td>
             <td style="width: 10.00%"> {{ item.tax_date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 25.00%"> {{ item.managername }}</td>
             <td style="width: 10.00%"><a href="{{ url_for('util_bp.landlord', landlord_id=item.id) }}">view</a></td>

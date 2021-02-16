@@ -64,7 +64,7 @@ def email_acc(email_acc_id):
         id_ = post_email_acc(email_acc_id)
         return redirect(url_for('util_bp.email_acc', email_acc_id=id_))
     emailacc = get_email_acc(email_acc_id) if email_acc_id != 0 else {"id": 0}
-    return render_template('email_acc.html', emailacc=emailacc)
+    return render_template('email_account.html', emailacc=emailacc)
 
 
 @util_bp.route('/email_accounts', methods=['GET'])
