@@ -142,3 +142,9 @@ def rents_ex():
     filterdict, rent_s = get_rent_s("external", 0)
 
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
+
+
+@util_bp.route('/utilities', methods=['GET', 'POST'])
+@login_required
+def utilities():
+    return render_template('utilities.html')
