@@ -1,4 +1,4 @@
-### basic start up guide for installing mjinn - last updated 25 Dec 2020
+### basic start up guide for installing mjinn - last updated 16 Feb 2021
 
 ### install mysql server and mysql workbench using the mysql server and workbench installation guide
  
@@ -53,35 +53,15 @@ The app will only start if:
 3. all dependencies have been installed
 4. the mjinn schema has been populated sufficiently - please see the new mjinn user guide and my new mysql server and workbench installation guide
 
+We normally run mjinn as a development server in debug mode.  Here is the relevant line at the end of mjinn.py:
+
+if __name__ == '__main__':
+    app.run(debug=True, use_debugger=False, use_reloader=False, passthrough_errors=True)
+
+If you wish to run mjinn as a test server on a PC and access it from another (eg android) device, use this line:
+
+    app.run(host='0.0.0.0', debug=False, use_debugger=False, use_reloader=False, passthrough_errors=True)
  
-**How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):**
-
-File > Open > select mjinn directory. That loads it as a project.
-
-Run > Edit Configurations > Select Flask/mjinn.py > defaults should be fine - use python interpreter
-
-Find the Before launch near bottom of tab > click the green "+" beneath it > select desired Browser, for Url enter: http://127.0.0.1:5000/
-
-Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically. 
-
-Output/debug messages will go to the PyCharm Console tab.
-
-
-### How to install Chrome in Ubuntu 20.04:  In a terminal:
-
-First install the gdebi and wget packages. By using gdebi to install Google Chrome browser we also ensure that any possible package prerequisites are met during the installation:
-	
-	sudo apt install gdebi-core wget
-
-now download the Google Chrome browser pack:
-
-	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-	
-Now use gdebi command to install the prevously downloaded Google Chrome package: 
-
-	sudo gdebi google-chrome-stable_current_amd64.deb
-	
-Now go to apps and you will see Chrome available
 
 
 	
