@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
     <head>
+        <script src="https://kit.fontawesome.com/ab40005e00.js" crossorigin="anonymous"></script>
         <!-- Required meta tags -->
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,11 +11,12 @@
               crossorigin="anonymous">
         <link rel="stylesheet" href="{{ url_for('static', filename='mjinn.css') }}">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
     </head>
     {% block navbar %}
-    <aside id="nav_aside" class="col-12 col-md-2 bg-dark fixed-top full-height">
+    <aside id="nav_aside" class="bg-dark fixed-top nav-display">
         <nav class="navbar navbar-dark bg-dark" id="nav_bar">
-            <a class="navbar-brand" href="{{ url_for('util_bp.home') }}">mjinn</a>
+            <a class="navbar-brand" href="{{ url_for('util_bp.home') }}"><i class="fas fa-meteor"></i> mjinn</a>
 <!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"-->
 <!--                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
 <!--                <span class="navbar-toggler-icon"></span>-->
@@ -38,28 +40,14 @@
                 <a class="nav-link" href="{{ url_for('money_bp.money') }}">money</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('pr_bp.pr_start') }}">pr_start</a>
+                <a class="nav-link" href="{{ url_for('pr_bp.pr_start') }}">pr start</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('rental_bp.rentals') }}">rentals</a>
                 </li>
-                <a class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
-                       data-toggle="collapse" data-target="#dd" aria-haspopup="true" aria-expanded="false">
-                    utilities
-                    </a>
-                    <div class="dropdown-menu collapse" id="dd" aria-labelledby="navbarDropdownMenuLink">
-                      <a class="dropdown-item" href="{{ url_for('util_bp.backup') }}">backup or restore mjinn</a>
-                      <a class="dropdown-item" href="{{ url_for('charge_bp.charges') }}">charges</a>
-                      <a class="dropdown-item" href="{{ url_for('doc_bp.docfiles', rent_id=0) }}">docfiles</a>
-                      <a class="dropdown-item" href="{{ url_for('util_bp.email_accounts') }}">email accounts</a>
-                      <a class="dropdown-item" href="{{ url_for('util_bp.rents_ex') }}">external rents</a>
-                      <a class="dropdown-item" href="{{ url_for('form_letter_bp.form_letters') }}">form_letters</a>
-                      <a class="dropdown-item" href="{{ url_for('lease_bp.leases') }}">leases</a>
-                      <a class="dropdown-item" href="{{ url_for('util_bp.landlords') }}">landlords</a>
-                      <a class="dropdown-item" href="{{ url_for('util_bp.properties', rent_id=0) }}">properties</a>
-                    </div>
-                  </a>
+                  <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('util_bp.utilities') }}">utilities</a>
+                </li>
                  {% if current_user.is_anonymous %}
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">login</a>
@@ -79,25 +67,23 @@
     {% endblock %}
     {% block content %}
     <body>
-    <div class="container container-main col-md-10 offset-md-2 bg-faded justify-content-center">
-        <h6>&nbsp;</h6>
-        <div class="row align-items-center">
-            <div class="col">
-                <div class="justify-content-center">
-                    {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-info" role="alert">{{ message }}</div>
-                    {% endfor %}
-                    {% endif %}
-                    {% endwith %}
-                    {# application content needs to be provided in the app_content block #}
-                    {% block app_content %}{% endblock %}
+        <div class="col-md-11 main-container bg-faded ">
+            <div class="row align-items-center ">
+                <div class="col">
+                    <div class="justify-content-center">
+                        {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-info" role="alert">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        {# application content needs to be provided in the app_content block #}
+                        {% block app_content %}{% endblock %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
     <!-- javascript files -- jquery first, then popper, bootstrap, then mjinn -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
