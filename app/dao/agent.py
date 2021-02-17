@@ -26,19 +26,23 @@ def get_agent(agent_id):
     return agent
 
 
-def get_agent_rents(agent_id):
-    agent_rents = Agent.query.join(Rent).with_entities(Rent.id, Rent.rentcode, Rent.tenantname) \
-        .filter(Rent.agent_id == agent_id) \
-        .all()
+def get_agent_rents(agent_id, type='rent'):
+    if agent_id and agent_id != 0:
+        if type == 'rent':
+            agent_rents = Agent.query.join(Rent).with_entities(Rent.id, Rent.rentcode, Rent.tenantname) \
+                .filter(Rent.agent_id == agent_id) \
+                .all()
+        else:
+            agent_rents = Agent.query.join(Headrent).with_entities(Headrent.id, Headrent.code, Headrent.propaddr) \
+                .filter(Headrent.agent_id == agent_id) \
+                .all()
+    else:
+        agent_rents = None
 
-    agent_headrents = Agent.query.join(Headrent).with_entities(Headrent.id, Headrent.code, Headrent.propaddr) \
-        .filter(Headrent.agent_id == agent_id) \
-        .all()
-
-    return agent_headrents, agent_rents
+    return agent_rents
 
 
-def post_agent(agent_id):
+def post_agent(agent_id, rent_id):
     if agent_id == 0:
         agent = Agent()
     else:
@@ -50,6 +54,9 @@ def post_agent(agent_id):
     db.session.add(agent)
     db.session.flush()
     agent_id = agent.id
+    if rent_id != 0:
+        rent = Rent.query.get(rent_id)
+        rent.agent_id = agent_id
     commit_to_database()
 
     return agent_id

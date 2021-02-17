@@ -37,9 +37,13 @@
                    class="btn btn-block btn-primary" role="button">back to agents</a>
             </div>
         {% endif %}
+        <div class="col-md-2">
+            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id, type='rent') }}"
+               class="btn btn-block btn-primary" role="button">associated rents</a>
+        </div>
         <div class="col-md-3">
-            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id) }}"
-               class="btn btn-block btn-primary" role="button">view rents/headrents</a>
+            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id, type='headrent') }}"
+               class="btn btn-block btn-primary" role="button">associated headrents</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
