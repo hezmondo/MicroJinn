@@ -1,4 +1,4 @@
-# Git and PyChram notes (mainly for Windows) updated 16 Dec 2020 for mysql 8.0.21, Python 3.7.5
+# Git and PyChram notes (mainly for Windows) updated 16 Feb 2021 for mysql 8.0.21, Python 3.7.5
 
 ### Development PC:
 
@@ -116,15 +116,21 @@ Now you can run/debug from PyCharm, and it will open a new browser window for yo
 
 Output/debug messages will go to the PyCharm Console tab.
 
-### How to set up to edit/run/debug mjinn in PyCharm (available as software app on all Linux platforms and also on Windows):
+### How to install Chrome in Ubuntu 20.04:  In a terminal:
 
-File > Open ..., select mjinn directory.  That loads it as a project.
+First install the gdebi and wget packages. By using gdebi to install Google Chrome browser we also ensure that any possible package prerequisites are met during the installation:
+	
+	sudo apt install gdebi-core wget
 
-Run > Edit Configurations ....  Find the Before launch near bottom of tab, click the green "+" beneath it.
+now download the Google Chrome browser pack:
 
-Select desired Browser, for Url enter: http://127.0.0.1:5000/
+	wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+	
+Now use gdebi command to install the prevously downloaded Google Chrome package: 
 
-Now you can run/debug from PyCharm, and it will open a new browser window for your app each time automatically.  Output/debug messages go to PyCharm Console tab.
+	sudo gdebi google-chrome-stable_current_amd64.deb
+	
+Now go to apps and you will see Chrome available
 
 
 **How to count lines of code in project**  Open powershell window in Code folder and try this:
