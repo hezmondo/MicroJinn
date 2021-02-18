@@ -6,11 +6,11 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <a href="{{ url_for('money_bp.money_acc', acc_id=0) }}"
-               class="btn btn-block btn-danger" role="button"><i class="fas fa-plus"></i> add new account</a>
+               class="btn btn-block btn-danger button-icon plus" role="button">add new account</a>
         </div>
         <div class="col-md-3">
             <a href="{{ url_for('money_bp.money_items', acc_id=0) }}"
-               class="btn btn-block btn-success" role="button">transactions for all accounts</a>
+               class="btn btn-block btn-primary button-icon receipt" role="button">transactions for all accounts</a>
         </div>
         <div class="col-md-5">
             click right tab to show transactions for an account below

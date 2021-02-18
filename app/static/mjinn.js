@@ -20,14 +20,26 @@ $(document).ready(function(){
     });
     $("#edit_view").click(function(){
         if ($(this).text() == "edit") {
+            $(this).removeClass("edit");
+            $(this).addClass("eye");
             $(this).text("view");
             $(':input').prop('readonly', false);
             $("#save_delete").show();
             }
         else {
+            $(this).addClass("edit");
+            $(this).removeClass("eye");
             $(this).text("edit");
             $(':input').prop('readonly', true);
             $("#save_delete").hide();
+        }
+    });
+    $(".btn-check").click(function(){
+        if($(".btn-tog").hasClass('check')){
+            $(".btn-tog").removeClass("check");
+        }
+        else {
+            $(".btn-tog").addClass("check");
         }
     });
     $("#more_less").click(function(){

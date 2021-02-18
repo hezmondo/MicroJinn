@@ -3,6 +3,76 @@
 @import "bootstrap";
 */
 
+.button-icon::before {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    margin-right: 10px;
+    -webkit-font-smoothing: antialiased;
+}
+.arrow-left::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f060";
+}
+.arrow-right::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0a9";
+}
+.trash::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f1f8";
+}
+.edit::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f044";
+}
+.email-ic::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f1fa";
+}
+.exclamation::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f06a";
+}
+.check::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f00c";
+}
+.eye::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f06e";
+}
+.filter::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0b0";
+}
+.info::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f129";
+}
+.invoice::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f570";
+}
+.letter::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f658";
+}
+.mail-ic::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f674";
+}
+.meteor::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f753";
+}
+.plus::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f067";
+}
+.receipt::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f543";
+}
+.save::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0c7";
+}
+.search::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f002";
+}
+.sync::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2f1";
+}
+.wallet::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f555";
+}
+
+
 
 #nav_bar a {
   vertical-align: middle;
@@ -31,6 +101,7 @@
     min-width: 130px;
     height: 100%;
     overflow-y: auto;
+    box-shadow: 0 0 10px 0px rgba(0,0,0,.60);
 }
 
 .navbar-brand {
@@ -116,9 +187,60 @@
 /*    background-color: #41B9B9;
     border-color: #41B9B9;*/
 }
-.btn-secondary, .btn-secondary:focus, .btn-secondary.focus {
+.btn-tog {
+ color:#fff;
+ background-color:#007bff;
+ border-color:#007bff
+}
+.btn-tog:hover {
+ color:#fff;
+ background-color:#0069d9;
+ border-color:#0062cc
+}
+.btn-tog.focus,
+.btn-tog:focus {
+ color:#fff;
+ background-color:#0069d9;
+ border-color:#0062cc;
+ box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}
+.btn-tog.disabled,
+.btn-tog:disabled {
+ color:#fff;
+ background-color:#007bff;
+ border-color:#007bff
+}
+.btn-tog:not(:disabled):not(.disabled).active,
+.btn-tog:not(:disabled):not(.disabled):active,
+.show>.btn-tog.dropdown-toggle {
+ color:#fff;
+ background-color:#0062cc;
+ border-color:#005cbf
+}
+.btn-tog:not(:disabled):not(.disabled).active:focus,
+.btn-tog:not(:disabled):not(.disabled):active:focus,
+.show>.btn-tog.dropdown-toggle:focus {
+ box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}
+.btn-tog, .btn-tog:focus, .btn-tog.focus {
     color: #514B64;
     background-color: transparent;
+}
+
+.btn-info, .btn-info:focus, .btn-info.focus,  .btn-info:active.focus, .btn-info:active, .btn-info:not(:disabled):not(.disabled):active{
+    background-color: #a84fa7;
+    border-color: #a84fa7;
+}
+.btn-info:focus {
+    box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
+}
+.btn-info:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
+}
+
+.btn-info:hover {
+    background-color: #9b469a;
+    border-color: #9b469a;
 }
 .btn-success {
     background-color: #3dbd5a;
@@ -141,7 +263,6 @@
 .btn {
     box-shadow: 0 4px 8px rgba(0,0,0,.25);
 }
-
 body {
     background: #CDDBD9;
     background: -webkit-linear-gradient(to right, #0083B0, #CDDBD9);
@@ -149,6 +270,7 @@ body {
     color: #514B64;
     min-height: 100vh
 }
+
 select:-internal-list-box option:checked {
     background-color: rgb(206, 227, 227) !important;
     color: rgb(16, 16, 16) !important;
