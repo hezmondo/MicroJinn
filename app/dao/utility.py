@@ -23,7 +23,7 @@ def delete_record(item_id, item):
         redir = "doc_bp.docfiles"
     elif item == "email_acc":
         EmailAcc.query.filter_by(id=item_id).delete()
-        redir = "util_bp.email_accounts"
+        redir = "util_bp.email_accs"
     elif item == "formletter":
         FormLetter.query.filter_by(id=item_id).delete()
         redir = "formletter_bp.forms"

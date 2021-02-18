@@ -9,12 +9,12 @@
         <div class="col-md-3">
             <label for="name">landlord name:</label>
             <input type="text" class="form-control" name="name"
-                   value="{{ landlord.landlordname }}" readonly="true">
+                   value="{{ landlord.name }}" readonly="true">
         </div>
         <div class="col-md-6">
             <label for="address">landlord address:</label>
             <input type="text" class="form-control" name="address"
-                   value="{{ landlord.landlordaddr }}" readonly="true">
+                   value="{{ landlord.address }}" readonly="true">
         </div>
         <div class="col-md-3">
             <label for="manager">manager:</label>
@@ -59,4 +59,3 @@
     </div>
 </form>
 {% endblock %}
-

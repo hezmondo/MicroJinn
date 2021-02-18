@@ -38,8 +38,8 @@ def post_landlord(id):
         landlord.id = 0
     else:
         landlord = Landlord.query.get(id)
-    ll_name = request.form.get("name")
-    landlord.name = ll_name
+    landlordname = request.form.get("name")
+    landlord.name = landlordname
     landlord.address = request.form.get("address")
     landlord.tax_date = request.form.get("tax_date")
     emailacc = request.form.get("emailacc")
@@ -56,5 +56,5 @@ def post_landlord(id):
             (Manager.managername == manager).one()[0]
     db.session.add(landlord)
     commit_to_database()
-    landlord = Landlord.query.filter(Landlord.name == ll_name).first()
+    landlord = Landlord.query.filter(Landlord.name == landlordname).first()
     return landlord

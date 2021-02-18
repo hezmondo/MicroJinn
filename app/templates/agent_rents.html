@@ -14,68 +14,72 @@
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-12">
+        <div class="col-md-10">
             <label for="email">agent email:</label>
             <input type="text" class="form-control" name="email" value="{{ agent.email }}">
         </div>
+        <div class="col-md-2">
+            <label for="count">count:</label>
+            <input type="text" class="form-control" name="count" value="{{ agent_rents|length }}">
+        </div>
     </div>
-    <div class="form-group row">
-        <div class="col-md-12">
+    <div class="form-group row align-items-end">
+        <div class="col-md-10">
             <label for="note">agent notes:</label>
             <input type="text" class="form-control" name="note" value="{{ agent.note }}">
         </div>
-    </div>
-    <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.agent', agent_id=agent.id) }}"
                class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to agent</a>
         </div>
     </div>
 </form>
-<div class="table-fixed">
-    <table class="table" id="rents">
-        <thead>
-        <tr>
-            <th style="width: 10.00%">rent id</th>
-            <th style="width: 20.00%">rentcode</th>
-            <th style="width: 60.00%">tenant name</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for rent in agent_rents %}
-        <tr id="{{ rent.id }}">
-            <td style="width: 10.00%">{{ rent.id }}</td>
-            <td style="width: 20.00%">{{ rent.rentcode }}</td>
-            <td style="width: 60.00%"> {{ rent.note }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">view</a></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-<div class="table-fixed">
-    <table class="table" id="headrents">
-        <thead>
-        <tr>
-            <th style="width: 10.00%">id</th>
-            <th style="width: 20.00%">code</th>
-            <th style="width: 60.00%">property address</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in agent_headrents %}
-        <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.id }}</td>
-            <td style="width: 20.00%">{{ item.code }}</td>
-            <td style="width: 60.00%"> {{ item.propaddr }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('headrent_bp.headrent',
-            headrent_id=item.id) }}">view</a></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
+{% if type == "rent" %}
+    <div class="table-fixed">
+        <table class="table" id="rents">
+            <thead>
+            <tr>
+                <th style="width: 10.00%">rent id</th>
+                <th style="width: 20.00%">rentcode</th>
+                <th style="width: 60.00%">tenant name</th>
+                <th style="width: 10.00%">action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for rent in agent_rents %}
+            <tr id="{{ rent.id }}">
+                <td style="width: 10.00%">{{ rent.id }}</td>
+                <td style="width: 20.00%">{{ rent.rentcode }}</td>
+                <td style="width: 60.00%"> {{ rent.tenantname }}</td>
+                <td style="width: 10.00%"><a href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">view</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="table-fixed">
+        <table class="table" id="headrents">
+            <thead>
+            <tr>
+                <th style="width: 10.00%">id</th>
+                <th style="width: 20.00%">code</th>
+                <th style="width: 60.00%">property address</th>
+                <th style="width: 10.00%">action</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in agent_rents %}
+            <tr id="{{ item.id }}">
+                <td style="width: 10.00%">{{ item.id }}</td>
+                <td style="width: 20.00%">{{ item.code }}</td>
+                <td style="width: 60.00%"> {{ item.propaddr }}</td>
+                <td style="width: 10.00%"><a href="{{ url_for('headrent_bp.headrent',
+                headrent_id=item.id) }}">view</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
 {% endblock %}
