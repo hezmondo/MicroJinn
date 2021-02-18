@@ -10,7 +10,7 @@
         </div>
         <div class="col-md-3">
             <a href="{{ url_for('loan_bp.loan', loan_id=0) }}"
-               class="btn btn-block btn-danger" role="button">add new loan</a>
+               class="btn btn-block btn-danger" role="button"><i class="fas fa-plus"></i> add new loan</a>
         </div>
     </div>
 </form>
@@ -40,7 +40,7 @@
             <td style="width: 12.00%"> {{ item.notes }}</td>
             <td style="width: 12.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 10.00%"> {{ item.valuation }}</td>
-            <td style="width: 8.00%"><a href="{{ url_for('loan_bp.loan', loan_id=item.id) }}" >view</a></td>
+            <td style="width: 8.00%"><a href="{{ url_for('loan_bp.loan', loan_id=item.id) }}">view</a></td>
         </tr>
         {% endfor %}
         <tr>

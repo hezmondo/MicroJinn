@@ -80,7 +80,7 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
             <a href="{{ url_for('headrent_bp.headrents') }}"
-               class="btn btn-block btn-primary" role="button">back to headrents</a>
+               class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to headrents</a>
         </div>
         <div class="col-md-2">
             <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
@@ -90,19 +90,19 @@
                class="btn btn-block btn-primary" role="button">produce remittance advice</a>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('headrent_bp.headrents') }}" role="button">view past payments</a>
+            <a href="{{ url_for('headrent_bp.headrents') }}" role="button"><i class="fas fa-eye"></i> view past payments</a>
         </div>
     </div>
     <div class="form-group row">
     </div>
     <div class="form-group row flex-row-reverse" id="save_delete" >
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">save changes</button>
+            <button type="submit" class="btn btn-block btn-success"><i class="fas fa-save"></i> save changes</button>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=headrent.id, item='headrent') }}"
                onclick="return confirm('Are you sure you want to delete this headrent?');"
-               class="btn btn-block btn-warning" role="button">delete headrent</a>
+               class="btn btn-block btn-warning" role="button"><i class="fas fa-trash-alt"></i> delete headrent</a>
         </div>
     </div>
 </form>

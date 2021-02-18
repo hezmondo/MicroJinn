@@ -22,7 +22,7 @@
     <div class="form-group row flex-row-reverse align-items-end">
         <div class="col-md-2">
             <a href="{{ url_for('rent_bp.rent', rent_id=property_.rent_id) }}"
-               class="btn btn-block btn-primary" role="button">back to rent</a>
+               class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to rent</a>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.properties', rent_id=0) }}"
@@ -35,7 +35,7 @@
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=property_.id, item='property', id_2=property_.rent_id) }}"
                onclick="return confirm('Are you sure you want to delete this property?');"
-               class="btn btn-block btn-danger" role="button">delete property</a>
+               class="btn btn-block btn-danger" role="button"><i class="fas fa-trash-alt"></i> delete property</a>
         </div>
         {% endif %}
         <div class="col-md-2">

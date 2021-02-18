@@ -35,12 +35,12 @@ class Charge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     chargestartdate = db.Column(db.Date)
-    chargetotal = db.Column(db.Numeric(8,2))
+    chargetotal = db.Column(db.Numeric(8, 2))
     chargedetail = db.Column(db.String(140))
-    chargebalance = db.Column(db.Numeric(8,2))
+    chargebalance = db.Column(db.Numeric(8, 2))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
-    
+
 class ChargeType(db.Model):
     __tablename__ = 'chargetype'
 
@@ -141,8 +141,8 @@ class Headrent(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15), index=True, unique=True)
-    rentpa = db.Column(db.Numeric(8,2))
-    arrears = db.Column(db.Numeric(8,2))
+    rentpa = db.Column(db.Numeric(8, 2))
+    arrears = db.Column(db.Numeric(8, 2))
     lastrentdate = db.Column(db.Date)
     datecode = db.Column(db.String(10))
     source = db.Column(db.String(20))
@@ -163,7 +163,7 @@ class Income(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.Date)
     payer = db.Column(db.String(90))
-    amount = db.Column(db.Numeric(8,2))
+    amount = db.Column(db.Numeric(8, 2))
     paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
     acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
@@ -175,13 +175,13 @@ class IncomeAlloc(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     rentcode = db.Column(db.String(15))
-    amount = db.Column(db.Numeric(8,2))
+    amount = db.Column(db.Numeric(8, 2))
     chargetype_id = db.Column(db.Integer, db.ForeignKey('chargetype.id'))
     income_id = db.Column(db.Integer, db.ForeignKey('income.id'))
     landlord_id = db.Column(db.Integer)
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
-    
+
 class Jstore(db.Model):
     __tablename__ = 'jstore'
 
@@ -261,7 +261,7 @@ class Loan(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
-    interest_rate = db.Column(db.Numeric(8,2))
+    interest_rate = db.Column(db.Numeric(8, 2))
     end_date = db.Column(db.Date)
     frequency = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
@@ -269,8 +269,8 @@ class Loan(db.Model):
     borrower = db.Column(db.String(45))
     notes = db.Column(db.String(45))
     val_date = db.Column(db.Date)
-    valuation = db.Column(db.Numeric(8,2))
-    interestpa = db.Column(db.Numeric(8,2))
+    valuation = db.Column(db.Numeric(8, 2))
+    interestpa = db.Column(db.Numeric(8, 2))
 
     loan_trans_loan = db.relationship('LoanTran', backref='loan', lazy='dynamic')
     loan_interest_rate_loan = db.relationship('LoanIntRate', backref='loan', lazy='dynamic')
@@ -322,7 +322,7 @@ class Manager(db.Model):
     def __repr__(self):
         return '<Manager {}>'.format(self.name)
 
-        
+
 class ManagerExt(db.Model):
     __tablename__ = 'manager_external'
 
@@ -451,12 +451,12 @@ class Rent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rentcode = db.Column(db.String(15), index=True, unique=True)
     tenantname = db.Column(db.String(90))
-    rentpa = db.Column(db.Numeric(8,2))
-    arrears = db.Column(db.Numeric(8,2))
+    rentpa = db.Column(db.Numeric(8, 2))
+    arrears = db.Column(db.Numeric(8, 2))
     lastrentdate = db.Column(db.Date)
     datecode = db.Column(db.String(10))
     source = db.Column(db.String(20))
-    price = db.Column(db.Numeric(8,2))
+    price = db.Column(db.Numeric(8, 2))
     email = db.Column(db.String(60))
     note = db.Column(db.String(120))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
@@ -492,8 +492,8 @@ class Rental(db.Model):
     rentalcode = db.Column(db.String(15), index=True, unique=True)
     propaddr = db.Column(db.String(120))
     tenantname = db.Column(db.String(90))
-    rentpa = db.Column(db.Numeric(8,2))
-    arrears = db.Column(db.Numeric(8,2))
+    rentpa = db.Column(db.Numeric(8, 2))
+    arrears = db.Column(db.Numeric(8, 2))
     startrentdate = db.Column(db.Date)
     note = db.Column(db.String(90))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
@@ -588,9 +588,9 @@ class TypeDeed(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     deedcode = db.Column(db.String(15))
-    nfee = db.Column(db.Numeric(8,2))
+    nfee = db.Column(db.Numeric(8, 2))
     nfeeindeed = db.Column(db.String(45))
-    interest = db.Column(db.Numeric(8,2))
+    interest = db.Column(db.Numeric(8, 2))
     dcov = db.Column(db.Boolean, default=False)
     licencetoassign = db.Column(db.Boolean, default=False)
     insapprove = db.Column(db.Boolean, default=False)
@@ -634,7 +634,7 @@ class TypeFreq(db.Model):
     loan_typefreq = db.relationship('Loan', backref='typefreq', lazy='dynamic')
     rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
 
-    
+
 class TypeMailTo(db.Model):
     __tablename__ = 'typemailto'
 
@@ -699,7 +699,7 @@ class TypeTenure(db.Model):
     rent_typetenure = db.relationship('Rent', backref='typetenure', lazy='dynamic')
     headrent_typetenure = db.relationship('Headrent', backref='typetenure', lazy='dynamic')
 
-                
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
