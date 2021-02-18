@@ -8,7 +8,7 @@
     <div class="form-group row flex-row-reverse">
         {% if rent_id == 0 %}
             <div class="col-md-2">
-                <button type="submit" class="btn btn-block btn-success"><i class="fas fa-search"></i> search</button>
+                <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
             </div>
             <div class="col-md-2">
                 <input type="text" class="form-control" name="rentcode" placeholder="rent code">
@@ -29,19 +29,19 @@
         {% else %}
             <div class="col-md-2">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to rent</a>
+                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
             </div>
             <div class="col-md-2">
                 <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
-                   class="btn btn-block btn-primary" role="button">view all docfiles</a>
+                   class="btn btn-block btn-primary button-icon eye" role="button">view all docfiles</a>
             </div>
             <div class="col-md-2">
                 <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
-                   class="btn btn-block btn-primary" role="button"><i class="fas fa-plus"></i> new doc in</a>
+                   class="btn btn-block btn-danger button-icon plus" role="button">new doc in</a>
             </div>
             <div class="col-md-2">
                 <a href="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=docfiles.rentcode) }}"
-                   class="btn btn-block btn-primary" role="button"><i class="fas fa-plus"></i> new digfile</a>
+                   class="btn btn-block btn-danger button-icon plus" role="button">new digfile</a>
             </div>
         {% endif %}
     </div>

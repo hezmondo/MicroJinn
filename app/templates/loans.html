@@ -5,12 +5,12 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="{{ url_for('loan_bp.loans', action='Nick') }}"
-               class="btn btn-block btn-primary" role="button">show only Nick loans</a>
+            <a href="{{ url_for('loan_bp.loan', loan_id=0) }}"
+               class="btn btn-block btn-danger button-icon plus" role="button">add new loan</a>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('loan_bp.loan', loan_id=0) }}"
-               class="btn btn-block btn-danger" role="button"><i class="fas fa-plus"></i> add new loan</a>
+            <a href="{{ url_for('loan_bp.loans', action='Nick') }}"
+               class="btn btn-block btn-primary button-icon filter" role="button">show only Nick loans</a>
         </div>
     </div>
 </form>

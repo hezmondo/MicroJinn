@@ -109,17 +109,17 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <button type="submit" formaction="/payrequests/?action=filter"
-                    class="btn btn-block btn-success ">filter</button>
+                    class="btn btn-block btn-danger button-icon filter">filter</button>
         </div>
         <div class="col-md-2">
-            <a href="/load_query" class="btn btn-block btn-primary" role="button">load saved filter:</a>
+            <a href="/load_query" class="btn btn-block btn-primary button-icon filter" role="button">load saved filter:</a>
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="jname" placeholder="query name" value="{{ jname }}">
         </div>
         <div class="col-md-3">
             <button type="submit" formaction="/payrequests/?action=save"
-                    class="btn btn-block btn-danger ">save query as</button>
+                    class="btn btn-block btn-danger  button-icon save">save query as</button>
         </div>
     </div>
 

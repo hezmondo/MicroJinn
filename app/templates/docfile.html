@@ -8,20 +8,20 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
             <a href="{{ url_for('doc_bp.docfiles', rent_id=docfile.rent_id) }}"
-               class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to docfiles</a>
+               class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to docfiles</a>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('rent_bp.rent', rent_id=docfile.rent_id) }}"
-               class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to rent</a>
+               class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
         </div>
         {% if doc_dig == "dig" %}
             <div class="col-md-2">
                 <a href="{{ url_for('doc_bp.download', doc_id=docfile.id) }}"
-                   class="btn btn-block btn-danger" role="button">view dig file</a>
+                   class="btn btn-block btn-primary button-icon eye" role="button">view dig file</a>
             </div>
         {% endif %}
         <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+            <button type="button" id="edit_view" class="btn btn-block btn-dark button-icon edit">edit</button>
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="docid" value = "{{ docfile.id }}">
@@ -30,17 +30,17 @@
     <div class="form-group row flex-row-reverse" id="save_delete" >
     {% if doc_dig == "doc" %}
         <div class="col-md-2">
-            <button id="savehtml" class="btn btn-block btn-success"><i class="fas fa-save"></i> save changes</button>
+            <button id="savehtml" class="btn btn-block btn-success button-icon save">save changes</button>
         </div>
     {% else %}
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success"><i class="fas fa-save"></i> save changes</button>
+            <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
         </div>
     {% endif %}
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=docfile.id, item='digfile') }}"
                onclick="return confirm('Are you sure you want to delete this docfile?');"
-               class="btn btn-block btn-warning" role="button"><i class="fas fa-trash-alt"></i> delete item</a>
+               class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
         </div>
     </div>
     <div class="form-group row">

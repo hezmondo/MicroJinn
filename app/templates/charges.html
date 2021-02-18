@@ -7,15 +7,15 @@
         {% if rent_id != "0" %}
             <div class="col-md-2">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-primary" role="button"><i class="fas fa-arrow-left"></i> back to rent</a>
+                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
                 <a href="{{ url_for('charge_bp.charge', charge_id=0, rent_id=rent_id, rentcode=rentcode) }}"
-                   class="btn btn-block btn-danger" role="button"><i class="fas fa-plus"></i> new charge for this rent</a>
+                   class="btn btn-block btn-danger button-icon plus" role="button">new charge for this rent</a>
             </div>
         {% endif %}
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-primary"><i class="fas fa-search"></i> search</button>
+            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
         </div>
         <div class="col-md-3">
             <input type="text" class="form-control" name="chargedetail" placeholder="charge details">
