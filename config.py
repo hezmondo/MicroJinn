@@ -19,3 +19,5 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['your-email@example.com']
     SQLALCHEMY_ECHO = 'debug'
+    MYSQLDUMP_EXECUTABLE = getattr(MyConfig, 'MYSQLDUMP_EXECUTABLE', 'mysqldump')
+    MYSQL_EXECUTABLE = getattr(MyConfig, 'MYSQL_EXECUTABLE', 'mysql')
