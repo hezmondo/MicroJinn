@@ -3,6 +3,21 @@
 @import "bootstrap";
 */
 
+/*example 'text copied' modal on rent screen when user clicks readonly text input*/
+.modal-dialog {
+   position:fixed;
+   top:auto;
+   right:0;
+   left:0;
+   bottom:0;
+   width: 100%;
+}
+
+.modal-backdrop.show {
+    opacity: 0.0;
+}
+
+/*button icons require the button to have 2 classes .button-icon and ie .arrow-left*/
 .button-icon::before {
     display: inline-block;
     font-style: normal;
@@ -18,7 +33,7 @@
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0a9";
 }
 .trash::before {
-    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f1f8";
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2ed";
 }
 .edit::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f044";
@@ -73,7 +88,7 @@
 }
 
 
-
+/*nav bar stylings*/
 #nav_bar a {
   vertical-align: middle;
   -webkit-transform: perspective(1px) translateZ(0);
@@ -91,11 +106,9 @@
     background-color: #518ADD;
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
 }
-
 .navbar {
     padding: 0px;
 }
-
 .nav-display {
     max-width: 10%;
     min-width: 130px;
@@ -103,13 +116,13 @@
     overflow-y: auto;
     box-shadow: 0 0 10px 0px rgba(0,0,0,.60);
 }
-
 .navbar-brand {
     margin-top: 30px;
     width: 100%;
     margin-right: 0px;
 }
 
+/*show editable html elements in pr edit in blocks - easier to edit*/
 .block-text {
     display: block;
 }
@@ -120,27 +133,25 @@
     margin: 50px auto;
 }
 
+/*change container size on resize of app window*/
 @media screen and (min-width: 768px) {
     .main-container {
         width: 85%;
         margin-left: 15%
     }
 }
-
 @media screen and (min-width: 992px) {
     .main-container {
         width: 88%;
         margin-left: 12%
     }
 }
-
 @media screen and (min-width: 1200px) {
     .main-container {
         width: 88%;
         margin-left: 11%
     }
 }
-
 @media screen and (min-width: 1500px) {
     .main-container {
         width: 83%;
@@ -154,6 +165,63 @@
     }
 }
 
+/*colourful card css*/
+.card {
+    box-shadow: 0 8px 16px rgba(0,0,0,.15);
+    border: none;
+    background-color: #d9e3e7;
+}
+.card-purple {
+    border: 3px solid #a84fa7 !important;
+    border-radius: 6px;
+}
+.card-purple .card-header {
+    border-radius: 0px;
+    background-color: #a84fa7;
+    color: white;
+}
+.card-orange {
+    border: 3px solid #e5ad06 !important;
+    border-radius: 6px;
+}
+.card-orange .card-header {
+    border-radius: 0px;
+    background-color: #e5ad06;
+    color: white;
+}
+.card-red {
+    border: 3px solid #e85765 !important;
+    border-radius: 6px;
+}
+.card-red .card-header {
+    border-radius: 0px;
+    background-color: #e85765;
+    color: white;
+}
+.card-green {
+    border: 3px solid #3dbd5a !important;
+    border-radius: 6px;
+}
+.card-green .card-header {
+    border-radius: 0px;
+    background-color: #3dbd5a;
+    color: white;
+}
+.card-blue {
+    border: 3px solid #518ADD !important;
+    border-radius: 6px;
+}
+.card-blue .card-header {
+    border-radius: 0px;
+    background-color: #518ADD;
+    color: white;
+}
+/*Overide bootstrap card text colour*/
+.text-primary{
+    color: inherit !important;
+}
+
+/*dropdown should not be too far below button - set margin: 0*/
 .dropdown-menu {
   margin: 0;
 }
@@ -173,6 +241,7 @@
   /*Without this, clicking will make it sticky*/
     pointer-events: none;
 }
+
 #doc_html, #email_html {
     background-color: 	#EDEDED !important;
     padding: 10px;
@@ -184,18 +253,18 @@
 .btn-primary {
     background-color: #518ADD;
     border-color: #518ADD;
-/*    background-color: #41B9B9;
-    border-color: #41B9B9;*/
 }
+
+/*btn-tog toggles between transparent and blue*/
 .btn-tog {
  color:#fff;
  background-color:#007bff;
- border-color:#007bff
+ border-color:#959595;
 }
 .btn-tog:hover {
  color:#fff;
- background-color:#0069d9;
- border-color:#0062cc
+ background-color:#518ADD;
+ border-color: #518ADD;
 }
 .btn-tog.focus,
 .btn-tog:focus {
@@ -223,12 +292,11 @@
  box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
 }
 .btn-tog, .btn-tog:focus, .btn-tog.focus {
-    color: #514B64;
+    color: #5E5E5E;
     background-color: transparent;
 }
-
 .btn-info, .btn-info:focus, .btn-info.focus,  .btn-info:active.focus, .btn-info:active, .btn-info:not(:disabled):not(.disabled):active{
-    background-color: #a84fa7;
+    background-color: #a84fa7; /*purple*/
     border-color: #a84fa7;
 }
 .btn-info:focus {
@@ -237,10 +305,25 @@
 .btn-info:not(:disabled):not(.disabled):active:focus {
     box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
 }
-
 .btn-info:hover {
     background-color: #9b469a;
     border-color: #9b469a;
+}
+.btn-teal, .btn-teal:focus, .btn-teal.focus,  .btn-teal:active.focus, .btn-teal:active, .btn-teal:not(:disabled):not(.disabled):active{
+    color: #fff;
+    background-color: #4FB397;
+    border-color: #4FB397;
+}
+.btn-teal:focus {
+    box-shadow: 0 0 0 .2rem rgba(149, 209, 192, 0.5);
+}
+.btn-teal:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(149, 209, 192, 0.5);
+}
+.btn-teal:hover {
+    color: #fff;
+    background-color: #377d69;
+    border-color: #377d69;
 }
 .btn-success {
     background-color: #3dbd5a;
@@ -270,7 +353,6 @@ body {
     color: #514B64;
     min-height: 100vh
 }
-
 select:-internal-list-box option:checked {
     background-color: rgb(206, 227, 227) !important;
     color: rgb(16, 16, 16) !important;
@@ -306,33 +388,27 @@ table {
   overflow: hidden;
   font-size: 11pt;
 }
-
 thead {
     background-color: #86A9DC;
     color: #ffffff;
     font-weight: bold;
 }
-
+/*alternate row colours*/
 tbody tr:nth-child(odd) td   { background-color:#d0dde1; }
-
 tbody tr:nth-child(even) td   { background-color:#e3eaed; }
 
 .table {
     color: #3f4c59;
 }
-
 .table-fixed, .table-condensed{
     box-shadow: 0 8px 16px rgba(0,0,0,.15)
 }
-
 .table thead th, .table td, .table th {
     border-bottom: 0px solid #86A9DC;
     border-top: 0px solid #86A9DC;
 }
 
-
-
-/* box styles */
+/* box styles - add shadow around boxes */
 .boxed-center {
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
     padding: 20px;
@@ -346,6 +422,7 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
     margin: 20px 0px;
     background: #c7d6db;
 }
+/*add colour stripe to boxes*/
 .boxed-green {
     border-left: 10px solid #3dbd5a;
 }
@@ -358,16 +435,20 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
 .boxed-red {
     border-left: 10px solid #e85765;
 }
-/* blank horizontal line */
+.boxed-teal {
+    border-left: 10px solid #4FB397;
+}
+
+/* blank horizontal line to help separate elements*/
 .hr-invisible {
     border-top:0px;
 }
 
+/*spans allow for markup in form_letter to be displayed in different styles */
 span.span-input {
     position: absolute;
     min-width: 100px;
 }
-
 span.emboldened {
   font-weight: bold;
 }

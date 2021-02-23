@@ -61,12 +61,12 @@
     {% endif %}
     <table class="table table-condensed">
         <thead>
-        <tr>
-            <th style="width: 10.00%">code</th>
-            <th style="width: 70.00%">description</th>
-            <th style="width: 10.00%">action</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
+            <tr>
+                <th style="width: 10.00%">code</th>
+                <th style="width: 70.00%">description</th>
+                <th style="width: 10.00%">action</th>
+                <th style="width: 10.00%">action</th>
+            </tr>
         </thead>
         <tbody>
         {% for item in form_letters %}
@@ -76,12 +76,12 @@
             <td>
                 <button type="submit" formaction="{{ url_for('mail_bp.mail_edit',
                 form_letter_id=item.id, method='email',
-                action=action) }}" class="btn btn-danger">email</button>
+                action=action) }}" class="btn btn-info button-icon email-ic">email</button>
             </td>
             <td>
                 <button type="submit" formaction="{{ url_for('mail_bp.mail_edit',
                 form_letter_id=item.id, method='letter',
-                action=action) }}" class="btn btn-danger">post</button>
+                action=action) }}" class="btn btn-teal button-icon letter">post</button>
             </td>
         </tr>
         {% endfor %}

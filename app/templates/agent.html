@@ -7,12 +7,12 @@
         {% if rent_id != 0 %}
             <div class="col-md-2">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
+                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
             </div>
         {% else %}
             <div class="col-md-2">
                 <a href="{{ url_for('util_bp.agents') }}"
-                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to agents</a>
+                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to agents</a>
             </div>
         {% endif %}
     </div>
@@ -48,7 +48,7 @@
               class="btn btn-block btn-primary button-icon eye" role="button">associated headrents</a>
         </div>
         <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-dark button-icon edit">edit</button>
+            <button type="button" id="edit_view" class="btn btn-block btn-secondary button-icon edit">edit</button>
         </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="agentid" value = "{{ agent.id }}">
@@ -61,7 +61,7 @@
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=agent.id, item='agent') }}"
                onclick="return confirm('Are you sure you want to delete this agent?');"
-               class="btn btn-block btn-danger button-icon trash" role="button">delete agent</a>
+               class="btn btn-block btn-warning button-icon trash" role="button">delete agent</a>
         </div>
     </div>
 </form>
