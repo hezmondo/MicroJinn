@@ -17,10 +17,10 @@
             <th style="width: 6.00%">id</th>
             <th style="width: 18.00%">smtp_server</th>
             <th style="width: 9.00%">smtp_port</th>
-            <th style="width: 22.00%">smtp_user</th>
-            <th style="width: 22.00%">smtp_sendfrom</th>
+            <th style="width: 21.00%">smtp_user</th>
+            <th style="width: 20.00%">smtp_sendfrom</th>
             <th style="width: 17.00%">imap_server</th>
-            <th style="width: 7.00%"></th>
+            <th style="width: 10.00%"></th>
         </tr>
         </thead>
         <tbody>
@@ -29,11 +29,11 @@
             <td style="width: 5.00%">{{ item.id }}</td>
             <td style="width: 18.00%">{{ item.smtp_server }}</td>
             <td style="width: 9.00%">{{ item.smtp_port }}</td>
-            <td style="width: 22.00%">{{ item.smtp_user }}</td>
-            <td style="width: 22.00%">{{ item.smtp_sendfrom }}</td>
+            <td style="width: 21.00%">{{ item.smtp_user }}</td>
+            <td style="width: 20.00%">{{ item.smtp_sendfrom }}</td>
             <td style="width: 17.00%">{{ item.imap_server }}</td>
-            <td style="width: 7.00%"><a href="{{ url_for('util_bp.email_acc',
-            email_acc_id=item.id) }}">view</a></td>
+            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.email_acc',
+            email_acc_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

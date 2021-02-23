@@ -1,7 +1,8 @@
-from datetime import date, datetime
+from datetime import datetime
 from app import db
 from app.models import PrArrearsMatrix, PrHistory, Rent, TypePrDelivery
 from app.dao.functions import commit_to_database
+from sqlalchemy import desc
 
 
 def add_pr_history(pr_history):
@@ -19,14 +20,14 @@ def get_typeprdelivery_id(prdeliverydet='email'):
 
 def get_pr_file(pr_id):
     pr_file = PrHistory.query.join(Rent).with_entities(PrHistory.id, PrHistory.summary, PrHistory.block,
-                                                       PrHistory.date, Rent.rentcode,
+                                                       PrHistory.datetime, Rent.rentcode,
                                                        Rent.id.label("rent_id")) \
         .filter(PrHistory.id == pr_id).one_or_none()
     return pr_file
 
 
 def get_pr_history(rent_id):
-    return PrHistory.query.filter_by(rent_id=rent_id)
+    return PrHistory.query.filter_by(rent_id=rent_id).order_by(desc(PrHistory.datetime))
 
 
 def get_recovery_info(suffix):
@@ -53,7 +54,7 @@ def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method=
     pr_history.block = block
     pr_history.rent_id = rent_id
     pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
-    pr_history.date = date.today()
+    pr_history.datetime = datetime.now()
     pr_history.rent_date = datetime.strptime(pr_save_data.get("rent_date_string"), '%Y-%m-%d')
     pr_history.total_due = pr_save_data.get("tot_due")
     pr_history.arrears_level = pr_save_data.get("new_arrears_level")

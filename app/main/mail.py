@@ -101,6 +101,7 @@ def get_owing_stat(rentobj, mail_variables):
 
     return owing_stat
 
+
 def get_mail_variables(rentobj):
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
