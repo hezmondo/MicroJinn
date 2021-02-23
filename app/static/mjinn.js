@@ -96,7 +96,15 @@ $(document).ready(function(){
     $('#nav_bar').find('a').each(function() {
         $(this).toggleClass('active', $(this).attr('href') == loc);
     });
-
+    $('#doc_html').html(function(i, html) {
+      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
+    });
+    $('#doc_html').html(function(i, html2) {
+      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
+    });
+    $('#doc_html').html(function(i, html3) {
+      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
+    });
 });
 $(function() {
   // Sidebar toggle behavior

@@ -37,7 +37,7 @@
         <thead>
         <tr>
             <th style="width: 10.00%">rentcode</th>
-            <th style="width: 75.00%">address</th>
+            <th style="width: 65.00%">address</th>
             <th style="width: 15.00%">proptype</th>
             <th style="width: 10.00%">action</th>
         </tr>
@@ -46,7 +46,7 @@
         {% for item in properties %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
-            <td style="width: 75.00%"> {{ item.propaddr }}</td>
+            <td style="width: 65.00%"> {{ item.propaddr }}</td>
             <td style="width: 15.00%"> {{ item.detail }}</td>
             <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.property',
             property_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
