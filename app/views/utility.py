@@ -41,15 +41,6 @@ def agents():
     return render_template('agents.html', agents=agents)
 
 
-@util_bp.route('/backup', methods=['GET', 'POST'])
-# @login_required
-def backup():
-    if request.method == "POST":
-        backup_database()
-
-    return render_template('backup.html')
-
-
 @util_bp.route('/delete_item/<int:item_id>/<item>')
 @login_required
 def delete_item(item_id, item=''):

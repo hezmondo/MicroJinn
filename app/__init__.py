@@ -84,6 +84,9 @@ def create_app(config_class=Config):
     from .views.utility import util_bp
     app.register_blueprint(util_bp)
 
+    from .views.backup import backup_bp
+    app.register_blueprint(backup_bp)
+
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
             auth = None
