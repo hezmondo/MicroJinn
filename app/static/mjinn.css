@@ -250,11 +250,15 @@
 }
 
 /*button styles*/
+.btn-small {
+    margin: 0px;
+    padding: 3px 10px;
+    border-radius: 15px;
+}
 .btn-primary {
     background-color: #518ADD;
     border-color: #518ADD;
 }
-
 /*btn-tog toggles between transparent and blue*/
 .btn-tog {
  color:#fff;
@@ -407,7 +411,9 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
     border-bottom: 0px solid #86A9DC;
     border-top: 0px solid #86A9DC;
 }
-
+.table .vertical-align {
+    vertical-align: middle;
+}
 /* box styles - add shadow around boxes */
 .boxed-center {
     box-shadow: 0 8px 16px rgba(0,0,0,.15);

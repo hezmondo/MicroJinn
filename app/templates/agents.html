@@ -31,7 +31,7 @@
             <th style="width: 40.00%">agent address</th>
             <th style="width: 25.00%">agent email</th>
             <th style="width: 25.00%">agent notes</th>
-            <th style="width: 10.00%">action</th>
+            <th style="width: 10.00%"></th>
         </tr>
         </thead>
         <tbody>
@@ -40,7 +40,8 @@
             <td style="width: 40.00%">{{ item.detail }}</td>
             <td style="width: 25.00%">{{ item.email }}</td>
             <td style="width: 25.00%"> {{ item.note }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('util_bp.agent', agent_id=item.id, rent_id=0) }}">view</a></td>
+            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.agent', agent_id=item.id,
+            rent_id=0) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

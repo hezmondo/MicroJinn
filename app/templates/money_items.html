@@ -49,13 +49,13 @@
         <tr>
             <th style="width: 8.00%">id</th>
             <th style="width: 8.00%">cleared</th>
-            <th style="width: 12.00%">date</th>
+            <th style="width: 10.00%">date</th>
             <th style="width: 14.00%">payer</th>
             <th style="width: 10.00%">amount</th>
             <th style="width: 14.00%">memo</th>
             <th style="width: 12.00%">account</th>
             <th style="width: 14.00%">category</th>
-            <th style="width: 8.00%"></th>
+            <th style="width: 10.00%"></th>
         </tr>
         </thead>
         <tbody>
@@ -63,14 +63,14 @@
         <tr id="{{ item.id }}">
             <td style="width: 8.00%"> {{ item.id }}</td>
             <td style="width: 8.00%"> {{ item.cleared }}</td>
-            <td style="width: 12.00%"> {{ item.date.strftime('%d-%b-%Y') }}</td>
+            <td style="width: 10.00%"> {{ item.date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 14.00%"> {{ item.payer }}</td>
             <td style="width: 10.00%"> {{ item.amount }}</td>
             <td style="width: 14.00%">{{ item.memo }}</td>
             <td style="width: 12.00%"> {{ item.acc_desc }}</td>
             <td style="width: 14.00%"> {{ item.cat_name }}</td>
-            <td style="width: 8.00%"><a href="{{ url_for('money_bp.money_deduce', item_id=item.id,
-            mode=item.num) }}">view</a></td>
+            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('money_bp.money_deduce', item_id=item.id,
+            mode=item.num) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>
         {% endfor %}
         </tbody>
