@@ -174,7 +174,7 @@ def get_rent_s_data(qfilter, action, runsize):
                                # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                                func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
-                .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
+                .filter(*qfilter).limit(runsize).all()
 
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed

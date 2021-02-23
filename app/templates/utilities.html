@@ -10,7 +10,11 @@
         </div>
         <div class="col-md-3">
             <a href="{{ url_for('util_bp.backup') }}"
-               class="btn btn-block btn-success button-icon sync" role="button">backup or restore mjinn</a>
+               class="btn btn-block btn-success button-icon sync" role="button">backup mjinn database</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.backup') }}"
+               class="btn btn-block btn-danger button-icon sync" role="button">restore mjinn database</a>
         </div>
     </div>
     <div class="form-group row boxed boxed-blue">
