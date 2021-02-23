@@ -5,6 +5,18 @@
 
 {% block app_content %}
 <form method="POST" id="target">
+    {% if incomevals.rent_id != 0 %}
+        <div class="form-group row flex-row-reverse">
+            <div class="col-md-2">
+                <a href="{{ url_for('rent_bp.rent', rent_id=incomevals.rent_id) }}"
+                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
+                   class="btn btn-block btn-primary" role="button">post income for this rent</a>
+            </div>
+        </div>
+    {% endif %}
     <div class="form-group row">
         <div class="col-md-2">
             <input type="text" class="form-control" name="payer"
@@ -21,22 +33,10 @@
             {{ widgets.combobox(name="paytype", items=income_dict.paytypes_all, item_selected=incomevals.paytype) }}
         </div>
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">search</button>
+            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
         </div>
     </div>
-    {% if incomevals.rent_id != 0 %}
-        <div class="form-group row flex-row-reverse">
-            <div class="col-md-3">
-                <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
-                   class="btn btn-block btn-primary" role="button">post income for this rent</a>
-            </div>
-            <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent', rent_id=incomevals.rent_id) }}"
-                   class="btn btn-block btn-primary" role="button">back to rent</a>
-            </div>
-        </div>
-    {% endif %}
-</form>
+ </form>
 <div class="table-fixed">
     <table class="table" id="incomeitems">
         <thead>

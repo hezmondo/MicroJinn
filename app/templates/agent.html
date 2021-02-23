@@ -3,6 +3,18 @@
 
 {% block app_content %}
 <form method="POST" id="target">
+    <div class="form-group row flex-row-reverse">
+        {% if rent_id != 0 %}
+            <div class="col-md-2">
+                <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
+            </div>
+        {% endif %}
+        <div class="col-md-2">
+            <a href="{{ url_for('util_bp.agents') }}"
+               class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to agents</a>
+        </div>
+    </div>
     <div class="form-group row">
         <div class="col-md-10">
             <label for="detail">agent details:</label>
@@ -26,36 +38,36 @@
         </div>
     </div>
     <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id, type='rent') }}"
+              class="btn btn-block btn-primary button-icon eye" role="button">associated rents</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id, type='headrent') }}"
+              class="btn btn-block btn-primary button-icon eye" role="button">associated headrents</a>
+        </div>
+        <div class="col-md-2">
+            <button type="button" id="edit_view" class="btn btn-block btn-dark button-icon edit">edit</button>
+        </div>
         {% if rent_id != 0 %}
             <div class="col-md-2">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-primary" role="button">back to rent</a>
-            </div>
-        {% else %}
-            <div class="col-md-2">
-                <a href="{{ url_for('util_bp.agents') }}"
-                   class="btn btn-block btn-primary" role="button">back to agents</a>
+                   class="btn btn-block btn-secondary button-icon arrow-left"
+                   role="button">link agent to {{ rentcode }}?</a>
             </div>
         {% endif %}
-        <div class="col-md-3">
-            <a href="{{ url_for('util_bp.agent_rents', agent_id=agent.id) }}"
-               class="btn btn-block btn-primary" role="button">view rents/headrents</a>
-        </div>
-        <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
-        </div>
 		<div class="col-md-2">
             <input type="hidden" class="form-control" name="agentid" value = "{{ agent.id }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse" id="save_delete" >
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">save changes</button>
+            <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=agent.id, item='agent') }}"
                onclick="return confirm('Are you sure you want to delete this agent?');"
-               class="btn btn-block btn-warning" role="button">delete agent</a>
+               class="btn btn-block btn-danger button-icon trash" role="button">delete agent</a>
         </div>
     </div>
 </form>

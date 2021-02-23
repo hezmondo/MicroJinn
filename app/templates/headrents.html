@@ -5,7 +5,7 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
+    <div class="form-group row boxed boxed-green">
         <div class="col-md-2">
             <label for="rentcode">code:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ filterdict.rentcode }}">
@@ -28,7 +28,7 @@
         <div class="col-md-9">
         </div>
         <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-danger">search</button>
+            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
         </div>
     </div>
 </form>

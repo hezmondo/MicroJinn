@@ -114,11 +114,11 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('filter_bp.filter', filter_id=filter_id, action=action) }}"
-                    class="btn btn-block btn-success ">search</button>
+                    class="btn btn-block btn-success  button-icon search" role="button">search</button>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('filter_bp.load_filter') }}"
-               class="btn btn-block btn-primary" role="button">load saved filter:</a>
+               class="btn btn-block btn-primary button-icon filter" role="button">load saved filter:</a>
         </div>
         <div class="col-md-2">
             <input type="text" class="form-control" name="filtername" placeholder="filter name"
@@ -126,7 +126,7 @@
         </div>
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('filter_bp.filter', filter_id=0, action='save') }}"
-                    class="btn btn-block btn-danger ">save query as</button>
+                    class="btn btn-block btn-danger  button-icon save">save query as</button>
         </div>
     </div>
     {% if action == "pr_query" %}

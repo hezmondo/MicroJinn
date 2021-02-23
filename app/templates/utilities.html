@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% set active_page = "index" %}
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row boxed boxed-green">
+        <div class="col-md-2">
+            <label>backup</label>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('backup_bp.backup') }}"
+               class="btn btn-block btn-success button-icon sync" role="button">backup mjinn database</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('backup_bp.backup') }}"
+               class="btn btn-block btn-danger button-icon sync" role="button">restore mjinn database</a>
+        </div>
+    </div>
+    <div class="form-group row boxed boxed-blue">
+        <div class="col-md-2">
+            <label>letter utilities</label>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('form_letter_bp.form_letters') }}"
+               class="btn btn-block btn-primary button-icon letter" role="button">form letter templates</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
+               class="btn btn-block btn-primary button-icon mail-ic" role="button">view docfiles</a>
+        </div>
+    </div>
+    <div class="form-group row boxed boxed-blue">
+        <div class="col-md-2">
+            <label>emails</label>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.email_accs') }}"
+               class="btn btn-block btn-primary button-icon email-ic" role="button">email accounts</a>
+        </div>
+    </div>
+    <div class="boxed boxed-yellow">
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label>other utilities</label>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.rents_ex') }}"
+                   class="btn btn-block btn-warning" role="button">external rents</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('charge_bp.charges') }}"
+                   class="btn btn-block btn-warning" role="button">charges</a>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-2">
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('lease_bp.leases') }}"
+                   class="btn btn-block btn-warning" role="button">leases</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.landlords') }}"
+                   class="btn btn-block btn-warning" role="button">landlords</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.properties', rent_id=0) }}"
+                   class="btn btn-block btn-warning" role="button">properties</a>
+            </div>
+        </div>
+    </div>
+
+</form>
+{% endblock %}

@@ -20,14 +20,26 @@ $(document).ready(function(){
     });
     $("#edit_view").click(function(){
         if ($(this).text() == "edit") {
+            $(this).removeClass("edit");
+            $(this).addClass("eye");
             $(this).text("view");
             $(':input').prop('readonly', false);
             $("#save_delete").show();
             }
         else {
+            $(this).addClass("edit");
+            $(this).removeClass("eye");
             $(this).text("edit");
             $(':input').prop('readonly', true);
             $("#save_delete").hide();
+        }
+    });
+    $(".btn-check").click(function(){
+        if($(".btn-tog").hasClass('check')){
+            $(".btn-tog").removeClass("check");
+        }
+        else {
+            $(".btn-tog").addClass("check");
         }
     });
     $("#more_less").click(function(){
@@ -61,21 +73,16 @@ $(document).ready(function(){
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
         $('#pr_addr').val(pr_addr_strip);
     });
+
+    resize_view();
     $(window).resize(function(){
-        var viewportwidth;
-        if(typeof window.innerWidth!='undefined'){
-              viewportwidth=window.innerWidth;
-        }
-       $('#nav_aside').removeClass("fixed-top");
-       $('#nav_bar').removeClass("navbar-expand");
-       if(viewportwidth >= 768){
-           $('#nav_aside').addClass("fixed-top");
-           $('#nav_bar').removeClass("navbar-expand");
-       }
-       else {//if(viewportwidth >= 640){
-           $('#nav_bar').addClass("navbar-expand");
-        }
+        resize_view();
     });
+      var loc = window.location.pathname;
+
+   $('#nav_bar').find('a').each(function() {
+     $(this).toggleClass('active', $(this).attr('href') == loc);
+  });
 
 });
 $(function() {
@@ -87,3 +94,22 @@ $(function() {
 $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 });
+
+function resize_view() {
+            var viewportwidth;
+        if(typeof window.innerWidth!='undefined'){
+              viewportwidth=window.innerWidth;
+        }
+       $('#nav_aside').removeClass("fixed-top");
+       $('#nav_aside').removeClass("nav-display");
+       $('#nav_bar').removeClass("navbar-expand");
+
+       if(viewportwidth >= 768){
+           $('#nav_aside').addClass("fixed-top");
+           $('#nav_aside').addClass("nav-display");
+           $('#nav_bar').removeClass("navbar-expand");
+       }
+       else {
+           $('#nav_bar').addClass("navbar-expand");
+        }
+}

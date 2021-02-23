@@ -36,8 +36,19 @@ That setting only lasts for the workbench setting
  
 Create two sql dump folders, one being just all the tables, named TablesDump, and the other being just the teeny user table along with the functions and procedures, named UserFuncProcDump
 
-The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as set out above, to remove the offending text and then do data import in workbench.  
+The TablesDump sql dump file should import fine as it is.  Now it is easier to edit the small FuncProcDump sql file as 
+set out above and below, to remove the offending text and then do data import in workbench.  
 
 So, after refreshing, you should now see all the tables and all the functions and procedures.
+
+**Using sed in linux**
+
+Run these commands in a terminal opened in the folder containing your sql dump file eg "mydump.sql"
+  
+	sed -i 's/NO_AUTO_CREATE_USER//' mydump.sql 
+	sed -i 's/DEFINER=`root`@`localhost`//' mydump.sql 
+
+If you get an error because of text containing SET TIME_ZONE=, then I suggest you remove this line, which is a few lines up from the very end of the sql file.  I will ask JB if sed can do this.
+
     
 **Feel free to check out the mjinn guide for mysql console and maria**

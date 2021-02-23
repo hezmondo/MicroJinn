@@ -3,27 +3,155 @@
 @import "bootstrap";
 */
 
+.button-icon::before {
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    margin-right: 10px;
+    -webkit-font-smoothing: antialiased;
+}
+.arrow-left::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f060";
+}
+.arrow-right::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0a9";
+}
+.trash::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f1f8";
+}
+.edit::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f044";
+}
+.email-ic::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f1fa";
+}
+.exclamation::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f06a";
+}
+.check::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f00c";
+}
+.eye::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f06e";
+}
+.filter::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0b0";
+}
+.info::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f129";
+}
+.invoice::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f570";
+}
+.letter::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f658";
+}
+.mail-ic::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f674";
+}
+.meteor::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f753";
+}
+.plus::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f067";
+}
+.receipt::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f543";
+}
+.save::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0c7";
+}
+.search::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f002";
+}
+.sync::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2f1";
+}
+.wallet::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f555";
+}
+
+
+
+#nav_bar a {
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  overflow: hidden;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: color, background-color;
+  transition-property: color, background-color;
+        padding-left: 20px;
+    padding-bottom: 10px;
+}
+#nav_bar a:hover, #nav_bar a:focus, #nav_bar a.active {
+    color: white;
+    background-color: #518ADD;
+    box-shadow: 0 8px 16px rgba(0,0,0,.15);
+}
+
+.navbar {
+    padding: 0px;
+}
+
+.nav-display {
+    max-width: 10%;
+    min-width: 130px;
+    height: 100%;
+    overflow-y: auto;
+    box-shadow: 0 0 10px 0px rgba(0,0,0,.60);
+}
+
+.navbar-brand {
+    margin-top: 30px;
+    width: 100%;
+    margin-right: 0px;
+}
+
 .block-text {
     display: block;
 }
 
 /*container*/
-.container-main {
+.main-container {
     width: 100%;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin: 50px auto;
 }
-@media screen and (min-width: 1400px) {
-    .container-main {
-        width: 60%;
-        margin-top: 20px;
-        margin-bottom: 20px;
-        margin-left: 28%;
+
+@media screen and (min-width: 768px) {
+    .main-container {
+        width: 85%;
+        margin-left: 15%
     }
 }
-/* even sizes for 2 radio buttons in group for pr email delivery*/
-.btn-fixed-width {
-    width: 50%;
+
+@media screen and (min-width: 992px) {
+    .main-container {
+        width: 88%;
+        margin-left: 12%
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .main-container {
+        width: 88%;
+        margin-left: 11%
+    }
+}
+
+@media screen and (min-width: 1500px) {
+    .main-container {
+        width: 83%;
+        margin-left: 13%;
+    }
+}
+@media screen and (min-width: 1700px) {
+    .main-container {
+        width: 70%;
+        margin-left: 20%;
+    }
 }
 
 .dropdown-menu {
@@ -37,12 +165,6 @@
 .dropdown-item:hover {
     background-color: #518ADD;
     color: #fff;
-}
-.navbar-nav li:hover>.dropdown-menu {
-  display: block;
-}
-.navbar-brand {
-    margin-top: 30px;
 }
 .dropdown:hover>.dropdown-menu {
   display: block;
@@ -65,9 +187,60 @@
 /*    background-color: #41B9B9;
     border-color: #41B9B9;*/
 }
-.btn-secondary, .btn-secondary:focus, .btn-secondary.focus {
+.btn-tog {
+ color:#fff;
+ background-color:#007bff;
+ border-color:#007bff
+}
+.btn-tog:hover {
+ color:#fff;
+ background-color:#0069d9;
+ border-color:#0062cc
+}
+.btn-tog.focus,
+.btn-tog:focus {
+ color:#fff;
+ background-color:#0069d9;
+ border-color:#0062cc;
+ box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}
+.btn-tog.disabled,
+.btn-tog:disabled {
+ color:#fff;
+ background-color:#007bff;
+ border-color:#007bff
+}
+.btn-tog:not(:disabled):not(.disabled).active,
+.btn-tog:not(:disabled):not(.disabled):active,
+.show>.btn-tog.dropdown-toggle {
+ color:#fff;
+ background-color:#0062cc;
+ border-color:#005cbf
+}
+.btn-tog:not(:disabled):not(.disabled).active:focus,
+.btn-tog:not(:disabled):not(.disabled):active:focus,
+.show>.btn-tog.dropdown-toggle:focus {
+ box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}
+.btn-tog, .btn-tog:focus, .btn-tog.focus {
     color: #514B64;
     background-color: transparent;
+}
+
+.btn-info, .btn-info:focus, .btn-info.focus,  .btn-info:active.focus, .btn-info:active, .btn-info:not(:disabled):not(.disabled):active{
+    background-color: #a84fa7;
+    border-color: #a84fa7;
+}
+.btn-info:focus {
+    box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
+}
+.btn-info:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
+}
+
+.btn-info:hover {
+    background-color: #9b469a;
+    border-color: #9b469a;
 }
 .btn-success {
     background-color: #3dbd5a;
@@ -90,64 +263,6 @@
 .btn {
     box-shadow: 0 4px 8px rgba(0,0,0,.25);
 }
-
-.full-height {
-    height: 100%;
-    overflow-y: auto;
-}
-/*.btn-danger
-{
-  background-color: hsl(351, 68%, 11%) !important;
-  background-repeat: repeat-x;
-  background-image: -o-linear-gradient(top, #d12741, #2f080e);
-  background-image: linear-gradient(#d12741, #2f080e);
-  border-color: #2f080e #2f080e hsl(351, 68%, 1.5%);
-  color: #fff !important;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.62);
-}*/
-/*.btn-danger:hover, .btn-danger:focus, .btn-danger:active, .btn-danger.active, .open .dropdown-toggle.btn-danger {
-
-  background-color: hsl(360, 68%, 60%) !important;
-  background-repeat: repeat-x;
-  background-image: linear-gradient(#fbeded, #de5353);
-  border-color: #de5353 #de5353 hsl(360, 68%, 51%);
-  color: #333 !important;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.59);
- }*/
-/*
-.btn-primary
-{
-  background-color: #2764a5 !important;
-  border-color: #2f080e;
-}
-*/
-/* ------- customize primary buttons -------- */
-/*
-$mynewcolor:teal;
-
-.btn-primary {
-    @include button-variant($mynewcolor, darken($mynewcolor, 7.5%), darken($mynewcolor, 10%), lighten($mynewcolor,5%), lighten($mynewcolor, 10%), darken($mynewcolor,30%));
-}
-
-.btn-outline-primary {
-    @include button-outline-variant($mynewcolor, #222222, lighten($mynewcolor,5%), $mynewcolor);
-}
-*/
-/*.btn-primary{color:#fff;background-color:teal;border-color:#005a5a}
-
-.btn-primary:hover{color:#fff;background-color:#004d4d;border-color:#009a9a}
-.btn-primary:focus,.btn-primary.focus{box-shadow:0 0 0 .2rem rgba(0,90,90,0.5)}
-.btn-primary.disabled,
-.btn-primary:disabled{color:#fff;background-color:teal;border-color:#005a5a}
-.btn-primary:not(:disabled):not(.disabled):active,
-.btn-primary:not(:disabled):not(.disabled).active,
-.show>.btn-primary.dropdown-toggle{color:#fff;background-color:#00b3b3;border-color:#000}
-.btn-primary:not(:disabled):not(.disabled):active:focus,
-.btn-primary:not(:disabled):not(.disabled).active:focus,
-.show>.btn-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem rgba(0,90,90,0.5)}
-.btn-success{border-color: #2f080e}
-.mt-100 {margin-top: 100px}
-.warning {background: #76A0D3 !important;}*/
 body {
     background: #CDDBD9;
     background: -webkit-linear-gradient(to right, #0083B0, #CDDBD9);
@@ -155,17 +270,11 @@ body {
     color: #514B64;
     min-height: 100vh
 }
+
 select:-internal-list-box option:checked {
     background-color: rgb(206, 227, 227) !important;
     color: rgb(16, 16, 16) !important;
 }
-/* docs.css */
-/* standard CSS for docs */
-
-/* font family */
-/* body {
-/*     font-family: Verdana, Tahoma, sans-serif;
-/* }
 
 /* font sizes */
 
@@ -188,16 +297,6 @@ select:-internal-list-box option:checked {
 .font-size-17px {
     font-size: 9pt;
 }
-
-/* table for email accounts (overspilling at right)*/
-
-.my-table {
-    word-wrap: break-word;
-    table-layout:fixed;
-    width: 100%;
-}
-
-
 
 /*table css*/
 
@@ -247,7 +346,18 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
     margin: 20px 0px;
     background: #c7d6db;
 }
-
+.boxed-green {
+    border-left: 10px solid #3dbd5a;
+}
+.boxed-blue {
+    border-left: 10px solid #518ADD;
+}
+.boxed-yellow {
+    border-left: 10px solid #e5ad06;
+}
+.boxed-red {
+    border-left: 10px solid #e85765;
+}
 /* blank horizontal line */
 .hr-invisible {
     border-top:0px;

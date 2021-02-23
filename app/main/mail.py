@@ -2,10 +2,11 @@ import datetime
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from app.dao.charge import get_rent_charge_details
 from app.dao.form_letter import get_form_letter
 from app.dao.functions import dateToStr, doReplace, hashCode, moneyToStr
-from app.dao.lease import get_lease_variables
 from app.dao.income import get_income_item
+from app.dao.lease import get_lease_variables
 from app.dao.rent import get_rent_mail
 
 
@@ -19,7 +20,7 @@ def writeMail(rent_id, form_letter_id, income_id=0):
     mail_variables['#payer#'] = income_item.payer if income_item else "no payer"
     mail_variables['#paytypedet#'] = income_item.paytypedet if income_item else "no paytype"
     owing_stat = get_owing_stat(rentobj, mail_variables)
-    mail_variables['owing_stat'] = owing_stat
+    mail_variables['#owing_stat#'] = owing_stat
     form_letter = get_form_letter(form_letter_id)
     if "LEQ" in form_letter.code:
         leasedata, lease_variables = get_lease_variables(rent_id)
@@ -51,35 +52,53 @@ def get_owing_stat(rentobj, mail_variables):
                         Further {0} will be due and payable {2} {3} on {4} in the sum of {5}."\
                 .format(mail_variables["#rent_type#"], mail_variables["#paidtodate#"], mail_variables["#periodly#"],
                         mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
-    elif rentobj.arrears == 0 and rentobj.totcharges == 0 and rentobj.nextrentdate <= datetime.date.today():
+    elif rentobj.arrears == 0 and rentobj.totcharges == 0 and rentobj.nextrentdate < datetime.date.today():
         owing_stat = "{0} was last paid on this property up to {1}. Further {0} was due and \
                         payable {2} {3} on {4} in the sum of {5} but no rent demand has yet been issued." \
             .format(mail_variables["#rent_type#"], mail_variables["#paidtodate#"], mail_variables["#periodly#"],
                         mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
     elif rentobj.arrears > 0 and rentobj.totcharges == 0 and rentobj.lastrentdate > datetime.date.today():
-        owing_stat = "A recent pay request has been issued showing the total amount owing to us on this property \
-        as {} being {} owing for the period {}. This amount is not payable until the date stated on the pay request."\
+        owing_stat = "A recent pay request has been issued for {} {} due {} {} on {}. \
+        This amount is not payable until the date stated on the pay request."\
             .format(mail_variables["#totdue#"], mail_variables["#rent_type#"], mail_variables["#periodly#"],
-                        mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
-    elif rentobj.arrears > 0 and rentobj.totcharges == 0 and \
-        rentobj.lastrentdate <= datetime.date.today() < rentobj.nextrentdate:
+                        mail_variables["#advarr#"], mail_variables["#nextrentdate#"])
+    elif rentobj.arrears > 0 and rentobj.totcharges == 0 and rentobj.lastrentdate <= datetime.date.today():
         owing_stat = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
          to {3}. Further {1} will be due and payable {4} {5} on {6} in the sum of {7}." \
             .format(mail_variables["#totdue#"], mail_variables["#rent_type#"], mail_variables["#arrears_start_date#"],
                     mail_variables["#arrears_end_date#"], mail_variables["#periodly#"],
                     mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
-    elif rentobj.arrears > 0 and rentobj.totcharges == 0 and \
-             rentobj.nextrentdate < datetime.date.today():
+    elif rentobj.arrears > 0 and rentobj.totcharges == 0 and rentobj.nextrentdate < datetime.date.today():
         owing_stat = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
-                         to {3}. Further {1} will be due and payable {4} {5} on {6} in the sum of {7} but no \
+                         to {3}. Further {1} fell due and payable {4} {5} on {6} in the sum of {7} but no \
                          rent demand has yet been issued." \
             .format(mail_variables["#totdue#"], mail_variables["#rent_type#"], mail_variables["#arrears_start_date#"],
                     mail_variables["#arrears_end_date#"], mail_variables["#periodly#"],
                     mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
-    # TODO several more cases for Hez to deal with here - particularly where charges are owing as well as rent and also
-    # TODO reduced rents
+    elif rentobj.arrears == 0 and rentobj.totcharges > 0 and rentobj.nextrentdate < datetime.date.today():
+        owing_stat = "The total amount owing to us on this property is {0} as more fully set out below. {1} fell due \
+                        and payable {4} {5} on {6} in the sum of {7} but no rent demand has yet been issued." \
+            .format(mail_variables["#totdue#"], mail_variables["#rent_type#"], mail_variables["#arrears_start_date#"],
+                    mail_variables["#arrears_end_date#"], mail_variables["#periodly#"],
+                    mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
+    elif rentobj.arrears == 0 and rentobj.totcharges > 0:
+        owing_stat = "The total amount owing to us on this property is {0} as more fully set out below. \
+                        {1} will next be due and payable {4} {5} on {6} in the sum of {7}." \
+            .format(mail_variables["#totdue#"], mail_variables["#rent_type#"], mail_variables["#arrears_start_date#"],
+                    mail_variables["#arrears_end_date#"], mail_variables["#periodly#"],
+                    mail_variables["#advarr#"], mail_variables["#nextrentdate#"], mail_variables["#rentgale#"])
     else:
-        owing_stat = "owing stat not yet deduced for this case: Please see Hez"
+        owing_stat = "The total amount owing to us on this property is {0} being {1} {2} owing for the period from {3} \
+                         to {4} plus other charges as set out below." \
+            .format(mail_variables["#totdue#"], mail_variables["#arrears#"], mail_variables["#rent_type#"],
+                    mail_variables["#arrears_start_date#"], mail_variables["#arrears_end_date#"])
+    # TODO reduced
+    if rentobj.totcharges > 0:
+        charges = get_rent_charge_details(rentobj.id)
+        for charge in charges:
+            owing_stat += "\n{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
+                             charge.chargedesc, dateToStr(charge.chargestartdate))
+
     return owing_stat
 
 def get_mail_variables(rentobj):

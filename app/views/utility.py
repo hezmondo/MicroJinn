@@ -16,35 +16,42 @@ util_bp = Blueprint('util_bp', __name__)
 @login_required
 def agent(agent_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
     if request.method == "POST":
-        agent_id = post_agent(agent_id)
+        agent_id = post_agent(agent_id, rent_id)
         return redirect(url_for('util_bp.agent', agent_id=agent_id))
-
     if agent_id == 0:
         agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
     else:
         agent = get_agent(agent_id)
-    return render_template('agent.html', agent=agent, rent_id=rent_id)
+
+    return render_template('agent.html', agent=agent, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
 @login_required
 def agent_rents(agent_id):
+    type = request.args.get('type', "rent", type=str)
     agent = get_agent(agent_id)
-    agent_headrents, agent_rents = get_agent_rents(agent_id)
-    return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, agent_headrents=agent_headrents)
+    agent_rents = get_agent_rents(agent_id, type)
+
+    return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, type=type)
 
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
 def agents():
+    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
     agents = get_agents()
-    return render_template('agents.html', agents=agents)
+
+    return render_template('agents.html', agents=agents, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/delete_item/<int:item_id>/<item>')
 @login_required
 def delete_item(item_id, item=''):
     redir, id_dict = delete_record(item_id, item)
+
     return redirect(url_for(redir, **id_dict))
 
 
@@ -55,13 +62,15 @@ def email_acc(email_acc_id):
         id_ = post_email_acc(email_acc_id)
         return redirect(url_for('util_bp.email_acc', email_acc_id=id_))
     emailacc = get_email_acc(email_acc_id) if email_acc_id != 0 else {"id": 0}
-    return render_template('email_account.html', emailacc=emailacc)
+
+    return render_template('email_acc.html', emailacc=emailacc)
 
 
-@util_bp.route('/email_accounts', methods=['GET'])
-def email_accounts():
+@util_bp.route('/email_accs', methods=['GET'])
+def email_accs():
     emailaccs = get_email_accs()
-    return render_template('email_accounts.html', emailaccs=emailaccs)
+
+    return render_template('email_accs.html', emailaccs=emailaccs)
 
 
 @util_bp.route('/', methods=['GET', 'POST'])
@@ -69,6 +78,7 @@ def email_accounts():
 # @login_required
 def home():
     filterdict, rent_s = get_rent_s("basic", 0)
+
     return render_template('home.html', filterdict=filterdict, rent_s=rent_s)
 
 
@@ -81,12 +91,14 @@ def landlord(landlord_id):
 
     landlord = get_landlord(landlord_id) if landlord_id != 0 else {"id": 0}
     landlord_dict = get_landlord_dict()
+
     return render_template('landlord.html', landlord=landlord, landlord_dict=landlord_dict)
 
 
 @util_bp.route('/landlords', methods=['GET'])
 def landlords():
     landlords = get_landlords()
+
     return render_template('landlords.html', landlords=landlords)
 
 
@@ -99,6 +111,7 @@ def property(property_id):
         return redirect(url_for('util_bp.property', property_id=property_id))
     property_ = get_property(property_id, rent_id)
     proptypes = get_proptypes("basic")
+
     return render_template('property.html', property_=property_, proptypes=proptypes)
 
 
@@ -107,6 +120,7 @@ def property(property_id):
 def properties(rent_id):
     properties, proptypes = get_properties(rent_id)
     print(rent_id)
+
     return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
 
 
@@ -114,10 +128,19 @@ def properties(rent_id):
 @login_required
 def rent_ex(rent_ex_id):
     rent_ex = get_rent_ex(rent_ex_id)
+
     return render_template('rent_ex.html', rent_ex=rent_ex)
 
 
 @util_bp.route('/rents_ex', methods=['GET', 'POST'])
 def rents_ex():
     filterdict, rent_s = get_rent_s("external", 0)
+
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
+
+
+@util_bp.route('/utilities', methods=['GET', 'POST'])
+@login_required
+def utilities():
+
+    return render_template('utilities.html')

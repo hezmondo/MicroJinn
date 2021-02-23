@@ -5,6 +5,16 @@
 
 {% block app_content %}
 <form method="POST" id="target">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-2">
+            <a href="{{ url_for('rent_bp.rent', rent_id=lease.rent_id) }}"
+               class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('lease_bp.leases') }}"
+               class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to leases</a>
+        </div>
+    </div>
     <div class="form-group row">
         <div class="col-md-3">
             <label for="rentcode">rentcode:</label>
@@ -60,15 +70,7 @@
     </div>
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
-            <a href="{{ url_for('rent_bp.rent', rent_id=lease.rent_id) }}"
-               class="btn btn-block btn-primary" role="button">back to rent</a>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('lease_bp.leases') }}"
-               class="btn btn-block btn-primary" role="button">back to leases</a>
-        </div>
-        <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-danger">edit</button>
+            <button type="button" id="edit_view" class="btn btn-block btn-dark button-icon edit">edit</button>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('mail_bp.mail_dialog', rent_id=lease.rent_id, action='lease') }}"
@@ -77,12 +79,12 @@
     </div>
     <div class="form-group row flex-row-reverse" id="save_delete" >
         <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success">save changes</button>
+            <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
         </div>
         <div class="col-md-2">
             <a href="{{ url_for('util_bp.delete_item', item_id=lease.id, item='lease', id_2=lease.rent_id) }}"
                onclick="return confirm('Are you sure you want to delete this lease?');"
-               class="btn btn-block btn-warning" role="button">delete item</a>
+               class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
         </div>
     </div>
 </form>

@@ -39,15 +39,15 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('util_bp.home') }}"
-                    class="btn btn-block btn-success ">search</button>
+                    class="btn btn-block btn-success  button-icon search" role="button">search</button>
         </div>
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('util_bp.rents_ex') }}"
-                    class="btn btn-block btn-primary ">search external</button>
+                    class="btn btn-block btn-primary  button-icon search" role="button">search external</button>
         </div>
         <div class="col-md-3">
             <a href="{{ url_for('filter_bp.filter', filter_id=0) }}"
-               class="btn btn-block btn-danger" role="button">advanced filter</a>
+               class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
         </div>
     </div>
 </form>
