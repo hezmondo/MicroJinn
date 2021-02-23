@@ -38,10 +38,11 @@ def get_lease(lease_id):
     return lease, uplift_types
 
 
-def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val):
-    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e)"), params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_val})
+def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val, calc_date):
+    resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e, :f)"),
+                     params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_val, "f": calc_date})
     leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
-    db.session.commit()
+    commit_to_database()
 
     return leasedata
 
@@ -59,12 +60,13 @@ def get_leases():
         lfilter.append(Lease.uplift_date <= enddate)
     if ult and ult != "" and ult != "all uplift types":
         lfilter.append(LeaseUpType.uplift_type.ilike('%{}%'.format(ult)))
-
-    leases = Lease.query.join(Rent).join(LeaseUpType).with_entities(Rent.rentcode, Lease.id, Lease.info,
-                                                                    func.mjinn.lex_unexpired(Lease.id).label('unexpired'),
-                                                                    Lease.term, Lease.uplift_date, LeaseUpType.uplift_type) \
+    leases = Lease.query \
+        .join(Rent) \
+        .join(LeaseUpType) \
+        .with_entities(Rent.rentcode, Lease.id, Lease.info,
+                        func.mjinn.lex_unexpired(Lease.id, date.today()).label('unexpired'),
+                        Lease.term, Lease.uplift_date, LeaseUpType.uplift_type) \
         .filter(*lfilter).limit(60).all()
-
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")
 
@@ -76,8 +78,8 @@ def get_lease_variables(rent_id):
     gr_rate = request.form.get('gr_rate')
     gr_new = request.form.get('gr_new')
     yp_val = request.form.get('yp_val')
-
-    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val)
+    calc_date = date.today()
+    leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val, calc_date)
     impval = leasedata["impvalk"] * 1000
     unimpval = leasedata["impvalk"] * leasedata["realty"] * 10 if leasedata["realty"] > 0 else impval
     lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",

@@ -16,6 +16,7 @@ util_bp = Blueprint('util_bp', __name__)
 @login_required
 def agent(agent_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
     if request.method == "POST":
         agent_id = post_agent(agent_id, rent_id)
         return redirect(url_for('util_bp.agent', agent_id=agent_id))
@@ -24,7 +25,7 @@ def agent(agent_id):
     else:
         agent = get_agent(agent_id)
 
-    return render_template('agent.html', agent=agent, rent_id=rent_id)
+    return render_template('agent.html', agent=agent, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
@@ -39,17 +40,11 @@ def agent_rents(agent_id):
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
 def agents():
+    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
     agents = get_agents()
-    return render_template('agents.html', agents=agents)
 
-
-@util_bp.route('/backup', methods=['GET', 'POST'])
-# @login_required
-def backup():
-    if request.method == "POST":
-        backup_database()
-
-    return render_template('backup.html')
+    return render_template('agents.html', agents=agents, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/delete_item/<int:item_id>/<item>')
@@ -147,4 +142,5 @@ def rents_ex():
 @util_bp.route('/utilities', methods=['GET', 'POST'])
 @login_required
 def utilities():
+
     return render_template('utilities.html')
