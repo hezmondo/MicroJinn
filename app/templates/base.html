@@ -24,6 +24,12 @@
             <div class="navbar-collapse" id="navbarResponsive">
               <ul class="nav navbar-nav mr-auto">
                   <hr/>
+                  {% if current_user %}
+                    <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('rent_bp.rent', rent_id=current_user.most_recent_rent) }}">recent rent</a>
+                    </li>
+                    <hr class="nav-hr">
+                  {% endif %}
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('util_bp.agents') }}">agents</a>
                 </li>
@@ -48,6 +54,7 @@
                 <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('util_bp.utilities') }}">utilities</a>
                 </li>
+                  <hr class="nav-hr">
                  {% if current_user.is_anonymous %}
                   <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">login</a>

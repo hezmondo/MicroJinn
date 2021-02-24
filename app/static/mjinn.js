@@ -80,8 +80,8 @@ $(document).ready(function(){
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
         $('#pr_addr').val(pr_addr_strip);
     });
-    //copy text area in rent screen on click
-    $('.copyable').click(function(e) {
+    //copy text from readonly input on click
+    $('.copyable-input').click(function(e) {
         if ( $(this).is('[readonly]') ) {
             var element = $(this);
             copyToClipboard(this);
@@ -89,6 +89,18 @@ $(document).ready(function(){
             setTimeout(function() {$('#exampleModal').modal('hide');}, 1000);
         }
     });
+    //copy text from table on click
+    $('.copyable-text').click(function(e) {
+        let range = new Range();
+        range.setStart(this, 0);
+        range.setEnd(this, this.childNodes.length);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand("copy");
+        $('#exampleModal').modal();
+        setTimeout(function() {$('#exampleModal').modal('hide');}, 1000);
+    });
+
     //allow display and navbar to change for smaller screens / phones
     resizeView();
     $(window).resize(function(){

@@ -1,7 +1,7 @@
 from datetime import datetime
 from hashlib import md5
 from time import time
-from flask import current_app
+from flask import current_app, json
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
@@ -739,4 +739,12 @@ class User(UserMixin, db.Model):
 
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    # TODO: Added attribute most_recent_rent to current_user, but duplication of get_idlist_recent()
+    #  (cant import - circular dependency with common.py)
+    current_user = User.query.get(int(id))
+    try:
+        id_list = json.loads(getattr(current_user, "recent_rents"))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
+    current_user.most_recent_rent = id_list[0]
+    return current_user

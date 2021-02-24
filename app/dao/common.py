@@ -81,12 +81,13 @@ def pop_idlist_recent(type, id):
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
         id_list = [1, 2, 3]
-    if id not in id_list:
-        id_list.insert(0, id)
-        if len(id_list) > 20:
-            id_list.pop()
-        setattr(current_user, type, json.dumps(id_list))
-        db.session.commit()
+    if id in id_list:
+        id_list.remove(id)
+    id_list.insert(0, id)
+    if len(id_list) > 20:
+        id_list.pop()
+    setattr(current_user, type, json.dumps(id_list))
+    db.session.commit()
 
 
 def get_postvals_id():

@@ -4,6 +4,8 @@ from app.dao.charge import get_charges
 from app.dao.common import get_combodict_rent
 from app.dao.rent import get_rent, post_rent
 from app.main.mail import rent_stats
+from flask_login import current_user
+
 
 rent_bp = Blueprint('rent_bp', __name__)
 
