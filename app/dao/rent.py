@@ -33,11 +33,13 @@ def get_rent(rent_id):
             .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                           func.mjinn.prop_addr(Rent.id).label('mailaddr'),
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
+                           Manager.manageraddr,
                            TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
                            TypeMailTo.mailtodet, TypeSaleGrade.salegradedet,
                            TypeStatus.statusdet, TypeTenure.tenuredet) \
