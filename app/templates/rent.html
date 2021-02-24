@@ -6,84 +6,206 @@
 {% block app_content %}
 <form method="POST" id="rent">
     <div class="form-group row">
-        <div class="col-md-2">
-            <label for="rentcode">rent code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ rent.rentcode }}" readonly="true">
+        <div class="col-md-9">
+            <div class="card border-primary card-purple">
+                <div class="card-header">general info for rent {{ rent.rentcode }}</div>
+                <div class="card-body text-primary">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="landlord_stat"
+                                   value="landlord: {{ rent.name }} of {{ rent.manageraddr }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="tenant_stat"
+                                   value="tenant: {{ rent.tenantname }} of {{ rent.mailaddr }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="email"
+                                   value="emails to: {{ rent.email }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="property_stat"
+                                   value="property: {{ rent.propaddr }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="notes"
+                                   value="notes: {{ rent.note }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        {% if rent.agent_id %}
+                            <div class="col-md-12">
+                                <input type="text" class="form-control copyable" name="agent_detail"
+                                       value="agent: {{ rent.detail }}" readonly="true">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-3">
+            <div class="card border-primary card-orange">
+                <div class="card-header">actions for rent {{ rent.rentcode }}</div>
+                <div class="card-body text-primary">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
+                               class="btn btn-block btn-info button-icon eye" role="button">view property</a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('charge_bp.charges', rent_id=rent.id, rentcode=rent.rentcode) }}"
+                               class="btn btn-block btn-primary button-icon exclamation" role="button">charges</a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent.id,
+                                rentcode=rent.rentcode) }}"
+                               class="btn btn-block btn-info button-icon info" role="button">leaseinfo</a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('income_bp.income', acc_id=0, rent_id=rent.id) }}"
+                               class="btn btn-block btn-primary button-icon wallet" role="button">income</a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <div class="dropdown">
+                              <button class="btn btn-warning dropdown-toggle button-icon invoice" style="width:100%" type="button" id="statementsMenuButton"
+                                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
+                              <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
+                                <a class="dropdown-item"
+                                   href="{{ url_for('pr_bp.pr_history', rent_id=rent.id) }}">view payrequest history</a>
+                                  <a class="dropdown-item"
+                                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new statement for this rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new account for this rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('pr_bp.pr_dialog', rent_id=rent.id) }}">new payrequest for this rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}">new s166 for this rent</a>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        {% if rent.agent_id %}
+                            <div class="col-md-12">
+                                <a href="{{ url_for('util_bp.agent', agent_id=rent.agent_id, rent_id=rent.id) }}"
+                                   class="btn btn-block btn-danger button-icon eye" role="button">view agent</a>
+                            </div>
+                        {% else %}
+                            <div class="col-md-12">
+                                <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=rent.id) }}"
+                                   class="btn btn-block btn-danger button-icon plus" role="button">add agent</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('doc_bp.docfiles', rent_id=rent.id) }}"
+                               class="btn btn-block btn-success button-icon mail-ic" role="button">docfiles</a>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='rent') }}"
+                               class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-9">
+            <div class="card border-primary card-red">
+                <div class="card-header">owings info for rent {{ rent.rentcode }} </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="rent_stat"
+                                   value="{{ rentstats.rent_stat }}" readonly="true">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <input type="text" class="form-control copyable" name="owing_stat"
+                                   value="{{ rentstats.owing_stat }}" readonly="true">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row justify-content-center">
+        <div class="col-md-4">
+                            <button type="button" id="more_less"
+                                    class="btn btn-block btn-dark button-icon edit">edit rent </button>
+        </div>
+    </div>
+    <div class="card border-primary card-blue" id="edit_rent">
+        <div class="card-header">edit rent {{ rent.rentcode }} </div>
+    <div class="form-group row">
+        <div class="col-md-12">
             <label for="landlord">landlord:</label>
             {{ widgets.combobox(name="landlord", items=combodict.landlords, item_selected=rent.name) }}
         </div>
-        <div class="col-md-5">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-12">
             <label for="tenant">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}" readonly="true">
-        </div>
-    </div>
-    <div class="form-group row align-items-end">
-        <div class="col-md-10">
-            <label for="propaddr">property address:</label>
-            <textarea class="form-control" name="propaddr"  readonly="true">{{ rent.propaddr }}</textarea>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
-               class="btn btn-block btn-primary button-icon eye" role="button">view</a>
+            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
         </div>
     </div>
     <div class="form-group row">
-    </div>
-    <div class="form-group row">
-        <div class="col-md-8">
-            <label for="note">notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ rent.note }}" readonly="true">
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-12">
             <label for="email">email:</label>
-            <input type="text" class="form-control" name="email" value="{{ rent.email }}" readonly="true">
+            <input type="text" class="form-control" name="email" value="{{ rent.email }}">
         </div>
     </div>
-    <div class="form-group row align-items-end">
+    <div class="form-group row">
+        <div class="col-md-12">
+            <label for="note">notes:</label>
+            <input type="text" class="form-control" name="note" value="{{ rent.note }}">
+        </div>
+    </div>
+    <div class="form-group row">
         <div class="col-md-4">
             <label for="mailto">mail to:</label>
             {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
         </div>
-        <div class="col-md-6">
-            <label for="agent">agent:</label>
-            <input type="text" class="form-control" name="agent" value="{{ rent.detail }}" readonly="true">
-        </div>
-        {% if rent.agent_id %}
-            <div class="col-md-2">
-                <a href="{{ url_for('util_bp.agent', agent_id=rent.agent_id, rent_id=rent.id) }}"
-                   class="btn btn-block btn-primary button-icon eye" role="button">view</a>
-            </div>
-        {% else %}
-            <div class="col-md-2">
-                <a href="{{ url_for('util_bp.agents', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                   class="btn btn-block btn-danger button-icon plus" role="button">add agent</a>
-            </div>
-        {% endif %}
    </div>
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentpa">rent pa:</label>
-            <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}" readonly="true">
+            <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
         </div>
         <div class="col-md-2">
             <label for="arrears">rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}" readonly="true">
-        </div>
-        <div class="col-md-2">
-            <label for="totcharges">total charges:</label>
-            <input type="text" class="form-control" name="totcharges" value="{{ rent.totcharges }}" readonly="true">
+            <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
         </div>
         <div class="col-md-3">
             <label for="lastrentdate">last rent date:</label>
             <input type="date" class="form-control" name="lastrentdate"
-                   value="{{ rent.lastrentdate }}" readonly="true">
+                   value="{{ rent.lastrentdate }}">
         </div>
         <div class="col-md-3">
             <label for="nextrentdate">next rent date:</label>
             <input type="date" class="form-control" name="nextrentdate"
-                   value="{{ rent.nextrentdate }}" readonly="true">
+                   value="{{ rent.nextrentdate }}">
         </div>
     </div>
     <div class="form-group row align-items-end">
@@ -101,14 +223,11 @@
         </div>
         <div class="col-md-2">
             <label for="datecode">date code:</label>
-            <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}" readonly="true">
+            <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
         </div>
         <div class="col-md-2">
             <label for="prdelivery">pr delivery:</label>
             {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries, item_selected=rent.prdeliverydet) }}
-        </div>
-        <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-dark button-icon edit">edit rent</button>
         </div>
     </div>
     <div class="form-group row">
@@ -118,7 +237,7 @@
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
-            <input type="text" class="form-control" name="source" value="{{ rent.source }}" readonly="true">
+            <input type="text" class="form-control" name="source" value="{{ rent.source }}">
         </div>
         <div class="col-md-2">
             <label for="deedtype">deed type:</label>
@@ -130,52 +249,11 @@
         </div>
         <div class="col-md-2">
             <label for="price">price:</label>
-            <input type="text" class="form-control" name="price" value="{{ rent.price }}" readonly="true">
+            <input type="text" class="form-control" name="price" value="{{ rent.price }}">
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>
             {{ widgets.combobox(name="status", items=combodict.statuses, item_selected=rent.statusdet) }}
-        </div>
-    </div>
-    <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
-            <a href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent.id,
-                rentcode=rent.rentcode) }}"
-               class="btn btn-block btn-primary button-icon info" role="button">leaseinfo</a>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('charge_bp.charges', rent_id=rent.id, rentcode=rent.rentcode) }}"
-               class="btn btn-block btn-primary button-icon exclamation" role="button">charges</a>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('income_bp.income', acc_id=0, rent_id=rent.id) }}"
-               class="btn btn-block btn-primary button-icon wallet" role="button">income</a>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='rent') }}"
-               class="btn btn-block btn-primary button-icon letter" role="button">send mail</a>
-        </div>
-        <div class="col-md-2">
-            <a href="{{ url_for('doc_bp.docfiles', rent_id=rent.id) }}"
-               class="btn btn-block btn-primary button-icon mail-ic" role="button">docfiles</a>
-        </div>
-        <div class="col-md-2">
-            <div class="dropdown">
-              <button class="btn btn-primary dropdown-toggle button-icon invoice" style="width:100%" type="button" id="statementsMenuButton"
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
-              <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
-                <a class="dropdown-item"
-                   href="{{ url_for('pr_bp.pr_history', rent_id=rent.id) }}">view payrequest history</a>
-                  <a class="dropdown-item"
-                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new statement for this rent</a>
-                <a class="dropdown-item"
-                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new account for this rent</a>
-                <a class="dropdown-item"
-                   href="{{ url_for('pr_bp.pr_dialog', rent_id=rent.id) }}">new payrequest for this rent</a>
-                <a class="dropdown-item"
-                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}">new s166 for this rent</a>
-              </div>
-            </div>
         </div>
     </div>
     <div class="form-group row justify-content-center" id="save_delete">
@@ -188,8 +266,18 @@
                class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
         </div>
 		<div class="col-md-2">
-            <input type="text" class="form-control" name="rent_id" value = "{{ rent.id }}">
+            <input type="text" class="form-control" name="rent_id" value = "id: {{ rent.id }}" readonly="true">
         </div>
     </div>
 </form>
+<!-- Example Modal  - text copied-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        text copied!
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

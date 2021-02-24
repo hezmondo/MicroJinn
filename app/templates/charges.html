@@ -7,7 +7,7 @@
         {% if rent_id != "0" %}
             <div class="col-md-2">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-secondary button-icon arrow-left" role="button">back to rent</a>
+                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
                 <a href="{{ url_for('charge_bp.charge', charge_id=0, rent_id=rent_id, rentcode=rentcode) }}"
@@ -33,9 +33,9 @@
             <th style="width: 25.00%">description</th>
             <th style="width: 10.00%">start date</th>
             <th style="width: 10.00%">total</th>
-            <th style="width: 25.00%">details</th>
+            <th style="width: 20.00%">details</th>
             <th style="width: 10.00%">balance</th>
-            <th style="width: 5.00%"></th>
+            <th style="width: 10.00%"></th>
         </tr>
         </thead>
         <tbody>
@@ -45,9 +45,10 @@
             <td style="width: 25.00%"> {{ charge.chargedesc }}</td>
             <td style="width: 10.00%"> {{ charge.chargestartdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>
-            <td style="width: 25.00%"> {{ charge.chargedetail }}</td>
+            <td style="width: 20.00%"> {{ charge.chargedetail }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
-            <td style="width: 5.00%"><a href="{{ url_for('charge_bp.charge', charge_id=charge.id) }}">view</a></td>
+            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('charge_bp.charge', charge_id=charge.id) }}"
+                                         class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>
         {% endfor %}
         </tbody>

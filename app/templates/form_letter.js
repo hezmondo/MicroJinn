@@ -11,15 +11,6 @@ $(document).ready(function(){
     $('#remove_markup').click(function(){
         remove_markup();
     });
-    $('#doc_html').html(function(i, html) {
-      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
-    });
-    $('#doc_html').html(function(i, html2) {
-      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
-    });
-    $('#doc_html').html(function(i, html3) {
-      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
-    });
     $('[name = "lease_variables"]').on('change', function() {
         var selected = $('[name = "lease_variables"]').val();
         add_word(selected);

@@ -33,8 +33,9 @@
             <td style="width: 19.00%"> {{ item.tenantname }}</td>
             <td style="width: 12.00%"> {{ item.rentpa }}</td>
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
-            <td style="width: 12.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 10.00%"><a href="{{ url_for('rental_bp.rental', rental_id=item.id) }}">view</a></td>
+            <td style="width: 10.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
+            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('rental_bp.rental',
+            rental_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>
         {% endfor %}
         <tr>
@@ -46,7 +47,7 @@
             <td style="width: 18.00%"></td>
             <td style="width: 10.00%"> {{ rentsum }}</td>
             <td style="width: 10.00%"></td>
-            <td style="width: 16.00%"></td>
+            <td style="width: 10.00%"></td>
             <td style="width: 10.00%"></td>
         </tr>
         </tbody>
