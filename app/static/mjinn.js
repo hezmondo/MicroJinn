@@ -1,6 +1,6 @@
 $(document).ready(function(){
     $("#save_delete").hide();
-    $("#more_views").hide();
+    $("#edit_rent").hide();
     $("#xalloc").hide();
     $("#show-xalloc").click(function(){
         $("#xalloc").toggle();
@@ -45,14 +45,16 @@ $(document).ready(function(){
     });
     //show more details and scroll to bottom
     $("#more_less").click(function(){
-        if ($(this).text() == "view more details") {
-            $(this).text("view fewer details");
-            $("#more_views").show();
+        if ($(this).text() == "edit rent") {
+            $(this).text("view rent");
+            $("#edit_rent").show();
+            $("#save_delete").show();
             $('html, body').scrollTop( $(document).height() - $(window).height() );
             }
         else {
-            $(this).text("view more details");
-            $("#more_views").hide();
+            $(this).text("edit rent");
+            $("#save_delete").hide();
+            $("#edit_rent").hide();
         }
     });
     $(".custom-file-input").on("change", function() {
