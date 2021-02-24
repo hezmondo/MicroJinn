@@ -66,7 +66,7 @@ def get_rent_s(action, filter_id):
         post_rent__filter(filterdict)
     # now get filtered rent objects for this filter
     rent_s = get_rent_s_data(qfilter, action, 100)
-    # TODO: This can be cleaned up
+    # TODO: Repeated if statement - This can be cleaned up
     if action == 'basic' and request.method == "GET":
         rent_s = sorted(rent_s, key=lambda o: id_list.index(o.id))
     return filterdict, rent_s
