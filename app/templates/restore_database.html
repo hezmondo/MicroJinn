@@ -1,0 +1,77 @@
+<!-- /templates/restore_database.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="table-fixed" style="max-height: 300px; overflow: auto; margin-bottom: 20px;">
+        <table class="table" id="restore_files">
+            <thead>
+            <tr>
+                <th>select</th>
+                <th>file name</th>
+                <th>size</th>
+                <th>datetime</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for backup_file in backup_files %}
+            <tr>
+                <td>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="select_file" value="{{ backup_file.name }}">
+                    </div>
+                </td>
+                <td><a href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}">{{ backup_file.name }}</a></td>
+                <td style="text-align: right;">{{ "{:,}".format(backup_file.size) }}</td>
+                <td>{{ backup_file.datetime }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-9">
+            <ul>
+                <li><span class="label">To restore the database, click a radio button in the <strong>select</strong>
+                    column and then click the <strong>restore database</strong> button</span></li>
+                <li><span class="label">Alternatively, you can click on one the backup file names' links
+                    if you want to download a copy of the backup file instead</span>
+            </ul>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-secondary"
+                    onclick="javascript:return on_restore_database_clicked();">restore database</button>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <textarea id="restore_database_output" class="form-control form-control-sm" rows="12" readonly="readonly"
+                      style="width:800px; white-space:pre-wrap; font-family:monospace;"
+            >{{ restore_database_output }}</textarea>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    <!-- Scroll to bottom of restore output -->
+    var textarea = document.getElementById('restore_database_output');
+    textarea.scrollTop = textarea.scrollHeight;
+
+    function on_restore_database_clicked()
+    {
+        var oForm = document.forms["target"];
+        if (!oForm.elements["select_file"].value)
+        {
+            window.alert("Select a backup to restore from by clicking its radio button in the \"select\" column");
+            return false;   // prevent the submit from proceeding
+        }
+        if (!window.confirm("This will overwrite your database. Are you SURE you want to proceed?"))
+            return false;   // prevent the submit from proceeding
+        var textarea = document.getElementById('restore_database_output');
+        textarea.value = 'Starting restore...';
+        return true;    // allow the submit to proceed
+    }
+</script>
+{% endblock %}
+

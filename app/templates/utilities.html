@@ -9,11 +9,11 @@
             <label>backup</label>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('backup_bp.backup') }}"
+            <a href="{{ url_for('backup_bp.backup_database') }}"
                class="btn btn-block btn-success button-icon sync" role="button">backup mjinn database</a>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('backup_bp.backup') }}"
+            <a href="{{ url_for('backup_bp.restore_database') }}"
                class="btn btn-block btn-danger button-icon sync" role="button">restore mjinn database</a>
         </div>
     </div>
