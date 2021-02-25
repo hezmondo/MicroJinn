@@ -7,118 +7,138 @@
 
 <div class="row">
     <div class="col-md-9">
-        <div class="table-fixed" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table table-head">
                 <thead>
-                    <tr>
-                        <td style="width: 100%">general info for rent {{ rent.rentcode }}</td>
-                    </tr>
+                <tr>
+                    <td style="width: 100%">general info for rent {{ rent.rentcode }}</td>
+                </tr>
                 </thead>
             </table>
             <table class="table table-body">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">property</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.propaddr }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table table-body">
-                <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.name }} of {{ rent.manageraddr }}</td>
-                    </tr>
+                <tr>
+                    <td class="td-title vertical-align copyable-text" style="width: 12.00%">property</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.propaddr }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
+                            class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                </tr>
                 </tbody>
             </table>
             <table class="table table-body-alt">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">tenant</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.tenantname }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">mailaddr</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.mailaddr }}</td>
-                    </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rent.name }} of {{ rent.manageraddr }}</td>
+                </tr>
                 </tbody>
             </table>
             <table class="table table-body">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">emails to</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.email }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">notes</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.note }}</td>
-                    </tr>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">tenant</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.tenantname }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
+                                                                                   id="edit_tenant"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.mailaddr }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                </tr>
                 </tbody>
             </table>
-            <table class="table table-base">
+            <table class="table table-body">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">agent</td>
-                        {% if rent.agent_id %}
-                            <td class="copyable-text" style="width: 83.00%">{{ rent.detail }}</td>
-                            <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
+                    <td class="vertical-align copyable-text" style="width: 83.00%">{{ rent.email }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.note }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table table-body table-base">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
+                    {% if rent.agent_id %}
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=rent.agent_id, rent_id=rent.id) }}"
-                               class="btn btn-danger btn-round button-icon round eye" role="button"></a>
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
                         {% else %}
-                            <td class="copyable-text" style="width: 83.00%">no agent</td>
-                            <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                    <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=0, rent_id=rent.id) }}"
-                               class="btn btn-danger btn-round button-icon round plus" role="button"></a>
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
                         {% endif %}
-                    </tr>
+                </tr>
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table table-head">
                 <thead>
-                    <tr>
-                        <td style="width: 100%">owings info for rent {{ rent.rentcode }}</td>
-                    </tr>
+                <tr>
+                    <td style="width: 100%">owings info for rent {{ rent.rentcode }}</td>
+                </tr>
                 </thead>
             </table>
             <table class="table table-body">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.rent_stat }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">owing stat</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.owing_stat }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">charges</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.chargestat }}</td>
-                    </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.rent_stat }}</td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">owing stat</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.owing_stat }}</td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">charges</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.chargestat }}</td>
+                </tr>
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table table-head">
                 <thead>
-                    <tr>
-                        <td style="width: 100%">other info for rent {{ rent.rentcode }}</td>
-                    </tr>
+                <tr>
+                    <td style="width: 100%">other info for rent {{ rent.rentcode }}</td>
+                </tr>
                 </thead>
             </table>
             <table class="table table-body">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">misc</td>
-                        <td class="copyable-text" style="width: 88.00%">tenure: {{ rent.tenuredet }}, - last rent date:
-                            {{ rent.lastrentdate }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">misc</td>
-                        <td class="copyable-text" style="width: 88.00%">status {{ rent.statusdet }}, -
-                        actype: {{ rent.actypedet }}, - source:  {{ rent.source }}</td>
-                    </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">misc</td>
+                    <td class="copyable-text" style="width: 88.00%">tenure: {{ rent.tenuredet }}, - last rent date:
+                        {{ rent.lastrentdate }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">misc</td>
+                    <td class="copyable-text" style="width: 88.00%">status {{ rent.statusdet }}, -
+                        actype: {{ rent.actypedet }}, - source: {{ rent.source }}
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -143,20 +163,24 @@
                 <div class="form-group row">
                     <div class="col-md-12">
                         <div class="dropdown">
-                          <button class="btn btn-warning dropdown-toggle button-icon invoice" style="width:100%" type="button" id="statementsMenuButton"
-                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests</button>
-                          <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
-                            <a class="dropdown-item"
-                               href="{{ url_for('pr_bp.pr_history', rent_id=rent.id) }}">view payrequest history</a>
-                              <a class="dropdown-item"
-                               href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new statement for this rent</a>
-                            <a class="dropdown-item"
-                               href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new account for this rent</a>
-                            <a class="dropdown-item"
-                               href="{{ url_for('pr_bp.pr_dialog', rent_id=rent.id) }}">new payrequest for this rent</a>
-                            <a class="dropdown-item"
-                               href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}">new s166 for this rent</a>
-                          </div>
+                            <button class="btn btn-warning dropdown-toggle button-icon invoice" style="width:100%"
+                                    type="button" id="statementsMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">pay requests
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="statementsMenuButton">
+                                <a class="dropdown-item"
+                                   href="{{ url_for('pr_bp.pr_history', rent_id=rent.id) }}">view payrequest history</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new statement for this rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}">new account for this rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('pr_bp.pr_dialog', rent_id=rent.id) }}">new payrequest for this
+                                    rent</a>
+                                <a class="dropdown-item"
+                                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}">new s166 for this
+                                    rent</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -179,182 +203,191 @@
                 </div>
             </div>
         </div>
+        <div style="margin-top: 20px;">
+            <button type="button" id="open_edit_rent"
+                    class="btn btn-block btn-secondary button-icon edit"
+                    style="margin-bottom: 20px;">edit rent</button>
+        </div>
     </div>
 </div>
-<!--<div class="table-fixed" style="margin-bottom: 20px;">-->
-<!--    <table class="table table-head table-orange">-->
-<!--        <thead>-->
-<!--            <tr>-->
-<!--                <td style="width: 100%">(example) more details - get icons from https://fontawesome.com/icons?d=gallery&p=2&m=free</td>-->
-<!--            </tr>-->
-<!--        </thead>-->
-<!--    </table>-->
-<!--    <table class="table table-base table-long">-->
-<!--        <tr>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-money-bill-wave-alt"></i></h4>-->
-<!--                <h6 class="centre-heading">rent pa</h6>-->
-<!--                <p class="centre-text">{{ rent.rentpa }}</p>-->
-<!--            </td>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-file-invoice"></i></h4>-->
-<!--                <h6 class="centre-heading">arrears</h6>-->
-<!--                <p class="centre-text">{{ rent.arrears }}</p>-->
-<!--            </td>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-arrow-circle-left"></i></h4>-->
-<!--                <h6 class="centre-heading">last rent date</h6>-->
-<!--                <p class="centre-text">{{ rent.lastrentdate }}</p>-->
-<!--            </td>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-arrow-circle-right"></i></h4>-->
-<!--                <h6 class="centre-heading">next rent date</h6>-->
-<!--                <p class="centre-text">{{ rent.nextrentdate }}</p>-->
-<!--            </td>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-info-circle"></i></h4>-->
-<!--                <h6 class="centre-heading">status</h6>-->
-<!--                <p class="centre-text">{{ rent.statusdet }}</p>-->
-<!--            </td>-->
-<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
-<!--                <h4 class="centre-heading"><i class="fas fa-warehouse"></i></h4>-->
-<!--                <h6 class="centre-heading">source</h6>-->
-<!--                <p class="centre-text">{{ rent.source }}</p>-->
-<!--            </td>-->
-<!--        </tr>-->
-<!--    </table>-->
-<!--</div>-->
-<div>
-    <button type="button" id="more_less"
-            class="btn btn-block btn-secondary button-icon edit" style="margin-bottom: 20px;">edit rent</button>
-</div>
-<form method="POST" id="rent">
-    <div class="card border-primary card-blue" id="edit_rent">
-        <div class="card-header">edit rent {{ rent.rentcode }} </div>
-        <div class="card-body text-primary">
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label for="landlord">landlord:</label>
-                    {{ widgets.combobox(name="landlord", items=combodict.landlords, item_selected=rent.name) }}
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label for="tenant">tenant name:</label>
-                    <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label for="email">email:</label>
-                    <input type="text" class="form-control" name="email" value="{{ rent.email }}">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label for="note">notes:</label>
-                    <input type="text" class="form-control" name="note" value="{{ rent.note }}">
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-4">
-                    <label for="mailto">mail to:</label>
-                    {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
-                </div>
-           </div>
-            <div class="form-group row">
-                <div class="col-md-2">
-                    <label for="rentpa">rent pa:</label>
-                    <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="arrears">rent arrears:</label>
-                    <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
-                </div>
-                <div class="col-md-3">
-                    <label for="lastrentdate">last rent date:</label>
-                    <input type="date" class="form-control" name="lastrentdate"
-                           value="{{ rent.lastrentdate }}">
-                </div>
-                <div class="col-md-3">
-                    <label for="nextrentdate">next rent date:</label>
-                    <input type="date" class="form-control" name="nextrentdate"
-                           value="{{ rent.nextrentdate }}">
-                </div>
-            </div>
-            <div class="form-group row align-items-end">
-                <div class="col-md-2">
-                    <label for="frequency">frequency:</label>
-                    {{ widgets.combobox(name="frequency", items=combodict.freqs, item_selected=rent.freqdet) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="actype">account type:</label>
-                    {{ widgets.combobox(name="actype", items=combodict.actypes, item_selected=rent.actypedet) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="advarr">advance or arrears:</label>
-                    {{ widgets.combobox(name="advarr", items=combodict.advars, item_selected=rent.advarrdet) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="datecode">date code:</label>
-                    <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="prdelivery">pr delivery:</label>
-                    {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries, item_selected=rent.prdeliverydet) }}
-                </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-md-2">
-                    <label for="tenure">tenure:</label>
-                    {{ widgets.combobox(name="tenure", items=combodict.tenures, item_selected=rent.tenuredet) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="source">source:</label>
-                    <input type="text" class="form-control" name="source" value="{{ rent.source }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="deedtype">deed type:</label>
-                    {{ widgets.combobox(name="deedtype", items=combodict.deedcodes, item_selected=rent.deedcode) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="salegrade">sale grade:</label>
-                    {{ widgets.combobox(name="salegrade", items=combodict.salegrades, item_selected=rent.salegradedet) }}
-                </div>
-                <div class="col-md-2">
-                    <label for="price">price:</label>
-                    <input type="text" class="form-control" name="price" value="{{ rent.price }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="status">status:</label>
-                    {{ widgets.combobox(name="status", items=combodict.statuses, item_selected=rent.statusdet) }}
-                </div>
-            </div>
-            <div class="form-group row justify-content-center" id="save_delete">
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
-                </div>
-                <div class="col-md-2">
-                    <a href="{{ url_for('util_bp.delete_item', item_id=rent.id, item='rent') }}"
-                       onclick="return confirm('Are you sure you want to delete this rent?');"
-                       class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" class="form-control" name="rent_id" value = "id: {{ rent.id }}" readonly="true">
-                </div>
+
+<!-- Modal  - edit tenant - can be templated / used as widgets-->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <form method="POST" id="rent">
+                    <div class="card border-primary card-blue">
+                        <div class="card-header">edit rent {{ rent.rentcode }}</div>
+                        <div class="card-body text-primary">
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="landlord">landlord:</label>
+                                    {{ widgets.combobox(name="landlord", items=combodict.landlords, item_selected=rent.name) }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="tenant">tenant name:</label>
+                                    <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="email">email:</label>
+                                    <input type="text" class="form-control" name="email" value="{{ rent.email }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-12">
+                                    <label for="note">notes:</label>
+                                    <input type="text" class="form-control" name="note" value="{{ rent.note }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-4">
+                                    <label for="mailto">mail to:</label>
+                                    {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label for="rentpa">rent pa:</label>
+                                    <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="arrears">rent arrears:</label>
+                                    <input type="text" class="form-control" name="arrears" value="{{ rent.arrears }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="lastrentdate">last rent date:</label>
+                                    <input type="date" class="form-control" name="lastrentdate"
+                                           value="{{ rent.lastrentdate }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="nextrentdate">next rent date:</label>
+                                    <input type="date" class="form-control" name="nextrentdate"
+                                           value="{{ rent.nextrentdate }}">
+                                </div>
+                            </div>
+                            <div class="form-group row align-items-end">
+                                <div class="col-md-2">
+                                    <label for="frequency">frequency:</label>
+                                    {{ widgets.combobox(name="frequency", items=combodict.freqs, item_selected=rent.freqdet) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="actype">account type:</label>
+                                    {{ widgets.combobox(name="actype", items=combodict.actypes, item_selected=rent.actypedet) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="advarr">advance or arrears:</label>
+                                    {{ widgets.combobox(name="advarr", items=combodict.advars, item_selected=rent.advarrdet) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="datecode">date code:</label>
+                                    <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="prdelivery">pr delivery:</label>
+                                    {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
+                                    item_selected=rent.prdeliverydet) }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label for="tenure">tenure:</label>
+                                    {{ widgets.combobox(name="tenure", items=combodict.tenures, item_selected=rent.tenuredet) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="source">source:</label>
+                                    <input type="text" class="form-control" name="source" value="{{ rent.source }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="deedtype">deed type:</label>
+                                    {{ widgets.combobox(name="deedtype", items=combodict.deedcodes, item_selected=rent.deedcode) }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="salegrade">sale grade:</label>
+                                    {{ widgets.combobox(name="salegrade", items=combodict.salegrades, item_selected=rent.salegradedet)
+                                    }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="price">price:</label>
+                                    <input type="text" class="form-control" name="price" value="{{ rent.price }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="status">status:</label>
+                                    {{ widgets.combobox(name="status", items=combodict.statuses, item_selected=rent.statusdet) }}
+                                </div>
+                            </div>
+                            <div class="form-group row justify-content-center">
+                                <div class="col-md-2">
+                                    <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <a href="{{ url_for('util_bp.delete_item', item_id=rent.id, item='rent') }}"
+                                       onclick="return confirm('Are you sure you want to delete this rent?');"
+                                       class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" name="rent_id" value="id: {{ rent.id }}" readonly="true">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button"
+                                    class="btn btn-block btn-secondary button-icon cross"
+                                    style="margin-bottom: 20px;" data-dismiss="modal">close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</form>
-
-<!-- Example Modal  - text copied-->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        text copied!
-      </div>
-    </div>
-  </div>
 </div>
+
+
+
+<!-- Modal  - text copied - can be templated -->
+<div class="modal fade modal-no-backdrop" id="copy_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog modal-small" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                text copied!
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal  - edit tenant - can be templated / used as widgets-->
+<div class="modal fade" id="tenant_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <form method="POST" id="rent_tenant">
+                        <label for="tenant">edit tenant name</label>
+                        <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 20px;">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">close</button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    {% include "rent.js" %}
+
+</script>
 {% endblock %}

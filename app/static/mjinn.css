@@ -4,7 +4,7 @@
 */
 
 /*example 'text copied' modal on rent screen when user clicks readonly text input*/
-.modal-dialog {
+.modal-dialog.modal-small {
    position:fixed;
    top:auto;
    right:0;
@@ -12,11 +12,19 @@
    bottom:0;
    width: 100%;
 }
-
 .modal-backdrop.show {
-    opacity: 0.0;
+    opacity: 0.4;
 }
-
+.modal-no-backdrop .modal-backdrop {
+    opacity: 0;
+}
+.no-border {
+    border: 0;
+    border-radius: 6px;
+}
+.no-padding {
+    padding: 0;
+}
 /*button icons require the button to have 2 classes .button-icon and ie .arrow-left*/
 .button-icon::before {
     display: inline-block;
@@ -28,6 +36,7 @@
 }
 .round::before {
     margin: 0;
+    font-size: 15px;
 }
 /*for round buttons in tables */
 .align-right {
@@ -39,8 +48,11 @@
 .arrow-right::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0a9";
 }
-.trash::before {
-    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2ed";
+.bolt::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f0e7"; color: #626262;
+}
+.cross::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f057";
 }
 .edit::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f044";
@@ -89,6 +101,9 @@
 }
 .sync::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2f1";
+}
+.trash::before {
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f2ed";
 }
 .wallet::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f555";
@@ -180,6 +195,9 @@ hr.nav-hr {
     box-shadow: 0 8px 16px rgba(0,0,0,.15);
     border: none;
     background-color: #d9e3e7;
+}
+.card-header {
+    padding: .60rem 1.25rem;
 }
 .card-purple {
     border-radius: 6px;
@@ -275,7 +293,6 @@ hr.nav-hr {
 .btn-tog {
  color:#fff;
  background-color:#007bff;
- border-color:#959595;
 }
 .btn-tog:hover {
  color:#fff;
@@ -325,6 +342,20 @@ hr.nav-hr {
     background-color: #9b469a;
     border-color: #9b469a;
 }
+.btn-light, .btn-light:focus, .btn-light.focus,  .btn-light:active.focus, .btn-light:active, .btn-light:not(:disabled):not(.disabled):active{
+    background-color: #e2e6ea;
+    border-color: #e2e6ea;
+}
+.btn-light:focus {
+    box-shadow: 0 0 0 .2rem rgba(30, 30, 30, 0.5);
+}
+.btn-light:not(:disabled):not(.disabled):active:focus {
+    box-shadow: 0 0 0 .2rem rgba(30, 30, 30, 0.5);
+}
+.btn-light:hover {
+    background-color: #fff;
+    border-color: #fff;
+}
 .btn-teal, .btn-teal:focus, .btn-teal.focus,  .btn-teal:active.focus, .btn-teal:active, .btn-teal:not(:disabled):not(.disabled):active{
     color: #fff;
     background-color: #4FB397;
@@ -364,6 +395,10 @@ hr.nav-hr {
 }
 .btn-round {
     border-radius: 25px;
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+    margin: 0;
 }
 body {
     background: #CDDBD9;
@@ -425,6 +460,9 @@ tbody tr:nth-child(even) td   { background-color:#e3eaed; }
 .table {
     color: #3f4c59;
 }
+.table-rent td {
+    padding: 0.6rem;
+}
 .table-fixed, .table-condensed{
     box-shadow: 0 8px 16px rgba(0,0,0,.15)
 }
@@ -454,9 +492,6 @@ table .td-title {
 }
 .table-base{
     border-radius: 0px 0px 6px 6px;
-}
-.table.table-base tbody td{
-    background: #e3eaed;
 }
 .table.table-long tr td:nth-child(odd) {
     background-color: #e3eaed;
