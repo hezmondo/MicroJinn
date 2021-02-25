@@ -1,4 +1,3 @@
-import datetime
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
@@ -10,51 +9,66 @@ from app.dao.lease import get_lease_variables
 from app.dao.rent import get_rent_mail
 
 
-def writeMail(rent_id, form_letter_id, income_id=0):
-    rentobj = get_rent_mail(rent_id)
-    mail_variables = get_mail_variables(rentobj)
-    income_item, allocdata = get_income_item(rent_id, income_id)
-    mail_variables['#paidtodate#'] = dateToStr(rentobj.paidtodate) if rentobj else "no paidtodate"
-    mail_variables['#payamount#'] = moneyToStr(income_item.payamount, pound=True) if income_item else "no payment"
-    mail_variables['#paydate#'] = dateToStr(income_item.paydate) if income_item else "no paydate"
-    mail_variables['#payer#'] = income_item.payer if income_item else "no payer"
-    mail_variables['#paytypedet#'] = income_item.paytypedet if income_item else "no paytype"
-    rent_stat = get_rent_stat(rentobj, mail_variables)
-    mail_variables['#rent_stat#'] = rent_stat
-    owing_stat = get_owing_stat(rentobj, mail_variables)
-    mail_variables['#owing_stat#'] = owing_stat
-    form_letter = get_form_letter(form_letter_id)
-    if "LEQ" in form_letter.code:
-        leasedata, lease_variables = get_lease_variables(rent_id)
-        mail_variables.update(lease_variables)
-    else:
-        leasedata = None
-    subject = form_letter.subject
-    block = form_letter.block if form_letter.block else ""
-    doctype = form_letter.doctype
-    dcode = form_letter.code
-    subject = doReplace(mail_variables, subject)
-    block = doReplace(mail_variables, block)
+def get_mail_variables(rentobj, type='mail'):
+    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
+    paidtodate = rentobj.paidtodate if hasattr(rentobj, 'paidtodate') else date.today()
+    arrears_start_date = dateToStr(paidtodate + relativedelta(days=1))
+    lastrentdate = rentobj.lastrentdate if hasattr(rentobj, 'lastrentdate') else date.today()
+    nextrentdate = rentobj.nextrentdate if hasattr(rentobj, 'lastrentdate') else date.today()
+    arrears_end_date = dateToStr(nextrentdate + relativedelta(days=-1)) \
+        if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate)
+    rentpa = rentobj.rentpa if rentobj.rentpa else Decimal(1)
+    frequency = rentobj.freq_id if rentobj.freq_id else 1
+    rent_gale = (rentpa / frequency)
+    rent_type = "rent charge" if rentobj.tenuredet == "Rentcharge" else "ground rent"
+    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
+    totdue = arrears + totcharges
+    mail_variables = {'#acc_name#': rentobj.acc_name if hasattr(rentobj, 'acc_name') else "no acc_name",
+                    '#acc_num#': rentobj.acc_num if hasattr(rentobj, 'acc_num') else "no acc_num",
+                    '#advarr#': rentobj.advarrdet if hasattr(rentobj, 'advarrdet') else "no advarrdet",
+                    '#arrears#': moneyToStr(arrears, pound=True),
+                    '#arrears_start_date#': arrears_start_date,
+                    '#arrears_end_date#': arrears_end_date,
+                    '#bank_name#': rentobj.bank_name if hasattr(rentobj, 'bank_name') else "no bank_name",
+                    '#hashcode#': hashCode(rentobj.rentcode) if hasattr(rentobj, 'rentcode') else "no hashcode",
+                    '#landlord_name#': rentobj.name if hasattr(rentobj, 'name') else "no landlord name",
+                    '#lastrentdate#': dateToStr(rentobj.lastrentdate),
+                    '#manageraddr#': rentobj.manageraddr if rentobj.manageraddr else "no manager address",
+                    '#manageraddr2#': rentobj.manageraddr2 if hasattr(rentobj, 'manageraddr2') else "no manageraddr2",
+                    '#managername#': rentobj.managername if rentobj.managername else "no manager name",
+                    '#nextrentdate#': dateToStr(rentobj.nextrentdate),
+                    '#periodly#': rentobj.freqdet if rentobj.freqdet else "no periodly",
+                    '#propaddr#': rentobj.propaddr if rentobj.propaddr else "no property address",
+                    '#rentcode#': rentobj.rentcode if rentobj.rentcode else "no rentcode",
+                    '#rentgale#': moneyToStr(rent_gale, pound=True),
+                    '#rentpa#': moneyToStr(rentobj.rentpa, pound=True),
+                    '#rent_type#': rent_type,
+                    '#sort_code#': rentobj.sort_code if hasattr(rentobj, 'sort_code') else "no sort_code",
+                    '#tenantname#': rentobj.tenantname if rentobj.tenantname else "no tenant name",
+                    '#today#': dateToStr(date.today()),
+                    '#totcharges#': moneyToStr(totcharges, pound=True),
+                    '#totdue#': moneyToStr(totdue, pound=True)
+                    }
+    if type != "payrequest":
+        mail_variables['#paidtodate#'] = dateToStr(paidtodate)
+        mail_variables['#payamount#'] = "no payment"
+        mail_variables['#paydate#'] = "no paydate"
+        mail_variables['#payer#'] = "no payer"
+        mail_variables['#paytypedet#'] = "no paytype"
+        rent_stat = get_rent_stat(rentobj, mail_variables)
+        mail_variables['#rent_stat#'] = rent_stat
+        mail_variables['rent_stat'] = rent_stat
+        owing_stat = get_owing_stat(rentobj, mail_variables)
+        mail_variables['#owing_stat#'] = owing_stat
+        mail_variables['owing_stat'] = owing_stat
+        charges = get_rent_charge_details(rentobj.id)
+        chargestat = ""
+        for charge in charges:
+            chargestat += "\n{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
+                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
+        mail_variables['chargestat'] = chargestat
 
-    return block, leasedata, rentobj, subject, doctype, dcode
-
-
-def rent_stats(rent_id):
-    rentobj = get_rent_mail(rent_id)
-    mail_variables = get_mail_variables(rentobj)
-    # horrible kludge until I can refactor this shit
-    mail_variables['#paidtodate#'] = "no paidtodate"
-    mail_variables['#payamount#'] = "no payment"
-    mail_variables['#paydate#'] = "no paydate"
-    mail_variables['#payer#'] = "no payer"
-    mail_variables['#paytypedet#'] = "no paytype"
-    rent_stat = get_rent_stat(rentobj, mail_variables)
-    mail_variables['#rent_stat#'] = rent_stat
-    owing_stat = get_owing_stat(rentobj, mail_variables)
-    mail_variables['#owing_stat#'] = owing_stat
-    rentstats = {'owing_stat': owing_stat, 'rent_stat': rent_stat}
-
-    return rentstats
+    return mail_variables
 
 
 def get_rent_stat(rentobj, mail_variables):
@@ -125,50 +139,33 @@ def get_owing_stat(rentobj, mail_variables):
                 .format(mail_variables["#totdue#"], mail_variables["#arrears#"], mail_variables["#rent_type#"],
                         mail_variables["#arrears_start_date#"], mail_variables["#arrears_end_date#"])
         # TODO reduced
-        if totcharges and totcharges > 0:
-            charges = get_rent_charge_details(rentobj.id)
-            for charge in charges:
-                owing_stat += "\n{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
-                                 charge.chargedesc, dateToStr(charge.chargestartdate))
     else:
         owing_stat = "no rent owing because status is either grouped payment, sold off or terminated"
 
     return owing_stat
 
 
-def get_mail_variables(rentobj):
-    arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
-    arrears_start_date = dateToStr(rentobj.paidtodate + relativedelta(days=1))
-    arrears_end_date = dateToStr(rentobj.nextrentdate + relativedelta(days=-1)) \
-        if rentobj.advarrdet == "in advance" else dateToStr(rentobj.lastrentdate)
-    rent_gale = (rentobj.rentpa / rentobj.freq_id) if rentobj.rentpa != 0 else 0
-    rent_type = "rent charge" if rentobj.tenuredet == "Rentcharge" else "ground rent"
-    totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
-    totdue = arrears + totcharges
-    mail_variables = {'#acc_name#': rentobj.acc_name if rentobj.acc_name else "no acc_name",
-                    '#acc_num#': rentobj.acc_num if rentobj.acc_num else "no acc_number",
-                    '#advarr#': rentobj.advarrdet if rentobj else "no advarr",
-                    '#arrears#': moneyToStr(arrears, pound=True),
-                    '#arrears_start_date#': arrears_start_date,
-                    '#arrears_end_date#': arrears_end_date,
-                    '#bank_name#': rentobj.bank_name if rentobj.bank_name else "no bank_name",
-                    '#hashcode#': hashCode(rentobj.rentcode) if rentobj else "no hashcode",
-                    '#landlord_name#': rentobj.name if rentobj else "no landlord name",
-                    '#lastrentdate#': dateToStr(rentobj.lastrentdate) if rentobj else "11/11/1111",
-                    '#manageraddr#': rentobj.manageraddr if rentobj else "no manager address",
-                    '#manageraddr2#': rentobj.manageraddr2 if rentobj else "no manager address2",
-                    '#managername#': rentobj.managername if rentobj else "no manager name",
-                    '#nextrentdate#': dateToStr(rentobj.nextrentdate) if rentobj else "no nextrentdate",
-                    '#periodly#': rentobj.freqdet if rentobj else "no periodly",
-                    '#propaddr#': rentobj.propaddr if rentobj else "no property address",
-                    '#rentcode#': rentobj.rentcode if rentobj else "no rentcode",
-                    '#rentgale#': moneyToStr(rent_gale, pound=True) if rentobj else "£0.00",
-                    '#rentpa#': moneyToStr(rentobj.rentpa, pound=True) if rentobj else "no rent",
-                    '#rent_type#': rent_type,
-                    '#sort_code#': rentobj.sort_code if rentobj.sort_code else "no sort_code",
-                    '#tenantname#': rentobj.tenantname if rentobj else "no tenant name",
-                    '#today#': dateToStr(date.today()),
-                    '#totcharges#': moneyToStr(totcharges, pound=True),
-                    '#totdue#': moneyToStr(totdue, pound=True) if totdue else "no total due"
-                    }
-    return mail_variables
+def writeMail(rent_id, form_letter_id, income_id=0):
+    rentobj = get_rent_mail(rent_id)
+    mail_variables = get_mail_variables(rentobj, 'mail')
+    income_item, allocdata = get_income_item(rent_id, income_id)
+    mail_variables['#payamount#'] = moneyToStr(income_item.payamount, pound=True) if income_item else "no payment"
+    mail_variables['#paydate#'] = dateToStr(income_item.paydate) if income_item else "no paydate"
+    mail_variables['#payer#'] = income_item.payer if income_item else "no payer"
+    mail_variables['#paytypedet#'] = income_item.paytypedet if income_item else "no paytype"
+    form_letter = get_form_letter(form_letter_id)
+    if "LEQ" in form_letter.code:
+        leasedata, lease_variables = get_lease_variables(rent_id)
+        mail_variables.update(lease_variables)
+    else:
+        leasedata = None
+    subject = form_letter.subject
+    block = form_letter.block if form_letter.block else ""
+    doctype = form_letter.doctype
+    dcode = form_letter.code
+    subject = doReplace(mail_variables, subject)
+    block = doReplace(mail_variables, block)
+
+    return block, leasedata, rentobj, subject, doctype, dcode
+
+

@@ -29,7 +29,7 @@
         <div class="col-md-2">
             <label for="agentdetail">agent details:</label>
             <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
-                   title="includes" value="{{ filterdict.agentdetail }}">
+                   title="includes" value="{{ filterdict.agentdetail | truncate(20, True) }}">
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>

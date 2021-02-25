@@ -191,7 +191,7 @@ def serialize_pr_save_data(pr_save_data):
 
 def write_payrequest(rent_id, pr_form_id):
     rent_mail = get_rent_mail(rent_id)
-    pr_variables = get_mail_variables(rent_mail)
+    pr_variables = get_mail_variables(rent_mail, 'payrequest')
     arrears_clause, create_case, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue = \
         build_pr_table(rent_mail, pr_variables)
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
