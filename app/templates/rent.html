@@ -60,9 +60,15 @@
                     <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">agent</td>
                         {% if rent.agent_id %}
-                            <td class="copyable-text" style="width: 88.00%">{{ rent.detail }}</td>
+                            <td class="copyable-text" style="width: 83.00%">{{ rent.detail }}</td>
+                            <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                            agent_id=rent.agent_id, rent_id=rent.id) }}"
+                               class="btn btn-danger btn-round button-icon round eye" role="button"></a>
                         {% else %}
-                            <td class="copyable-text" style="width: 88.00%">no agent</td>
+                            <td class="copyable-text" style="width: 83.00%">no agent</td>
+                            <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                            agent_id=0, rent_id=rent.id) }}"
+                               class="btn btn-danger btn-round button-icon round plus" role="button"></a>
                         {% endif %}
                     </tr>
                 </tbody>

@@ -26,6 +26,13 @@
     margin-right: 10px;
     -webkit-font-smoothing: antialiased;
 }
+.round::before {
+    margin: 0;
+}
+/*for round buttons in tables */
+.align-right {
+    text-align: right;
+}
 .arrow-left::before {
     font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f060";
 }
@@ -354,6 +361,9 @@ hr.nav-hr {
 }
 .btn {
     box-shadow: 0 4px 8px rgba(0,0,0,.25);
+}
+.btn-round {
+    border-radius: 25px;
 }
 body {
     background: #CDDBD9;
