@@ -1,11 +1,10 @@
 # common.py - attempt to put all commonly used stuff here and in functions.py
 import json
-import os
-from app import db
 from flask import request
-from flask_login import current_user, login_required
+from flask_login import current_user
 from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
-                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure\
+                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
+from app.dao.functions import commit_to_database
 
 
 # common functions
@@ -65,6 +64,7 @@ def get_combodict_filter():
 def get_hr_statuses():
     hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
+
     return hr_statuses
 
 
@@ -73,6 +73,7 @@ def get_idlist_recent(type):
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
         id_list = [1, 2, 3]
+
     return id_list
 
 
@@ -84,10 +85,10 @@ def pop_idlist_recent(type, id):
     if id in id_list:
         id_list.remove(id)
     id_list.insert(0, id)
-    if len(id_list) > 20:
+    if len(id_list) > 15:
         id_list.pop()
     setattr(current_user, type, json.dumps(id_list))
-    db.session.commit()
+    commit_to_database()
 
 
 def get_postvals_id():

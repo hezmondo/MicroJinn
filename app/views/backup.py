@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 
-from flask import Blueprint, current_app, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, redirect, render_template, request, url_for, send_from_directory
 from sqlalchemy import engine
 from sqlalchemy.engine import url
 
@@ -18,39 +18,6 @@ fn = getattr(sys.modules['__main__'], '__file__')
 root_path = os.path.abspath(os.path.dirname(fn))
 # Backup directory is `sqldumps` sub-directory
 backup_path = os.path.join(root_path, "sqldumps")
-
-
-@backup_bp.route('/backup', methods=['GET', 'POST'])
-# @login_required
-def backup():
-    # class for showing (selected) file information
-    class FileInfo:
-        def __init__(self):
-            self.name = ""
-            self.size = 0
-            self.mtime = 0
-            self.datetime = ""
-
-    # find the existing backup files, and put them into `restore_files` table
-    if not os.path.isdir(backup_path):
-        raise FileNotFoundError(f"Backup directory does not exist: {backup_path}")
-    backup_files = []
-    # populate `backup_files` with all ".sql" files
-    with os.scandir(backup_path) as it:
-        for entry in it:
-            if not entry.name.startswith('.') and entry.is_file():
-                if entry.name.lower().endswith('.sql'):
-                    stat_result = entry.stat()
-                    file_info = FileInfo()
-                    file_info.name = entry.name
-                    file_info.size = stat_result.st_size
-                    file_info.mtime = datetime.datetime.fromtimestamp(stat_result.st_mtime)
-                    file_info.datetime = file_info.mtime.strftime("%d-%b-%Y %H:%M")
-                    backup_files.append(file_info)
-    # sort by modification time, reversed, so that most recent at top
-    backup_files.sort(key=lambda fi: fi.mtime, reverse=True)
-
-    return render_template('backup.html', backup_files=backup_files)
 
 
 def get_SQLAlchemy_engine() -> engine.Engine:
@@ -80,16 +47,46 @@ def post_process_backup_output_file(result_file, final_output_file):
                 outp.write(line)
 
 
+def backup_file_list():
+    # class for showing (selected) file information
+    class FileInfo:
+        def __init__(self):
+            self.name = ""
+            self.size = 0
+            self.mtime = 0
+            self.datetime = ""
+
+    # find the existing backup files, and put them into `restore_files` table
+    if not os.path.isdir(backup_path):
+        raise FileNotFoundError(f"Backup directory does not exist: {backup_path}")
+    backup_files = []
+    # populate `backup_files` with all ".sql" files
+    with os.scandir(backup_path) as it:
+        for entry in it:
+            if not entry.name.startswith('.') and entry.is_file():
+                if entry.name.lower().endswith('.sql'):
+                    stat_result = entry.stat()
+                    file_info = FileInfo()
+                    file_info.name = entry.name
+                    file_info.size = stat_result.st_size
+                    file_info.mtime = datetime.datetime.fromtimestamp(stat_result.st_mtime)
+                    file_info.datetime = file_info.mtime.strftime("%d-%b-%Y %H:%M")
+                    backup_files.append(file_info)
+    # sort by modification time, reversed, so that most recent at top
+    backup_files.sort(key=lambda fi: fi.mtime, reverse=True)
+
+    return backup_files
+
+
 @backup_bp.route('/backup_database', methods=['GET', 'POST'])
 # @login_required
 def backup_database():
     backup_database_output = ""
+
     if request.method == "POST":
-        pass
-    else:
         # options for the backup
         class Options:
-            verbose = True
+            verbose = False
             add_drop_database = False
             include_routines = True
             post_process_output = True
@@ -157,7 +154,6 @@ def backup_database():
                 if Options.post_process_output:
                     # now do the postprocessing on the output
                     post_process_backup_output_file(result_file, final_output_file)
-
                 backup_database_output += f"Backup placed in file: {final_output_file}\n"
             else:
                 backup_database_output += f"OS command reported unsuccessful, exit code {exit_code}\n"
@@ -168,16 +164,17 @@ def backup_database():
                 if result_file:
                     os.unlink(result_file)
 
-    return render_template('backup.html', backup_database_output=backup_database_output)
+    return render_template('backup_database.html', backup_database_output=backup_database_output)
 
 
 @backup_bp.route('/restore_database', methods=['GET', 'POST'])
 # @login_required
 def restore_database():
+    # get the avialable backup files into the table for selection
+    backup_files = backup_file_list()
     restore_database_output = ""
-    if request.method == "GET":
-        pass
-    else:
+
+    if request.method == "POST":
         # options for the restore
         class Options:
             verbose = False
@@ -234,9 +231,18 @@ def restore_database():
             exit_code = completed_process.returncode
             if exit_code == 0:
                 restore_database_output += "OS command executed successfully\n"
+                restore_database_output += f"Backup restored from file: {restore_path}\n"
             else:
                 restore_database_output += f"OS command reported unsuccessful, exit code {exit_code}\n"
         except Exception as ex:
             restore_database_output += f"***Exception: {str(ex)}"
 
-    return render_template('backup.html', restore_database_output=restore_database_output)
+    return render_template('restore_database.html', backup_files=backup_files, restore_database_output=restore_database_output)
+
+
+@backup_bp.route('/sqldumps/<path:filename>', methods=['GET', 'POST'])
+# @login_required
+def sqldumps(filename):
+    # page has: <a href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}">{{ backup_file.name }}</a>
+    # this function sends the file from the directory as a download "attachment" (i.e. needs to be saved)
+    return send_from_directory(directory=backup_path, filename=filename, as_attachment=True)

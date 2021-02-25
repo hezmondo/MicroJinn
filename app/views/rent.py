@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.dao.charge import get_charges
 from app.dao.common import get_combodict_rent
 from app.dao.rent import get_rent, post_rent
-from app.main.mail import rent_stats
+from app.main.mail import get_mail_variables
 from flask_login import current_user
 
 
@@ -22,6 +22,6 @@ def rent(rent_id):
     # gather rent combobox values
     rent = get_rent(rent_id) if rent_id != 0 else {"id": 0}
     charges = get_charges(rent_id) if rent_id != 0 else None
-    rentstats = rent_stats(rent_id)
+    rentvariables = get_mail_variables(rent, 'rent')
 
-    return render_template('rent.html', charges=charges, rent=rent, combodict=combodict, rentstats=rentstats)
+    return render_template('rent.html', charges=charges, rent=rent, combodict=combodict, rentvariables=rentvariables)

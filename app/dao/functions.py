@@ -15,15 +15,6 @@ from decimal import Decimal
 dbLogger = logging.getLogger("dbLogger")
 
 
-def backup_database():
-    """A  function to backup the mjinn database and
-       handle exceptions if encountered"""
-    dbLogger.info('Committing changes to db...')
-    return
-    # try:
-    #     pass
-
-
 def commit_to_database():
     """A shared function to make a commit to the database and
        handle exceptions if encountered"""

@@ -18,6 +18,14 @@
             <table class="table table-body">
                 <tbody>
                     <tr>
+                        <td class="td-title copyable-text" style="width: 12.00%">property</td>
+                        <td class="copyable-text" style="width: 88.00%">{{ rent.propaddr }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-body">
+                <tbody>
+                    <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
                         <td class="copyable-text" style="width: 88.00%">{{ rent.name }} of {{ rent.manageraddr }}</td>
                     </tr>
@@ -27,21 +35,19 @@
                 <tbody>
                     <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">tenant</td>
-                        <td class="copyable-text" style="width: 83.00%">{{ rent.tenantname }} of {{ rent.mailaddr }}</td>
-                        <td  class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
-                           class="btn btn-info btn-round button-icon round eye" role="button"></a>
+                        <td class="copyable-text" style="width: 88.00%">{{ rent.tenantname }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title copyable-text" style="width: 12.00%">mailaddr</td>
+                        <td class="copyable-text" style="width: 88.00%">{{ rent.mailaddr }}</td>
                     </tr>
                 </tbody>
             </table>
             <table class="table table-body">
                 <tbody>
                     <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">email</td>
+                        <td class="td-title copyable-text" style="width: 12.00%">emails to</td>
                         <td class="copyable-text" style="width: 88.00%">{{ rent.email }}</td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">property</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rent.propaddr }}</td>
                     </tr>
                     <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">notes</td>
@@ -80,11 +86,38 @@
                 <tbody>
                     <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_stat }}</td>
+                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.rent_stat }}</td>
                     </tr>
                     <tr>
                         <td class="td-title copyable-text" style="width: 12.00%">owing stat</td>
-                        <td class="copyable-text" style="width: 88.00%">{{ rentstats.owing_stat }}</td>
+                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.owing_stat }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title copyable-text" style="width: 12.00%">charges</td>
+                        <td class="copyable-text" style="width: 88.00%">{{ rentvariables.chargestat }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-fixed" style="margin-bottom: 20px;">
+            <table class="table table-head">
+                <thead>
+                    <tr>
+                        <td style="width: 100%">other info for rent {{ rent.rentcode }}</td>
+                    </tr>
+                </thead>
+            </table>
+            <table class="table table-body">
+                <tbody>
+                    <tr>
+                        <td class="td-title copyable-text" style="width: 12.00%">misc</td>
+                        <td class="copyable-text" style="width: 88.00%">tenure: {{ rent.tenuredet }}, - last rent date:
+                            {{ rent.lastrentdate }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title copyable-text" style="width: 12.00%">misc</td>
+                        <td class="copyable-text" style="width: 88.00%">status {{ rent.statusdet }}, -
+                        actype: {{ rent.actypedet }}, - source:  {{ rent.source }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -94,12 +127,6 @@
         <div class="card border-primary card-white">
             <div class="card-header">actions</div>
             <div class="card-body text-primary">
-                <div class="form-group row">
-                    <div class="col-md-12">
-                        <a href="{{ url_for('charge_bp.charges', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                           class="btn btn-block btn-primary button-icon exclamation" role="button">charges</a>
-                    </div>
-                </div>
                 <div class="form-group row">
                     <div class="col-md-12">
                         <a href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent.id,
@@ -154,49 +181,49 @@
         </div>
     </div>
 </div>
-<div class="table-fixed" style="margin-bottom: 20px;">
-    <table class="table table-head table-orange">
-        <thead>
-            <tr>
-                <td style="width: 100%">(example) more details - get icons from https://fontawesome.com/icons?d=gallery&p=2&m=free</td>
-            </tr>
-        </thead>
-    </table>
-    <table class="table table-base table-long">
-        <tr>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-money-bill-wave-alt"></i></h4>
-                <h6 class="centre-heading">rent pa</h6>
-                <p class="centre-text">{{ rent.rentpa }}</p>
-            </td>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-file-invoice"></i></h4>
-                <h6 class="centre-heading">arrears</h6>
-                <p class="centre-text">{{ rent.arrears }}</p>
-            </td>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-arrow-circle-left"></i></h4>
-                <h6 class="centre-heading">last rent date</h6>
-                <p class="centre-text">{{ rent.lastrentdate }}</p>
-            </td>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-arrow-circle-right"></i></h4>
-                <h6 class="centre-heading">next rent date</h6>
-                <p class="centre-text">{{ rent.nextrentdate }}</p>
-            </td>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-info-circle"></i></h4>
-                <h6 class="centre-heading">status</h6>
-                <p class="centre-text">{{ rent.statusdet }}</p>
-            </td>
-            <td class="td-title copyable-text" style="width: 12.00%">
-                <h4 class="centre-heading"><i class="fas fa-warehouse"></i></h4>
-                <h6 class="centre-heading">source</h6>
-                <p class="centre-text">{{ rent.source }}</p>
-            </td>
-        </tr>
-    </table>
-</div>
+<!--<div class="table-fixed" style="margin-bottom: 20px;">-->
+<!--    <table class="table table-head table-orange">-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <td style="width: 100%">(example) more details - get icons from https://fontawesome.com/icons?d=gallery&p=2&m=free</td>-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--    </table>-->
+<!--    <table class="table table-base table-long">-->
+<!--        <tr>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-money-bill-wave-alt"></i></h4>-->
+<!--                <h6 class="centre-heading">rent pa</h6>-->
+<!--                <p class="centre-text">{{ rent.rentpa }}</p>-->
+<!--            </td>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-file-invoice"></i></h4>-->
+<!--                <h6 class="centre-heading">arrears</h6>-->
+<!--                <p class="centre-text">{{ rent.arrears }}</p>-->
+<!--            </td>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-arrow-circle-left"></i></h4>-->
+<!--                <h6 class="centre-heading">last rent date</h6>-->
+<!--                <p class="centre-text">{{ rent.lastrentdate }}</p>-->
+<!--            </td>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-arrow-circle-right"></i></h4>-->
+<!--                <h6 class="centre-heading">next rent date</h6>-->
+<!--                <p class="centre-text">{{ rent.nextrentdate }}</p>-->
+<!--            </td>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-info-circle"></i></h4>-->
+<!--                <h6 class="centre-heading">status</h6>-->
+<!--                <p class="centre-text">{{ rent.statusdet }}</p>-->
+<!--            </td>-->
+<!--            <td class="td-title copyable-text" style="width: 12.00%">-->
+<!--                <h4 class="centre-heading"><i class="fas fa-warehouse"></i></h4>-->
+<!--                <h6 class="centre-heading">source</h6>-->
+<!--                <p class="centre-text">{{ rent.source }}</p>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--    </table>-->
+<!--</div>-->
 <div>
     <button type="button" id="more_less"
             class="btn btn-block btn-secondary button-icon edit" style="margin-bottom: 20px;">edit rent</button>

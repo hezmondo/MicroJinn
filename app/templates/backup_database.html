@@ -1,0 +1,32 @@
+<!-- /templates/backup_database.html  -->
+{% extends 'base.html' %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-block btn-primary" onclick="javascript:on_backup_database_clicked();"
+            >backup database</button>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <textarea id="backup_database_output" class="form-control form-control-sm" rows="12"
+                      readonly="readonly" style="width:800px; white-space:pre-wrap; font-family:monospace;"
+            >{{ backup_database_output }}</textarea>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    <!-- Scroll to bottom of backup output -->
+    var textarea = document.getElementById('backup_database_output');
+    textarea.scrollTop = textarea.scrollHeight;
+
+    function on_backup_database_clicked()
+    {
+        var textarea = document.getElementById('backup_database_output');
+        textarea.value = 'Starting backup...';
+    }
+</script>
+{% endblock %}
+

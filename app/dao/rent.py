@@ -33,7 +33,7 @@ def get_rent(rent_id):
             .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.prop_addr(Rent.id).label('mailaddr'),
+                           func.mjinn.mail_addr(Rent.id).label('mailaddr'),
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
@@ -57,7 +57,7 @@ def get_rent(rent_id):
 def get_rent_addrs(rent_id):
     rent_addrs = \
         Rent.query.join(TypeMailTo).with_entities(Rent.id, Rent.rentcode, Rent.tenantname,
-                                                  func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                                                  func.mjinn.mail_addr(Rent.id).label('mailaddr'),
                                                   func.mjinn.prop_addr(Rent.id).label('propaddr'),
                                                   func.mjinn.tot_charges(Rent.id).label('totcharges'),
                                                   TypeMailTo.mailtodet) \
@@ -83,7 +83,7 @@ def get_rent_mail(rent_id):
             .join(TypeTenure) \
             .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
                            func.mjinn.check_pr_exists(Rent.id).label('prexists'),
-                           func.mjinn.mail_addr(Rent.id, 0, 0).label('mailaddr'),
+                           func.mjinn.mail_addr(Rent.id).label('mailaddr'),
                            # the following functions take id, renttype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
