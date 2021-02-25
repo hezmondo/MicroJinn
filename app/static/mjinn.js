@@ -1,6 +1,5 @@
 $(document).ready(function(){
     $("#save_delete").hide();
-    $("#edit_rent").hide();
     $("#xalloc").hide();
     $("#show-xalloc").click(function(){
         $("#xalloc").toggle();

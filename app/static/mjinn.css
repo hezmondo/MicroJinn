@@ -12,11 +12,19 @@
    bottom:0;
    width: 100%;
 }
-
 .modal-backdrop.show {
-    opacity: 0.0;
+    opacity: 0.4;
 }
-
+.modal-no-backdrop .modal-backdrop {
+    opacity: 0;
+}
+.no-border {
+    border: 0;
+    border-radius: 6px;
+}
+.no-padding {
+    padding: 0;
+}
 /*button icons require the button to have 2 classes .button-icon and ie .arrow-left*/
 .button-icon::before {
     display: inline-block;

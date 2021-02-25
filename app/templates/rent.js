@@ -24,13 +24,12 @@ $(document).ready(function(){
     });
     //show more details and scroll to bottom
     $("#open_edit_rent").click(function(){
-        $("#edit_rent").show();
-        $("#save_delete").show();
-        $('html, body').scrollTop( $(document).height() - $(window).height() );
-    });
-    $("#close_edit_rent").click(function(){
-        $("#edit_rent").hide();
-        $("#save_delete").hide();
+        $('#edit_modal').modal();
+        });
+    $('#copy_modal').on('show.bs.modal', function (e) {
+        $('body').addClass("modal-no-backdrop");
+    }).on('hide.bs.modal', function (e) {
+        setTimeout(function() {$('body').removeClass("modal-no-backdrop");}, 1000);
     });
 });
 //function to copy text from text area (in rent screen) to clipboard
