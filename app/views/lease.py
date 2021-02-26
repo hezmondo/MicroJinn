@@ -11,6 +11,7 @@ def lease(lease_id):
         rent_id = post_lease(lease_id)
         return redirect(url_for('rent_bp.rent', rent_id=rent_id))
     lease, uplift_types = get_lease(lease_id)
+
     return render_template('lease.html', lease=lease, uplift_types=uplift_types)
 
 

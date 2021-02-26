@@ -11,7 +11,7 @@
             <table class="table table-head">
                 <thead>
                 <tr>
-                    <td style="width: 100%">general info for rent {{ rent.rentcode }}</td>
+                    <td style="width: 100%">information for rent {{ rent.rentcode }}</td>
                 </tr>
                 </thead>
             </table>
@@ -34,22 +34,26 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
+<!--            <table class="table table-head">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <td style="width: 100%">tenant info for {{ rent.rentcode }}</td>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--            </table>-->
             <table class="table table-body">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">tenant</td>
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.tenantname }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
-                                                                                   id="edit_tenant"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#" id="edit_tenant"
+                          class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.mailaddr }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                    <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.mailaddr }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -57,62 +61,57 @@
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
-                    <td class="vertical-align copyable-text" style="width: 83.00%">{{ rent.email }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                    <td class="vertical-align copyable-text" style="width: 88.00%">{{ rent.email }}</td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.note }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                    <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.note }}</td>
                 </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table table-body table-base">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
                     {% if rent.agent_id %}
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
-                            agent_id=rent.agent_id, rent_id=rent.id) }}"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
-                        {% else %}
-                    <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                        <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.detail }}</td>
+                        <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                          agent_id=rent.agent_id, rent_id=rent.id) }}"
+                          class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                    {% else %}
+                        <td class="copyable-text vertical-align" style="width: 88.00%">no agent -
+                    click button to add agent to this rent</td>
+                        <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=0, rent_id=rent.id) }}"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
-                        {% endif %}
+                           class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                    {% endif %}
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-            <table class="table table-head">
-                <thead>
-                <tr>
-                    <td style="width: 100%">owings info for rent {{ rent.rentcode }}</td>
-                </tr>
-                </thead>
-            </table>
+<!--            <table class="table table-head">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <td style="width: 100%">owings info for rent {{ rent.rentcode }}</td>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--            </table>-->
             <table class="table table-body">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.rent_stat }}</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_stat }}</td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">owing stat</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.owing_stat }}</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.owing_stat }}</td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">charges</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentvariables.chargestat }}</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.charges_stat }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -121,23 +120,26 @@
             <table class="table table-head">
                 <thead>
                 <tr>
-                    <td style="width: 100%">other info for rent {{ rent.rentcode }}</td>
+                    <td style="width: 14%">status</td>
+                    <td style="width: 14%">actype</td>
+                    <td style="width: 14%">tenure</td>
+                    <td style="width: 14%">price</td>
+                    <td style="width: 14%">source</td>
+                    <td style="width: 14%">spare</td>
+                    <td style="width: 16%">deedtype</td>
                 </tr>
                 </thead>
             </table>
             <table class="table table-body">
                 <tbody>
                 <tr>
-                    <td class="td-title copyable-text" style="width: 12.00%">misc</td>
-                    <td class="copyable-text" style="width: 88.00%">tenure: {{ rent.tenuredet }}, - last rent date:
-                        {{ rent.lastrentdate }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="td-title copyable-text" style="width: 12.00%">misc</td>
-                    <td class="copyable-text" style="width: 88.00%">status {{ rent.statusdet }}, -
-                        actype: {{ rent.actypedet }}, - source: {{ rent.source }}
-                    </td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.statusdet }}</td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.actypedet }}</td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.tenuredet }}</td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.price }}</td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.source }}</td>
+                    <td class="copyable-text" style="width: 14.00%">{{ rent.source }}</td>
+                    <td class="copyable-text" style="width: 16.00%">{{ rent.deedcode }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -347,8 +349,6 @@
     </div>
 </div>
 
-
-
 <!-- Modal  - text copied - can be templated -->
 <div class="modal fade modal-no-backdrop" id="copy_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
      aria-hidden="true">
@@ -368,14 +368,31 @@
         <div class="modal-content">
             <div class="modal-body">
                 <form method="POST" id="rent_tenant">
-                        <label for="tenant">edit tenant name</label>
-                        <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <label for="tenant">edit tenant name</label>
+                            <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <label for="tenant">edit email addresses - separate with semicolon</label>
+                            <input type="text" class="form-control" name="email" value="{{ rent.email }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <label for="tenant">edit notes</label>
+                            <input type="text" class="form-control" name="note" value="{{ rent.note }}">
+                        </div>
+                    </div>
                     <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 20px;">
                         <div class="col-md-6">
                             <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">close</button>
                         </div>
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
+                            <button type="submit" formaction="{{ url_for('rent_bp.tenant', rent_id=rent.id) }}"
+                                    class="btn btn-block btn-success button-icon save">save changes</button>
                         </div>
                     </div>
                 </form>
