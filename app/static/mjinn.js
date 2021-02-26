@@ -1,6 +1,5 @@
 $(document).ready(function(){
     $("#save_delete").hide();
-    $("#edit_rent").hide();
     $("#xalloc").hide();
     $("#show-xalloc").click(function(){
         $("#xalloc").toggle();
@@ -43,20 +42,6 @@ $(document).ready(function(){
             $(".btn-tog").addClass("check");
         }
     });
-    //show more details and scroll to bottom
-    $("#more_less").click(function(){
-        if ($(this).text() == "edit rent") {
-            $(this).text("view rent");
-            $("#edit_rent").show();
-            $("#save_delete").show();
-            $('html, body').scrollTop( $(document).height() - $(window).height() );
-            }
-        else {
-            $(this).text("edit rent");
-            $("#save_delete").hide();
-            $("#edit_rent").hide();
-        }
-    });
     $(".custom-file-input").on("change", function() {
       var fileName = $(this).val().split("\\").pop();
       $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
@@ -80,27 +65,6 @@ $(document).ready(function(){
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
         $('#pr_addr').val(pr_addr_strip);
     });
-    //copy text from readonly input on click
-    $('.copyable-input').click(function(e) {
-        if ( $(this).is('[readonly]') ) {
-            var element = $(this);
-            copyToClipboard(this);
-            $('#exampleModal').modal();
-            setTimeout(function() {$('#exampleModal').modal('hide');}, 1000);
-        }
-    });
-    //copy text from table on click
-    $('.copyable-text').click(function(e) {
-        let range = new Range();
-        range.setStart(this, 0);
-        range.setEnd(this, this.childNodes.length);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-        document.execCommand("copy");
-        $('#exampleModal').modal();
-        setTimeout(function() {$('#exampleModal').modal('hide');}, 1000);
-    });
-
     //allow display and navbar to change for smaller screens / phones
     resizeView();
     $(window).resize(function(){
@@ -149,10 +113,4 @@ function resizeView() {
    else {
        $('#nav_bar').addClass("navbar-expand");
     }
-}
-//function to copy text from text area (in rent screen) to clipboard
-function copyToClipboard(element) {
-  element.select();
-  element.setSelectionRange(0, 99999)
-  document.execCommand("copy");
 }
