@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template
 from flask_login import login_required
 from app.dao.headrent import get_headrent, get_headrents
 from app.dao.common import get_combodict_basic, get_hr_statuses

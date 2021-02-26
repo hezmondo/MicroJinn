@@ -76,7 +76,7 @@
             <td style="width: 15.00%"> {{ item.tenantname }}</td>
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
-            <td style="width: 15.00%"> {{ item.detail }}</td>
+            <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}</td>
             <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
             rent_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
         </tr>

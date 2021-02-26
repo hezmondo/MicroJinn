@@ -8,6 +8,7 @@ money_bp = Blueprint('money_bp', __name__)
 @money_bp.route('/money', methods=['GET', 'POST'])
 def money():
     accsums, moneydets = get_moneydets()
+
     return render_template('money.html', accsums=accsums, moneydets=moneydets)
 
 
@@ -18,6 +19,7 @@ def money_acc(acc_id):
         acc_id = post_money_acc(acc_id)
         return redirect('/money_acc/{}'.format(acc_id))
     moneyacc = get_money_acc(acc_id)
+
     return render_template('money_acc.html', moneyacc=moneyacc)
 
 
@@ -37,6 +39,7 @@ def money_item(money_item_id):
         return redirect(url_for('money_bp.money_item', money_item_id=money_item_id))
     money_dict = get_moneydict()
     money_item, cleared = get_money_item(money_item_id)
+
     return render_template('money_item.html', cleared=cleared, money_dict=money_dict, money_item=money_item)
 
 
@@ -46,5 +49,6 @@ def money_items(acc_id):  # if account id is 0 show items for all accounts
     # post values are filter values, so dealt with in the following get function
     accsums, moneyvals, transitems = get_money_items(acc_id)
     money_dict = get_moneydict("plus_all")
+
     return render_template('money_items.html', accsums=accsums, money_dict=money_dict, moneyvals=moneyvals,
                            transitems=transitems)

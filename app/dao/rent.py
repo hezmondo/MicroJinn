@@ -5,7 +5,7 @@ from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
 from app.models import Agent, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
-    TypeMailTo, TypeSaleGrade, TypeStatus, TypeTenure
+    TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
 def create_new_rent():
@@ -28,6 +28,7 @@ def get_rent(rent_id):
             .join(TypeDeed) \
             .join(TypeFreq) \
             .join(TypeMailTo) \
+            .join(TypePrDelivery) \
             .join(TypeSaleGrade) \
             .join(TypeStatus) \
             .join(TypeTenure) \
@@ -41,7 +42,7 @@ def get_rent(rent_id):
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
                            Manager.manageraddr,
                            TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
-                           TypeMailTo.mailtodet, TypeSaleGrade.salegradedet,
+                           TypeMailTo.mailtodet, TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet,
                            TypeStatus.statusdet, TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
@@ -148,3 +149,13 @@ def update_roll_rent(rent_id, arrears):
 #     for rent_mailop in rent_mails:
 #         update_vals.append(update_roll_rent(rent_mailop.id))
 #     db.session.bulk_update_mappings(Rent, update_vals)
+
+
+def update_tenant(rent_id):
+    rent = Rent.query.get(rent_id)
+    rent.tenantname = request.form.get("tenantname")
+    rent.email = request.form.get("email")
+    rent.note = request.form.get("note")
+    db.session.add(rent)
+    db.session.commit()
+
