@@ -20,7 +20,7 @@
 }
 .no-border {
     border: 0;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .no-padding {
     padding: 0;
@@ -200,23 +200,23 @@ hr.nav-hr {
     padding: .60rem 1.25rem;
 }
 .card-purple {
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-purple .card-header {
-    border-radius: 6px 6px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
     background-color: #a84fa7;
     color: white;
 }
 .card-orange {
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-orange .card-header {
-    border-radius: 6px 6px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
     background-color: #e5ad06;
     color: white;
 }
 .card-red {
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-red .card-header {
     background-color: #e85765;
@@ -224,33 +224,32 @@ hr.nav-hr {
 }
 .card-green {
     border: 3px solid #3dbd5a !important;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-green .card-header {
     background-color: #3dbd5a;
     color: white;
 }
 .card-blue {
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-blue .card-header {
-    border-radius: 6px 6px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
     background-color: #518ADD;
     color: white;
 }
 .card-white {
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 .card-white .card-header {
-    border-radius: 6px 6px 0px 0px;
+    border-radius: 5px 5px 0px 0px;
     background-color: #fff;
 }
 /*Overide bootstrap card text colour*/
 .text-primary{
     color: inherit !important;
 }
-
 /*dropdown should not be too far below button - set margin: 0*/
 .dropdown-menu {
   margin: 0;
@@ -400,6 +399,18 @@ hr.nav-hr {
     padding: 2px;
     margin: 0;
 }
+.rounded-background {
+    border-radius: 5px;
+    padding: 5px 15px;
+    box-shadow: 0 8px 16px rgba(0,0,0,.15);
+    margin-left: 10px;
+}
+.light-green {
+    background-color: #3dbd5a99;
+}
+.light-purple {
+    background-color: #a84fa778;
+}
 body {
     background: #CDDBD9;
     background: -webkit-linear-gradient(to right, #0083B0, #CDDBD9);
@@ -490,14 +501,27 @@ table .td-title {
 .table-orange thead {
     background: #e5ad06;
 }
+.table-grey thead {
+    background: #6c757d;
+}
+.table-green thead {
+    background: #3dbd5a;
+}
 .table-base{
-    border-radius: 0px 0px 6px 6px;
+    border-radius: 0px 0px 5px 5px;
+}
+.rounded-corners{
+    border-radius: 5px 5px 5px 5px;
 }
 .table.table-long tr td:nth-child(odd) {
     background-color: #e3eaed;
 }
 .table.table-long tr td:nth-child(even) {
     background-color: #d0dde1;
+}
+.background-grey {
+    background-color: #6c757d !important;
+    color: white;
 }
 .centre-heading {
     margin: 10px;
