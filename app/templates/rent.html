@@ -11,7 +11,10 @@
             <table class="table table-head">
                 <thead>
                 <tr>
-                    <td style="width: 100%">information for rent {{ rent.rentcode }}</td>
+                    <td style="width: 25%">rent {{ rent.rentcode }}</td>
+                    <td style="width: 25%">tenure: <span class="rounded-background light-purple">{{ rent.tenuredet }}</span></td>
+                    <td style="width: 25%">status: <span class="rounded-background light-green">{{ rent.statusdet }}</span></td>
+                    <td style="width: 25%">actype: <span class="rounded-background light-green">{{ rent.actypedet }}</span></td>
                 </tr>
                 </thead>
             </table>
@@ -21,12 +24,13 @@
                     <td class="td-title vertical-align copyable-text" style="width: 12.00%">property</td>
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.propaddr }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a
-                            href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
+                            href="{{ url_for('util_bp.properties', rent_id=rent.id) }}" data-toggle="tooltip"
+                            title="edit the property"
                             class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                 </tr>
                 </tbody>
             </table>
-            <table class="table table-body-alt">
+            <table class="table table-base table-body-alt">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
@@ -43,63 +47,52 @@
 <!--                </tr>-->
 <!--                </thead>-->
 <!--            </table>-->
-            <table class="table table-body">
+            <table class="table table-head">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">tenant</td>
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.tenantname }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a href="#" id="edit_tenant"
+                    <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.tenantname }}</td>
+                    <td class="vertical-align align-right background-grey" style="width: 5.50%">
+                        <a href="#" id="edit_tenant" data-toggle="tooltip" title="edit the tenant, email, mailaddr and notes"
                           class="btn btn-light btn-round button-icon round bolt" role="button"></a>
-                </tr>
-                <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
-                    <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.mailaddr }}</td>
+                    </td>
                 </tr>
                 </tbody>
             </table>
-            <table class="table table-body">
+            <table class="table table-body-alt table-base">
                 <tbody>
-                <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
-                    <td class="vertical-align copyable-text" style="width: 88.00%">{{ rent.email }}</td>
-                </tr>
-                <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
-                    <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.note }}</td>
-                </tr>
+                    <tr>
+                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
+                        <td class="vertical-align copyable-text" style="width: 82.5%">{{ rent.email }}</td>
+                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
+                    </td>
+                    </tr>
+                    <tr>
+                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
+                        <td class="copyable-text vertical-align" style="width: 82.50%">{{ rent.mailaddr }}</td>
+                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
+
+                    </tr>
+                    <tr>
+                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
+                        <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.note }}</td>
+                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
+
+                    </tr>
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-            <table class="table table-body table-base">
-                <tbody>
-                <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
-                    {% if rent.agent_id %}
-                        <td class="copyable-text vertical-align" style="width: 88.00%">{{ rent.detail }}</td>
-                        <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
-                          agent_id=rent.agent_id, rent_id=rent.id) }}"
-                          class="btn btn-light btn-round button-icon round bolt" role="button"></a>
-                    {% else %}
-                        <td class="copyable-text vertical-align" style="width: 88.00%">no agent -
-                    click button to add agent to this rent</td>
-                        <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
-                            agent_id=0, rent_id=rent.id) }}"
-                           class="btn btn-light btn-round button-icon round bolt" role="button"></a>
-                    {% endif %}
-                </tr>
-                </tbody>
-            </table>
+        <div class="row">
+            <div class="col-md-6">
+
+            </div>
+            <div class="col-md-6">
+
+            </div>
         </div>
+
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-<!--            <table class="table table-head">-->
-<!--                <thead>-->
-<!--                <tr>-->
-<!--                    <td style="width: 100%">owings info for rent {{ rent.rentcode }}</td>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--            </table>-->
-            <table class="table table-body">
+            <table class="table rounded-corners">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
@@ -117,29 +110,23 @@
             </table>
         </div>
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-            <table class="table table-head">
+            <table class="table table-head table-grey">
                 <thead>
                 <tr>
-                    <td style="width: 14%">status</td>
-                    <td style="width: 14%">actype</td>
-                    <td style="width: 14%">tenure</td>
-                    <td style="width: 14%">price</td>
-                    <td style="width: 14%">source</td>
-                    <td style="width: 14%">spare</td>
-                    <td style="width: 16%">deedtype</td>
+                    <td style="width: 25%">price</td>
+                    <td style="width: 25%">source</td>
+                    <td style="width: 25%">spare</td>
+                    <td style="width: 25%">deedtype</td>
                 </tr>
                 </thead>
             </table>
-            <table class="table table-body">
+            <table class="table table-body table-long table-base">
                 <tbody>
                 <tr>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.statusdet }}</td>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.actypedet }}</td>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.tenuredet }}</td>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.price }}</td>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.source }}</td>
-                    <td class="copyable-text" style="width: 14.00%">{{ rent.source }}</td>
-                    <td class="copyable-text" style="width: 16.00%">{{ rent.deedcode }}</td>
+                    <td class="copyable-text" style="width: 25.00%">{{ rent.price }}</td>
+                    <td class="copyable-text" style="width: 25.00%">{{ rent.source }}</td>
+                    <td class="copyable-text" style="width: 25.00%">{{ rent.source }}</td>
+                    <td class="copyable-text" style="width: 25.00%">{{ rent.deedcode }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -405,6 +392,5 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "rent.js" %}
-
 </script>
 {% endblock %}
