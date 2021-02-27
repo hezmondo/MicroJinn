@@ -10,7 +10,7 @@ from app.dao.payrequest import add_pr_history, get_recovery_info, \
     prepare_new_pr_history_entry
 from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_rent_charge_details
 from app.dao.rent import get_rent, get_rent_mail, update_roll_rent
-from app.main.mail import get_mail_variables
+from app.main.rent import get_rent_strings
 from app.dao.case import merge_case
 from app.dao.doc_ import convert_html_to_pdf
 
@@ -191,7 +191,7 @@ def serialize_pr_save_data(pr_save_data):
 
 def write_payrequest(rent_id, pr_form_id):
     rent_mail = get_rent_mail(rent_id)
-    pr_variables = get_mail_variables(rent_mail, 'payrequest')
+    pr_variables = get_rent_strings(rent_mail, 'payrequest')
     arrears_clause, create_case, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue = \
         build_pr_table(rent_mail, pr_variables)
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
