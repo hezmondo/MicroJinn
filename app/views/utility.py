@@ -74,7 +74,6 @@ def email_accs():
 
 @util_bp.route('/', methods=['GET', 'POST'])
 @util_bp.route('/home', methods=['GET', 'POST'])
-# @login_required
 def home():
     filterdict, rent_s = get_rent_s("basic", 0)
 

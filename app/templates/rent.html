@@ -39,58 +39,46 @@
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-<!--            <table class="table table-head">-->
-<!--                <thead>-->
-<!--                <tr>-->
-<!--                    <td style="width: 100%">tenant info for {{ rent.rentcode }}</td>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--            </table>-->
-            <table class="table table-head">
-                <tbody>
+        <div class="table-fixed" style="margin-bottom: 20px;">
+            <table class="table table-head table-narrow table-light-purple">
+                <thead>
                 <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">tenant</td>
-                    <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.tenantname }}</td>
-                    <td class="vertical-align align-right background-grey" style="width: 5.50%">
+                                        <td class="vertical-align" style="width: 94.5%">tenant details</td>
+                    <td class="vertical-align align-right" style="width: 5.50%">
                         <a href="#" id="edit_tenant" data-toggle="tooltip" title="edit the tenant, email, mailaddr and notes"
                           class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                     </td>
                 </tr>
+                </thead>
+            </table>
+            <table class="table table-rent table-body">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">tenant</td>
+                    <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.tenantname }}</td>
+                </tr>
                 </tbody>
             </table>
-            <table class="table table-body-alt table-base">
+            <table class="table table-rent table-body-alt table-base">
                 <tbody>
                     <tr>
                         <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
                         <td class="vertical-align copyable-text" style="width: 82.5%">{{ rent.email }}</td>
-                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
                     </td>
                     </tr>
                     <tr>
                         <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
                         <td class="copyable-text vertical-align" style="width: 82.50%">{{ rent.mailaddr }}</td>
-                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
 
                     </tr>
                     <tr>
                         <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
                         <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.note }}</td>
-                        <td class="vertical-align align-right background-grey" style="width: 5.50%">
 
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-
-            </div>
-            <div class="col-md-6">
-
-            </div>
-        </div>
-
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table rounded-corners">
                 <tbody>
