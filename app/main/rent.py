@@ -7,25 +7,37 @@ from app.dao.functions import dateToStr, hashCode, moneyToStr
 
 
 def get_rent_strings(rentobj, type='mail'):
-    paidtodate = rentobj.paidtodate if hasattr(rentobj, 'paidtodate') else  datetime.datetime(1991, 1, 1)
-    lastrentdate = rentobj.lastrentdate if hasattr(rentobj, 'lastrentdate') else datetime.datetime(1991, 1, 1)
-    nextrentdate = rentobj.nextrentdate if hasattr(rentobj, 'lastrentdate') else datetime.datetime(1991, 1, 1)
+    # this function creates strings needed for mail, pay requests and rent screen statements
+    # first we test and manipulate certain items from rentobj
+    paidtodate = rentobj.paidtodate if hasattr(rentobj, 'paidtodate') else  datetime.date(1991, 1, 1)
+    lastrentdate = rentobj.lastrentdate if hasattr(rentobj, 'lastrentdate') else datetime.date(1991, 1, 1)
+    nextrentdate = rentobj.nextrentdate if hasattr(rentobj, 'lastrentdate') else datetime.date(1991, 1, 1)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(paidtodate + relativedelta(days=1))
     arrears_end_date = dateToStr(nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate)
     charges = get_rent_charge_details(rentobj.id) or Decimal(0)
-    charges_list = ""
-    for charge in charges:
-        charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
-                                                   charge.chargedesc, dateToStr(charge.chargestartdate))
-    charges_list = [x.strip() for x in charges_list.split(', ')]
+    charges_list = "no charges"
+    if charges and charges != 0:
+        charges_list = ""
+        for charge in charges:
+            charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
+                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
+        charges_list = [x.strip() for x in charges_list.split(', ')]
+    for_sale = rentobj.salegradedet if hasattr(rentobj, 'salegradedet') else "not for sale"
     rentpa = rentobj.rentpa if rentobj.rentpa else Decimal(1)
     frequency = rentobj.freq_id if rentobj.freq_id else 1
     rent_gale = (rentpa / frequency)
     rent_type = "rent charge" if rentobj.tenuredet == "rentcharge" else "ground rent"
     totcharges = rentobj.totcharges if rentobj.totcharges else Decimal(0)
     totdue = arrears + totcharges
+    price = rentobj.price if rentobj.price else Decimal(0)
+    if price != 0:
+        days = (date.today() - paidtodate).days
+        # days = Decimal(days)
+        price_quote = price + totcharges + (days*rentpa / Decimal(365.25))
+    else:
+        price_quote = Decimal(99999)
     rent_strings_1 = {'#advarr#': rentobj.advarrdet if hasattr(rentobj, 'advarrdet') else "no advarrdet",
                     '#arrears#': moneyToStr(arrears, pound=True),
                     '#arrears_start_date#': arrears_start_date,
@@ -35,6 +47,7 @@ def get_rent_strings(rentobj, type='mail'):
                     '#nextrentdate#': dateToStr(rentobj.nextrentdate),
                     '#paidtodate#': dateToStr(paidtodate),
                     '#periodly#': rentobj.freqdet if rentobj.freqdet else "no periodly",
+                    '#price_quote#': moneyToStr(price_quote, pound=True),
                     '#rentgale#': moneyToStr(rent_gale, pound=True),
                     '#rentpa#': moneyToStr(rentobj.rentpa, pound=True),
                     '#rent_type#': rent_type,
@@ -42,7 +55,9 @@ def get_rent_strings(rentobj, type='mail'):
                     '#totdue#': moneyToStr(totdue, pound=True)
                     }
     rent_stat = get_rent_stat(rentobj, rent_strings_1)
-    owing_stat = get_owing_stat(rentobj, rent_strings_1)
+    rent_owing = get_rent_owing(rentobj, rent_strings_1)
+    price_stat = "for sale at {}".format(moneyToStr(price_quote, pound=True)) \
+                        if for_sale == 'for sale' else "not for sale"
     rent_strings_2 = {'#acc_name#': rentobj.acc_name if hasattr(rentobj, 'acc_name') else "no acc_name",
                     '#acc_num#': rentobj.acc_num if hasattr(rentobj, 'acc_num') else "no acc_num",
                     '#bank_name#': rentobj.bank_name if hasattr(rentobj, 'bank_name') else "no bank_name",
@@ -51,7 +66,6 @@ def get_rent_strings(rentobj, type='mail'):
                     '#lastrentdate#': dateToStr(rentobj.lastrentdate),
                     '#manageraddr2#': rentobj.manageraddr2 if hasattr(rentobj, 'manageraddr2') else "no manageraddr2",
                     '#managername#': rentobj.managername if rentobj.managername else "no manager name",
-                    '#owing_stat#': owing_stat,
                     '#propaddr#': rentobj.propaddr if rentobj.propaddr else "no property address",
                     '#rentcode#': rentobj.rentcode if rentobj.rentcode else "no rentcode",
                     '#rent_stat#': rent_stat,
@@ -60,12 +74,13 @@ def get_rent_strings(rentobj, type='mail'):
                     '#today#': dateToStr(date.today()),
                     }
     rent_strings_3 = {'#charges_list#': charges_list,
-                    '#owing_stat#': owing_stat,
+                    '#rent_owing#': rent_owing,
                     '#rent_stat#': rent_stat
                     }
 
     rent_strings_rent = {'charges_list': charges_list,
-                           'owing_stat': owing_stat,
+                           'price_stat': price_stat,
+                           'rent_owing': rent_owing,
                            'rent_stat': rent_stat
                            }
     if type == 'rent':
@@ -76,60 +91,36 @@ def get_rent_strings(rentobj, type='mail'):
         return {**rent_strings_1, **rent_strings_2, **rent_strings_3}
 
 
-def get_owing_stat(rentobj, rent_strings):
+def get_rent_owing(rentobj, rent_strings):
     if rentobj.statusdet not in ("grouped payment", "sold off", "terminated"):
-        totcharges = rentobj.totcharges or 0
-        if rentobj.arrears == 0 and totcharges == 0 and rentobj.nextrentdate >= date.today():
-            owing_stat = "There is no {0} owing to us on this property and {0} is paid up to {1}. \
-                            Further {0} will be due and payable {2} {3} on {4} in the sum of {5}."\
+        if rentobj.arrears == 0 and rentobj.nextrentdate >= date.today():
+            rent_owing = "There is no {0} owing to us on this property and {0} is paid up to {1}. \
+                            Further {0} will be due and payable {2} {3} on {4} in the sum of {5}"\
                     .format(rent_strings["#rent_type#"], rent_strings["#paidtodate#"], rent_strings["#periodly#"],
                             rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
-        elif rentobj.arrears == 0 and totcharges == 0 and rentobj.nextrentdate < date.today():
-            owing_stat = "{0} was last paid on this property up to {1}. Further {0} was due and \
+        elif rentobj.arrears == 0 and rentobj.nextrentdate < date.today():
+            rent_owing = "{0} was last paid on this property up to {1}. Further {0} was due and \
                             payable {2} {3} on {4} in the sum of {5} but no rent demand has yet been issued." \
                 .format(rent_strings["#rent_type#"], rent_strings["#paidtodate#"], rent_strings["#periodly#"],
                             rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
-        elif rentobj.arrears > 0 and totcharges == 0 and rentobj.lastrentdate > date.today():
-            owing_stat = "A recent pay request has been issued for {} {} due {} {} on {}. \
+        elif rentobj.arrears > 0 and rentobj.lastrentdate > date.today():
+            rent_owing = "A recent pay request has been issued for {} {} due {} {} on {}. \
             This amount is not payable until the date stated on the pay request."\
                 .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#periodly#"],
                             rent_strings["#advarr#"], rent_strings["#nextrentdate#"])
-        elif rentobj.arrears > 0 and totcharges == 0 and rentobj.lastrentdate <= date.today():
-            owing_stat = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
-             to {3}. Further {1} will be due and payable {4} {5} on {6} in the sum of {7}." \
-                .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#arrears_start_date#"],
-                        rent_strings["#arrears_end_date#"], rent_strings["#periodly#"],
-                        rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
-        elif rentobj.arrears > 0 and totcharges == 0 and rentobj.nextrentdate < date.today():
-            owing_stat = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
-                             to {3}. Further {1} fell due and payable {4} {5} on {6} in the sum of {7} but no \
-                             rent demand has yet been issued." \
-                .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#arrears_start_date#"],
-                        rent_strings["#arrears_end_date#"], rent_strings["#periodly#"],
-                        rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
-        elif rentobj.arrears == 0 and totcharges > 0 and rentobj.nextrentdate < date.today():
-            owing_stat = "The total amount owing to us on this property is {0} as more fully set out below. {1} fell due \
-                            and payable {4} {5} on {6} in the sum of {7} but no rent demand has yet been issued." \
-                .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#arrears_start_date#"],
-                        rent_strings["#arrears_end_date#"], rent_strings["#periodly#"],
-                        rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
-        elif rentobj.arrears == 0 and totcharges > 0:
-            owing_stat = "The total amount owing to us on this property is {0} as more fully set out below. \
-                            {1} will next be due and payable {4} {5} on {6} in the sum of {7}." \
-                .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#arrears_start_date#"],
-                        rent_strings["#arrears_end_date#"], rent_strings["#periodly#"],
-                        rent_strings["#advarr#"], rent_strings["#nextrentdate#"], rent_strings["#rentgale#"])
         else:
-            owing_stat = "The total amount owing to us on this property is {0} being {1} {2} owing for the period from {3} \
-                             to {4} plus other charges as set out below." \
-                .format(rent_strings["#totdue#"], rent_strings["#arrears#"], rent_strings["#rent_type#"],
-                        rent_strings["#arrears_start_date#"], rent_strings["#arrears_end_date#"])
+            rent_owing = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
+             to {3}." \
+                .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#arrears_start_date#"],
+                        rent_strings["#arrears_end_date#"])
+        if rentobj.totcharges and rentobj.totcharges > 0:
+            rent_owing = rent_owing.strip('.') + " plus other charges as set out below."
         # TODO reduced
     else:
-        owing_stat = "no owing statement because the status for this rent is either grouped payment, managed, \
+        rent_owing = "no rent owing because the status for this rent is either grouped payment, managed, \
                         sold off or terminated"
 
-    return owing_stat
+    return rent_owing
 
 
 def get_rent_stat(rentobj, rent_strings):
