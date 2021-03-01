@@ -2,73 +2,101 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<form method="POST" id="target">
-    <div class="table-fixed" style="max-height: 300px; overflow: auto; margin-bottom: 20px;">
-        <table class="table" id="restore_files">
-            <thead>
-            <tr>
-                <th>select</th>
-                <th>file name</th>
-                <th>size</th>
-                <th>datetime</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for backup_file in backup_files %}
-            <tr>
-                <td>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="select_file" value="{{ backup_file.name }}">
-                    </div>
-                </td>
-                <td><a href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}">{{ backup_file.name }}</a></td>
-                <td style="text-align: right;">{{ "{:,}".format(backup_file.size) }}</td>
-                <td>{{ backup_file.datetime }}</td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-9">
-            <ul>
-                <li><span class="label">To restore the database, click a radio button in the <strong>select</strong>
-                    column and then click the <strong>restore database</strong> button</span></li>
-                <li><span class="label">Alternatively, you can click on one the backup file names' links
-                    if you want to download a copy of the backup file instead</span>
-            </ul>
+
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3" style="margin-bottom: 20px;">
+            <a href="{{ url_for('util_bp.utilities') }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to utilities</a>
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-secondary"
-                    onclick="javascript:return on_restore_database_clicked();">restore database</button>
-        </div>
+   <div class="form-group row">
+       <div class="col-md-12">
+        {% if backup_files %}
+        <form method="POST" id="target">
+<!--            <div class="form-group row">-->
+<!--                <div class="col-md-12">-->
+<!--                        <span class="label">To restore the database, click a radio button in the <strong>select</strong>-->
+<!--                            column and then click the <strong>restore database</strong> button.</span>-->
+<!--                    <br/>-->
+<!--                    <span class="label">Alternatively, click on a backup file's name-->
+<!--                            if you want to download a copy of the backup file instead.</span>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="table-fixed">
+                <table class="table table-head" id="restore_files">
+                    <thead>
+                    <tr>
+                        <th style="width: 25.00%">name</th>
+                        <th style="width: 20.00%">size</th>
+                        <th style="width: 25.00%">datetime</th>
+                        <th style="width: 15.00%">download to computer</th>
+                        <th style="width: 15.00%">restore database</th>
+                    </tr>
+                    </thead>
+                </table>
+                <div style="max-height: 450px; overflow: auto; margin-bottom: 20px;">
+                    <table class="table table-base">
+                        <tbody>
+                        {% for backup_file in backup_files %}
+                        <tr style="width: 100%;">
+                            <td style="width: 25.00%">{{ backup_file.name }}</td>
+                            <td style="width: 20.00%">{{ "{:,}".format(backup_file.size) }}</td>
+                            <td style="width: 25.00%">{{ backup_file.datetime }}</td>
+                            <td style="width: 15.00%"><a
+                                    href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}"
+                                    class="btn btn-small btn-block btn-info button-icon download" role="button">download</a></td>
+                            <td style="width: 15.00%">
+                                <button type="submit" class="btn btn-block btn-danger btn-small button-icon arrow-right"
+                                onclick="javascript:return on_restore_database_clicked();" name="select_file"
+                                           value="{{ backup_file.name }}">go
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+<!--            <div class="form-group row">-->
+<!--                <div class="col-md-12">-->
+<!--                    <button type="submit" class="btn btn-block btn-danger"-->
+<!--                            onclick="javascript:return on_restore_database_clicked();">restore database-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div class="form-group row">
+                <div class="col-md-12">
+                    <textarea id="restore_database_output" class="form-control form-control-sm" rows="8"
+                              readonly="readonly"
+                              style="white-space:pre-wrap; font-family:monospace; display: none;"
+                    >{{ restore_database_output }}</textarea>
+                </div>
+            </div>
+        </form>
+        {% endif %}
+       </div>
     </div>
-    <div class="form-group row">
-        <div class="col-md-3">
-            <textarea id="restore_database_output" class="form-control form-control-sm" rows="12" readonly="readonly"
-                      style="width:800px; white-space:pre-wrap; font-family:monospace;"
-            >{{ restore_database_output }}</textarea>
+
+
+{% if not backup_files %}
+        <div class="boxed-center boxed-blue">
+            You have no previous backups
         </div>
-    </div>
-</form>
+{% endif %}
 <script type="text/javascript">
     <!-- Scroll to bottom of restore output -->
     var textarea = document.getElementById('restore_database_output');
     textarea.scrollTop = textarea.scrollHeight;
-
+    if (textarea.value) {
+        textarea.style.display = 'block';
+    }
     function on_restore_database_clicked()
     {
         var oForm = document.forms["target"];
-        if (!oForm.elements["select_file"].value)
-        {
-            window.alert("Select a backup to restore from by clicking its radio button in the \"select\" column");
-            return false;   // prevent the submit from proceeding
-        }
-        if (!window.confirm("This will overwrite your database. Are you SURE you want to proceed?"))
+        if (!window.confirm("This will overwrite your current database with the database you have selected. Are you sure you want to proceed?"))
             return false;   // prevent the submit from proceeding
         var textarea = document.getElementById('restore_database_output');
+        textarea.style.display = 'block';
         textarea.value = 'Starting restore...';
         return true;    // allow the submit to proceed
     }

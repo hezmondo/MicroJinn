@@ -1,4 +1,16 @@
 $(document).ready(function(){
+    if ($('#statusdet').text() == 'active status') {
+        $('#statusdet').removeClass("light-purple");
+        $('#statusdet').addClass("light-green");
+    }
+    else if ($('#statusdet').text() == 'x-ray status') {
+        $('#statusdet').removeClass("light-purple");
+        $('#statusdet').addClass("light-red");
+    }
+    if ($('#actypedet').text() == 'normal actype') {
+        $('#actypedet').removeClass("light-purple");
+        $('#actypedet').addClass("light-green");
+    }
     //copy text from readonly input on click
     $('.copyable-input').click(function(e) {
         if ( $(this).is('[readonly]') ) {

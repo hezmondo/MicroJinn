@@ -19,11 +19,15 @@ def get_rent_strings(rentobj, type='mail'):
     charges = get_rent_charge_details(rentobj.id) or Decimal(0)
     charges_list = "no charges"
     if charges and charges != 0:
-        charges_list = ""
+        # charges_list = ""
+        # for charge in charges:
+        #     charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
+        #                                                charge.chargedesc, dateToStr(charge.chargestartdate))
+        # charges_list = [x.strip() for x in charges_list.split(', ')]
+        charges_list = []
         for charge in charges:
-            charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
-                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
-        charges_list = [x.strip() for x in charges_list.split(', ')]
+            charges_list.append("{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
+                                                       charge.chargedesc, dateToStr(charge.chargestartdate)))
     for_sale = rentobj.salegradedet if hasattr(rentobj, 'salegradedet') else "not for sale"
     rentpa = rentobj.rentpa if rentobj.rentpa else Decimal(1)
     frequency = rentobj.freq_id if rentobj.freq_id else 1
