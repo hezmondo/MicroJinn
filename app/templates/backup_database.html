@@ -3,28 +3,49 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-primary" onclick="javascript:on_backup_database_clicked();"
-            >backup database</button>
+        <div class="form-group row">
+
+                <div class="col-md-9">
+                    <button type="submit" class="btn btn-block btn-primary"
+                            onclick="javascript:on_backup_database_clicked();"
+                    >backup database
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <a href="{{ url_for('util_bp.utilities') }}"
+                       class="btn btn-block btn-tog button-icon arrow-left" role="button">back to utilities</a>
+                </div>
         </div>
-    </div>
     <div class="form-group row">
-        <div class="col-md-3">
-            <textarea id="backup_database_output" class="form-control form-control-sm" rows="12"
-                      readonly="readonly" style="width:800px; white-space:pre-wrap; font-family:monospace;"
+<div class="col-md-12">
+            <textarea id="backup_database_output" class="form-control form-control-sm" rows="8"
+                      readonly="readonly"
+                      style="white-space:pre-wrap; font-family:monospace; display: none;"
             >{{ backup_database_output }}</textarea>
+            {% if file_name %}
+    </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-12">
+            <a href="{{ url_for('backup_bp.sqldumps', filename=file_name) }}" id="backup_download"
+               class="btn btn-block btn-info button-icon download"
+               role="button">download backup file {{ file_name }}</a>
+            {% endif %}
         </div>
     </div>
+
 </form>
 <script type="text/javascript">
     <!-- Scroll to bottom of backup output -->
     var textarea = document.getElementById('backup_database_output');
     textarea.scrollTop = textarea.scrollHeight;
-
+    if (textarea.value) {
+        textarea.style.display = 'block';
+    }
     function on_backup_database_clicked()
     {
         var textarea = document.getElementById('backup_database_output');
+        textarea.style.display = 'block';
         textarea.value = 'Starting backup...';
     }
 </script>

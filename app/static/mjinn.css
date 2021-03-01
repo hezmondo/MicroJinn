@@ -332,6 +332,12 @@
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
+.download::before
+{
+	content: "\f019";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+}
 .dropdown:hover>.dropdown-menu
 {
 	display: block;
@@ -432,6 +438,10 @@
 .light-purple
 {
 	background-color: #a84fa778;
+}
+.light-red
+{
+	background-color: #db7a7a;
 }
 .mail-ic::before
 {
@@ -543,6 +553,7 @@
 .table
 {
 	color: #3f4c59;
+	margin-bottom: 0;
 }
 .table .vertical-align
 {
@@ -569,11 +580,6 @@
 {
 	border-radius: 0px;
 	margin: 0px;
-}
-.table-body-alt
-{
-	border-radius: 0;
-	margin: 0;
 }
 .table-body-alt tbody tr:nth-child(even) td
 {

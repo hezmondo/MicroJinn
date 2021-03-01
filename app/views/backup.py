@@ -82,7 +82,7 @@ def backup_file_list():
 # @login_required
 def backup_database():
     backup_database_output = ""
-
+    file_name = ""
     if request.method == "POST":
         # options for the backup
         class Options:
@@ -150,6 +150,7 @@ def backup_database():
                 backup_database_output += completed_process.stderr
             exit_code = completed_process.returncode
             if exit_code == 0:
+                file_name = f"{db_name}-{now_str}.sql"
                 backup_database_output += "OS command executed successfully\n"
                 if Options.post_process_output:
                     # now do the postprocessing on the output
@@ -164,7 +165,7 @@ def backup_database():
                 if result_file:
                     os.unlink(result_file)
 
-    return render_template('backup_database.html', backup_database_output=backup_database_output)
+    return render_template('backup_database.html', file_name=file_name, backup_database_output=backup_database_output)
 
 
 @backup_bp.route('/restore_database', methods=['GET', 'POST'])
