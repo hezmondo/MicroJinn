@@ -93,7 +93,7 @@ def get_rent_mail(rent_id):
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
-                           Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
+                           Rent.price, Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
                            MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
                            TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeStatus.statusdet, TypeTenure.tenuredet) \
@@ -112,22 +112,16 @@ def post_rent(rent_id):
     rent.arrears = strToDec(request.form.get("arrears"))
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")
-    rent.deed_id = request.form.get("deedcode")
-    rent.email = request.form.get("email")
+    rent.deed_id = postvals_id["deedcode"]
     rent.freq_id = postvals_id["frequency"]
     rent.landlord_id = postvals_id["landlord"]
     rent.lastrentdate = request.form.get("lastrentdate")
-    rent.mailto_id = postvals_id["mailto"]
-    rent.note = request.form.get("note")
-    rent.prdelivery_id = postvals_id["prdelivery"]
     rent.price = strToDec(request.form.get("price")) or strToDec("99999")
-    rent.rentcode = request.form.get("rentcode")
+    # rent.rentcode = request.form.get("rentcode")
     rent.rentpa = strToDec(request.form.get("rentpa"))
-    rent.rentcode = request.form.get("rentcode")
     rent.salegrade_id = postvals_id["salegrade"]
     rent.source = request.form.get("source")
     rent.status_id = postvals_id["status"]
-    rent.tenantname = request.form.get("tenantname")
     rent.tenure_id = postvals_id["tenure"]
     db.session.add(rent)
     db.session.flush()
@@ -154,7 +148,10 @@ def update_roll_rent(rent_id, arrears):
 def update_tenant(rent_id):
     rent = Rent.query.get(rent_id)
     rent.tenantname = request.form.get("tenantname")
+    postvals_id = get_postvals_id()
+    rent.mailto_id = postvals_id["mailto"]
     rent.email = request.form.get("email")
+    rent.prdelivery_id = postvals_id["prdelivery"]
     rent.note = request.form.get("note")
     db.session.add(rent)
     db.session.commit()

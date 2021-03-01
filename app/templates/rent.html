@@ -12,9 +12,9 @@
                 <thead>
                 <tr>
                     <td style="width: 25%">rent {{ rent.rentcode }}</td>
-                    <td style="width: 25%">tenure: <span class="rounded-background light-purple">{{ rent.tenuredet }}</span></td>
-                    <td style="width: 25%">status: <span class="rounded-background light-green">{{ rent.statusdet }}</span></td>
-                    <td style="width: 25%">actype: <span class="rounded-background light-green">{{ rent.actypedet }}</span></td>
+                    <td style="width: 25%"><span class="rounded-background light-green">{{ rent.tenuredet }}</span></td>
+                    <td style="width: 25%"><span class="rounded-background light-purple">{{ rent.statusdet }} status</span></td>
+                    <td style="width: 25%"><span class="rounded-background light-green">{{ rent.actypedet }} actype</span></td>
                 </tr>
                 </thead>
             </table>
@@ -43,9 +43,9 @@
             <table class="table table-head table-narrow table-light-purple">
                 <thead>
                 <tr>
-                                        <td class="vertical-align" style="width: 94.5%">tenant details</td>
+                                        <td class="vertical-align" style="width: 94.5%">tenant and mail details</td>
                     <td class="vertical-align align-right" style="width: 5.50%">
-                        <a href="#" id="edit_tenant" data-toggle="tooltip" title="edit the tenant, email, mailaddr and notes"
+                        <a href="#" id="edit_tenant" data-toggle="tooltip" title="edit tenant and mail details"
                           class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                     </td>
                 </tr>
@@ -78,45 +78,71 @@
                     </tr>
                 </tbody>
             </table>
+            <table class="table table-body table-base">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
+                    {% if rent.agent_id %}
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                            agent_id=rent.agent_id, rent_id=rent.id) }}"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                        {% else %}
+                    <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
+                            agent_id=0, rent_id=rent.id) }}"
+                                                                                   class="btn btn-light btn-round button-icon round bolt"
+                                                                                   role="button"></a>
+                        {% endif %}
+                </tr>
+                </tbody>
+            </table>
         </div>
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
             <table class="table rounded-corners">
                 <tbody>
                 <tr>
-                    <td class="td-title copyable-text" style="width: 12.00%">rent stat</td>
+                    <td class="td-title copyable-text" style="width: 12.00%">rent</td>
                     <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_stat }}</td>
                 </tr>
                 <tr>
-                    <td class="td-title copyable-text" style="width: 12.00%">owing stat</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.owing_stat }}</td>
+                    <td class="td-title copyable-text" style="width: 12.00%">owing</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_owing }}</td>
                 </tr>
+            </table>
+            <table class="table table-body">
+                <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">charges</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.charges_stat }}</td>
+                    <td class="copyable-text" style="width: 83.00%">
+                    {% if rentstats.charges_list != "no charges" %}
+                        {% for item in rentstats.charges_list %}
+                            {{ item }}
+                            <br />
+                        {% endfor %}
+                    {% else %}
+                        no charges
+                    {% endif %}
+                    </td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="{{ url_for('charge_bp.charges', rent_id=rent.id) }}" data-toggle="tooltip"
+                            title="charges for this rent"
+                            class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-fixed table-rent" style="margin-bottom: 20px;">
-            <table class="table table-head table-grey">
+            <table class="table table-head">
                 <thead>
                 <tr>
-                    <td style="width: 25%">price</td>
-                    <td style="width: 25%">source</td>
-                    <td style="width: 25%">spare</td>
-                    <td style="width: 25%">deedtype</td>
+                    <td style="width: 25%">{{ rentstats.price_stat }}</td>
+                    <td style="width: 25%">source {{ rent.source }}</td>
+                    <td style="width: 25%">deed {{ rent.deedcode }}</td>
                 </tr>
                 </thead>
-            </table>
-            <table class="table table-body table-long table-base">
-                <tbody>
-                <tr>
-                    <td class="copyable-text" style="width: 25.00%">{{ rent.price }}</td>
-                    <td class="copyable-text" style="width: 25.00%">{{ rent.source }}</td>
-                    <td class="copyable-text" style="width: 25.00%">{{ rent.source }}</td>
-                    <td class="copyable-text" style="width: 25.00%">{{ rent.deedcode }}</td>
-                </tr>
-                </tbody>
             </table>
         </div>
     </div>
@@ -205,30 +231,6 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <div class="col-md-12">
-                                    <label for="tenant">tenant name:</label>
-                                    <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <label for="email">email:</label>
-                                    <input type="text" class="form-control" name="email" value="{{ rent.email }}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-12">
-                                    <label for="note">notes:</label>
-                                    <input type="text" class="form-control" name="note" value="{{ rent.note }}">
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-md-4">
-                                    <label for="mailto">mail to:</label>
-                                    {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
-                                </div>
-                            </div>
-                            <div class="form-group row">
                                 <div class="col-md-2">
                                     <label for="rentpa">rent pa:</label>
                                     <input type="text" class="form-control" name="rentpa" value="{{ rent.rentpa }}">
@@ -265,11 +267,6 @@
                                     <label for="datecode">date code:</label>
                                     <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="prdelivery">pr delivery:</label>
-                                    {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
-                                    item_selected=rent.prdeliverydet) }}
-                                </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-2">
@@ -281,8 +278,8 @@
                                     <input type="text" class="form-control" name="source" value="{{ rent.source }}">
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="deedtype">deed type:</label>
-                                    {{ widgets.combobox(name="deedtype", items=combodict.deedcodes, item_selected=rent.deedcode) }}
+                                    <label for="deedcode">deed code:</label>
+                                    {{ widgets.combobox(name="deedcode", items=combodict.deedcodes, item_selected=rent.deedcode) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="salegrade">sale grade:</label>
@@ -345,19 +342,32 @@
                 <form method="POST" id="rent_tenant">
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="tenant">edit tenant name</label>
+                            <label for="tenantname">edit tenant name</label>
                             <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="tenant">edit email addresses - separate with semicolon</label>
+                            <label for="mailto">mail to:</label>
+                            {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <label for="email">edit email addresses - separate with semicolon</label>
                             <input type="text" class="form-control" name="email" value="{{ rent.email }}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="tenant">edit notes</label>
+                                    <label for="prdelivery">pr delivery:</label>
+                                    {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
+                                    item_selected=rent.prdeliverydet) }}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <label for="note">edit notes</label>
                             <input type="text" class="form-control" name="note" value="{{ rent.note }}">
                         </div>
                     </div>

@@ -29,10 +29,10 @@ def list_variables():
     lease_variables = ['#unexpired#', '#rent_code#', '#relativity#', '#tot_val#', '#unimpvalue#',
                        '#impvalue#', '#leq200R#', '#leq200P#', '#gr_new#']
     mail_variables = ['#acc_name#', '#acc_num#', '#advarr#', '#arrears#', '#arrears_start_date#',
-                      '#arrears_end_date#', '#bank_name#', '#hashcode#', '#landlord_name#',
+                      '#arrears_end_date#', '#bank_name#', '#charges_stat#', '#hashcode#', '#landlord_name#',
                       '#lastrentdate#', '#manageraddr#', '#manageraddr2#', '#managername#',
-                      '#nextrentdate#', 'owing_stat', '#paidtodate#', '#payamount#', '#paydate#', '#payer#',
-                      '#paytypedet#', '#periodly#', '#propaddr#', '#rentcode#', '#rentgale#',
+                      '#nextrentdate#', '#rent_owing#', '#paidtodate#', '#payamount#', '#paydate#', '#payer#',
+                      '#paytypedet#', '#periodly#', '#propaddr#', '#rentcode#', '#rentgale#', '#rent_owing#',
                       '#rentpa#', '#rent_type#', '#sort_code#', '#tenantname#', '#today#',
                       '#totcharges#', '#totdue#']
     return {'lease_variables': lease_variables,
