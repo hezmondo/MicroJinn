@@ -97,7 +97,7 @@ def get_postvals_id():
         "actype": "",
         "advarr": "",
         "agent": "",
-        "deedtype": "",
+        "deedcode": "",
         "frequency": "",
         "landlord": "",
         "mailto": "",
@@ -115,7 +115,7 @@ def get_postvals_id():
                 actval = TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == actval).one()[0]
             elif key == "agent":
                 actval = Agent.query.with_entities(Agent.id).filter(Agent.detail == actval).one()[0]
-            elif key == "deedtype":
+            elif key == "deedcode":
                 actval = TypeDeed.query.with_entities(TypeDeed.id).filter(TypeDeed.deedcode == actval).one()[0]
             elif key == "frequency":
                 actval = TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == actval).one()[0]

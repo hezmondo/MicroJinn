@@ -1,11 +1,13 @@
+import json
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
 from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
-from app.models import Agent, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
-    TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
+from app.models import Agent, Charge, Jstore, Landlord, Manager, ManagerExt, MoneyAcc, Property, \
+    Rent, RentExt, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, TypePrDelivery, TypeSaleGrade, \
+    TypeStatus, TypeTenure
 
 
 def create_new_rent():
@@ -72,6 +74,15 @@ def get_rent_addrs(rent_id):
     return rent_addrs
 
 
+def get_rent_ex(id):
+    rent_ex = RentExt.query \
+        .join(ManagerExt) \
+        .with_entities(RentExt.rentcode, RentExt.propaddr, RentExt.tenantname, RentExt.owner, RentExt.rentpa,
+                       RentExt.arrears, RentExt.lastrentdate, RentExt.source, RentExt.status,
+                       ManagerExt.codename, ManagerExt.detail, RentExt.agentdetail) \
+        .filter(RentExt.id == id).one_or_none()
+    return rent_ex
+
 def get_rent_mail(rent_id):
     rent_mail = \
         Rent.query \
@@ -93,7 +104,7 @@ def get_rent_mail(rent_id):
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            func.mjinn.last_arrears_level(Rent.id).label('lastarrearslevel'),
-                           Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
+                           Rent.price, Rent.rentpa, Rent.tenantname, Rent.freq_id, Landlord.name,
                            Manager.managername, Manager.manageraddr, Manager.manageraddr2,
                            MoneyAcc.bank_name, MoneyAcc.acc_name, MoneyAcc.acc_num, MoneyAcc.sort_code,
                            TypeAdvArr.advarrdet, TypeFreq.freqdet, TypeStatus.statusdet, TypeTenure.tenuredet) \
@@ -101,6 +112,81 @@ def get_rent_mail(rent_id):
             .one_or_none()
 
     return rent_mail
+
+
+def get_rent_s_data(qfilter, action, runsize):
+    if action == "basic":
+        # simple search of views rents submitted from home page
+        rent_s = \
+            Property.query \
+                .join(Rent) \
+                .outerjoin(Agent) \
+                .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
+                               # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                               func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                               Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
+                .filter(*qfilter).limit(runsize).all()
+
+    elif action == "external":
+        # simple search of external rents submitted from home page - not yet completed
+        rent_s = \
+            RentExt.query \
+            .join(ManagerExt) \
+            .with_entities(RentExt.id, RentExt.rentcode, RentExt.propaddr, RentExt.tenantname, RentExt.owner,
+                           RentExt.rentpa, RentExt.arrears, RentExt.lastrentdate, RentExt.source, RentExt.status,
+                           ManagerExt.codename, RentExt.agentdetail) \
+            .filter(*qfilter).order_by(RentExt.rentcode).limit(runsize).all()
+
+    else:
+        # advanced search submitted from filter page
+        rent_s = \
+                Property.query \
+                    .join(Rent) \
+                    .join(Landlord) \
+                    .outerjoin(Agent) \
+                    .outerjoin(Charge) \
+                    .join(TypeAcType) \
+                    .join(TypePrDelivery) \
+                    .join(TypeStatus) \
+                    .join(TypeSaleGrade) \
+                    .join(TypeTenure) \
+                    .with_entities(Rent.id, TypeAcType.actypedet, Agent.detail, Rent.arrears, Rent.lastrentdate,
+                                   # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+                                   func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                                   func.mjinn.tot_charges(Rent.id).label('totcharges'),
+                                   Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                                   TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
+                                   TypeTenure.tenuredet) \
+                    .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
+
+    return rent_s
+
+
+def post_rent__filter(filterdict):
+    # save this filter dictionary in jstore
+    print("filterdict during save")
+    print(filterdict)
+    jname = request.form.get("filtername")
+    jtype = request.form.get("filtertype")
+    if jtype == "payrequest":
+        jtype = 1
+    elif jtype == "rentprop":
+        jtype = 2
+    else:
+        jtype = 3
+    j_id = \
+        Jstore.query.with_entities(Jstore.id).filter \
+            (Jstore.code == jname).one_or_none()
+    if j_id:
+        j_id = j_id[0]
+        jstore = Jstore.query.get(j_id)
+    else:
+        jstore = Jstore()
+    jstore.type = jtype
+    jstore.code = jname
+    jstore.content = json.dumps(filterdict)
+    db.session.add(jstore)
+    db.session.commit()
 
 
 def post_rent(rent_id):
@@ -112,22 +198,16 @@ def post_rent(rent_id):
     rent.arrears = strToDec(request.form.get("arrears"))
     # we may write code later to generate datecode from lastrentdate!:
     rent.datecode = request.form.get("datecode")
-    rent.deed_id = request.form.get("deedcode")
-    rent.email = request.form.get("email")
+    rent.deed_id = postvals_id["deedcode"]
     rent.freq_id = postvals_id["frequency"]
     rent.landlord_id = postvals_id["landlord"]
     rent.lastrentdate = request.form.get("lastrentdate")
-    rent.mailto_id = postvals_id["mailto"]
-    rent.note = request.form.get("note")
-    rent.prdelivery_id = postvals_id["prdelivery"]
     rent.price = strToDec(request.form.get("price")) or strToDec("99999")
-    rent.rentcode = request.form.get("rentcode")
+    # rent.rentcode = request.form.get("rentcode")
     rent.rentpa = strToDec(request.form.get("rentpa"))
-    rent.rentcode = request.form.get("rentcode")
     rent.salegrade_id = postvals_id["salegrade"]
     rent.source = request.form.get("source")
     rent.status_id = postvals_id["status"]
-    rent.tenantname = request.form.get("tenantname")
     rent.tenure_id = postvals_id["tenure"]
     db.session.add(rent)
     db.session.flush()
@@ -154,7 +234,10 @@ def update_roll_rent(rent_id, arrears):
 def update_tenant(rent_id):
     rent = Rent.query.get(rent_id)
     rent.tenantname = request.form.get("tenantname")
+    postvals_id = get_postvals_id()
+    rent.mailto_id = postvals_id["mailto"]
     rent.email = request.form.get("email")
+    rent.prdelivery_id = postvals_id["prdelivery"]
     rent.note = request.form.get("note")
     db.session.add(rent)
     db.session.commit()
