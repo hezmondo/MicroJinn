@@ -43,9 +43,9 @@ def get_rent(rent_id):
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
                            Agent.id.label("agent_id"), Agent.detail, Landlord.name, Manager.managername,
                            Manager.manageraddr,
-                           TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeFreq.freqdet,
-                           TypeMailTo.mailtodet, TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet,
-                           TypeStatus.statusdet, TypeTenure.tenuredet) \
+                           TypeAcType.actypedet, TypeAdvArr.advarrdet, TypeDeed.deedcode, TypeDeed.info,
+                           TypeFreq.freqdet, TypeMailTo.mailtodet, TypePrDelivery.prdeliverydet,
+                           TypeSaleGrade.salegradedet, TypeStatus.statusdet, TypeTenure.tenuredet) \
             .filter(Rent.id == rent_id) \
             .one_or_none()
     if rent_ is None:
