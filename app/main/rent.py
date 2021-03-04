@@ -35,17 +35,15 @@ def get_rent_strings(rentobj, type='mail'):
     arrears_end_date = dateToStr(nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate)
     charges = get_rent_charge_details(rentobj.id) or Decimal(0)
+    # TODO: charges_string needs cleaning adds ', ' onto final charge
     charges_string = "no charges"
-    charges_list = ""
+    charges_list = []
     if charges and charges != 0:
         for charge in charges:
-            charges_string += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
+            charge_string = "{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
                                                        charge.chargedesc, dateToStr(charge.chargestartdate))
-        charges_list = []
-        for charge in charges:
-            charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
-                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
-        charges_list = [x.strip() for x in charges_list.split(', ')]
+            charges_string += charge_string + ", "
+            charges_list.append(charge_string)
     for_sale = rentobj.salegradedet if hasattr(rentobj, 'salegradedet') else "not for sale"
     rentpa = rentobj.rentpa if rentobj.rentpa else Decimal(1)
     rent_gale = get_rent_gale(rentobj.datecode, rentobj.freq_id, rentobj.nextrentdate, rentpa)
