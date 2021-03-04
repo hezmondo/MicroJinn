@@ -11,6 +11,8 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id, charge_details):
                         chargetotal=recovery_charge_amount, chargedetail=charge_details,
                         chargebalance=recovery_charge_amount, rent_id=rent_id)
     db.session.add(new_charge)
+    db.session.flush()
+    return new_charge.id
 
 
 def get_charge(charge_id):
@@ -63,6 +65,7 @@ def get_charge_type(chargetype_id):
     return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
 
 
+# TODO: Can refactor this into get_charges()
 def get_rent_charge_details(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
@@ -70,6 +73,10 @@ def get_rent_charge_details(rent_id):
                                                                      Charge.chargedetail, Charge.chargebalance) \
         .filter(*qfilter).all()
     return charges
+
+
+def get_total_charges(rent_id):
+    return Charge.query.with_entities(Charge.chargetotal).filter_by(rent_id=rent_id).all()
 
 
 def post_charge(charge_id):

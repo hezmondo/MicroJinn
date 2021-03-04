@@ -4,7 +4,7 @@ from sqlalchemy import func
 from app.dao.common import get_postvals_id, pop_idlist_recent
 from app.dao.functions import strToDec
 
-from app.models import Agent, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
+from app.models import Agent, Dates, Landlord, Manager, MoneyAcc, Rent, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, \
     TypeMailTo, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
@@ -12,6 +12,10 @@ def create_new_rent():
     # create new rent and property function not yet built, so return id for dummy rent:
 
     return 23
+
+
+def get_last_date_from_datecode(datecode):
+    return Dates.query.filter_by(code=datecode).order_by(Dates.id.desc()).first()
 
 
 def get_rent(rent_id):
@@ -131,9 +135,22 @@ def post_rent(rent_id):
     return rent_id
 
 
-def update_roll_rent(rent_id, arrears):
+# def update_roll_rent(rent_id, arrears):
+#     rent = Rent.query.get(rent_id)
+#     last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
+#     rent.lastrentdate = last_rent_date
+#     rent.arrears = arrears
+
+
+def update_roll_rent(rent_id, last_rent_date, arrears):
     rent = Rent.query.get(rent_id)
-    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
+    rent.lastrentdate = last_rent_date
+    rent.arrears = arrears
+
+
+def update_rollback_rent(rent_id, arrears):
+    rent = Rent.query.get(rent_id)
+    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, -1)).scalar()
     rent.lastrentdate = last_rent_date
     rent.arrears = arrears
 

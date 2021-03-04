@@ -5,7 +5,8 @@ from app.dao.filter import get_filters
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
 from app.dao.rent import get_rent_addrs
-from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, write_payrequest, write_payrequest_email
+from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, \
+    undo_pr, write_payrequest, write_payrequest_email
 
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -57,9 +58,11 @@ def pr_file(pr_id):
 
 
 @pr_bp.route('/pr_history/<int:rent_id>', methods=['GET', 'POST'])
+@login_required
 def pr_history(rent_id):
+    message = request.args.get('message', type=str)
     pr_history = get_pr_history(rent_id)
-    return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history)
+    return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history, message=message)
 
 
 # @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
@@ -78,6 +81,7 @@ def pr_history(rent_id):
 
 
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
+@login_required
 def pr_save_send():
     method = request.args.get('method', type=str)
     if request.method == 'POST':
@@ -94,3 +98,11 @@ def pr_save_send():
 def pr_start():
     filters = get_filters(1)
     return render_template('pr_start.html', filters=filters)
+
+
+@pr_bp.route('/pr_undo/<int:pr_id>', methods=['GET', 'POST'])
+@login_required
+def pr_undo(pr_id):
+    if request.method == 'POST':
+        message, rent_id = undo_pr(pr_id)
+        return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))

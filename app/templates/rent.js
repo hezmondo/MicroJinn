@@ -31,13 +31,6 @@ $(document).ready(function(){
         $('#copy_modal').modal();
         setTimeout(function() {$('#copy_modal').modal('hide');}, 1000);
     });
-    $('#edit_tenant').click(function(e) {
-        $('#tenant_modal').modal();
-    });
-    //show more details and scroll to bottom
-    $("#open_edit_rent").click(function(){
-        $('#edit_modal').modal();
-        });
     $('#copy_modal').on('show.bs.modal', function (e) {
         $('body').addClass("modal-no-backdrop");
     }).on('hide.bs.modal', function (e) {

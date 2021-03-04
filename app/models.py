@@ -40,6 +40,8 @@ class Charge(db.Model):
     chargebalance = db.Column(db.Numeric(8, 2))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
+    pr_charge = db.relationship('PrCharge', backref='charge', lazy='dynamic')
+
 
 class ChargeType(db.Model):
     __tablename__ = 'chargetype'
@@ -399,6 +401,14 @@ class PrBatch(db.Model):
     payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
 
 
+class PrCharge(db.Model):
+    __tablename__ = 'pr_charge'
+
+    id = db.Column(db.Integer, db.ForeignKey('pr_history.id'), primary_key=True)
+    charge_id = db.Column(db.Integer, db.ForeignKey('charge.id'))
+    case_created = db.Column(db.Boolean)
+
+
 class PrFilter(db.Model):
     __tablename__ = 'pr_filter'
 
@@ -422,6 +432,8 @@ class PrHistory(db.Model):
     arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
     delivered = db.Column(db.Boolean)
+
+    pr_charge_pr_history = db.relationship('PrCharge', backref='pr_history', lazy='dynamic')
 
 
 class Property(db.Model):
@@ -739,8 +751,6 @@ class User(UserMixin, db.Model):
 
 @login.user_loader
 def load_user(id):
-    # TODO: Added attribute most_recent_rent to current_user, but duplication of get_idlist_recent()
-    #  (cant import - circular dependency with common.py)
     current_user = User.query.get(int(id))
     try:
         id_list = json.loads(getattr(current_user, "recent_rents"))
