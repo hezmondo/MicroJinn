@@ -43,9 +43,8 @@ def get_rent_strings(rentobj, type='mail'):
                                                        charge.chargedesc, dateToStr(charge.chargestartdate))
         charges_list = []
         for charge in charges:
-            charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
-                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
-        charges_list = [x.strip() for x in charges_list.split(', ')]
+            charges_list.append("{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
+                                                       charge.chargedesc, dateToStr(charge.chargestartdate)))
     for_sale = rentobj.salegradedet if hasattr(rentobj, 'salegradedet') else "not for sale"
     rentpa = rentobj.rentpa if rentobj.rentpa else Decimal(1)
     rent_gale = get_rent_gale(rentobj.datecode, rentobj.freq_id, rentobj.nextrentdate, rentpa)
