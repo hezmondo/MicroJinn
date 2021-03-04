@@ -35,9 +35,13 @@ def get_rent_strings(rentobj, type='mail'):
     arrears_end_date = dateToStr(nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate)
     charges = get_rent_charge_details(rentobj.id) or Decimal(0)
-    charges_list = "no charges"
+    charges_string = "no charges"
+    charges_list = ""
     if charges and charges != 0:
-        charges_list = ""
+        for charge in charges:
+            charges_string += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
+                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
+        charges_list = []
         for charge in charges:
             charges_list += "{} {} added on {}, ".format(moneyToStr(charge.chargetotal, pound=True),
                                                        charge.chargedesc, dateToStr(charge.chargestartdate))
@@ -76,24 +80,23 @@ def get_rent_strings(rentobj, type='mail'):
     price_stat = "for sale at {}".format(moneyToStr(price_quote, pound=True)) \
         if for_sale == 'for sale' else "not for sale"
     rent_strings_2 = {'#acc_name#': rentobj.acc_name if hasattr(rentobj, 'acc_name') else "no acc_name",
-                      '#acc_num#': rentobj.acc_num if hasattr(rentobj, 'acc_num') else "no acc_num",
-                      '#bank_name#': rentobj.bank_name if hasattr(rentobj, 'bank_name') else "no bank_name",
-                      '#charges_list#': charges_list,
-                      '#hashcode#': hashCode(rentobj.rentcode) if hasattr(rentobj, 'rentcode') else "no hashcode",
-                      '#lastrentdate#': dateToStr(rentobj.lastrentdate),
-                      '#manageraddr2#': rentobj.manageraddr2 if hasattr(rentobj, 'manageraddr2') else "no manageraddr2",
-                      '#managername#': rentobj.managername if rentobj.managername else "no manager name",
-                      '#propaddr#': rentobj.propaddr if rentobj.propaddr else "no property address",
-                      '#rentcode#': rentobj.rentcode if rentobj.rentcode else "no rentcode",
-                      '#rent_stat#': rent_stat,
-                      '#sort_code#': rentobj.sort_code if hasattr(rentobj, 'sort_code') else "no sort_code",
-                      '#tenantname#': rentobj.tenantname if rentobj.tenantname else "no tenant name",
-                      '#today#': dateToStr(date.today()),
-                      }
-    rent_strings_3 = {'#charges_list#': charges_list,
-                      '#rent_owing#': rent_owing,
-                      '#rent_stat#': rent_stat
-                      }
+                    '#acc_num#': rentobj.acc_num if hasattr(rentobj, 'acc_num') else "no acc_num",
+                    '#bank_name#': rentobj.bank_name if hasattr(rentobj, 'bank_name') else "no bank_name",
+                    '#charges_string#': charges_string,
+                    '#hashcode#': hashCode(rentobj.rentcode) if hasattr(rentobj, 'rentcode') else "no hashcode",
+                    '#lastrentdate#': dateToStr(rentobj.lastrentdate),
+                    '#manageraddr2#': rentobj.manageraddr2 if hasattr(rentobj, 'manageraddr2') else "no manageraddr2",
+                    '#managername#': rentobj.managername if rentobj.managername else "no manager name",
+                    '#propaddr#': rentobj.propaddr if rentobj.propaddr else "no property address",
+                    '#rentcode#': rentobj.rentcode if rentobj.rentcode else "no rentcode",
+                    '#rent_stat#': rent_stat,
+                    '#sort_code#': rentobj.sort_code if hasattr(rentobj, 'sort_code') else "no sort_code",
+                    '#tenantname#': rentobj.tenantname if rentobj.tenantname else "no tenant name",
+                    '#today#': dateToStr(date.today()),
+                    }
+    rent_strings_3 = {'#rent_owing#': rent_owing,
+                    '#rent_stat#': rent_stat
+                    }
 
     rent_strings_rent = {'charges_list': charges_list,
                          'price_stat': price_stat,

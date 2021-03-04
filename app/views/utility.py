@@ -5,7 +5,7 @@ from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.filter import get_rent_s
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
-from app.dao.rent_ex import get_rent_ex
+from app.dao.rent import get_rent_ex
 from app.dao.utility import delete_record
 
 util_bp = Blueprint('util_bp', __name__)

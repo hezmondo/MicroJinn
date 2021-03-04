@@ -602,15 +602,7 @@ class TypeDeed(db.Model):
     deedcode = db.Column(db.String(15))
     nfee = db.Column(db.Numeric(8, 2))
     nfeeindeed = db.Column(db.String(45))
-    interest = db.Column(db.Numeric(8, 2))
-    dcov = db.Column(db.Boolean, default=False)
-    licencetoassign = db.Column(db.Boolean, default=False)
-    insapprove = db.Column(db.Boolean, default=False)
-    insproduce = db.Column(db.Boolean, default=False)
-    alterations = db.Column(db.Boolean, default=False)
-    dwellingonly = db.Column(db.Boolean, default=False)
-    sublet = db.Column(db.Boolean, default=False)
-    info = db.Column(db.String(180))
+    info = db.Column(db.String(90))
 
     rent_typedeed = db.relationship('Rent', backref='typedeed', lazy='dynamic')
 
