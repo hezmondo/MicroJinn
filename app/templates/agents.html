@@ -43,11 +43,11 @@
         <tbody>
         {% for item in agents %}
         <tr id="{{ item.id }}">
-            <td style="width: 40.00%">{{ item.detail }}</td>
+            <td style="width: 48.00%">{{ item.detail }}</td>
             <td style="width: 25.00%">{{ item.email }}</td>
             <td style="width: 25.00%"> {{ item.note }}</td>
-            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.agent', agent_id=item.id,
-            rent_id=0) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
+            <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('util_bp.agent', agent_id=item.id,
+            rent_id=0) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

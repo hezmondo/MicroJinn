@@ -35,24 +35,24 @@
             <td style="width: 10.00%">{{ item.id }}</td>
             <td style="width: 30.00%"> {{ item.acc_desc }}</td>
             <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_acc',
-            acc_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view account</a></td>
+            acc_id=item.id) }}" class="btn btn-light btn-small button-icon bolt" role="button">view account</a></td>
             <td style="width: 15.00%"> {{ item.cbalance }}</td>
             <td style="width: 15.00%"> {{ item.ubalance }}</td>
             <td style="width: 15.00%"><a href="{{ url_for('money_bp.money_items',
-            acc_id=item.id) }}" class="btn btn-info btn-small button-icon eye" role="button">view transactions</a></td>
+            acc_id=item.id) }}" class="btn btn-light btn-small button-icon bolt" role="button">view transactions</a></td>
         </tr>
         {% endfor %}
-        <tr>
-        </tr>
+        </tbody>
+    </table>
+    <table class="table table-base">
+        <thead>
         <tr>
             <td style="width: 10%"></td>
-            <td style="width: 30.00%">total for all accounts</td>
-            <td style="width: 15.00%"></td>
+            <td style="width: 45.00%">total for all accounts</td>
             <td style="width: 15.00%"> {{ accsums.cleared }}</td>
-            <td style="width: 15.00%"> {{ accsums.uncleared }}</td>
-            <td style="width: 15.00%"></td>
+            <td style="width: 30.00%"> {{ accsums.uncleared }}</td>
         </tr>
-        </tbody>
+        </thead>
     </table>
 </div>
 {% endblock %}

@@ -56,6 +56,13 @@
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
+.bolt-light::before
+{
+	color: white;
+	content: "\f0e7";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+}
 .boxed
 {
 	background: #d9e4e8;
@@ -370,12 +377,6 @@
 .exclamation::before
 {
 	content: "\f06a";
-	font-family: "Font Awesome 5 Free";
-	font-weight: 900;
-}
-.eye::before
-{
-	content: "\f1e5";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }

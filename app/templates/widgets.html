@@ -10,6 +10,7 @@
 </select>
 {%- endmacro %}
 
+
 <!-- combobox_id(): implement a single choice select via <select> element passing id (for js getElementbyID)-->
 {% macro combobox_id(idc, name, items, item_selected=None) -%}
 <select class="form-control" id="{{ idc }}" name="{{ name }}">
@@ -21,7 +22,8 @@
 {%- endmacro %}
 
 
-<!-- macro action modal - produces a modal with a message, optional title and optional two buttons ('cancel' and an action button which we can define)
+<!-- macro action modal - produces a modal with a message, optional title and optional
+two buttons ('cancel' and an action button which we can define)
 if we do not define a button, the default close button appears-->
 {% macro modal_action(body, id, btn_class="", btn_text="", btn_url="", title="") -%}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
@@ -74,7 +76,6 @@ if we do not define a button, the default close button appears-->
     $(document).ready(function(){
     $("#modal_message_on_load").modal('show');
 });
-
 </script>
 {%- endmacro %}
 
@@ -89,6 +90,7 @@ if we do not define a button, the default close button appears-->
 </select>
 {%- endmacro %}
 
+
 <!-- multiselect_as_checkboxes(): implement a multiple choice select via <input type="checkbox"> elements -->
 {% macro multiselect_as_checkboxes(name, items, items_selected=None) -%}
 <div class="form-control" style="height: auto;">
@@ -101,12 +103,14 @@ if we do not define a button, the default close button appears-->
 </div>
 {%- endmacro %}
 
+
 <!-- multiselect(): implement a multiple choice select via preferred method -->
 {% macro multiselect(name, items, items_selected=None) -%}
 <!-- comment/uncomment whichever preferred -->
 <!--{{ multiselect_as_select(name, items, items_selected) }}-->
 {{ multiselect_as_checkboxes(name, items, items_selected) }}
 {%- endmacro %}
+
 
 <!-- add a line break to the html where the text contains \n -->
 {% macro linebreaks_for_string( the_string ) -%}

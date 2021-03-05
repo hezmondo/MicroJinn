@@ -47,7 +47,7 @@
                 <td style="width: 10.00%"> {{ pr_history[0].total_due }}</td>
                 <td style="width: 10.00%" class="vertical-align"><a
                         href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id) }}"
-                        class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
+                        class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                 <td style="width: 10.00%" class="vertical-align">
                     <a data-toggle="modal" data-target="#modal_undo_pr"
                        class="btn btn-danger btn-small button-icon trash" role="button">undo
@@ -67,7 +67,7 @@
                 <td style="width: 10.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none' }}</td>
                 <td style="width: 10.00%"> {{ item.total_due }}</td>
                 <td style="width: 20.00%" class="vertical-align"><a href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
-                                                                    class="btn btn-primary btn-small button-icon eye"
+                                                                    class="btn btn-primary btn-small button-icon bolt"
                                                                     role="button">view</a></td>
             </tr>
             {% endif %}
