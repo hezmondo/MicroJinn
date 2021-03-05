@@ -1,7 +1,8 @@
+from app import db
 from flask import request
 from app.dao.functions import commit_to_database
 from app.models import Agent, Case, Charge, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, Landlord, Loan, \
-    MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, User
+    MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, TypeDeed
 
 
 def delete_record(item_id, item):
@@ -76,3 +77,35 @@ def delete_record_basic(item_id, item):
         PrCharge.query.filter_by(id=item_id).delete()
     elif item == "pr_file":
         PrHistory.query.filter_by(id=item_id).delete()
+
+
+def get_deeds():
+    deeds = TypeDeed.query.all()
+
+    return deeds
+
+
+def get_deed(deed_id):
+    deed = TypeDeed.query.get(deed_id)
+
+    return deed
+
+
+def post_deed(deed_id, rent_id):
+    if deed_id == 0:
+        deed = TypeDeed()
+    else:
+        deed = TypeDeed.query.get(deed_id)
+    deed.deedcode = request.form.get("deedcode")
+    deed.nfee = request.form.get("nfee")
+    deed.nfeeindeed = request.form.get("nfeeindeed")
+    deed.info = request.form.get("info")
+    db.session.add(deed)
+    db.session.flush()
+    deed_id = deed.id
+    if rent_id != 0:
+        rent = Rent.query.get(rent_id)
+        rent.deed_id = deed_id
+    commit_to_database()
+
+    return deed_id

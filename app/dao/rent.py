@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
@@ -41,6 +42,7 @@ def get_rent(rent_id):
                            # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
                            func.mjinn.mail_addr(Rent.id).label('mailaddr'),
                            func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                           func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
                            Rent.note, Rent.price, Rent.rentpa, Rent.source, Rent.tenantname, Rent.freq_id,
@@ -205,8 +207,8 @@ def post_rent(rent_id):
     rent.freq_id = postvals_id["frequency"]
     rent.landlord_id = postvals_id["landlord"]
     rent.lastrentdate = request.form.get("lastrentdate")
-    rent.price = strToDec(request.form.get("price")) or strToDec("99999")
-    # rent.rentcode = request.form.get("rentcode")
+    price = request.form.get("price")
+    rent.price = price if (price and price != 'None') else Decimal(99999)
     rent.rentpa = strToDec(request.form.get("rentpa"))
     rent.salegrade_id = postvals_id["salegrade"]
     rent.source = request.form.get("source")

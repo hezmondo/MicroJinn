@@ -6,7 +6,7 @@ from app.dao.filter import get_rent_s
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
 from app.dao.rent import get_rent_ex
-from app.dao.utility import delete_record
+from app.dao.utility import delete_record, get_deed, get_deeds, post_deed
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -38,12 +38,39 @@ def agent_rents(agent_id):
 
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
+@login_required
 def agents():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     agents = get_agents()
 
     return render_template('agents.html', agents=agents, rent_id=rent_id, rentcode=rentcode)
+
+
+@util_bp.route('/deed/<int:deed_id>', methods=["GET", "POST"])
+@login_required
+def deed(deed_id):
+    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
+    if request.method == "POST":
+        deed_id = post_deed(deed_id, rent_id)
+        return redirect(url_for('util_bp.deed', deed_id=deed_id))
+    if deed_id == 0:
+        deed = {"id": 0, "deedcode": "", "nfee": 75.00, "nfeeindeed": "£10", "info": ""}
+    else:
+        deed = get_deed(deed_id)
+
+    return render_template('deed.html', deed=deed, rent_id=rent_id, rentcode=rentcode)
+
+
+@util_bp.route('/deeds', methods=['GET', 'POST'])
+@login_required
+def deeds():
+    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "ABC1", type=str)
+    deeds = get_deeds()
+
+    return render_template('deeds.html', deeds=deeds, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/delete_item/<int:item_id>/<item>')
@@ -66,6 +93,7 @@ def email_acc(email_acc_id):
 
 
 @util_bp.route('/email_accs', methods=['GET'])
+@login_required
 def email_accs():
     emailaccs = get_email_accs()
 
@@ -74,6 +102,7 @@ def email_accs():
 
 @util_bp.route('/', methods=['GET', 'POST'])
 @util_bp.route('/home', methods=['GET', 'POST'])
+@login_required
 def home():
     filterdict, rent_s = get_rent_s("basic", 0)
 
@@ -114,7 +143,7 @@ def property(property_id):
 
 
 @util_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
-# @login_required
+@login_required
 def properties(rent_id):
     properties, proptypes = get_properties(rent_id)
     print(rent_id)
@@ -131,6 +160,7 @@ def rent_ex(rent_ex_id):
 
 
 @util_bp.route('/rents_ex', methods=['GET', 'POST'])
+@login_required
 def rents_ex():
     filterdict, rent_s = get_rent_s("external", 0)
 

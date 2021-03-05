@@ -29,11 +29,16 @@ def get_rent_strings(rentobj, type='mail'):
     # first we test and manipulate certain items from rentobj
     paidtodate = rentobj.paidtodate if hasattr(rentobj, 'paidtodate') else datetime.date(1991, 1, 1)
     lastrentdate = rentobj.lastrentdate if hasattr(rentobj, 'lastrentdate') else datetime.date(1991, 1, 1)
-    nextrentdate = rentobj.nextrentdate if hasattr(rentobj, 'lastrentdate') else datetime.date(1991, 1, 1)
+    nextrentdate = rentobj.nextrentdate if hasattr(rentobj, 'nextrentdate') else datetime.date(1991, 1, 1)
+    nextrentdate_plus1 = rentobj.nextrentdate_plus1 if hasattr(rentobj, 'nextrentdate_plus1') else datetime.date(1991, 1, 1)
     arrears = rentobj.arrears if rentobj.arrears else Decimal(0)
     arrears_start_date = dateToStr(paidtodate + relativedelta(days=1))
     arrears_end_date = dateToStr(nextrentdate + relativedelta(days=-1)) \
         if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate)
+    arrearsenddate_plus1 = dateToStr(nextrentdate_plus1 + relativedelta(days=-1)) \
+        if rentobj.advarrdet == "in advance" else dateToStr(nextrentdate)
+    next_gale_start = dateToStr(nextrentdate) \
+        if rentobj.advarrdet == "in advance" else dateToStr(lastrentdate + relativedelta(days=1))
     charges = get_rent_charge_details(rentobj.id) or Decimal(0)
     # TODO: charges_string needs cleaning adds ', ' onto final charge
     charges_string = "no charges"
@@ -62,6 +67,7 @@ def get_rent_strings(rentobj, type='mail'):
                       '#arrears_start_date#': arrears_start_date,
                       '#arrears_end_date#': arrears_end_date,
                       '#landlord_name#': rentobj.name if hasattr(rentobj, 'name') else "no landlord name",
+                      '#lastrentdate#': dateToStr(rentobj.lastrentdate),
                       '#manageraddr#': rentobj.manageraddr if rentobj.manageraddr else "no manager address",
                       '#nextrentdate#': dateToStr(rentobj.nextrentdate),
                       '#paidtodate#': dateToStr(paidtodate),
@@ -79,12 +85,15 @@ def get_rent_strings(rentobj, type='mail'):
         if for_sale == 'for sale' else "not for sale"
     rent_strings_2 = {'#acc_name#': rentobj.acc_name if hasattr(rentobj, 'acc_name') else "no acc_name",
                     '#acc_num#': rentobj.acc_num if hasattr(rentobj, 'acc_num') else "no acc_num",
+                    '#arrearsenddate_plus1#': arrearsenddate_plus1,
                     '#bank_name#': rentobj.bank_name if hasattr(rentobj, 'bank_name') else "no bank_name",
                     '#charges_string#': charges_string,
                     '#hashcode#': hashCode(rentobj.rentcode) if hasattr(rentobj, 'rentcode') else "no hashcode",
-                    '#lastrentdate#': dateToStr(rentobj.lastrentdate),
                     '#manageraddr2#': rentobj.manageraddr2 if hasattr(rentobj, 'manageraddr2') else "no manageraddr2",
                     '#managername#': rentobj.managername if rentobj.managername else "no manager name",
+                    '#next_gale_start#': next_gale_start,
+                    '#nextrentdate_plus1#': dateToStr(nextrentdate_plus1),
+                    '#pay_date#': dateToStr(date.today() + relativedelta(days=30)),
                     '#propaddr#': rentobj.propaddr if rentobj.propaddr else "no property address",
                     '#rentcode#': rentobj.rentcode if rentobj.rentcode else "no rentcode",
                     '#rent_stat#': rent_stat,
@@ -125,7 +134,7 @@ def get_rent_owing(rentobj, rent_strings):
             rent_owing = "A recent pay request has been issued for {} {} due {} {} on {}. \
             This amount is not payable until the date stated on the pay request." \
                 .format(rent_strings["#totdue#"], rent_strings["#rent_type#"], rent_strings["#periodly#"],
-                        rent_strings["#advarr#"], rent_strings["#nextrentdate#"])
+                        rent_strings["#advarr#"], rent_strings["#lastrentdate#"])
         else:
             rent_owing = "The total amount owing to us on this property is {0} being {1} owing for the period from {2} \
              to {3}." \

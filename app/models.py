@@ -8,6 +8,8 @@ import jwt
 from app import db, login
 
 
+# As there are numerous model classes, shall we agree to keep them in alphabetic order, in English?
+# apart from the last one, which seems to belong to User.
 class Agent(db.Model):
     __tablename__ = 'agent'
 
@@ -556,15 +558,6 @@ class Template(db.Model):
     form_letter_template = db.relationship('FormLetter', backref='template', lazy='dynamic')
 
 
-class TypeStatusHr(db.Model):
-    __tablename__ = 'type_status_hr'
-
-    id = db.Column(db.Integer, primary_key=True)
-    hr_status = db.Column(db.String(45))
-
-    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
-
-
 class TypeAcType(db.Model):
     __tablename__ = 'typeactype'
 
@@ -584,15 +577,6 @@ class TypeAdvArr(db.Model):
     headrent_typeadvarr = db.relationship('Headrent', backref='typeadvarr', lazy='dynamic')
     loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
-
-
-class TypeStatusBatch(db.Model):
-    __tablename__ = 'typebatchstatus'
-
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String(30))
-
-    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
 
 
 class TypeDeed(db.Model):
@@ -692,6 +676,24 @@ class TypeStatus(db.Model):
     statusdet = db.Column(db.String(45))
 
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
+
+
+class TypeStatusBatch(db.Model):
+    __tablename__ = 'typebatchstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(30))
+
+    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
+
+
+class TypeStatusHr(db.Model):
+    __tablename__ = 'type_status_hr'
+
+    id = db.Column(db.Integer, primary_key=True)
+    hr_status = db.Column(db.String(45))
+
+    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
 
 
 class TypeTenure(db.Model):
