@@ -14,10 +14,14 @@
     <div class="form-group row">
     </div>
     {% if pr_history.count() > 0 %}
-    {{ widgets.modal_action(body="Are you sure you want to undo this payrequest?",
-    btn_class="btn btn-danger button-icon trash", btn_text="undo payrequest",
+    {{ widgets.modal_action(
+    body="Are you sure you want to undo this payrequest?",
+    id="modal_undo_pr",
+    btn_class="btn btn-block btn-danger button-icon trash",
+    btn_text="undo payrequest",
     btn_url=url_for('pr_bp.pr_undo', pr_id=pr_history[0].id),
-    id="modal_undo_pr", title="warning") }}
+    title="warning"
+    ) }}
     <div class="table-fixed">
         <table class="table table-head" id="docfiles">
             <thead>
@@ -72,7 +76,7 @@
         </table>
     </div>
     {% else %}
-    <div class="boxed-center">
+    <div class="boxed boxed-center boxed-blue">
         There are no previous payrequests for this rent.
     </div>
     {% endif %}
