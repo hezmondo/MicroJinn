@@ -19,45 +19,47 @@
         <thead>
         <tr>
             <th style="width: 10.00%">code</th>
-            <th style="width: 14.00%">borrower</th>
+            <th style="width: 22.00%">borrower</th>
             <th style="width: 8.00%">int rate</th>
             <th style="width: 12.00%">lender</th>
             <th style="width: 12.00%">end date</th>
             <th style="width: 12.00%">notes</th>
             <th style="width: 12.00%">valuation date</th>
             <th style="width: 10.00%">valuation</th>
-            <th style="width: 10.00%"></th>
+            <th style="width: 2.00%"></th>
         </tr>
         </thead>
         <tbody>
         {% for item in loans %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.code }}</td>
-            <td style="width: 14.00%"> {{ item.borrower }}</td>
+            <td style="width: 22.00%"> {{ item.borrower }}</td>
             <td style="width: 8.00%"> {{ item.interest_rate }}</td>
             <td style="width: 12.00%"> {{ item.lender }}</td>
             <td style="width: 12.00%"> {{ item.end_date.strftime('%d-%b-%Y') if item.end_date else 'none'  }}</td>
             <td style="width: 12.00%"> {{ item.notes }}</td>
             <td style="width: 12.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 8.00%"> {{ item.valuation }}</td>
-            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('loan_bp.loan',
-            loan_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
+            <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('loan_bp.loan',
+            loan_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
         </tr>
         {% endfor %}
         <tr>
         </tr>
         <tr>
-            <td style="width: 6.00%"></td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 8.00%"></td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 12.00%">total for all loans</td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 10.00%"> {{ loansum.tot_val }} </td>
-            <td style="width: 10.00%"> {{ loansum.totint }} </td>
-            <td style="width: 10.00%"></td>
+
         </tr>
         </tbody>
+    </table>
+    <table class="table table-base">
+        <thead>
+        <tr>
+            <td style="width: 30.00%"></td>
+            <td style="width: 48.00%">total for all loans</td>
+            <td style="width: 12.00%"> {{ loansum.tot_val }} </td>
+            <td style="width: 10.00%"> {{ loansum.totint }} </td>
+        </tr>
+        </thead>
     </table>
 </div>
 {% endblock %}

@@ -48,7 +48,7 @@
             <td style="width: 20.00%"> {{ charge.chargedetail }}</td>
             <td style="width: 10.00%"> {{ charge.chargebalance }}</td>
             <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('charge_bp.charge', charge_id=charge.id) }}"
-                                         class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
+                                         class="btn btn-light btn-round button-icon round bolt" role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

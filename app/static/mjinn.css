@@ -56,9 +56,16 @@
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
+.bolt-light::before
+{
+	color: white;
+	content: "\f0e7";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+}
 .boxed
 {
-	background: #c7d6db;
+	background: #d9e4e8;
 	border-radius: 5px;
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
 	margin: 20px 0px;
@@ -180,14 +187,10 @@
 {
 	box-shadow: 0 0 0 .2rem rgba(149, 209, 192, 0.5);
 }
-.btn-tog
-{
-	background-color: #007bff;
-	color: #fff;
-}
+
 .btn-tog, .btn-tog:focus, .btn-tog.focus
 {
-	background-color: transparent;
+	background-color: #e3e7ee;
 	color: #5E5E5E;
 }
 .btn-tog.disabled,
@@ -374,12 +377,6 @@
 .exclamation::before
 {
 	content: "\f06a";
-	font-family: "Font Awesome 5 Free";
-	font-weight: 900;
-}
-.eye::before
-{
-	content: "\f1e5";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }

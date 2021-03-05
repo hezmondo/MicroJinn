@@ -174,7 +174,8 @@ def restore_database():
     # get the avialable backup files into the table for selection
     backup_files = backup_file_list()
     restore_database_output = ""
-
+    # Testing Sams modal messaging system with feedback from restore
+    message = ""
     if request.method == "POST":
         # options for the restore
         class Options:
@@ -233,12 +234,15 @@ def restore_database():
             if exit_code == 0:
                 restore_database_output += "OS command executed successfully\n"
                 restore_database_output += f"Backup restored from file: {restore_path}\n"
+                message = "Restore successful!"
             else:
                 restore_database_output += f"OS command reported unsuccessful, exit code {exit_code}\n"
+                message = f"Restore failed with exit code: {exit_code}\n"
         except Exception as ex:
             restore_database_output += f"***Exception: {str(ex)}"
+            message = f"Restore failed with exception: {str(ex)}"
 
-    return render_template('restore_database.html', backup_files=backup_files, restore_database_output=restore_database_output)
+    return render_template('restore_database.html', backup_files=backup_files, restore_database_output=restore_database_output, message=message)
 
 
 @backup_bp.route('/sqldumps/<path:filename>', methods=['GET', 'POST'])

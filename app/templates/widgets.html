@@ -10,6 +10,7 @@
 </select>
 {%- endmacro %}
 
+
 <!-- combobox_id(): implement a single choice select via <select> element passing id (for js getElementbyID)-->
 {% macro combobox_id(idc, name, items, item_selected=None) -%}
 <select class="form-control" id="{{ idc }}" name="{{ name }}">
@@ -21,40 +22,46 @@
 {%- endmacro %}
 
 
-<!-- macro action modal - produces a modal with a message and two buttons ('close' and an action button which we can define)-->
-{% macro modal_action(body, btn_class, btn_text, btn_url, id, title) -%}
-    <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ title }}</h5>
-                </div>
-                <div class="modal-body">
-                    {{ body }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
-                    <button type="submit" class="{{ btn_class }}"
-                            formaction="{{ btn_url }}">{{ btn_text }}</button>
-                </div>
-            </div>
-        </div>
-    </div>
-{%- endmacro %}
-
-<!-- macro message modal - a basic modal with a message and close button-->
-{% macro modal_message(id, message) -%}
-<div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog">
+<!-- macro action modal - produces a modal with a message, optional title and optional
+two buttons ('cancel' and an action button which we can define)
+if we do not define a button, the default close button appears-->
+{% macro modal_action(body, id, btn_class="", btn_text="", btn_url="", title="") -%}
+<div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
+            {% if title -%}
             <div class="modal-header">
-                <h5 class="modal-title">message</h5>
+                <h5 class="modal-title">{{ title }}</h5>
             </div>
+            {%- endif %}
             <div class="modal-body">
-                {{ message }}
+                {{ body }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                {% if btn_class and btn_text and btn_url -%}
+                <div class="container">
+                    <div class="row align-items-end">
+                        <div class="col">
+                            <button type="submit" class="{{ btn_class }}"
+                                    formaction="{{ btn_url }}">{{ btn_text }}
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else -%}
+                <div class="container">
+                    <div class="row flex-row-reverse">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {%- endif %}
             </div>
         </div>
     </div>
@@ -64,7 +71,7 @@
 
 <!-- macro message on page load - useful if we want to give feedback to a user after a process has completed and a page has loaded-->
 {% macro modal_message_on_load(message) -%}
-{{ modal_message(id="modal_message_on_load", message=message) }}
+{{ modal_action(body=message, id="modal_message_on_load", title="message") }}
 <script type="text/javascript">
     $(document).ready(function(){
     $("#modal_message_on_load").modal('show');
@@ -83,6 +90,7 @@
 </select>
 {%- endmacro %}
 
+
 <!-- multiselect_as_checkboxes(): implement a multiple choice select via <input type="checkbox"> elements -->
 {% macro multiselect_as_checkboxes(name, items, items_selected=None) -%}
 <div class="form-control" style="height: auto;">
@@ -95,6 +103,7 @@
 </div>
 {%- endmacro %}
 
+
 <!-- multiselect(): implement a multiple choice select via preferred method -->
 {% macro multiselect(name, items, items_selected=None) -%}
 <!-- comment/uncomment whichever preferred -->
@@ -102,11 +111,12 @@
 {{ multiselect_as_checkboxes(name, items, items_selected) }}
 {%- endmacro %}
 
+
 <!-- add a line break to the html where the text contains \n -->
 {% macro linebreaks_for_string( the_string ) -%}
 {% if the_string %}
 {% for line in the_string.split('\n') %}
-<br />
+<br/>
 {{ line }}
 {% endfor %}
 {% else %}

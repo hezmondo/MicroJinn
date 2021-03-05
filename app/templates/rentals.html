@@ -21,7 +21,7 @@
             <th style="width: 12.00%">annual rent</th>
             <th style="width: 12.00%">AST date</th>
             <th style="width: 12.00%">gas safe</th>
-            <th style="width: 10.00%">action</th>
+            <th style="width: 2.00%">action</th>
         </tr>
         </thead>
         <tbody>
@@ -34,23 +34,20 @@
             <td style="width: 12.00%"> {{ item.rentpa }}</td>
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
             <td style="width: 10.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('rental_bp.rental',
-            rental_id=item.id) }}" class="btn btn-primary btn-small button-icon eye" role="button">view</a></td>
+            <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rental_bp.rental',
+            rental_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
         </tr>
         {% endfor %}
-        <tr>
-        </tr>
-        <tr class="warning">
-            <td style="width: 6.00%"></td>
-            <td style="width: 8.00%"></td>
-            <td style="width: 22.00%">total for all rents</td>
-            <td style="width: 18.00%"></td>
-            <td style="width: 10.00%"> {{ rentsum }}</td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 10.00%"></td>
-            <td style="width: 10.00%"></td>
-        </tr>
         </tbody>
+    </table>
+    <table class="table table-base">
+        <thead>
+                <tr class="warning">
+            <td style="width: 68.00%"></td>
+            <td style="width: 22.00%">total for all rents</td>
+            <td style="width: 10.00%"> {{ rentsum }}</td>
+        </tr>
+        </thead>
     </table>
 </div>
 {% endblock %}
