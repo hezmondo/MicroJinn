@@ -25,6 +25,9 @@ def edit_profile():
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # For GET requests, display the login form.
+    # For POSTS, login the current user by processing the form.
+
     if current_user.is_authenticated:
         return redirect(url_for('util_bp.home'))
     form = LoginForm()
