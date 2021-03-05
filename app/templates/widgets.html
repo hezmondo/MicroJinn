@@ -20,6 +20,59 @@
 </select>
 {%- endmacro %}
 
+
+<!-- macro action modal - produces a modal with a message and two buttons ('close' and an action button which we can define)-->
+{% macro modal_action(body, btn_class, btn_text, btn_url, id, title) -%}
+    <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ title }}</h5>
+                </div>
+                <div class="modal-body">
+                    {{ body }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">cancel</button>
+                    <button type="submit" class="{{ btn_class }}"
+                            formaction="{{ btn_url }}">{{ btn_text }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
+<!-- macro message modal - a basic modal with a message and close button-->
+{% macro modal_message(id, message) -%}
+<div class="modal fade" id="{{ id }}" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">message</h5>
+            </div>
+            <div class="modal-body">
+                {{ message }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+
+<!-- macro message on page load - useful if we want to give feedback to a user after a process has completed and a page has loaded-->
+{% macro modal_message_on_load(message) -%}
+{{ modal_message(id="modal_message_on_load", message=message) }}
+<script type="text/javascript">
+    $(document).ready(function(){
+    $("#modal_message_on_load").modal('show');
+});
+</script>
+{%- endmacro %}
+
+
 <!-- multiselect_as_select(): implement a multiple choice select via <select> element -->
 {% macro multiselect_as_select(name, items, items_selected=None) -%}
 <select multiple class="form-control" name="{{ name }}">

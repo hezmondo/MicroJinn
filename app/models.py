@@ -8,6 +8,8 @@ import jwt
 from app import db, login
 
 
+# As there are numerous model classes, shall we agree to keep them in alphabetic order, in English?
+# apart from the last one, which seems to belong to User.
 class Agent(db.Model):
     __tablename__ = 'agent'
 
@@ -39,6 +41,8 @@ class Charge(db.Model):
     chargedetail = db.Column(db.String(140))
     chargebalance = db.Column(db.Numeric(8, 2))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
+
+    pr_charge = db.relationship('PrCharge', backref='charge', lazy='dynamic')
 
 
 class ChargeType(db.Model):
@@ -399,6 +403,14 @@ class PrBatch(db.Model):
     payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
 
 
+class PrCharge(db.Model):
+    __tablename__ = 'pr_charge'
+
+    id = db.Column(db.Integer, db.ForeignKey('pr_history.id'), primary_key=True)
+    charge_id = db.Column(db.Integer, db.ForeignKey('charge.id'))
+    case_created = db.Column(db.Boolean)
+
+
 class PrFilter(db.Model):
     __tablename__ = 'pr_filter'
 
@@ -422,6 +434,8 @@ class PrHistory(db.Model):
     arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
     delivered = db.Column(db.Boolean)
+
+    pr_charge_pr_history = db.relationship('PrCharge', backref='pr_history', lazy='dynamic')
 
 
 class Property(db.Model):
@@ -544,15 +558,6 @@ class Template(db.Model):
     form_letter_template = db.relationship('FormLetter', backref='template', lazy='dynamic')
 
 
-class TypeStatusHr(db.Model):
-    __tablename__ = 'type_status_hr'
-
-    id = db.Column(db.Integer, primary_key=True)
-    hr_status = db.Column(db.String(45))
-
-    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
-
-
 class TypeAcType(db.Model):
     __tablename__ = 'typeactype'
 
@@ -574,15 +579,6 @@ class TypeAdvArr(db.Model):
     rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
 
 
-class TypeStatusBatch(db.Model):
-    __tablename__ = 'typebatchstatus'
-
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String(30))
-
-    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
-
-
 class TypeDeed(db.Model):
     __tablename__ = 'typedeed'
 
@@ -590,15 +586,7 @@ class TypeDeed(db.Model):
     deedcode = db.Column(db.String(15))
     nfee = db.Column(db.Numeric(8, 2))
     nfeeindeed = db.Column(db.String(45))
-    interest = db.Column(db.Numeric(8, 2))
-    dcov = db.Column(db.Boolean, default=False)
-    licencetoassign = db.Column(db.Boolean, default=False)
-    insapprove = db.Column(db.Boolean, default=False)
-    insproduce = db.Column(db.Boolean, default=False)
-    alterations = db.Column(db.Boolean, default=False)
-    dwellingonly = db.Column(db.Boolean, default=False)
-    sublet = db.Column(db.Boolean, default=False)
-    info = db.Column(db.String(180))
+    info = db.Column(db.String(90))
 
     rent_typedeed = db.relationship('Rent', backref='typedeed', lazy='dynamic')
 
@@ -690,6 +678,24 @@ class TypeStatus(db.Model):
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
 
 
+class TypeStatusBatch(db.Model):
+    __tablename__ = 'typebatchstatus'
+
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(30))
+
+    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
+
+
+class TypeStatusHr(db.Model):
+    __tablename__ = 'type_status_hr'
+
+    id = db.Column(db.Integer, primary_key=True)
+    hr_status = db.Column(db.String(45))
+
+    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
+
+
 class TypeTenure(db.Model):
     __tablename__ = 'typetenure'
 
@@ -739,8 +745,6 @@ class User(UserMixin, db.Model):
 
 @login.user_loader
 def load_user(id):
-    # TODO: Added attribute most_recent_rent to current_user, but duplication of get_idlist_recent()
-    #  (cant import - circular dependency with common.py)
     current_user = User.query.get(int(id))
     try:
         id_list = json.loads(getattr(current_user, "recent_rents"))

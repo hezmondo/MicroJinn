@@ -13,8 +13,10 @@
                 <tr>
                     <td style="width: 25%">rent {{ rent.rentcode }}</td>
                     <td style="width: 25%"><span class="rounded-background light-green">{{ rent.tenuredet }}</span></td>
-                    <td style="width: 25%"><span id="statusdet" class="rounded-background light-purple">{{ rent.statusdet }} status</span></td>
-                    <td style="width: 25%"><span id="actypedet" class="rounded-background light-purple">{{ rent.actypedet }} actype</span></td>
+                    <td style="width: 25%"><span id="statusdet" class="rounded-background light-purple">{{ rent.statusdet }} status</span>
+                    </td>
+                    <td style="width: 25%"><span id="actypedet" class="rounded-background light-purple">{{ rent.actypedet }} actype</span>
+                    </td>
                 </tr>
                 </thead>
             </table>
@@ -43,10 +45,11 @@
             <table class="table table-head table-narrow table-light-purple">
                 <thead>
                 <tr>
-                                        <td class="vertical-align" style="width: 94.5%">tenant and mail details</td>
+                    <td class="vertical-align" style="width: 94.5%">tenant and mail details</td>
                     <td class="vertical-align align-right" style="width: 5.50%">
-                        <a href="#" id="edit_tenant" data-toggle="tooltip" title="edit tenant and mail details"
-                          class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                        <a href="#" id="edit_tenant" data-toggle="modal"
+                           data-target="#tenant_modal" class="btn btn-light btn-round button-icon round bolt"
+                           role="button"></a>
                     </td>
                 </tr>
                 </thead>
@@ -61,21 +64,21 @@
             </table>
             <table class="table table-rent table-body-alt table-base">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
-                        <td class="vertical-align copyable-text" style="width: 82.5%">{{ rent.email }}</td>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
+                    <td class="vertical-align copyable-text" style="width: 82.5%">{{ rent.email }}</td>
                     </td>
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
-                        <td class="copyable-text vertical-align" style="width: 82.50%">{{ rent.mailaddr }}</td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
+                    <td class="copyable-text vertical-align" style="width: 82.50%">{{ rent.mailaddr }}</td>
 
-                    </tr>
-                    <tr>
-                        <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
-                        <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.note }}</td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
+                    <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.note }}</td>
 
-                    </tr>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -115,24 +118,24 @@
             </table>
             <table class="table table-base">
                 <tbody>
-                    <tr>
-                        <td class="td-title copyable-text" style="width: 12.00%">charges</td>
-                        <td class="copyable-text" style="width: 83.00%">
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">charges</td>
+                    <td class="copyable-text" style="width: 83.00%">
                         {% if rentstats.charges_list != "no charges" %}
-                            {% for item in rentstats.charges_list %}
-                                {{ item }}
-                            <br />
-                            {% endfor %}
+                        {% for item in rentstats.charges_list %}
+                        {{ item }}
+                        <br/>
+                        {% endfor %}
                         {% else %}
-                            no charges
+                        no charges
                         {% endif %}
-                        </td>
-                        <td class="vertical-align align-right" style="width: 5.00%"><a
-                                href="{{ url_for('charge_bp.charges', rent_id=rent.id) }}" data-toggle="tooltip"
-                                title="charges for this rent"
-                                class="btn btn-light btn-round button-icon round bolt" role="button"></a>
-                        </td>
-                    </tr>
+                    </td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="{{ url_for('charge_bp.charges', rent_id=rent.id) }}" data-toggle="tooltip"
+                            title="charges for this rent"
+                            class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>
@@ -207,20 +210,21 @@
                 <tr>
                     <td style="width: 25%">{{ rentstats.price_stat }}</td>
                     <td style="width: 25%">source {{ rent.source }}</td>
-                    <td style="width: 25%">deed {{ rent.deedcode }}</td>
+                    <td style="width: 25%">nfee {{ rent.info }}</td>
                 </tr>
                 </thead>
             </table>
         </div>
     </div>
     <div class="col-md-3">
-            <button type="button" id="open_edit_rent"
-                    class="btn btn-block btn-secondary button-icon edit"
-                    style="margin-bottom: 20px;">edit rent</button>
+        <button type="button" id="open_edit_rent" data-toggle="modal" data-target="#edit_modal"
+                class="btn btn-block btn-secondary button-icon edit"
+                style="margin-bottom: 20px;">edit rent
+        </button>
     </div>
 </div>
 
-<!-- Modal  - edit tenant - can be templated / used as widgets-->
+<!-- Modal  - edit rent - can be templated / used as widgets -->
 <div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
      aria-hidden="true">
     <div class="modal-dialog mw-100 w-75" role="document">
@@ -233,7 +237,8 @@
                             <div class="form-group row">
                                 <div class="col-md-12">
                                     <label for="landlord">landlord:</label>
-                                    {{ widgets.combobox(name="landlord", items=combodict.landlords, item_selected=rent.name) }}
+                                    {{ widgets.combobox(name="landlord", items=combodict.landlords,
+                                    item_selected=rent.name) }}
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -259,15 +264,18 @@
                             <div class="form-group row align-items-end">
                                 <div class="col-md-2">
                                     <label for="frequency">frequency:</label>
-                                    {{ widgets.combobox(name="frequency", items=combodict.freqs, item_selected=rent.freqdet) }}
+                                    {{ widgets.combobox(name="frequency", items=combodict.freqs,
+                                    item_selected=rent.freqdet) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="actype">account type:</label>
-                                    {{ widgets.combobox(name="actype", items=combodict.actypes, item_selected=rent.actypedet) }}
+                                    {{ widgets.combobox(name="actype", items=combodict.actypes,
+                                    item_selected=rent.actypedet) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="advarr">advance or arrears:</label>
-                                    {{ widgets.combobox(name="advarr", items=combodict.advars, item_selected=rent.advarrdet) }}
+                                    {{ widgets.combobox(name="advarr", items=combodict.advars,
+                                    item_selected=rent.advarrdet) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="datecode">date code:</label>
@@ -277,7 +285,8 @@
                             <div class="form-group row">
                                 <div class="col-md-2">
                                     <label for="tenure">tenure:</label>
-                                    {{ widgets.combobox(name="tenure", items=combodict.tenures, item_selected=rent.tenuredet) }}
+                                    {{ widgets.combobox(name="tenure", items=combodict.tenures,
+                                    item_selected=rent.tenuredet) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="source">source:</label>
@@ -285,11 +294,13 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="deedcode">deed code:</label>
-                                    {{ widgets.combobox(name="deedcode", items=combodict.deedcodes, item_selected=rent.deedcode) }}
+                                    {{ widgets.combobox(name="deedcode", items=combodict.deedcodes,
+                                    item_selected=rent.deedcode) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="salegrade">sale grade:</label>
-                                    {{ widgets.combobox(name="salegrade", items=combodict.salegrades, item_selected=rent.salegradedet)
+                                    {{ widgets.combobox(name="salegrade", items=combodict.salegrades,
+                                    item_selected=rent.salegradedet)
                                     }}
                                 </div>
                                 <div class="col-md-2">
@@ -298,12 +309,15 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="status">status:</label>
-                                    {{ widgets.combobox(name="status", items=combodict.statuses, item_selected=rent.statusdet) }}
+                                    {{ widgets.combobox(name="status", items=combodict.statuses,
+                                    item_selected=rent.statusdet) }}
                                 </div>
                             </div>
                             <div class="form-group row justify-content-center">
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
+                                    <button type="submit" class="btn btn-block btn-success button-icon save">save
+                                        changes
+                                    </button>
                                 </div>
                                 <div class="col-md-2">
                                     <a href="{{ url_for('util_bp.delete_item', item_id=rent.id, item='rent') }}"
@@ -311,12 +325,14 @@
                                        class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="text" class="form-control" name="rent_id" value="id: {{ rent.id }}" readonly="true">
+                                    <input type="text" class="form-control" name="rent_id" value="id: {{ rent.id }}"
+                                           readonly="true">
                                 </div>
                                 <div class="col-md-2">
                                     <button type="button"
-                                    class="btn btn-block btn-secondary button-icon cross"
-                                    style="margin-bottom: 20px;" data-dismiss="modal">close</button>
+                                            class="btn btn-block btn-secondary button-icon cross"
+                                            style="margin-bottom: 20px;" data-dismiss="modal">close
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -339,16 +355,19 @@
     </div>
 </div>
 
-<!-- Modal  - edit tenant - can be templated / used as widgets-->
+<!-- Modal  - edit and mail - can be templated / used as widgets-->
 <div class="modal fade" id="tenant_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">edit details below</h6>
+            </div>
             <div class="modal-body">
                 <form method="POST" id="rent_tenant">
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="tenantname">edit tenant name</label>
+                            <label for="tenantname">tenant name</label>
                             <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
                         </div>
                     </div>
@@ -360,30 +379,32 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="email">edit email addresses - separate with semicolon</label>
+                            <label for="email">email addresses - separate with semicolon</label>
                             <input type="text" class="form-control" name="email" value="{{ rent.email }}">
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                                    <label for="prdelivery">pr delivery:</label>
-                                    {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
-                                    item_selected=rent.prdeliverydet) }}
+                            <label for="prdelivery">pr delivery:</label>
+                            {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
+                            item_selected=rent.prdeliverydet) }}
                         </div>
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="note">edit notes</label>
+                            <label for="note">notes</label>
                             <input type="text" class="form-control" name="note" value="{{ rent.note }}">
                         </div>
                     </div>
                     <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 20px;">
                         <div class="col-md-6">
-                            <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">close</button>
+                            <button type="button" class="btn btn-block btn-secondary" data-dismiss="modal">close
+                            </button>
                         </div>
                         <div class="col-md-6">
                             <button type="submit" formaction="{{ url_for('rent_bp.tenant', rent_id=rent.id) }}"
-                                    class="btn btn-block btn-success button-icon save">save changes</button>
+                                    class="btn btn-block btn-success button-icon save">save changes
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -396,5 +417,6 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "rent.js" %}
+
 </script>
 {% endblock %}
