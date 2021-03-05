@@ -17,6 +17,8 @@ class Config(object):
     MAIL_USE_TLS = (os.environ.get('MAIL_USE_TLS') or getattr(MyConfig, 'MAIL_USE_TLS', None)) is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or getattr(MyConfig, 'MAIL_USERNAME', None)
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or getattr(MyConfig, 'MAIL_PASSWORD', None)
+    MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or getattr(MyConfig, 'MAIL_DEFAULT_SENDER', None)
+    MAIL_DEBUG = getattr(MyConfig, 'MAIL_DEBUG', None)
     ADMINS = getattr(MyConfig, 'ADMINS', None) or ['your-email@example.com']
     MYSQLDUMP_EXECUTABLE = getattr(MyConfig, 'MYSQLDUMP_EXECUTABLE', 'mysqldump')
     MYSQL_EXECUTABLE = getattr(MyConfig, 'MYSQL_EXECUTABLE', 'mysql')

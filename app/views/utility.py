@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
 from app.dao.agent import get_agent, get_agents, get_agent_rents, post_agent
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
@@ -7,6 +7,7 @@ from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, pos
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
 from app.dao.rent import get_rent_ex
 from app.dao.utility import delete_record
+from app.email import test_email_connect, test_send_email
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -135,6 +136,30 @@ def rents_ex():
     filterdict, rent_s = get_rent_s("external", 0)
 
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
+
+
+@util_bp.route('/test_emailing', methods=['GET'])
+def test_emailing():
+    mail = current_app.extensions['mail']
+
+    return render_template('test_emailing.html', mail=mail)
+
+
+@util_bp.route('/test_emailing_connect', methods=['GET'])
+def test_emailing_connect():
+    appmail = current_app.extensions['mail']
+    response = test_email_connect(appmail)
+
+    return render_template('test_emailing.html', mail=appmail, test_response=response)
+
+
+@util_bp.route('/test_emailing_send', methods=['POST'])
+def test_emailing_send():
+    appmail = current_app.extensions['mail']
+    recipient = request.form.get('test_send_mail_to', "", type=str)
+    response = test_send_email(appmail, recipient)
+
+    return render_template('test_emailing.html', mail=appmail, test_response=response)
 
 
 @util_bp.route('/utilities', methods=['GET', 'POST'])
