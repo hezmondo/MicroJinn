@@ -1,0 +1,103 @@
+<!-- /templates/test_emailing.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row flex-row-reverse align-items-end">
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.utilities') }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to utilities</a>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="mail_server">mail_server:</label>
+            <input type="text" class="form-control" name="mail_server" value="{{ mail.server }}"
+                   readonly="readonly">
+        </div>
+        <div class="col-md-3">
+            <label for="mail_port">mail_port:</label>
+            <input type="text" class="form-control" name="mail_port" value="{{ mail.port }}"
+                   readonly="readonly">
+        </div>
+        <div class="col-md-3">
+            <label for="mail_username">mail_username:</label>
+            <input type="text" class="form-control" name="mail_username" value="{{ mail.username }}"
+                   readonly="readonly">
+        </div>
+        <div class="col-md-3">
+            <label for="mail_password">mail_password:</label>
+            <input type="text" class="form-control" name="mail_password" value="{{ mail.password }}"
+                   readonly="readonly">
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label for="mail_use_tls">mail_use_tls:</label>
+            <input type="text" class="form-control" name="mail_use_tls" value="{{ mail.use_tls }}"
+                   readonly="readonly">
+        </div>
+        <div class="col-md-3">
+            <label for="mail_use_ssl">mail_use_ssl:</label>
+            <input type="text" class="form-control" name="mail_use_ssl" value="{{ mail.use_ssl }}"
+                   readonly="readonly">
+        </div>
+        <div class="col-md-3">
+            <label for="mail_default_sender">mail_default_sender:</label>
+            <input type="text" class="form-control" name="mail_default_sender" value="{{ mail.default_sender }}"
+                   readonly="readonly">
+        </div>
+    </div>
+    <div class="form-group row justify-content-end">
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.test_emailing_connect') }}" class="btn btn-primary btn-block"
+               role="button" onclick="on_test_mail_connect_clicked()">test mail connect</a>
+        </div>
+    </div>
+    <div class="form-group row justify-content-end">
+        <div class="col-md-1">
+            <label for="test_send_mail_to">email to:</label>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="test_send_mail_to" placeholder="enter email address">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" formaction="{{ url_for('util_bp.test_emailing_send') }}"
+                    class="btn btn-block btn-secondary" onclick="on_test_send_mail_clicked()">test send mail</button>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-9">
+            <textarea id="test_response" class="form-control form-control-sm" rows="8"
+                      readonly="readonly"
+                      style="white-space:pre-wrap; font-family:monospace; display: none;"
+            >{{ test_response }}</textarea>
+        </div>
+    </div>
+</form>
+<script type="text/javascript">
+    <!-- Scroll to bottom of backup output -->
+    var textarea = document.getElementById('test_response');
+    textarea.scrollTop = textarea.scrollHeight;
+    if (textarea.value) {
+        textarea.style.display = 'block';
+    }
+    function on_test_mail_connect_clicked()
+    {
+        var textarea = document.getElementById('test_response');
+        textarea.style.display = 'block';
+        textarea.value = 'Testing connecting to mail server...';
+        textarea.value += '\nPlease be patient, if there is a problem this could take quite a few seconds to respond';
+    }
+    function on_test_send_mail_clicked()
+    {
+        var textarea = document.getElementById('test_response');
+        textarea.style.display = 'block';
+        textarea.value = 'Testing sending an email...';
+        textarea.value += '\nPlease be patient, if there is a problem this could take quite a few seconds to respond';
+    }
+</script>
+{% endblock %}
+

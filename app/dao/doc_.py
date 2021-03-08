@@ -6,7 +6,7 @@ from flask import request
 from sqlalchemy import desc, literal
 from werkzeug.utils import secure_filename
 from app.models import DigFile, DocFile, Rent, TypeDoc
-from app.dao.functions import commit_to_database
+from app.dao.database import commit_to_database
 
 
 def get_digfile(doc_id):

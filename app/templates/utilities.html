@@ -38,6 +38,10 @@
             <a href="{{ url_for('util_bp.email_accs') }}"
                class="btn btn-block btn-primary button-icon email-ic" role="button">email accounts</a>
         </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('util_bp.test_emailing') }}"
+               class="btn btn-block btn-primary button-icon email-ic" role="button">test emailing</a>
+        </div>
     </div>
     <div class="boxed boxed-yellow">
         <div class="form-group row">
@@ -45,24 +49,28 @@
                 <label>other utilities</label>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('util_bp.rents_ex') }}"
-                   class="btn btn-block btn-warning" role="button">external rents</a>
-            </div>
-            <div class="col-md-3">
                 <a href="{{ url_for('charge_bp.charges') }}"
                    class="btn btn-block btn-warning" role="button">charges</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.deeds') }}"
+                   class="btn btn-block btn-warning" role="button">deeds</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('util_bp.rents_ex') }}"
+                   class="btn btn-block btn-warning" role="button">external rents</a>
             </div>
         </div>
         <div class="form-group row">
             <div class="col-md-2">
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('lease_bp.leases') }}"
-                   class="btn btn-block btn-warning" role="button">leases</a>
-            </div>
-            <div class="col-md-3">
                 <a href="{{ url_for('util_bp.landlords') }}"
                    class="btn btn-block btn-warning" role="button">landlords</a>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('lease_bp.leases') }}"
+                   class="btn btn-block btn-warning" role="button">leases</a>
             </div>
             <div class="col-md-3">
                 <a href="{{ url_for('util_bp.properties', rent_id=0) }}"

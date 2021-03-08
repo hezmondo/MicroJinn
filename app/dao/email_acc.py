@@ -1,6 +1,5 @@
 from flask import request
 from app import db
-from app.dao.functions import commit_to_database
 from app.models import EmailAcc
 
 

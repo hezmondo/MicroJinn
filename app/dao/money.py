@@ -3,7 +3,7 @@ from datetime import date
 from flask import request
 from sqlalchemy import desc, func, literal
 from app import db
-from app.dao.functions import commit_to_database
+from app.dao.database import commit_to_database
 from app.models import Income, IncomeAlloc, MoneyAcc, MoneyCat, MoneyItem
 
 

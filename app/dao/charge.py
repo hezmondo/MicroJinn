@@ -1,7 +1,7 @@
 from app import db
 from datetime import date
 from flask import request
-from app.dao.functions import strToDec
+from app.main.functions import strToDec
 from sqlalchemy import func
 from app.models import Charge, ChargeType, Rent
 

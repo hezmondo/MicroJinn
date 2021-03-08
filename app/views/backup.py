@@ -198,7 +198,7 @@ def restore_database():
             db_password = _url.password
             selected_file = request.form.get("select_file")
             if not selected_file:
-                raise Exception("No file selected to restore from")
+                raise ValueError("No file selected to restore from")
             restore_path = os.path.join(backup_path, selected_file)
             if not os.path.isfile(restore_path):
                 raise FileNotFoundError(f"Restore file does not exist: {restore_path}")

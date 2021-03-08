@@ -1,5 +1,5 @@
 from app.dao.form_letter import get_form_letter
-from app.dao.functions import dateToStr, doReplace, moneyToStr
+from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.dao.income import get_income_item
 from app.dao.lease import get_lease_variables
 from app.dao.rent import get_rent_mail

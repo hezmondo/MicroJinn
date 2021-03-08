@@ -46,10 +46,6 @@
             <label for="agent">agent:</label>
             <input type="text" class="form-control" name="agent" value="{{ headrent.detail }}" readonly="true">
         </div>
-        <div class="form-group col-md-2">
-            <label for="datecode">date code:</label>
-            <input type="text" class="form-control" name="datecode" value="{{ headrent.datecode }}" readonly="true">
-        </div>
         <div class="col-md-2">
             <label for="status">status:</label>
             {{ widgets.combobox(name="status", items=hr_statuses, item_selected=headrent.hr_status) }}
@@ -80,7 +76,7 @@
         <div class="col-md-2">
             <label for="nextrentdate">next rent date:</label>
             <input type="date" class="form-control" name="nextrentdate"
-                   value="{{ headrent.nextrentdate }}" readonly="true">
+                   value="{{ nextrentdate }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">

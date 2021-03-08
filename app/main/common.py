@@ -1,13 +1,14 @@
-# common.py - attempt to put all commonly used stuff here and in functions.py
+# common.py - attempt to put all commonly used non db stuff here and in functions.py
 import json
+import datetime
+
+from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_login import current_user
 from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
                         TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
-from app.dao.functions import commit_to_database
 
 
-# common functions
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
     actypes = [value for (value,) in TypeAcType.query.with_entities(TypeAcType.actypedet).all()]
@@ -61,6 +62,19 @@ def get_combodict_filter():
     return combo_dict
 
 
+def inc_date_m(date1, frequency, datecode_id, periods):
+    # first we get a new pure date calculated forwards or backwards for the number of periods
+    date2 = inc_date(date1, frequency, periods)
+    dates = [(1, 3, 25), (1, 6, 24), (1, 9, 29), (1, 12, 25), (2, 6, 30), (2, 12, 31), (3, 3, 31), (3, 9, 30),
+             (4, 3, 31), (4, 6, 30), (4, 9, 30), (4, 12, 31)]
+    if datecode_id != 0:
+        for item in dates:
+            if item[0] == datecode_id and item[1] == date2.month:
+                date2 = date2.replace(day=item[2])
+
+    return date2
+
+
 def get_hr_statuses():
     hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
@@ -75,20 +89,6 @@ def get_idlist_recent(type):
         id_list = [1, 2, 3]
 
     return id_list
-
-
-def pop_idlist_recent(type, id):
-    try:
-        id_list = json.loads(getattr(current_user, type))
-    except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
-    if id in id_list:
-        id_list.remove(id)
-    id_list.insert(0, id)
-    if len(id_list) > 15:
-        id_list.pop()
-    setattr(current_user, type, json.dumps(id_list))
-    commit_to_database()
 
 
 def get_postvals_id():
@@ -135,6 +135,33 @@ def get_postvals_id():
             print(key, value)
 
     return postvals_id
+
+
+def inc_date(date1, freq, num):
+    # this function simply increments or decrements a date by num periods without modulating day of month
+    date2 = date1
+    if freq == 1:
+        date2 = date1 + relativedelta(years=num)
+    elif freq == 2:
+        date2 = date1 + relativedelta(months=num*6)
+    elif freq == 4:
+        date2 = date1 + relativedelta(months=num*3)
+    elif freq == 12:
+        date2 = date1 + relativedelta(months=num)
+    elif freq == 13:
+        date2 = date1 + relativedelta(weeks=num*4)
+    elif freq == 52:
+        date2 = date1 + relativedelta(weeks=num)
+
+    return date2
+
+
+def inc_rent_date(date1, date_id, freq, num):
+    # this function increments or decrements a date by num periods and then modulates the day of month
+    date2 = inc_date(date1, freq, num)
+
+    return date2
+
 
 # def preferredEncoding() -> str:
 #     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
