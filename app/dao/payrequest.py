@@ -1,7 +1,7 @@
 from datetime import datetime
 from app import db
 from app.models import PrArrearsMatrix, PrCharge, PrHistory, Rent, TypePrDelivery
-from app.dao.functions import commit_to_database
+from app.dao.database import commit_to_database
 from sqlalchemy import desc
 
 

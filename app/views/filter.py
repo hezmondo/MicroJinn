@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template,  request
-from app.dao.common import get_combodict_filter
+from app.main.common import get_combodict_filter
 from app.dao.filter import get_filters, get_rent_s
 
 filter_bp = Blueprint('filter_bp', __name__)

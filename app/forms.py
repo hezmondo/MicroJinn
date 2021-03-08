@@ -19,7 +19,6 @@ class RentForm(FlaskForm):
     advarr = TextAreaField('AdvArr')
     lastrentdate = DateField('Last rent date')
     frequency = IntegerField('Frequency')
-    datecode = TextAreaField('Date code')
     actype = TextAreaField('AcType')
     tenure = TextAreaField('Tenure')
     source = TextAreaField('Source')

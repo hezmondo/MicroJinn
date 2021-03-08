@@ -4,7 +4,8 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
 from sqlalchemy import func
-from app.dao.functions import commit_to_database, moneyToStr
+from app.main.functions import moneyToStr
+from app.dao.database import commit_to_database
 from app.models import Lease, LeaseUpType, Rent
 
 

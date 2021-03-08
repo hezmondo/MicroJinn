@@ -1,6 +1,6 @@
 from app import db
 from flask import request
-from app.dao.functions import commit_to_database
+from app.dao.database import commit_to_database
 
 from app.models import Landlord, Manager, MoneyAcc, EmailAcc
 

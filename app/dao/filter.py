@@ -1,7 +1,7 @@
 import json
 from flask import request, session
-from app.dao.common import get_idlist_recent
-from app.dao.functions import strToDate
+from app.main.common import get_idlist_recent
+from app.main.functions import strToDate
 from app.dao.rent import get_rent_s_data, post_rent__filter
 from app.models import Agent, RentExt, Jstore, Landlord, Property, Rent, TypeAcType, \
     TypeDoc, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure

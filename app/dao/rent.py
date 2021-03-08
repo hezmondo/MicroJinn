@@ -3,9 +3,10 @@ from decimal import Decimal
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
-from app.dao.common import get_postvals_id, pop_idlist_recent
-from app.dao.functions import strToDec
-from app.models import Agent, Charge, Dates, Jstore, Landlord, Manager, ManagerExt, MoneyAcc, Property, \
+from app.main.common import get_postvals_id, inc_date_m
+from app.dao.database import pop_idlist_recent
+from app.main.functions import strToDec
+from app.models import Agent, Charge, Jstore, Landlord, Manager, ManagerExt, MoneyAcc, Property, \
     Rent, RentExt, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, TypePrDelivery, TypeSaleGrade, \
     TypeStatus, TypeTenure
 
@@ -14,10 +15,6 @@ def create_new_rent():
     # create new rent and property function not yet built, so return id for dummy rent:
 
     return 23
-
-
-def get_last_date_from_datecode(datecode):
-    return Dates.query.filter_by(code=datecode).order_by(Dates.id.desc()).first()
 
 
 def get_rent(rent_id):
@@ -38,10 +35,8 @@ def get_rent(rent_id):
             .join(TypeSaleGrade) \
             .join(TypeStatus) \
             .join(TypeTenure) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
-                           # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
+            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode_id, Rent.email, Rent.lastrentdate,
                            func.mjinn.mail_addr(Rent.id).label('mailaddr'),
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
@@ -98,13 +93,9 @@ def get_rent_mail(rent_id):
             .join(TypeFreq) \
             .join(TypeStatus) \
             .join(TypeTenure) \
-            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode, Rent.email, Rent.lastrentdate,
+            .with_entities(Rent.id, Rent.rentcode, Rent.arrears, Rent.datecode_id, Rent.email, Rent.lastrentdate,
                            func.mjinn.check_pr_exists(Rent.id).label('prexists'),
                            func.mjinn.mail_addr(Rent.id).label('mailaddr'),
-                           # the following functions take id, renttype (1 for Rent or 2 for Headrent) and periods
-                           func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                           func.mjinn.next_rent_date(Rent.id, 1, 2).label('nextrentdate_plus1'),
-                           func.mjinn.next_rent_date(Rent.id, 1, 3).label('nextrentdate_plus2'),
                            func.mjinn.paid_to_date(Rent.id).label('paidtodate'),
                            func.mjinn.prop_addr(Rent.id).label('propaddr'),
                            func.mjinn.tot_charges(Rent.id).label('totcharges'),
@@ -127,8 +118,8 @@ def get_rent_s_data(qfilter, action, runsize):
                 .join(Rent) \
                 .outerjoin(Agent) \
                 .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-                               # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                               func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
+                               func.mjinn.inc_date_m(Rent.lastrentdate, Rent.freq_id, Rent.datecode_id,
+                                                         1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
                 .filter(*qfilter).limit(runsize).all()
 
@@ -156,12 +147,12 @@ def get_rent_s_data(qfilter, action, runsize):
                     .join(TypeSaleGrade) \
                     .join(TypeTenure) \
                     .with_entities(Rent.id, TypeAcType.actypedet, Agent.detail, Rent.arrears, Rent.lastrentdate,
-                                   # the following function takes id, rentype (1 for Rent or 2 for Headrent) and periods
-                                   func.mjinn.next_rent_date(Rent.id, 1, 1).label('nextrentdate'),
-                                   func.mjinn.tot_charges(Rent.id).label('totcharges'),
-                                   Landlord.name, Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-                                   TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
-                                   TypeTenure.tenuredet) \
+                            func.mjinn.inc_date_m(Rent.lastrentdate,
+                                                  Rent.freq_id, Rent.datecode_id, 1).label('nextrentdate'),
+                            func.mjinn.tot_charges(Rent.id).label('totcharges'), Landlord.name, Property.propaddr,
+                            Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
+                            TypePrDelivery.prdeliverydet, TypeSaleGrade.salegradedet, TypeStatus.statusdet,
+                            TypeTenure.tenuredet) \
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
     return rent_s
@@ -201,8 +192,8 @@ def post_rent(rent_id):
     rent.actype_id = postvals_id["actype"]
     rent.advarr_id = postvals_id["advarr"]
     rent.arrears = strToDec(request.form.get("arrears"))
-    # we may write code later to generate datecode from lastrentdate!:
-    rent.datecode = request.form.get("datecode")
+    # we need code to generate datecode_id from lastrentdate with user choosing sequence:
+    rent.datecode_id = int(request.form.get("datecode_id"))
     rent.deed_id = postvals_id["deedcode"]
     rent.freq_id = postvals_id["frequency"]
     rent.landlord_id = postvals_id["landlord"]
@@ -224,7 +215,7 @@ def post_rent(rent_id):
 
 # def update_roll_rent(rent_id, arrears):
 #     rent = Rent.query.get(rent_id)
-#     last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
+#  this fn now gone!  last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
 #     rent.lastrentdate = last_rent_date
 #     rent.arrears = arrears
 
@@ -237,7 +228,7 @@ def update_roll_rent(rent_id, last_rent_date, arrears):
 
 def update_rollback_rent(rent_id, arrears):
     rent = Rent.query.get(rent_id)
-    last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, -1)).scalar()
+    last_rent_date = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, -1)
     rent.lastrentdate = last_rent_date
     rent.arrears = arrears
 

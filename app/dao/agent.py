@@ -1,7 +1,7 @@
 from app import db
 from flask import request
-from app.dao.common import get_idlist_recent, pop_idlist_recent
-from app.dao.functions import commit_to_database
+from app.main.common import get_idlist_recent
+from app.dao.database import commit_to_database, pop_idlist_recent
 from app.models import Agent, Headrent, Rent
 
 

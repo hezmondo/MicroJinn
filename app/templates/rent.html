@@ -258,7 +258,7 @@
                                 <div class="col-md-3">
                                     <label for="nextrentdate">next rent date:</label>
                                     <input type="date" class="form-control" name="nextrentdate"
-                                           value="{{ rent.nextrentdate }}">
+                                           value="{{ rentstats.nextrentdate }}">
                                 </div>
                             </div>
                             <div class="form-group row align-items-end">
@@ -276,10 +276,6 @@
                                     <label for="advarr">advance or arrears:</label>
                                     {{ widgets.combobox(name="advarr", items=combodict.advars,
                                     item_selected=rent.advarrdet) }}
-                                </div>
-                                <div class="col-md-2">
-                                    <label for="datecode">date code:</label>
-                                    <input type="text" class="form-control" name="datecode" value="{{ rent.datecode }}">
                                 </div>
                             </div>
                             <div class="form-group row">

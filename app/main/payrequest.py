@@ -1,19 +1,22 @@
+import datetime
 import json
 from app import decimal_default
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from flask import abort, request
+from flask import request
 from dateutil.relativedelta import relativedelta
+from app.dao.case import check_case_exists, add_case
+from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_total_charges, get_rent_charge_details
+from app.dao.database import commit_to_database
+from app.dao.doc_ import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
-from app.dao.functions import commit_to_database, dateToStr, doReplace, round_decimals_down, moneyToStr
 from app.dao.payrequest import add_pr_history, get_pr_charge, get_pr_file, get_recovery_info, \
     prepare_new_pr_history_entry, add_pr_charge
-from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_total_charges, get_rent_charge_details
 from app.dao.rent import get_rent, get_rent_mail, update_roll_rent, update_rollback_rent
-from app.main.rent import get_rent_gale, get_rent_strings
-from app.dao.case import check_case_exists, add_case
-from app.dao.doc_ import convert_html_to_pdf
 from app.dao.utility import delete_record_basic
+from app.main.common import inc_date_m
+from app.main.functions import dateToStr, doReplace, moneyToStr
+from app.main.rent import get_rent_gale, get_rent_strings
 
 
 def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
@@ -94,14 +97,17 @@ def build_pr_charges_table(rent_mail):
 
 
 def build_pr_table(rent_mail, pr_variables):
-    rent_gale = get_rent_gale(rent_mail.datecode, rent_mail.freq_id, rent_mail.nextrentdate, rent_mail.rentpa)
+    nextrentdatestr = pr_variables.get('#nextrentdate#')
+    nextrentdate = inc_date_m(rent_mail.lastrentdate, rent_mail.freq_id, rent_mail.datecode_id, 1) if hasattr(rent_mail,
+                                'lastrentdate') else datetime.date(1991, 1, 1)
+    rent_gale = get_rent_gale(nextrentdate, rent_mail.freq_id, rent_mail.rentpa)
     arrears = rent_mail.arrears
     arrears_start_date = pr_variables.get('#arrears_start_date#')
     arrears_end_date = pr_variables.get('#arrears_end_date#')
     rent_type = pr_variables.get('#rent_type#')
     table_rows = {}
     if rent_gale:
-        rent_statement = build_rent_statement(rent_mail, rent_type)
+        rent_statement = build_rent_statement(rent_mail, rent_type, nextrentdatestr)
         table_rows.update({rent_statement: moneyToStr(rent_gale, pound=True)})
     if arrears:
         arrears_statement = build_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
@@ -115,9 +121,9 @@ def build_pr_table(rent_mail, pr_variables):
     return arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue
 
 
-def build_rent_statement(rent_mail, rent_type):
+def build_rent_statement(rent_mail, rent_type, nextrentdatestr):
     statement = "{0} {1} due and payable {2} on {3}:".format(rent_mail.freqdet, rent_type, rent_mail.advarrdet,
-                                                             dateToStr(rent_mail.nextrentdate))
+                                                             nextrentdatestr)
     statement = statement[0].upper() + statement[1:]
     return statement
 
@@ -223,7 +229,7 @@ def undo_pr(pr_id):
             if pr_charge.case_created:
                 delete_record_basic(rent_id, 'case')
         delete_record_basic(pr_id, 'pr_file')
-        rent_gale = get_rent_gale(rentobj.datecode, rentobj.freq_id, rentobj.lastrentdate, rentobj.rentpa)
+        rent_gale = get_rent_gale(rentobj.lastrentdate, rentobj.freq_id, rentobj.rentpa)
         altered_arrears = rentobj.arrears - rent_gale
         update_rollback_rent(rent_id, altered_arrears)
         commit_to_database()
@@ -236,6 +242,7 @@ def undo_pr(pr_id):
 def write_payrequest(rent_id, pr_form_id):
     rent_mail = get_rent_mail(rent_id)
     pr_variables = get_rent_strings(rent_mail, 'payrequest')
+    nextrentdate = pr_variables.get('#nextrentdate#')
     arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue = \
         build_pr_table(rent_mail, pr_variables)
     totdue_string = moneyToStr(totdue, pound=True) if totdue else "no total due"
@@ -252,7 +259,7 @@ def write_payrequest(rent_id, pr_form_id):
         'new_arrears_level': new_arrears_level,
         'new_charge_dict': new_charge_dict,
         'pr_code': pr_form.code,
-        'rent_date_string': str(rent_mail.nextrentdate),
+        'rent_date_string': nextrentdate,
         'tot_due': totdue,
         'pr_variables': pr_variables
     }

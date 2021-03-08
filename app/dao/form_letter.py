@@ -1,7 +1,7 @@
 from app import db
 from flask import request
 from app.models import FormLetter, Template, TypeDoc
-from app.dao.functions import commit_to_database
+from app.dao.database import commit_to_database
 
 
 def get_form_letter(form_letter_id):

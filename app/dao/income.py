@@ -1,8 +1,9 @@
 from flask import request
 from sqlalchemy import desc
 from app import db
-from app.models import Charge, ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent, TypePayment
-from app.dao.functions import commit_to_database
+from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent, TypePayment
+from app.dao.database import commit_to_database
+
 
 def get_incomes(acc_id):
     # display postings for all bank accounts if accid = 0 and pick up rent_id as arg from rent screen

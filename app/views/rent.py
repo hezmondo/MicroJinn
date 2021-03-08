@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for
-from flask_login import login_required
 from app.dao.charge import get_charges
-from app.dao.common import get_combodict_rent
+from app.main.common import get_combodict_rent, inc_date_m
 from app.dao.rent import get_rent, post_rent, update_tenant
 from app.main.rent import get_rent_strings
 
