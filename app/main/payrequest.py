@@ -156,7 +156,7 @@ def create_case(rent_id, pr_id):
 
 
 def forward_rent_case_and_charges(pr_id, pr_save_data, rent_id):
-    last_rent_date = datetime.strptime(pr_save_data.get('rent_date_string'), '%Y-%m-%d').date()
+    last_rent_date = datetime.strptime(pr_save_data.get('rent_date_string'), '%d-%b-%Y').date()
     arrears = pr_save_data.get('new_arrears')
     update_roll_rent(rent_id, last_rent_date, arrears)
     new_charge_dict = pr_save_data.get("new_charge_dict")

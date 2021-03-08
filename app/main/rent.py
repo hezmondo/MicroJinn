@@ -8,18 +8,14 @@ from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_dec
 
 
 def get_rent_gale(next_rent_date, frequency, rentpa):
-    if rentpa == 0:
-        return money(rentpa)
-    if frequency not in (2, 4):
+    if rentpa == 0 or frequency not in (2, 4):
         return money(rentpa)
     missing_pennies = (rentpa * 100) % frequency
     if missing_pennies == 0:
         return money(rentpa / frequency)
     rent_gale = money(round_decimals_down(rentpa / frequency))
-    if frequency == 2 and next_rent_date.month > 6:
-        rent_gale += (missing_pennies / 100)
-    elif frequency == 4 and next_rent_date.month > 9:
-        rent_gale += (missing_pennies / 100)
+    if (frequency == 2 and next_rent_date.month > 6) or (frequency == 4 and next_rent_date.month > 9):
+        return rent_gale + (missing_pennies / 100)
     else:
         return money(rent_gale)
 

@@ -62,15 +62,68 @@ def get_combodict_filter():
     return combo_dict
 
 
+# if statements to get the modulated day - do we need this in a table / in a separate file?
+def get_date_m_day(datecode_id, month):
+    if datecode_id == 1:
+        if month == 3 or 12:
+            return 25
+        if month == 6:
+            return 24
+        if month == 9:
+            return 29
+    if datecode_id == 2:
+        if month == 6:
+            return 30
+        if month == 12:
+            return 31
+    if datecode_id == 3:
+        if month == 3:
+            return 31
+        if month == 9:
+            return 30
+    if datecode_id == 4:
+        if month == 3 or 12:
+            return 31
+        if month == 6 or 9:
+            return 30
+
+
+def inc_date(date1, freq, num):
+    # this function simply increments or decrements a date by num periods without modulating day of month
+    date2 = date1
+    if freq == 1:
+        date2 = date1 + relativedelta(years=num)
+    elif freq == 2:
+        date2 = date1 + relativedelta(months=num*6)
+    elif freq == 4:
+        date2 = date1 + relativedelta(months=num*3)
+    elif freq == 12:
+        date2 = date1 + relativedelta(months=num)
+    elif freq == 13:
+        date2 = date1 + relativedelta(weeks=num*4)
+    elif freq == 52:
+        date2 = date1 + relativedelta(weeks=num)
+
+    return date2
+
+
 def inc_date_m(date1, frequency, datecode_id, periods):
     # first we get a new pure date calculated forwards or backwards for the number of periods
     date2 = inc_date(date1, frequency, periods)
-    dates = [(1, 3, 25), (1, 6, 24), (1, 9, 29), (1, 12, 25), (2, 6, 30), (2, 12, 31), (3, 3, 31), (3, 9, 30),
-             (4, 3, 31), (4, 6, 30), (4, 9, 30), (4, 12, 31)]
+    # dates = [(1, 3, 25), (1, 6, 24), (1, 9, 29), (1, 12, 25), (2, 6, 30), (2, 12, 31), (3, 3, 31), (3, 9, 30),
+    #          (4, 3, 31), (4, 6, 30), (4, 9, 30), (4, 12, 31)]
     if datecode_id != 0:
-        for item in dates:
-            if item[0] == datecode_id and item[1] == date2.month:
-                date2 = date2.replace(day=item[2])
+        date2 = date2.replace(day=get_date_m_day(datecode_id, date2.month))
+        # for item in dates:
+        #     if item[0] == datecode_id and item[1] == date2.month:
+        #         date2 = date2.replace(day=item[2])
+
+    return date2
+
+
+def inc_rent_date(date1, date_id, freq, num):
+    # this function increments or decrements a date by num periods and then modulates the day of month
+    date2 = inc_date(date1, freq, num)
 
     return date2
 
@@ -135,47 +188,3 @@ def get_postvals_id():
             print(key, value)
 
     return postvals_id
-
-
-def inc_date(date1, freq, num):
-    # this function simply increments or decrements a date by num periods without modulating day of month
-    date2 = date1
-    if freq == 1:
-        date2 = date1 + relativedelta(years=num)
-    elif freq == 2:
-        date2 = date1 + relativedelta(months=num*6)
-    elif freq == 4:
-        date2 = date1 + relativedelta(months=num*3)
-    elif freq == 12:
-        date2 = date1 + relativedelta(months=num)
-    elif freq == 13:
-        date2 = date1 + relativedelta(weeks=num*4)
-    elif freq == 52:
-        date2 = date1 + relativedelta(weeks=num)
-
-    return date2
-
-
-def inc_rent_date(date1, date_id, freq, num):
-    # this function increments or decrements a date by num periods and then modulates the day of month
-    date2 = inc_date(date1, freq, num)
-
-    return date2
-
-
-# def preferredEncoding() -> str:
-#     # return the OS preferred encoding to use for text, e.g. when reading/writing from/to a text file via pathlib.open()
-#     # ("utf-8" for Linux, "cp1252" for Windows)
-#     import locale
-#     return locale.getpreferredencoding()
-#
-#
-# def readFromFile(filename):
-#     basedir = os.path.abspath(os.path.dirname('mjinn'))
-#     mergedir = os.path.join(basedir, 'app/templates/mergedocs')
-#     filePath = os.path.join(mergedir, filename)
-#     # with open(htmlFilePath, "r" encoding="utf-8") as f:
-#     #     htmlText = f.read()
-#     with filePath.open('r', encoding="utf-8") as f:
-#         fileText = f.read()
-#     return fileText

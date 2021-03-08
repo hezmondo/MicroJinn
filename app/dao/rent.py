@@ -83,6 +83,7 @@ def get_rent_ex(id):
         .filter(RentExt.id == id).one_or_none()
     return rent_ex
 
+
 def get_rent_mail(rent_id):
     rent_mail = \
         Rent.query \
@@ -113,13 +114,15 @@ def get_rent_mail(rent_id):
 def get_rent_s_data(qfilter, action, runsize):
     if action == "basic":
         # simple search of views rents submitted from home page
+        # Sam: I have removed inc_date_m and am using a class RentS in utility.py to derive the nextrentdate from
+        # the inc_date_m python function
         rent_s = \
             Property.query \
                 .join(Rent) \
                 .outerjoin(Agent) \
-                .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-                               func.mjinn.inc_date_m(Rent.lastrentdate, Rent.freq_id, Rent.datecode_id,
-                                                         1).label('nextrentdate'),
+                .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate, Rent.datecode_id,
+                               # func.mjinn.inc_date_m(Rent.lastrentdate, Rent.freq_id, Rent.datecode_id,
+                               #                           1).label('nextrentdate'),
                                Property.propaddr, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
                 .filter(*qfilter).limit(runsize).all()
 
