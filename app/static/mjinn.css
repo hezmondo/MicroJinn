@@ -28,6 +28,12 @@
 {
 	text-align: right;
 }
+.arrow-down::before
+{
+	content: "\f063";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+}
 .arrow-left::before
 {
 	content: "\f060";
@@ -124,6 +130,9 @@
 .btn-info:not(:disabled):not(.disabled):active:focus
 {
 	box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
+}
+.btn-light {
+    color: #5E5E5E;
 }
 .btn-light, .btn-light:focus, .btn-light.focus, .btn-light:active.focus, .btn-light:active, .btn-light:not(:disabled):not(.disabled):active
 {
@@ -457,6 +466,11 @@
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
+.minus::before {
+	content: "\f068";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
+}
 .modal-backdrop.show
 {
 	opacity: 0.4;
@@ -589,6 +603,7 @@
 .table-fixed, .table-condensed
 {
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
+	border-radius: 5px;
 }
 .table-green thead
 {

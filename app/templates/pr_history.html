@@ -10,6 +10,10 @@
             <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_id) }}"
+               class="btn btn-block btn-success button-icon plus" role="button">create new payrequest</a>
+        </div>
     </div>
     <div class="form-group row">
     </div>
@@ -86,9 +90,9 @@
 
 <!-- this modal message opens when the page loads (if we send a message argument to the url) to provide user feedback - ie 'pay request undone' -->
 {% block message_on_load %}
-    {% if message %}
-        {{ widgets.modal_message_on_load(message=message) }}
-    {% endif %}
+{% if message %}
+{{ widgets.modal_message_on_load(message=message) }}
+{% endif %}
 {% endblock %}
 
 

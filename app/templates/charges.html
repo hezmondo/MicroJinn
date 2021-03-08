@@ -25,6 +25,7 @@
         </div>
     </div>
 </form>
+{% if charge %}
 <div class="table-fixed">
     <table class="table" id="charges">
         <thead>
@@ -54,4 +55,9 @@
         </tbody>
     </table>
 </div>
+    {% else %}
+    <div class="boxed boxed-center boxed-blue">
+        There are no charges for this rent.
+    </div>
+    {% endif %}
 {% endblock %}	

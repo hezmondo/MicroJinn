@@ -68,7 +68,7 @@ def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method=
     pr_history.rent_id = rent_id
     pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
     pr_history.datetime = datetime.now()
-    pr_history.rent_date = datetime.strptime(pr_save_data.get('rent_date_string'), '%Y-%m-%d')
+    pr_history.rent_date = datetime.strptime(pr_save_data.get('rent_date_string'), '%d-%b-%Y')
     pr_history.total_due = pr_save_data.get('tot_due')
     pr_history.arrears_level = pr_save_data.get('new_arrears_level')
     # TODO: We are not using the typeprdelivery table yet in any meaningful way
