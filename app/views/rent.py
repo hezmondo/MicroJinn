@@ -10,6 +10,7 @@ rent_bp = Blueprint('rent_bp', __name__)
 @rent_bp.route('/rent/<int:rent_id>', methods=['GET', 'POST'])
 # @login_required
 def rent(rent_id):
+    message = request.args.get('message', type=str)
     if request.method == "POST":
         rent_id = post_rent(rent_id)
 
@@ -21,7 +22,8 @@ def rent(rent_id):
     charges = get_charges(rent_id) if rent_id != 0 else None
     rentstats = get_rent_strings(rent, 'rent')
 
-    return render_template('rent.html', charges=charges, rent=rent, combodict=combodict, rentstats=rentstats)
+    return render_template('rent.html', charges=charges, rent=rent, combodict=combodict,
+                           rentstats=rentstats, message=message)
 
 
 @rent_bp.route('/tenant/<int:rent_id>', methods=['GET', 'POST'])

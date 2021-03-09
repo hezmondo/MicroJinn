@@ -23,9 +23,9 @@
 
 
 <!-- macro action modal - produces a modal with a message, optional title and optional
-two buttons ('cancel' and an action button which we can define)
+two buttons ('cancel' and an action button which submits a form)
 if we do not define a button, the default close button appears-->
-{% macro modal_action(body, id, btn_class="", btn_text="", btn_url="", title="") -%}
+{% macro modal_form_action(body, id, btn_class="", btn_id="", btn_text="", btn_url="", title="") -%}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -42,7 +42,7 @@ if we do not define a button, the default close button appears-->
                 <div class="container">
                     <div class="row align-items-end">
                         <div class="col">
-                            <button type="submit" class="{{ btn_class }}"
+                            <button type="submit" id="{{ btn_id }}" class="{{ btn_class }}"
                                     formaction="{{ btn_url }}">{{ btn_text }}
                             </button>
                         </div>
@@ -71,11 +71,13 @@ if we do not define a button, the default close button appears-->
 
 <!-- macro message on page load - useful if we want to give feedback to a user after a process has completed and a page has loaded-->
 {% macro modal_message_on_load(message) -%}
-{{ modal_action(body=message, id="modal_message_on_load", title="message") }}
+{{ modal_form_action(body=message, id="modal_message_on_load", title="message") }}
 <script type="text/javascript">
     $(document).ready(function(){
     $("#modal_message_on_load").modal('show');
 });
+
+
 </script>
 {%- endmacro %}
 

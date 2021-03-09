@@ -9,7 +9,7 @@ from app.main.functions import strToDec
 from app.models import Agent, Charge, Jstore, Landlord, Manager, ManagerExt, MoneyAcc, Property, \
     Rent, RentExt, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, TypePrDelivery, TypeSaleGrade, \
     TypeStatus, TypeTenure
-
+from app.dao.database import commit_to_database
 
 def create_new_rent():
     # create new rent and property function not yet built, so return id for dummy rent:
@@ -159,6 +159,16 @@ def get_rent_s_data(qfilter, action, runsize):
                     .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
 
     return rent_s
+
+
+def post_agent_update(agent_id, rent_id):
+    if rent_id != 0:
+        rent = Rent.query.get(rent_id)
+        if agent_id != 0:
+            rent.agent_id = agent_id
+        else:
+            rent.agent_id = None
+    commit_to_database()
 
 
 def post_rent__filter(filterdict):
