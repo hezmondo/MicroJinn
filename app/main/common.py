@@ -110,13 +110,9 @@ def inc_date(date1, freq, num):
 def inc_date_m(date1, frequency, datecode_id, periods):
     # first we get a new pure date calculated forwards or backwards for the number of periods
     date2 = inc_date(date1, frequency, periods)
-    # dates = [(1, 3, 25), (1, 6, 24), (1, 9, 29), (1, 12, 25), (2, 6, 30), (2, 12, 31), (3, 3, 31), (3, 9, 30),
-    #          (4, 3, 31), (4, 6, 30), (4, 9, 30), (4, 12, 31)]
+    # now we modulate the day of the month for any rent with a special date sequence (ie datecode_id is not 0)
     if datecode_id != 0:
         date2 = date2.replace(day=get_date_m_day(datecode_id, date2.month))
-        # for item in dates:
-        #     if item[0] == datecode_id and item[1] == date2.month:
-        #         date2 = date2.replace(day=item[2])
 
     return date2
 

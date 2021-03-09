@@ -74,7 +74,7 @@
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 70.00%">{{ item.description}}</td>
             <td>
-                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit',
+                <button type="submit" formaction="{{ url_for('mail_bp.mail_edit_xray',
                 form_letter_id=item.id, method='email',
                 action=action) }}" class="btn btn-info button-icon email-ic">email</button>
             </td>
