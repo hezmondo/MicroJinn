@@ -1,110 +1,110 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <script src="https://kit.fontawesome.com/ab40005e00.js" crossorigin="anonymous"></script>
-        <!-- Required meta tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <!-- css files -- bootstrap first then mjinn -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-              integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
-              crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ url_for('static', filename='mjinn.css') }}">
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-    </head>
-    {% block navbar %}
-    <aside id="nav_aside" class="bg-dark fixed-top nav-display">
-        <nav class="navbar navbar-dark bg-dark" id="nav_bar">
-            <a class="navbar-brand button-icon meteor" href="{{ url_for('util_bp.home') }}">mjinn</a>
-<!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"-->
-<!--                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
-<!--                <span class="navbar-toggler-icon"></span>-->
-<!--            </button>-->
-            <div class="navbar-collapse" id="navbarResponsive">
-              <ul class="nav navbar-nav mr-auto">
-                  <hr/>
-                  {% if current_user and current_user.most_recent_rent %}
-                    <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('rent_bp.rent', rent_id=current_user.most_recent_rent) }}">recent rent</a>
-                    </li>
-                    <hr class="nav-hr">
-                  {% endif %}
+<head>
+    <script src="https://kit.fontawesome.com/ab40005e00.js" crossorigin="anonymous"></script>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- css files -- bootstrap first then mjinn -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='mjinn.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+{% block navbar %}
+<aside id="nav_aside" class="bg-dark fixed-top nav-display">
+    <nav class="navbar navbar-dark bg-dark" id="nav_bar">
+        <a class="navbar-brand button-icon meteor" href="{{ url_for('util_bp.home') }}">mjinn</a>
+        <!--            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"-->
+        <!--                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">-->
+        <!--                <span class="navbar-toggler-icon"></span>-->
+        <!--            </button>-->
+        <div class="navbar-collapse" id="navbarResponsive">
+            <ul class="nav navbar-nav mr-auto">
+                <hr/>
+                {% if current_user and current_user.most_recent_rent %}
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('util_bp.agents') }}">agents</a>
+                    <a class="nav-link" href="{{ url_for('rent_bp.rent', rent_id=current_user.most_recent_rent) }}">recent
+                        rent</a>
+                </li>
+                <hr class="nav-hr">
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('util_bp.agents') }}">agents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('headrent_bp.headrents') }}">headrents</a>
+                    <a class="nav-link" href="{{ url_for('headrent_bp.headrents') }}">headrents</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('income_bp.income', acc_id=0) }}">income</a>
+                    <a class="nav-link" href="{{ url_for('income_bp.income', acc_id=0) }}">income</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('loan_bp.loans') }}">loans</a>
+                    <a class="nav-link" href="{{ url_for('loan_bp.loans') }}">loans</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('money_bp.money') }}">money</a>
+                    <a class="nav-link" href="{{ url_for('money_bp.money') }}">money</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('pr_bp.pr_start') }}">pr start</a>
+                    <a class="nav-link" href="{{ url_for('pr_bp.pr_start') }}">pr start</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('rental_bp.rentals') }}">rentals</a>
+                    <a class="nav-link" href="{{ url_for('rental_bp.rentals') }}">rentals</a>
                 </li>
                 <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('util_bp.utilities') }}">utilities</a>
+                    <a class="nav-link" href="{{ url_for('util_bp.utilities') }}">utilities</a>
                 </li>
-                  <hr class="nav-hr">
-                 {% if current_user.is_anonymous %}
-                  <li class="nav-item">
+                <hr class="nav-hr">
+                {% if current_user.is_anonymous %}
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.login') }}">login</a>
-                  </li>
-                  {% else %}
-                  <li class="nav-item">
+                </li>
+                {% else %}
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.user', username=current_user.username) }}">profile</a>
-                  </li>
-                  <li class="nav-item">
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">logout</a>
-                  </li>
-                  {% endif %}
-                </ul>
-            </div>
-        </nav>
-    </aside>
-    {% endblock %}
-    {% block content %}
-    <body>
-        <div class="col-md-11 main-container bg-faded ">
-            <div class="row align-items-center ">
-                <div class="col">
-                    <div class="justify-content-center">
-                        {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                        {% for message in messages %}
-                        <div class="alert alert-info" role="alert">{{ message }}</div>
-                        {% endfor %}
-                        {% endif %}
-                        {% endwith %}
-                        {# application content needs to be provided in the app_content block #}
-                        {% block app_content %}{% endblock %}
-                    </div>
-                </div>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</aside>
+{% endblock %}
+{% block content %}
+<body>
+<div class="col-md-11 main-container bg-faded ">
+    <div class="row align-items-center ">
+        <div class="col">
+            <div class="justify-content-center">
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-info" role="alert">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+                {# application content needs to be provided in the app_content block #}
+                {% block app_content %}{% endblock %}
             </div>
         </div>
-    <!-- javascript files -- jquery first, then popper, bootstrap, then mjinn -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
-            crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
-            crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='mjinn.js') }}"></script>
-    {% block javascript %}{% endblock %}
+    </div>
+</div>
+<!-- javascript files -- jquery first, then popper, bootstrap, then mjinn -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='mjinn.js') }}"></script>
+{% block javascript %}{% endblock %}
 <!-- we can add a modal message when a page loads, for example after we post something to the db and want to give the user feedback -->
-    {% block message_on_load %}{% endblock %}
-    </body>
-    {% endblock %}
+{% block message_on_load %}{% endblock %}
+</body>
+{% endblock %}
 </html>

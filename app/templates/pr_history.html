@@ -18,7 +18,7 @@
     <div class="form-group row">
     </div>
     {% if pr_history.count() > 0 %}
-    {{ widgets.modal_action(
+    {{ widgets.modal_form_action(
     body="Are you sure you want to undo this payrequest?",
     id="modal_undo_pr",
     btn_class="btn btn-block btn-danger button-icon trash",
@@ -88,7 +88,8 @@
 </form>
 {% endblock %}
 
-<!-- this modal message opens when the page loads (if we send a message argument to the url) to provide user feedback - ie 'pay request undone' -->
+<!-- this modal message opens when the page loads (if we send a message argument to the url) to provide
+user feedback - ie 'pay request undone' -->
 {% block message_on_load %}
 {% if message %}
 {{ widgets.modal_message_on_load(message=message) }}

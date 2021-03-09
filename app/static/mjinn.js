@@ -83,6 +83,33 @@ $(document).ready(function(){
     $('#doc_html').html(function(i, html3) {
       return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
     });
+    //the expandable table buttons (show more) are found with id show_more_1 or show_more_2 (we can have a maximum
+    //of two expandable tables per page). We want to change the text of the buttons after they are expanded.
+    $('#accordion_1').on('shown.bs.collapse', function () {
+        $('#show_more_1').text('show fewer');
+        $('#show_more_1').removeClass('arrow-down');
+        $('#show_more_1').addClass('arrow-up');
+    });
+    $('#accordion_1').on('hidden.bs.collapse', function () {
+        $('#show_more_1').text('show more');
+        $('#show_more_1').addClass('arrow-down');
+        $('#show_more_1').removeClass('arrow-up');
+    });
+    $('#accordion_2').on('shown.bs.collapse', function () {
+        $('#show_more_2').text('show fewer');
+        $('#show_more_2').removeClass('arrow-down');
+        $('#show_more_2').addClass('arrow-up');
+    });
+    $('#accordion_2').on('hidden.bs.collapse', function () {
+        $('#show_more_2').text('show more');
+        $('#show_more_2').addClass('arrow-down');
+        $('#show_more_2').removeClass('arrow-up');
+    });
+    $('.btn-modal').click(function() {
+        var rentId = $(this).attr('name');
+        var btnLink = $('#btn_unlink').attr('formaction').slice(0, -1) + rentId;
+        $('#btn_unlink').attr('formaction', btnLink);
+    });
 });
 $(function() {
   // Sidebar toggle behavior

@@ -7,99 +7,98 @@
             <button id="savehtml" class="btn btn-block btn-success button-icon save">email and save</button>
         </div>
     </div>
-	<div id="doc_html" contenteditable="true">
-	    {% if method == "letter" %}
-			<div class="font-size-large" align="center">
-				<b>{{ rent.managername }}</b>
-			</div>
-			<div class="font-size-small" align="center">
-				{{ rent.manageraddr }}
-				<br />
-				{{ rent.manageraddr2 }}
-				<br />
-			</div>
-			<div class="font-size-medium" align="right">
-				Our Ref: {{ rent.rentcode }}
-				<br />
-				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
-			</div>
-			<div class="font-size-medium" align="left">
-				{% for item in mailaddr %}
-					{{ item }}
-					<br />
-				{% endfor %}
-				<br />
-				<br />
-				Dear {{ rent.tenantname }}
-			</div>
-	    {% else %}
-			<div class="font-size-medium" align="left">
-				Our Ref: {{ rent.rentcode }}
-				<br />
-				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent.email }}
-				<br />
-				<br />
-				Dear {{ rent.tenantname }}
-			</div>
-		{% endif %}
-		<div class="font-size-medium" align="left">
-			<br />
-			<b>Re: {{ rent.propaddr }}</b>
-			<br />
-			<br />
-			Thank you for your {{ variables.paytypedet }} payment in the sum of {{ variables.payamount }} received by
-			us on {{ variables.paydate }} paying {{ variables.rent_type }} on the above property up
-				to {{ rent.paidtodate.strftime('%d-%b-%Y') }}.
-			<br />
-			<br />
-			{{ variables.rent_type.capitalize() }} on the above property will next be due and payable
-			{{ rent.freqdet }} {{ rent.advarrdet }} on {{ rent.nextrentdate }} in the sum	of {{ variables.rentgale }}.
-			<br />
-			<br />
-			All Notices to the Lessor should be served only upon {{ rent.managername }} at {{ rent.manageraddr }}.
-			<br />
-			<br />
-			Yours sincerely
-			<br />
-			<br />
-			<br />
-		    {% if method == "email" %}
-				<b>{{ rent.managername }}</b>
-				<br />
-				<br />
-				{{ rent.manageraddr }}
-				<br />
-				<br />
-				{{ rent.manageraddr2 }}
-				<br />
-		    {% endif %}
-			</div>
-		</div>
-	</div>
-    <div class="form-group row">
-		<div class="col-md-3">
-            <input type="hidden" id="xinput" name="xinput" value = "xyz">
+    <div id="doc_html" contenteditable="true">
+        {% if method == "letter" %}
+        <div class="font-size-large" align="center">
+            <b>{{ rent.managername }}</b>
+        </div>
+        <div class="font-size-small" align="center">
+            {{ rent.manageraddr }}
+            <br/>
+            {{ rent.manageraddr2 }}
+            <br/>
+        </div>
+        <div class="font-size-medium" align="right">
+            Our Ref: {{ rent.rentcode }}
+            <br/>
+            Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+        </div>
+        <div class="font-size-medium" align="left">
+            {% for item in mailaddr %}
+            {{ item }}
+            <br/>
+            {% endfor %}
+            <br/>
+            <br/>
+            Dear {{ rent.tenantname }}
+        </div>
+        {% else %}
+        <div class="font-size-medium" align="left">
+            Our Ref: {{ rent.rentcode }}
+            <br/>
+            <br/>
+            Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to {{ rent.email }}
+            <br/>
+            <br/>
+            Dear {{ rent.tenantname }}
+        </div>
+        {% endif %}
+        <div class="font-size-medium" align="left">
+            <br/>
+            <b>Re: {{ rent.propaddr }}</b>
+            <br/>
+            <br/>
+            Thank you for your {{ variables.paytypedet }} payment in the sum of {{ variables.payamount }} received by
+            us on {{ variables.paydate }} paying {{ variables.rent_type }} on the above property up
+            to {{ rent.paidtodate.strftime('%d-%b-%Y') }}.
+            <br/>
+            <br/>
+            {{ variables.rent_type.capitalize() }} on the above property will next be due and payable
+            {{ rent.freqdet }} {{ rent.advarrdet }} on {{ rent.nextrentdate }} in the sum of {{ variables.rentgale }}.
+            <br/>
+            <br/>
+            All Notices to the Lessor should be served only upon {{ rent.managername }} at {{ rent.manageraddr }}.
+            <br/>
+            <br/>
+            Yours sincerely
+            <br/>
+            <br/>
+            <br/>
+            {% if method == "email" %}
+            <b>{{ rent.managername }}</b>
+            <br/>
+            <br/>
+            {{ rent.manageraddr }}
+            <br/>
+            <br/>
+            {{ rent.manageraddr2 }}
+            <br/>
+            {% endif %}
         </div>
     </div>
     <div class="form-group row">
-		<div class="col-md-2">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rent.id }}">
+        <div class="col-md-3">
+            <input type="hidden" id="xinput" name="xinput" value="xyz">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rent.rentcode }}">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <input type="hidden" id="rent_id" name="rent_id" value="{{ rent.id }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
+        <div class="col-md-2">
+            <input type="hidden" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
+        <div class="col-md-2">
+            <input type="hidden" id="doc_date" name="doc_date" value="{{ today_date }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="doc_type" name="doc_type" value = "{{ doctype }}">
+        <div class="col-md-2">
+            <input type="hidden" id="summary" name="summary" value="{{ summary }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="out_in" name="out_in" value = "out">
+        <div class="col-md-2">
+            <input type="hidden" id="doc_type" name="doc_type" value="{{ doctype }}">
+        </div>
+        <div class="col-md-2">
+            <input type="hidden" id="out_in" name="out_in" value="out">
         </div>
     </div>
 </form>

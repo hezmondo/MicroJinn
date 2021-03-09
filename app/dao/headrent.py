@@ -1,6 +1,8 @@
 from app import db
 from flask import request
 from sqlalchemy import func
+
+from app.dao.database import commit_to_database
 from app.main.common import get_postvals_id, inc_date_m
 from app.main.functions import strToDec
 from app.models import Agent, Headrent, Landlord, TypeAdvArr, TypeFreq, TypeStatusHr, TypeTenure\
@@ -94,3 +96,13 @@ def post_headrent(id):
     db.session.commit()
 
     return _id
+
+
+def post_headrent_agent_update(agent_id, rent_id):
+    if rent_id != 0:
+        headrent = Headrent.query.get(rent_id)
+        if agent_id != 0:
+            headrent.agent_id = agent_id
+        else:
+            headrent.agent_id = None
+    commit_to_database()
