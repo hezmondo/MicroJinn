@@ -30,3 +30,19 @@ def writeMail(rent_id, form_letter_id, income_id=0):
     return block, leasedata, rentobj, subject, doctype, dcode
 
 
+def writeMail_xray(rent_id, form_letter_id, income_id=0):
+    rentobj = get_rent_mail(rent_id)
+    variables = get_rent_strings(rentobj, 'xray')
+    income_item, allocdata = get_income_item(rent_id, income_id)
+    variables['payamount'] = moneyToStr(income_item.payamount, pound=True) if income_item else "no payment"
+    variables['paydate'] = dateToStr(income_item.paydate) if income_item else "no paydate"
+    variables['payer'] = income_item.payer if income_item else "no payer"
+    variables['paytypedet'] = income_item.paytypedet if income_item else "no paytype"
+    form_letter = get_form_letter(form_letter_id)
+    if "LEQ" in form_letter.code:
+        leasedata, lease_variables = get_lease_variables(rent_id)
+        variables.update(lease_variables)
+    else:
+        leasedata = None
+
+    return leasedata, rentobj, variables

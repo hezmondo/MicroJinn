@@ -113,6 +113,22 @@ def get_rent_strings(rent, type='mail'):
         return rent_strings_rent
     elif type == 'payrequest':
         return {**rent_strings_1, **rent_strings_2}
+    elif type == 'xray':
+        rent_strings_xray = {'arrears': moneyToStr(arrears, pound=True),
+                             'arrears_start_date': arrears_start_date,
+                             'arrears_end_date': arrears_end_date,
+                             'lastrentdate': dateToStr(rent.lastrentdate),
+                             'nextrentdate': dateToStr(nextrentdate),
+                             'paidtodate': dateToStr(paidtodate),
+                             'price_quote': moneyToStr(price_quote, pound=True),
+                             'rentgale': moneyToStr(rent_gale, pound=True),
+                             'rent_owing': rent_owing,
+                             'rentpa': moneyToStr(rent.rentpa, pound=True),
+                             'rent_type': rent_type,
+                             'totcharges': moneyToStr(totcharges, pound=True),
+                             'totdue': moneyToStr(totdue, pound=True)
+                             }
+        return rent_strings_xray
     else:
         return {**rent_strings_1, **rent_strings_2, **rent_strings_3}
 
