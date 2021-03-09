@@ -113,8 +113,10 @@
                         <td style="width: 15.00%">{{ rent.rentcode }}</td>
                         <td style="width: 55.00%"> {{ rent.tenantname }}</td>
                         <td style="width: 10.00%" class="vertical-align"><a href="#" data-toggle="modal"
-                                                                            data-target="#remove_agent_modal"
-                                                                            class="btn btn-warning btn-round button-icon round minus"
+                                                                            name="{{ rent.id }}"
+                                                                            data-target="#unlink_rent_modal"
+                                                                            id="unlink_{{ rent.id }}"
+                                                                            class="btn btn-warning btn-round button-icon round minus btn-modal"
                                                                             role="button"></a></td>
                         <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
                     rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
@@ -151,8 +153,7 @@
                 <tr>
                     <td class="vertical-align" style="width: 15%">headrent id</td>
                     <td class="vertical-align" style="width: 15.00%">code</td>
-                    <td class="vertical-align" style="width: 55.00%">propery address</td>
-                    <td class="vertical-align" style="width: 15.00%">unlink</td>
+                    <td class="vertical-align" style="width: 70.00%">propery address</td>
                 </tr>
                 </thead>
             </table>
@@ -164,13 +165,7 @@
                 <tr>
                     <td style="width: 15.00%">{{ rent.id }}</td>
                     <td style="width: 15.00%">{{ rent.code }}</td>
-                    <td style="width: 55.00%"> {{ rent.propaddr }}</td>
-                    <td style="width: 10.00%" class="vertical-align"><a href="#" data-toggle="modal"
-                                                                        data-target="#remove_agent_modal"
-                                                                        class="btn btn-warning btn-round button-icon round minus"
-                                                                        role="button"></a></td>
-                    <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                    rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                    <td style="width: 70.00%"> {{ rent.propaddr }}</td>
                 </tr>
                 {% endif %}
                 {% endfor %}
@@ -182,15 +177,9 @@
                     {% for rent in headrents %}
                     {% if loop.index >= 6 %}
                     <tr>
-                        <td style="width: 12.00%">{{ rent.id }}</td>
-                        <td style="width: 18.00%">{{ rent.code }}</td>
-                        <td style="width: 45.00%"> {{ rent.propaddr }}</td>
-                        <td style="width: 13.00%" class="vertical-align"><a href="#" data-toggle="modal"
-                                                                            data-target="#remove_agent_modal"
-                                                                            class="btn btn-warning btn-round button-icon round minus"
-                                                                            role="button"></a></td>
-                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                    rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                        <td style="width: 15.00%">{{ rent.id }}</td>
+                        <td style="width: 15.00%">{{ rent.code }}</td>
+                        <td style="width: 70.00%"> {{ rent.propaddr }}</td>
                     </tr>
                     {% endif %}
                     {% endfor %}
