@@ -19,6 +19,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or getattr(MyConfig, 'MAIL_PASSWORD', None)
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER') or getattr(MyConfig, 'MAIL_DEFAULT_SENDER', None)
     MAIL_DEBUG = getattr(MyConfig, 'MAIL_DEBUG', False)
+    MAIL_SUPPRESS_SEND = getattr(MyConfig, 'MAIL_SUPPRESS_SEND', False)
     ADMINS = getattr(MyConfig, 'ADMINS', None) or ['your-email@example.com']
     MYSQLDUMP_EXECUTABLE = getattr(MyConfig, 'MYSQLDUMP_EXECUTABLE', 'mysqldump')
     MYSQL_EXECUTABLE = getattr(MyConfig, 'MYSQL_EXECUTABLE', 'mysql')
