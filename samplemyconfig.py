@@ -18,6 +18,7 @@ class MyConfig(object):
     # MAIL_DEFAULT_SENDER = '<username>@gmail.com'
     # MAIL_DEBUG = True
     # MAIL_SUPPRESS_SEND = True
+    # MAIL_OVERRIDE_TO = '<some-user>@gmail.com'
     ADMINS = ['<some-user>@gmail.com']
     # uncomment MYSQLDUMP_EXECUTABLE and set to command/path if not default 'mysqldump'
     # MYSQLDUMP_EXECUTABLE = 'mysqldump'
