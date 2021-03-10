@@ -8,8 +8,8 @@ import jwt
 from app import db, login
 
 
-# As there are numerous model classes, shall we agree to keep them in alphabetic order, in English?
-# apart from the last one, which seems to belong to User.
+# As there are numerous model classes, shall we agree to keep them in alphabetic order,
+# apart from the last one, which seems to belong to User?
 class Agent(db.Model):
     __tablename__ = 'agent'
 
@@ -55,13 +55,14 @@ class ChargeType(db.Model):
     incomealloc_chargetype = db.relationship('IncomeAlloc', backref='chargetype', lazy='dynamic')
 
 
-class Dates(db.Model):
-    __tablename__ = 'dates'
+class Date_m(db.Model):
+    __tablename__ = 'date_m'
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15))
     month = db.Column(db.Integer)
     day = db.Column(db.Integer)
+    code_id = db.Column(db.Integer)
 
 
 class DigFile(db.Model):
@@ -126,6 +127,15 @@ class Event(db.Model):
     description = db.Column(db.String(90))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
+
+
+class FmLetter(db.Model):
+    __tablename__ = 'fm_letter'
+
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String(30))
+    description = db.Column(db.String(90))
+    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
 
 
 class FormLetter(db.Model):
@@ -600,6 +610,7 @@ class TypeDoc(db.Model):
     form_letter_typedoc = db.relationship('FormLetter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('DigFile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('DocFile', backref='typedoc', lazy='dynamic')
+    fm_letter_typedoc = db.relationship('FmLetter', backref='typedoc', lazy='dynamic')
 
 
 class TypeEvent(db.Model):

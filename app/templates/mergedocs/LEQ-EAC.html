@@ -1,125 +1,157 @@
-<!-- /templates/mergedocs/LTS.html  -->
+<!-- /templates/mergedocs/LEQ=EAC.html  -->
 {% extends 'base.html' %}
 {% block app_content %}
-<form method="POST" action="/save_html">
+<form method="POST" action="{{ url_for('doc_bp.save_html') }}">
     <div class="form-group row justify-content-end">
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success button-icon save">email and save</button>
         </div>
     </div>
-	<div id="doc_html" contenteditable="true">
-	    {% if method == "letter" %}
-			<div class="font-size-large" align="center">
-				<b>{{ rent.managername }}</b>
-			</div>
-			<div class="font-size-small" align="center">
-				{{ rent.manageraddr }}
-				<br />
-				{{ rent.manageraddr2 }}
-				<br />
-			</div>
-			<div class="font-size-medium" align="right">
-				Our Ref: {{ rent.rentcode }}
-				<br />
-				Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
-			</div>
-			<div class="font-size-medium" align="left">
-				{% for item in mailaddr %}
-					{{ item }}
-					<br />
-				{% endfor %}
-				<br />
-				<br />
-				Dear {{ rent.tenantname }}
-			</div>
-	    {% else %}
-			<div class="font-size-medium" align="left">
-				Our Ref: {{ rent.rentcode }}
-				<br />
-				<br />
-				Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to {{ rent.email }}
-				<br />
-				<br />
-				Dear {{ rent.tenantname }}
-			</div>
-		{% endif %}
-		<div class="font-size-medium" align="left">
-			<br />
-			<b>Re: {{ rent.propaddr }} - subject to contract</b>
-			<br />
-			<br />
-			Thank you for your enquiry about extending the Lease for the above property.
-			<br />
-			<br />
-			We can offer you a range of options, all available to your purchaser, in case you might wish to offer the
-			flat for sale with a choice of lease extension.  Our records show your lease as currently having
-			{{ leasedata.unexpired }} years unexpired. The following proposals are based upon us estimating your
-			flat's current market value to be about {{ leasedata.unimpvalue }} with the existing lease and about
-			{{ leasedata.impvalue }} with a new long lease at a modest ground rent:
-			<br />
-			<br />
-			1. A consideration of {{ leasedata.leq200R }} for a lease extension to provide a new term of 200 years
-			from {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} at a new ground rent of
-			{{ leasedata.gr_new }} per annum fixed throughout the new term.
-			<br />
-			<br />
-			2. A consideration of {{ leasedata.leq200P }} for a lease extension to provide a new term of
-			200 years from {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} at a new nil ground rent
-			fixed throughout the term.
-			<br />
-			<br />
-			At the point that you or a prospective purchaser should decide to proceed, all we will require is a
-			non-returnable deposit of £350.00 towards our costs of drafting the chosen lease extension and providing
-			documentation to your solicitor. This sum is payable in addition to the consideration mentioned above but
-			there are no other costs or charges payable to us. We strongly suggest that you use a solicitor to advise
-			you and to register your extended lease.
-			<br />
-			<br />
-			These quotations are valid for 90 days and we again make clear that these terms are available to any
-			purchaser.
-			<br />
-			<br />
-			Rentcode: {{ rent.rentcode }} Predicted tribunal value: {{ leasedata.tot_val }}
-			Relativity: {{ leasedata.relativity }} Unimproved value: {{ leasedata.unimpvalue }}
-			<br />
-			<br />
-			<br />
-		    {% if method == "email" %}
-				<b>{{ rent.managername }}</b>
-				<br />
-				<br />
-				{{ rent.manageraddr }}
-				<br />
-				<br />
-				{{ rent.manageraddr2 }}
-				<br />
-		    {% endif %}
-			</div>
-		</div>
-	</div>
-    <div class="form-group row">
-		<div class="col-md-3">
-            <input type="hidden" id="xinput" name="xinput" value = "xyz">
+    <div id="doc_html" contenteditable="true">
+        {% if method == "letter" %}
+        <div class="font-size-large" align="center">
+            <b>{{ rent.managername }}</b>
+        </div>
+        <div class="font-size-small" align="center">
+            {{ rent.manageraddr }}
+            <br/>
+            {{ rent.manageraddr2 }}
+            <br/>
+        </div>
+        <div class="font-size-medium" align="right">
+            Our Ref: {{ rent.rentcode }}
+            <br/>
+            Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+        </div>
+        <div class="font-size-medium" align="left">
+            {% for item in mailaddr %}
+            {{ item }}
+            <br/>
+            {% endfor %}
+            <br/>
+            <br/>
+            Dear {{ rent.tenantname }}
+        </div>
+        {% else %}
+        <div class="font-size-medium" align="left">
+            Our Ref: {{ rent.rentcode }}
+            <br/>
+            <br/>
+            Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to {{ rent.email }}
+            <br/>
+            <br/>
+            Dear {{ rent.tenantname }}
+        </div>
+        {% endif %}
+        <div class="font-size-medium" align="left">
+            <br/>
+            <b>Re: {{ rent.propaddr }} - subject to contract</b>
+            <br/>
+            <br/>
+            Thank you for your enquiry about extending the Lease for the above property.
+            <br/>
+            <br/>
+            All flat leaseholders currently have the right to obtain a statutory lease extension which is a "one size
+            fits all" solution which adds 90 years to your unexpired term and reduces your ground rent to a nil rent.
+            This current statutory process requires the flat leaseholder to pay the landlord's professional valuation
+            costs and reasonable conveyancing costs, on top of the flat leaseholder's own professional costs.
+            <br/>
+            <br/>
+            I have personally been involved in over 200 lease extensions granted by private treaty over the last
+            30 years. It is my personal view as a layman that all of these lease extensions involved the flat
+            leaseholder in far lower costs than the statutory procedure and also that the total premium paid was less
+            than what would likely have been paid under the statutory process.
+            <br/>
+            <br/>
+            If you were to obtain a statutory lease extension under the current legislation, your new lease would be
+            for 150.31 years from today at a peppercorn rent and the premium would include you paying me one half of
+            the "marriage value" (the difference in market value between that with the current lease and that with a
+            new lease for 125 years or more at a nil ground rent).
+            <br/>
+            <br/>
+            I have always tried to advise my flat leaseholders fairly and I draw to your attention that the government
+            recently announced proposed new legislation in respect of residential flat leases. It appears that the
+            new legislation will mean all flat lease extensions will have to be be done by way of a new lease for a
+            term of 990 years at a nil annual ground rent, with no alternatives offered. It also appears that the new
+            legislation will remove the freeholder's right to half the marriage value. I stress that these are my
+            assumptions as a layman. We do not know how long the new legislation will take to come into effect and what
+            it will eventually comprise.
+            <br/>
+            <br/>
+            In view of everything I have explained above and if I were you, I would probably wait to see when the new
+            legislation comes into effect and what it comprises. Having made that clear, I am aware that many of our
+            flat leaseholders do not wish to wait, possibly indefinitely. In view of this, we have decided to offer
+            all our tenants significantly improved terms over what we were offering before the recent government
+            announcements, in case any of our tenants might wish to proceed now on these significantly improved terms
+            rather than wait to see what the future holds.
+            <br/>
+            <br/>
+            We can offer you the following options, all available to a purchaser, in case you might wish to offer the
+            flat for sale with a choice of lease extension. Our records show your lease as currently having
+            {{ variables.unexpired }} years unexpired. The following proposals are based upon us estimating your
+            flat's current market value to be about {{ variables.unimpvalue }} with the existing lease and about
+            {{ variables.impvalue }} with a new long lease at a modest ground rent:
+            <br/>
+            <br/>
+            1. A lease extension to provide a new term of 250 years from 2021 at a new ground rent of
+            {{ variables.gr_new }} per annum fixed throughout the new term for a consideration of
+            {{ variables.leq200R }}
+            <br/>
+            <br/>
+            2. A lease extension to provide a new term of 250 years from 2021 at a new nil ground rent fixed throughout
+            the new term for a consideration of {{ variables.leq200P }}.
+            <br/>
+            <br/>
+            At the point that you or a prospective purchaser might wish to proceed, all we will require is a
+            non-returnable deposit of £350.00 towards our costs of drafting the chosen lease extension and providing
+            this to your solicitor. This sum is payable in addition to the consideration mentioned above but
+            there are no other costs or charges payable to us. We strongly suggest that you use a solicitor to advise
+            you and to register your extended lease.
+            <br/>
+            <br/>
+            These quotations are valid for 90 days and are available to any purchaser.
+            <br/>
+            <br/>
+            Rentcode: {{ rent.rentcode }} Predicted tribunal value: {{ variables.tot_val }}
+            Relativity: {{ variables.relativity }} Unimproved value: {{ variables.unimpvalue }}
+            <br/>
+            <br/>
+            <br/>
+            {% if method == "email" %}
+            <b>{{ rent.managername }}</b>
+            <br/>
+            <br/>
+            {{ rent.manageraddr }}
+            <br/>
+            <br/>
+            {{ rent.manageraddr2 }}
+            <br/>
+            {% endif %}
         </div>
     </div>
     <div class="form-group row">
-		<div class="col-md-2">
-            <input type="hidden" id="rent_id" name="rent_id" value = "{{ rent.id }}">
+        <div class="col-md-3">
+            <input type="hidden" id="xinput" name="xinput" value="xyz">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="rentcode" name="rentcode" value = "{{ rent.rentcode }}">
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <input type="hidden" id="rent_id" name="rent_id" value="{{ rent.id }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="doc_date" name="doc_date" value = "{{ today_date }}">
+        <div class="col-md-2">
+            <input type="hidden" id="rentcode" name="rentcode" value="{{ rent.rentcode }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="summary" name="summary" value = "{{ summary }}">
+        <div class="col-md-2">
+            <input type="hidden" id="doc_date" name="doc_date" value="{{ today_date }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="doc_type" name="doc_type" value = "{{ doctype }}">
+        <div class="col-md-2">
+            <input type="hidden" id="summary" name="summary" value="{{ summary }}">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="out_in" name="out_in" value = "out">
+        <div class="col-md-2">
+            <input type="hidden" id="doc_type" name="doc_type" value="{{ doctype }}">
+        </div>
+        <div class="col-md-2">
+            <input type="hidden" id="out_in" name="out_in" value="out">
         </div>
     </div>
 </form>
