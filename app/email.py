@@ -12,6 +12,15 @@ def send_async_email(app, msg):
 
 def send_email(subject, sender, recipients, text_body, html_body,
                attachments=None, sync=False):
+    if recipients:
+        # if any recipients are specified
+        # then if there is a config variable 'MAIL_OVERRIDE_TO'
+        # use that as the sole recipient
+        # this allows you to relax while developing/testing,
+        # sure in the knowledge that any emails sent will only be addressed to a set user, not the real recipient
+        override_to = current_app.config.get('MAIL_OVERRIDE_TO', None)
+        if override_to:
+            recipients = [override_to]
     msg = Message(subject, sender=sender, recipients=recipients)
     msg.body = text_body
     msg.html = html_body
