@@ -257,15 +257,17 @@
                 </div>
                 <div class="modal-body">
                     {% if rents or headrents %}
-                    {% if (rents|length + headrents|length) > 1 %}
-                    There are {{ rents|length + headrents|length }} rents or headrents associated with this agent.
-                    Are you sure you want to delete?
-                    {% elif (rents|length + headrents|length) == 1 and rent_id != 0 %}
-                    There are no rents or headrents associated with this agent apart from {{ rentcode }}.
-                    You can now delete this agent if no longer required for {{ rentcode }} or any other rent or purpose.
-                    {% endif %}
+                        {% if (rents|length + headrents|length) > 1 %}
+                        There are {{ rents|length + headrents|length }} rents or headrents associated with this agent.
+                        Are you sure you want to delete?
+                        {% elif (rents|length + headrents|length) == 1 and rent_id != 0 %}
+                        There are no rents or headrents associated with this agent apart from {{ rentcode }}.
+                        You can now delete this agent if no longer required for {{ rentcode }} or any other rent or purpose.
+                        {% else %}
+                        Are you sure you want to delete this agent?
+                        {% endif %}
                     {% else %}
-                    Are you sure you want to delete this agent?
+                        Are you sure you want to delete this agent?
                     {% endif %}
                 </div>
                 <div class="modal-footer">
