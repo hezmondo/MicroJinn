@@ -184,9 +184,10 @@ def get_rent_stat(rent, rent_strings):
     return rent_stat
 
 
+# simple check that there are no mail/post conflicts. If there are, a message is displayed on rent page load
 def rent_validation(rent, message=""):
     messages = [message] if message else []
-    if rent.prdeliverydet == 'email' and ('@' not in rent.email):
+    if ('email' in rent.prdeliverydet) and ('@' not in rent.email):
         messages.append('Payrequest delivery is set to email but there is no valid email address linked to this rent.')
     if not rent.mailaddr:
         messages.append("The mail address is currently 'None'. Please change the mail address "
