@@ -228,15 +228,11 @@
                         {% endif %}
                         <a data-toggle="modal" data-target="#agent_delete" href="#"
                            class="btn btn-block btn-danger button-icon trash" role="button">delete agent</a>
-                        {% else %}
-                        {% if rent_id != 0 %}
+                        {% elif rent_id != 0 %}
                         <a href="{{ url_for('util_bp.agents', agent_id=agent.id, rent_id=rent_id, rentcode=rentcode) }}"
                            class="btn btn-block btn-primary button-icon sync" role="button">link existing agent to {{
                             rentcode }}
                         </a>
-                        {% else %}
-                        First add an agent before linking to rents
-                        {% endif %}
                         {% endif %}
                     </div>
                 </div>
