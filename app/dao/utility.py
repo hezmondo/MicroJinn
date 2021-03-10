@@ -1,8 +1,8 @@
 from app import db
 from flask import request
 from app.dao.database import commit_to_database
-from app.models import Agent, Case, Charge, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, Landlord, Loan, \
-    MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, TypeDeed
+from app.models import Agent, Case, Charge, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, \
+    Landlord, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, TypeDeed
 
 
 def delete_record(item_id, item):
@@ -77,6 +77,12 @@ def delete_record_basic(item_id, item):
         PrCharge.query.filter_by(id=item_id).delete()
     elif item == "pr_file":
         PrHistory.query.filter_by(id=item_id).delete()
+
+
+def get_dates_m():
+    dates_m = Date_m.query.with_entities(Date_m.code_id, Date_m.month, Date_m.day) \
+        .all()
+    return dates_m
 
 
 def get_deeds():

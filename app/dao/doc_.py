@@ -29,16 +29,19 @@ def get_docfile(doc_id):
         docfile.doctype_id = 1
     else:
         if doc_dig == "doc":
-            docfile = DocFile.query.join(Rent).join(TypeDoc).with_entities(DocFile.id, DocFile.summary, DocFile.out_in,
-                                                                           DocFile.doc_text, DocFile.doc_date, literal("doc").label('doc_dig'),
-                                                                           Rent.rentcode, Rent.id.label("rent_id"), TypeDoc.desc) \
-                        .filter(DocFile.id == doc_id).one_or_none()
+            docfile = DocFile.query \
+                .join(Rent) \
+                .join(TypeDoc) \
+                .with_entities(DocFile.id, DocFile.summary, DocFile.out_in, DocFile.doc_text, DocFile.doc_date,
+                            literal("doc").label('doc_dig'), Rent.rentcode, Rent.id.label("rent_id"), TypeDoc.desc) \
+                .filter(DocFile.id == doc_id).one_or_none()
         else:
             docfile = DigFile.query.join(Rent).join(TypeDoc).with_entities(DigFile.id, DigFile.summary, DigFile.out_in,
-                                                                           DigFile.doc_date, literal("dig").label('doc_dig'),
-                                                                           Rent.rentcode, Rent.id.label("rent_id"), TypeDoc.desc) \
-                        .filter(DigFile.id == doc_id).one_or_none()
-
+                                                                           DigFile.doc_date,
+                                                                           literal("dig").label('doc_dig'),
+                                                                           Rent.rentcode, Rent.id.label("rent_id"),
+                                                                           TypeDoc.desc) \
+                .filter(DigFile.id == doc_id).one_or_none()
     return docfile, doc_dig
 
 
@@ -74,16 +77,19 @@ def get_docfiles(rent_id):
         docfile_filter.append(DocFile.rent_id == rent_id)
 
     docfiles = \
-        DocFile.query.join(Rent).join(TypeDoc).with_entities(DocFile.id, DocFile.doc_date,
-                                                             DocFile.summary, literal("doc").label('doc_dig'), DocFile.doc_text.label('doctext'),
-                                                             TypeDoc.desc, DocFile.out_in, Rent.rentcode) \
-            .filter(*docfile_filter).union\
-        (DigFile.query.join(Rent).join(TypeDoc).with_entities(DigFile.id, DigFile.doc_date,
-                                                              DigFile.summary, literal("dig").label('doc_dig'),
-                                                              literal("Digitext").label('doctext'), TypeDoc.desc, DigFile.out_in, Rent.rentcode) \
-         .filter(*digfile_filter)) \
+        DocFile.query \
+            .join(Rent) \
+            .join(TypeDoc) \
+            .with_entities(DocFile.id, DocFile.doc_date, DocFile.summary, literal("doc").label('doc_dig'),
+                           DocFile.doc_text.label('doctext'), TypeDoc.desc, DocFile.out_in, Rent.rentcode) \
+            .filter(*docfile_filter).union \
+            (DigFile.query \
+             .join(Rent) \
+             .join(TypeDoc) \
+             .with_entities(DigFile.id, DigFile.doc_date, DigFile.summary, literal("dig").label('doc_dig'),
+                            literal("Digitext").label('doctext'), TypeDoc.desc, DigFile.out_in, Rent.rentcode) \
+             .filter(*digfile_filter)) \
             .order_by(desc(DocFile.doc_date), desc(DigFile.doc_date)).limit(100)
-
     return docfiles, dfoutin
 
 
@@ -108,11 +114,12 @@ def post_docfile(doc_id):
         TypeDoc.query.with_entities(TypeDoc.id).filter(TypeDoc.desc == doctype).one()[0]
     docfile.summary = request.form.get('summary')
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
+    # this is where I suggest J should invoke his send email routine, if everything he needs has been unpacked above,
+    # such as docfile.doc_text.  Howver, I strongly suggest J should look at what Sam has done in his
+    # mergedocs/
     db.session.add(docfile)
-    db.session.flush()
-    doc_id = docfile.id
     commit_to_database()
-    return doc_id
+    return rent_id
 
 
 def post_upload():
@@ -164,9 +171,9 @@ def convert_html_to_pdf(source_html, output_filename):
     result_file = open(output_filename, "w+b")
     # convert HTML to PDF
     pisa_status = pisa.CreatePDF(
-            source_html,                # the HTML to convert
-            dest=result_file)           # file handle to recieve result
+        source_html,  # the HTML to convert
+        dest=result_file)  # file handle to recieve result
     # close output file
-    result_file.close()                 # close output file
+    result_file.close()  # close output file
     # return False on success and True on errors
     return pisa_status.err

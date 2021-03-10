@@ -11,11 +11,8 @@ doc_bp = Blueprint('doc_bp', __name__)
 def docfile(doc_id):
     if request.method == "POST":
         rent_id = post_docfile(doc_id)
-
         return redirect("/views/rent/{}".format(rent_id))
-
     docfile, doc_dig = get_docfile(doc_id)
-
     return render_template('docfile.html', docfile=docfile, doc_dig=doc_dig)
 
 
@@ -23,7 +20,6 @@ def docfile(doc_id):
 def docfiles(rent_id):
     docfiles, dfoutin = get_docfiles(rent_id)
     outins = ["all", "out", "in"]
-
     return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
 
 
@@ -38,8 +34,8 @@ def download(doc_id):
 @doc_bp.route('/save_html', methods=['GET', 'POST'])
 def save_html():
     if request.method == "POST":
-        id_ = post_docfile(0)
-        return redirect(url_for('doc_bp.docfiles', rent_id=id_))
+        rent_id = post_docfile(0)
+        return redirect(url_for('doc_bp.docfiles', rent_id=rent_id))
 
 
 @doc_bp.route('/upload_file/<int:rent_id>', methods=["GET", "POST"])
@@ -48,9 +44,7 @@ def upload_file(rent_id):
     rentcode = request.args.get('rentcode', "dummy", type=str)
     if request.method == "POST":
         post_upload()
-
         return redirect('/rent/{}'.format(rent_id))
-
     return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rent_id)
 
 # @doc_bp.route('/uploads/<filename>')

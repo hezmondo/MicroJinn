@@ -35,7 +35,6 @@ def get_lease(lease_id):
                     'rentcode': rentcode
                 }
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
-
     return lease, uplift_types
 
 
@@ -44,7 +43,6 @@ def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val, calc_date):
                      params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_val, "f": calc_date})
     leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
     commit_to_database()
-
     return leasedata
 
 
@@ -70,7 +68,6 @@ def get_leases():
         .filter(*lfilter).limit(60).all()
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")
-
     return leases, uplift_types, rcd, uld, ult
 
 
@@ -84,7 +81,6 @@ def get_lease_variables(rent_id):
     impval = leasedata["impvalk"] * 1000
     unimpval = leasedata["impvalk"] * leasedata["realty"] * 10 if leasedata["realty"] > 0 else impval
     lease_variables = {'unexpired': str(leasedata["unexpired"]) if leasedata else "11.11",
-                       'rent_code': leasedata["rent_code"] if leasedata else "some rentcode",
                        'relativity': str(leasedata["realty"]) if leasedata else "some relativity",
                        'tot_val': moneyToStr(leasedata["totval"] if leasedata else 55555.55, pound=True),
                        'unimpvalue': moneyToStr(unimpval if leasedata else 555.55, pound=True),
@@ -93,7 +89,6 @@ def get_lease_variables(rent_id):
                        'leq200P': moneyToStr(leasedata["leq200P"] if leasedata else 55555.55, pound=True),
                        'gr_new': moneyToStr(leasedata["gr_new"] if leasedata else 555.55, pound=True)
                        }
-
     return leasedata, lease_variables
 
 
@@ -126,7 +121,6 @@ def post_lease(lease_id):
     print(request.form)
     db.session.add(lease)
     commit_to_database()
-
     return rent_id
 
 

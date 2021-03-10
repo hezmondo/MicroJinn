@@ -1,10 +1,10 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 import json
 import datetime
-
 from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_login import current_user
+from app.dao.utility import get_dates_m
 from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
                         TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
 
@@ -16,7 +16,6 @@ def get_combodict_basic():
     freqs = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     tenures = [value for (value,) in TypeTenure.query.with_entities(TypeTenure.tenuredet).all()]
-
     combo_dict = {
         "actypes": actypes,
         "advars": advars,
@@ -24,7 +23,6 @@ def get_combodict_basic():
         "landlords": landlords,
         "tenures": tenures,
     }
-
     return combo_dict
 
 
@@ -41,7 +39,6 @@ def get_combodict_rent():
     combo_dict['prdeliveries'] = prdeliveries
     combo_dict['salegrades'] = salegrades
     combo_dict['statuses'] = statuses
-
     return combo_dict
 
 
@@ -58,34 +55,7 @@ def get_combodict_filter():
     filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
     combo_dict["filternames"] = filternames
     combo_dict["filtertypes"] = ("payrequest", "rentprop", "income")
-
     return combo_dict
-
-
-# if statements to get the modulated day - do we need this in a table / in a separate file?
-def get_date_m_day(datecode_id, month):
-    if datecode_id == 1:
-        if month == 3 or 12:
-            return 25
-        if month == 6:
-            return 24
-        if month == 9:
-            return 29
-    if datecode_id == 2:
-        if month == 6:
-            return 30
-        if month == 12:
-            return 31
-    if datecode_id == 3:
-        if month == 3:
-            return 31
-        if month == 9:
-            return 30
-    if datecode_id == 4:
-        if month == 3 or 12:
-            return 31
-        if month == 6 or 9:
-            return 30
 
 
 def inc_date(date1, freq, num):
@@ -103,31 +73,24 @@ def inc_date(date1, freq, num):
         date2 = date1 + relativedelta(weeks=num*4)
     elif freq == 52:
         date2 = date1 + relativedelta(weeks=num)
-
     return date2
 
 
 def inc_date_m(date1, frequency, datecode_id, periods):
     # first we get a new pure date calculated forwards or backwards for the number of periods
     date2 = inc_date(date1, frequency, periods)
-    # now we modulate the day of the month for any rent with a special date sequence (ie datecode_id is not 0)
+    # now get special date sequences from date_m table
+    dates_m = get_dates_m()
     if datecode_id != 0:
-        date2 = date2.replace(day=get_date_m_day(datecode_id, date2.month))
-
-    return date2
-
-
-def inc_rent_date(date1, date_id, freq, num):
-    # this function increments or decrements a date by num periods and then modulates the day of month
-    date2 = inc_date(date1, freq, num)
-
+        for item in dates_m:
+            if item[0] == datecode_id and item[1] == date2.month:
+                date2 = date2.replace(day=item[2])
     return date2
 
 
 def get_hr_statuses():
     hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
     # hr_statuses = ["active", "dormant", "suspended", "terminated"]
-
     return hr_statuses
 
 
@@ -136,7 +99,6 @@ def get_idlist_recent(type):
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
         id_list = [1, 2, 3]
-
     return id_list
 
 
@@ -182,5 +144,4 @@ def get_postvals_id():
                 actval = TypeTenure.query.with_entities(TypeTenure.id).filter(TypeTenure.tenuredet == actval).one()[0]
             postvals_id[key] = actval
             print(key, value)
-
     return postvals_id
