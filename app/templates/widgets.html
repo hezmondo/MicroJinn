@@ -25,7 +25,7 @@
 <!-- macro action modal - produces a modal with a message, optional title and optional
 two buttons ('cancel' and an action button which submits a form)
 if we do not define a button, the default close button appears-->
-{% macro modal_form_action(body, id, btn_class="", btn_id="", btn_text="", btn_url="", title="") -%}
+{% macro modal_form_action(id, body="", body_as_list=[], btn_class="", btn_id="", btn_text="", btn_url="", title="") -%}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -35,7 +35,22 @@ if we do not define a button, the default close button appears-->
             </div>
             {%- endif %}
             <div class="modal-body">
+                {% if body %}
                 {{ body }}
+                <br>
+                <br>
+                {% endif %}
+                {% if body_as_list %}
+                {% for message in body_as_list %}
+                {% if loop.index == 1 %}
+                {{ message }}
+                {% else %}
+                <br>
+                <br>
+                {{ message }}
+                {% endif %}
+                {% endfor %}
+                {% endif %}
             </div>
             <div class="modal-footer">
                 {% if btn_class and btn_text and btn_url -%}
@@ -71,12 +86,23 @@ if we do not define a button, the default close button appears-->
 {%- endmacro %}
 
 
-<!-- macro message on page load - useful if we want to give feedback to a user after a process has completed and a page has loaded-->
-{% macro modal_message_on_load(message) -%}
-{{ modal_form_action(body=message, id="modal_message_on_load", title="message") }}
+<!-- macro message on page load - useful if we want to give feedback to a user after a process has
+completed and a page has loaded-->
+{% macro modal_message_on_load(message="", messages=[], title="") -%}
+{% if message %}
+{{ modal_form_action(body=message, id="modal_message_on_load", title=title) }}
+{% elif messages %}
+{{ modal_form_action(body_as_list=messages, id="modal_message_on_load", title=title) }}
+{% endif %}
+{{ modal_on_load_js(modal_id="modal_message_on_load") }}
+{%- endmacro %}
+
+
+<!-- macro js to load a modal at page start-->
+{% macro modal_on_load_js(modal_id) -%}
 <script type="text/javascript">
     $(document).ready(function(){
-    $("#modal_message_on_load").modal('show');
+    $("#{{ modal_id }}").modal('show');
 });
 
 

@@ -182,3 +182,13 @@ def get_rent_stat(rent, rent_strings):
                     rent_strings["#advarr#"])
 
     return rent_stat
+
+
+def rent_validation(rent, message=""):
+    messages = [message] if message else []
+    if rent.prdeliverydet == 'email' and ('@' not in rent.email):
+        messages.append('Payrequest delivery is set to email but there is no valid email address linked to this rent.')
+    if not rent.mailaddr:
+        messages.append("The mail address is currently 'None'. Please change the mail address "
+                        "from mailto agent or link a new agent.")
+    return messages

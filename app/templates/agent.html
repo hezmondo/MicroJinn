@@ -117,7 +117,8 @@
                                                                             data-target="#unlink_rent_modal"
                                                                             id="unlink_{{ rent.id }}"
                                                                             class="btn btn-warning btn-round button-icon round minus btn-modal"
-                                                                            role="button"></a></td>
+                                                                            role="button"></a>
+                        </td>
                         <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
                     rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
                     </tr>
@@ -225,6 +226,12 @@
                            class="btn btn-block btn-primary button-icon sync" role="button">change agent for {{ rentcode
                             }}
                         </a>
+                        <form style="margin: 8px 0px;" method="POST" action="{{ url_for('util_bp.agent_unlink',
+                        agent_id=agent.id, rent_id=rent_id, rentcode=rentcode, action='from_rent') }}">
+                            <button type="submit" class="btn btn-block btn-warning button-icon minus">
+                                unlink agent from {{ rentcode }}
+                            </button>
+                        </form>
                         {% endif %}
                         <a data-toggle="modal" data-target="#agent_delete" href="#"
                            class="btn btn-block btn-danger button-icon trash" role="button">delete agent</a>
@@ -291,14 +298,15 @@
             </div>
         </div>
     </div>
-    <!-- Modal - unlink rent -->
+    <!-- Modal - unlink rent. The rent_id is last in the btn_url as the end of the resulting url string is changed
+    by jquery depending on rent_id of the table unlink selection -->
     {{ widgets.modal_form_action(
     body="Are you sure you want to unlink this rent from this agent",
     id="unlink_rent_modal",
     btn_class="btn btn-block btn-warning button-icon minus",
     btn_id="btn_unlink",
     btn_text="unlink rent",
-    btn_url=url_for('util_bp.agent_unlink', agent_id=agent.id, rent_id=rent_id),
+    btn_url=url_for('util_bp.agent_unlink', agent_id=agent.id, rentcode=rentcode, rent_id=rent_id),
     title="warning"
     ) }}
 </form>
@@ -368,4 +376,10 @@
         </div>
     </div>
 </div>
+{% endblock %}
+<-- we show the edit agent modal on page load if a user has come from agents and chosen to create a new agent
+{% block message_on_load %}
+{% if rent_id == 0 and agent.id == 0 %}
+{{ widgets.modal_on_load_js(modal_id="agent_modal") }}
+{% endif %}
 {% endblock %}

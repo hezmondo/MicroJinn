@@ -387,7 +387,7 @@
                     </div>
                     <div class="form-group row">
                         <div class="col-md-12">
-                            <label for="prdelivery">pr delivery:</label>
+                            <label for="prdelivery">payrequest delivery:</label>
                             {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
                             item_selected=rent.prdeliverydet) }}
                         </div>
@@ -419,8 +419,8 @@
 {% endblock %}
 
 {% block message_on_load %}
-{% if message %}
-{{ widgets.modal_message_on_load(message=message) }}
+{% if messages %}
+{{ widgets.modal_message_on_load(messages=messages, title="Notice") }}
 {% endif %}
 {% endblock %}
 

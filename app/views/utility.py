@@ -71,10 +71,14 @@ def agent_rents(agent_id):
 @login_required
 def agent_unlink(agent_id):
     if request.method == "POST":
-        rent_id = request.args.get('rent_id', type=int)
+        rent_id = request.args.get('rent_id', 0, type=int)
+        rentcode = request.args.get('rentcode', '', type=str)
         post_agent_update(0, rent_id)
-
-        return redirect(url_for('util_bp.agent', agent_id=agent_id))
+        action = request.args.get('action', type=str)
+        if action == 'from_rent':
+            return redirect(url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode))
+        else:
+            return redirect(url_for('util_bp.agent', agent_id=agent_id))
 
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
