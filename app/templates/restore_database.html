@@ -91,6 +91,6 @@
 
 {% block message_on_load %}
     {% if message %}
-        {{ widgets.modal_message_on_load(message=message) }}
+        {{ widgets.modal_message_on_load(message=message, title="Notice") }}
     {% endif %}
 {% endblock %}
