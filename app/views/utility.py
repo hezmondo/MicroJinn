@@ -40,7 +40,7 @@ def agent(agent_id):
 @login_required
 def agent_delete(agent_id):
     if request.method == "POST":
-        rent_id = int(request.args.get('rent_id', "0", type=str))
+        rent_id = request.args.get('rent_id', 0, type=int)
         rentcode = request.args.get('rentcode', "ABC1", type=str)
         rents = get_agent_rents(agent_id, 'rent')
         if rents:
@@ -51,8 +51,10 @@ def agent_delete(agent_id):
             for rent in headrents:
                 post_headrent_agent_update(0, rent.id)
         delete_record(agent_id, 'agent')
-
-        return redirect(url_for('util_bp.agents', rent_id=rent_id, rentcode=rentcode))
+        if rent_id == 0:
+            return redirect(url_for('util_bp.agents', rent_id=rent_id, rentcode=rentcode))
+        else:
+            return redirect(url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode))
 
 
 @util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
@@ -69,10 +71,14 @@ def agent_rents(agent_id):
 @login_required
 def agent_unlink(agent_id):
     if request.method == "POST":
-        rent_id = request.args.get('rent_id', type=int)
+        rent_id = request.args.get('rent_id', 0, type=int)
+        rentcode = request.args.get('rentcode', '', type=str)
         post_agent_update(0, rent_id)
-
-        return redirect(url_for('util_bp.agent', agent_id=agent_id))
+        action = request.args.get('action', type=str)
+        if action == 'from_rent':
+            return redirect(url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode))
+        else:
+            return redirect(url_for('util_bp.agent', agent_id=agent_id))
 
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
@@ -80,9 +86,10 @@ def agent_unlink(agent_id):
 def agents():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
+    agent_id = request.args.get('agent_id', 0, type=int)
     agents = get_agents()
 
-    return render_template('agents.html', agents=agents, rent_id=rent_id, rentcode=rentcode)
+    return render_template('agents.html', agents=agents, agent_id=agent_id, rent_id=rent_id, rentcode=rentcode)
 
 
 @util_bp.route('/agents_select', methods=['GET', 'POST'])

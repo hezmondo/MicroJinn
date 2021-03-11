@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, render_template,  request, url_for, json
+from flask import Blueprint, redirect, render_template, request, url_for, json
 from flask_login import login_required
 from app.forms import PrPostForm
 from app.dao.filter import get_filters
@@ -7,7 +7,6 @@ from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequ
 from app.dao.rent import get_rent_addrs
 from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, \
     undo_pr, write_payrequest, write_payrequest_email
-
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -26,10 +25,14 @@ def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
         block, pr_save_data, rent_mail, subject, table_rows, \
-            totdue_string = write_payrequest(rent_id, pr_form_id)
+        totdue_string = write_payrequest(rent_id, pr_form_id)
         pr_form = PrPostForm()
         rent_addrs = get_rent_addrs(rent_id)
-        mailaddr = rent_addrs.mailaddr.split(", ")
+        if rent_addrs.mailaddr:
+            mailaddr = rent_addrs.mailaddr.split(", ")
+        else:
+            message = 'Cannot complete payrequest, Please update mail address.'
+            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
         pr_form.mailaddr.choices = [rent_addrs.mailaddr, (rent_addrs.tenantname + ', ' + rent_addrs.propaddr),
                                     ('The owner/occupier, ' + rent_addrs.propaddr)]
         if pr_form.validate_on_submit():

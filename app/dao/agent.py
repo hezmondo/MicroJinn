@@ -14,7 +14,8 @@ def get_agents():
                     Agent.email.ilike('%{}%'.format(email)), Agent.note.ilike('%{}%'.format(note))).all()
     else:
         id_list = get_idlist_recent("recent_agents")
-        agents = Agent.query.filter(Agent.id.in_(id_list))
+        agents = Agent.query.filter(Agent.id.in_(id_list)).all()
+        agents = sorted(agents, key=lambda o: id_list.index(o.id))
 
     return agents
 
