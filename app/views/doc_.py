@@ -1,7 +1,9 @@
-from flask import Blueprint, redirect, render_template, request, send_file, url_for
+from flask import Blueprint, redirect, render_template, request, send_file, url_for, current_app
 from flask_login import login_required
 from io import BytesIO
-from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, post_docfile, post_upload
+from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, create_docfile_for_upload, upload_docfile, \
+    post_docfile, post_upload
+from app.email import app_send_email
 
 doc_bp = Blueprint('doc_bp', __name__)
 
@@ -31,10 +33,22 @@ def download(doc_id):
                      mimetype='application/pdf')
 
 
-@doc_bp.route('/save_html', methods=['GET', 'POST'])
-def save_html():
+@doc_bp.route('/email_and_save', methods=['POST'])
+def email_and_save():
     if request.method == "POST":
-        rent_id = post_docfile(0)
+        # create the record to be uploaded to `docfile` table
+        # this contains the email
+        docfile = create_docfile_for_upload(0)
+        # send the email now, from the docfile record
+        appmail = current_app.extensions['mail']
+        recipients = request.form.get('email_to')
+        subject = request.form.get('email_subject')
+        html_body = docfile.doc_text
+        # next line will raise an exception if there is a problem actually sending the email
+        app_send_email(appmail, recipients, subject, html_body)
+        # now upload to the database
+        upload_docfile(docfile)
+        rent_id = docfile.rent_id
         return redirect(url_for('doc_bp.docfiles', rent_id=rent_id))
 
 

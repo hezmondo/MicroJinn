@@ -93,7 +93,7 @@ def get_docfiles(rent_id):
     return docfiles, dfoutin
 
 
-def post_docfile(doc_id):
+def create_docfile_for_upload(doc_id):
     rent_id = int(request.form.get('rent_id'))
     doc_dig = request.form.get('doc_dig') or "doc"
     # new file for id 0, otherwise existing dig or doc file:
@@ -114,12 +114,18 @@ def post_docfile(doc_id):
         TypeDoc.query.with_entities(TypeDoc.id).filter(TypeDoc.desc == doctype).one()[0]
     docfile.summary = request.form.get('summary')
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
-    # this is where I suggest J should invoke his send email routine, if everything he needs has been unpacked above,
-    # such as docfile.doc_text.  Howver, I strongly suggest J should look at what Sam has done in his
-    # mergedocs/
+    return docfile
+
+
+def upload_docfile(docfile):
     db.session.add(docfile)
     commit_to_database()
-    return rent_id
+
+
+def post_docfile(doc_id):
+    docfile = create_docfile_for_upload(doc_id)
+    upload_docfile(docfile)
+    return docfile.rent_id
 
 
 def post_upload():

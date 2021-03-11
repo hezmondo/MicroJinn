@@ -1,7 +1,7 @@
 <!-- /templates/mergedocs/LEQ=EAC.html  -->
 {% extends 'base.html' %}
 {% block app_content %}
-<form method="POST" action="{{ url_for('doc_bp.save_html') }}">
+<form method="POST" action="{{ url_for('doc_bp.email_and_save') }}">
     <div class="form-group row justify-content-end">
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success button-icon save">email and save</button>
