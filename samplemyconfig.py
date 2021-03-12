@@ -1,5 +1,6 @@
 class MyConfig(object):
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://<username>:<password>>@localhost/mjinn'
+    # SQLALCHEMY_ECHO = True
     # uncomment and set all MAIL_ variables to enable emailing
     # first set is for "emulated" mailing on development machine
     # to use, in another window/Command Prompt run:

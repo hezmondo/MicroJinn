@@ -2,8 +2,9 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.models import Loan, LoanStat, TypeAdvArr, TypeFreq
+from app.dao.common import get_advarr_types, get_freq_types
 from app.dao.database import commit_to_database
+from app.models import Loan, LoanStat, TypeAdvArr, TypeFreq
 
 
 def get_loan(loan_id):
@@ -26,8 +27,8 @@ def get_loan(loan_id):
 
 def get_loan_options():
     # return options for each multiple choice control in loan page
-    advarrdets = [value for (value,) in TypeAdvArr.query.with_entities(TypeAdvArr.advarrdet).all()]
-    freqdets = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
+    advarrdets = [typeadvarr.advarrdet for typeadvarr in get_advarr_types()]
+    freqdets = [typefreq.freqdet for typefreq in get_freq_types()]
 
     return advarrdets, freqdets
 

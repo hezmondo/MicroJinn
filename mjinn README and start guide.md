@@ -38,6 +38,8 @@ and then use pip3 to install these dependencies:
 
     pip3 install flask-table
 
+    pip3 install flask-caching
+
 **In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3**
 	
 ### Now download the mjinn code from the github repo, maintaining the directory structure.  

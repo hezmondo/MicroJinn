@@ -53,5 +53,8 @@ def mail_edit_x(fm_letter_id):
         mailaddr = request.form.get('mailaddr')
         mailaddr = mailaddr.split(", ")
         summary = f"{method}-{code}-to-{rent.email}"
-        return render_template(f"mergedocs/{code}.html", doctype=doctype, leasedata=leasedata, mailaddr=mailaddr,
-                               method=method, rent=rent, summary=summary, variables=variables)
+        email_to = rent.email
+        email_subject = f"Re: {rent.propaddr}"
+        return render_template(f"mergedocs/{code}.html", doctype=doctype, email_subject=email_subject,
+                               email_to=email_to, leasedata=leasedata, mailaddr=mailaddr, method=method, rent=rent,
+                               summary=summary, variables=variables)

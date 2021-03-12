@@ -1,8 +1,10 @@
-from app import db
+from app import db, cache
 from flask import request
 from app.dao.database import commit_to_database
-from app.models import Agent, Case, Charge, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, \
-    Landlord, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, TypeDeed
+from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
+    IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, \
+    TypeAcType, TypeAdvArr, TypeDeed, TypeDoc, TypeEvent, TypeFreq, TypeMailTo, TypePayment, TypePrDelivery, \
+    TypeProperty, TypeSaleGrade, TypeStatus, TypeStatusBatch, TypeStatusHr, TypeTenure
 
 
 def delete_record(item_id, item):
@@ -79,22 +81,126 @@ def delete_record_basic(item_id, item):
         PrHistory.query.filter_by(id=item_id).delete()
 
 
+@cache.cached(key_prefix='db_actypes_all')
+def get_actypes():
+    actypes = TypeAcType.query.all()
+
+    return actypes
+
+
+@cache.cached(key_prefix='db_advarr_types_all')
+def get_advarr_types():
+    advarr_types = TypeAdvArr.query.all()
+
+    return advarr_types
+
+
+@cache.cached(key_prefix='db_batchstatus_types_all')
+def get_batchstatus_types():
+    batchstatus_types = TypeStatusBatch.query.all()
+
+    return batchstatus_types
+
+
+@cache.cached(key_prefix='db_charge_types_all')
+def get_charge_types():
+    charge_types = ChargeType.query.all()
+
+    return charge_types
+
+
+@cache.cached(key_prefix='db_dates_m_all')
 def get_dates_m():
-    dates_m = Date_m.query.with_entities(Date_m.code_id, Date_m.month, Date_m.day) \
-        .all()
+    dates_m = Date_m.query.with_entities(Date_m.code_id, Date_m.month, Date_m.day).all()
+
     return dates_m
-
-
-def get_deeds():
-    deeds = TypeDeed.query.all()
-
-    return deeds
 
 
 def get_deed(deed_id):
     deed = TypeDeed.query.get(deed_id)
 
     return deed
+
+
+def get_deed_types():
+    deed_types = TypeDeed.query.all()
+
+    return deed_types
+
+
+@cache.cached(key_prefix='db_doc_types_all')
+def get_doc_types():
+    doc_types = TypeDoc.query.all()
+
+    return doc_types
+
+
+def get_event_types():
+    event_types = TypeEvent.query.all()
+
+    return event_types
+
+
+@cache.cached(key_prefix='db_freq_types_all')
+def get_freq_types():
+    freq_types = TypeFreq.query.all()
+
+    return freq_types
+
+
+def get_hrstatus_types():
+    hrstatus_types = TypeStatusHr.query.all()
+
+    return hrstatus_types
+
+
+def get_mailto_types():
+    mailto_types = TypeMailTo.query.all()
+
+    return mailto_types
+
+
+def get_pay_types():
+    pay_types = TypePayment.query.all()
+
+    return pay_types
+
+
+def get_prdelivery_types():
+    prdelivery_types = TypePrDelivery.query.all()
+
+    return prdelivery_types
+
+
+def get_prop_types():
+    prop_types = TypeProperty.query.all()
+
+    return prop_types
+
+
+def get_salegrade_types():
+    salegrade_types = TypeSaleGrade.query.all()
+
+    return salegrade_types
+
+
+def get_status_types():
+    status_types = TypeStatus.query.all()
+
+    return status_types
+
+
+@cache.cached(key_prefix='db_tenure_types_all')
+def get_tenure_types():
+    status_types = TypeTenure.query.all()
+
+    return status_types
+
+
+def get_uplift_types():
+    uplift_types = LeaseUpType.query.all()
+
+    return uplift_types
 
 
 def post_deed(deed_id, rent_id):

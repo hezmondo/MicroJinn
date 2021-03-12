@@ -114,7 +114,7 @@ def get_rent_mail(rent_id):
 def get_rent_s_data(qfilter, action, runsize):
     if action == "basic":
         # simple search of views rents submitted from home page
-        # Sam: I have removed inc_date_m and am using a class RentS in utility.py to derive the nextrentdate from
+        # Sam: I have removed inc_date_m and am using a class RentS in common.py to derive the nextrentdate from
         # the inc_date_m python function
         rent_s = \
             Property.query \

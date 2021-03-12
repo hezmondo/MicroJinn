@@ -4,7 +4,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="/save_html">
+<form method="POST" action="{{ url_for('doc_bp.email_and_save') }}">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-2">
 			<a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}"

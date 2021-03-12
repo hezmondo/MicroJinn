@@ -4,18 +4,18 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from flask import request
 from flask_login import current_user
-from app.dao.utility import get_dates_m
+from app.dao.common import get_actypes, get_advarr_types, get_dates_m, get_freq_types, get_tenure_types
 from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
                         TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
 
 
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
-    actypes = [value for (value,) in TypeAcType.query.with_entities(TypeAcType.actypedet).all()]
-    advars = [value for (value,) in TypeAdvArr.query.with_entities(TypeAdvArr.advarrdet).all()]
-    freqs = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
+    actypes = [typeactype.actypedet for typeactype in get_actypes()]
+    advars = [typeadvarr.advarrdet for typeadvarr in get_advarr_types()]
+    freqs = [typefreq.freqdet for typefreq in get_freq_types()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    tenures = [value for (value,) in TypeTenure.query.with_entities(TypeTenure.tenuredet).all()]
+    tenures = [typetenure.tenuredet for typetenure in get_tenure_types()]
     combo_dict = {
         "actypes": actypes,
         "advars": advars,
@@ -51,10 +51,10 @@ def get_combodict_filter():
     combo_dict['salegrades'].insert(0, "all salegrades")
     combo_dict['statuses'].insert(0, "all statuses")
     combo_dict['tenures'].insert(0, "all tenures")
-    combo_dict['options'] = ("include", "exclude", "only")
+    combo_dict['options'] = ["include", "exclude", "only"]
     filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
     combo_dict["filternames"] = filternames
-    combo_dict["filtertypes"] = ("payrequest", "rentprop", "income")
+    combo_dict["filtertypes"] = ["payrequest", "rentprop", "income"]
     return combo_dict
 
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required
+from app.dao.common import get_doc_types
 from app.dao.form_letter import get_form_letter, get_form_letters, get_templates, post_form_letter
 
 form_letter_bp = Blueprint('form_letter_bp', __name__)
@@ -11,10 +12,12 @@ def form_letter(form_letter_id):
     if request.method == "POST":
         form_letter_id = post_form_letter(form_letter_id)
         return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id))
+    doc_types = [typedoc.desc for typedoc in get_doc_types()]
     form_letter = get_form_letter(form_letter_id)
     templates = get_templates()
     variables = list_variables()
-    return render_template('form_letter.html', form_letter=form_letter, templates=templates, variables=variables)
+    return render_template('form_letter.html', doc_types=doc_types, form_letter=form_letter, templates=templates,
+                           variables=variables)
 
 
 @form_letter_bp.route('/form_letters', methods=['GET'])

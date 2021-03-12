@@ -9,7 +9,7 @@ from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, pos
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
 from app.dao.rent import get_rent_ex, post_agent_update
 from app.email import test_email_connect, test_send_email
-from app.dao.utility import delete_record, get_deed, get_deeds, post_deed
+from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.main.common import inc_date_m
 
 util_bp = Blueprint('util_bp', __name__)
@@ -126,7 +126,7 @@ def deed(deed_id):
 def deeds():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
-    deeds = get_deeds()
+    deeds = get_deed_types()
 
     return render_template('deeds.html', deeds=deeds, rent_id=rent_id, rentcode=rentcode)
 
