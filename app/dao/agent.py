@@ -44,20 +44,25 @@ def get_agent_rents(agent_id, type='rent'):
 
 
 def post_agent(agent_id, rent_id):
-    if agent_id == 0:
-        agent = Agent()
-    else:
-        agent = Agent.query.get(agent_id)
-    agent.detail = request.form.get("detail")
-    agent.email = request.form.get("email")
-    agent.note = request.form.get("note")
-    agent.code = request.form.get("code")
-    db.session.add(agent)
-    db.session.flush()
-    agent_id = agent.id
-    if rent_id != 0:
-        rent = Rent.query.get(rent_id)
-        rent.agent_id = agent_id
-    commit_to_database()
+    try:
+        if agent_id == 0:
+            agent = Agent()
+        else:
+            agent = Agent.query.get(agent_id)
+        agent.detail = request.form.get("detail")
+        agent.email = request.form.get("email")
+        agent.note = request.form.get("note")
+        agent.code = request.form.get("code")
+        db.session.add(agent)
+        db.session.flush()
+        message = "Agent details updated successfully!"
+        agent_id = agent.id
+        if rent_id != 0:
+            rent = Rent.query.get(rent_id)
+            rent.agent_id = agent_id
+            message += " Please review this rent\'s mailto details."
+        commit_to_database()
+    except Exception as ex:
+        message = f"Update agent failed. Error:  {str(ex)}"
 
-    return agent_id
+    return agent_id, message

@@ -7,7 +7,7 @@ from app.dao.filter import get_rent_s
 from app.dao.headrent import post_headrent_agent_update
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
-from app.dao.rent import get_rent_ex, post_agent_update
+from app.dao.rent import get_rent_ex, post_rent_agent
 from app.email import test_email_connect, test_send_email
 from app.dao.utility import delete_record, get_deed, get_deeds, post_deed
 from app.main.common import inc_date_m
@@ -20,11 +20,13 @@ util_bp = Blueprint('util_bp', __name__)
 def agent(agent_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
+    action = request.args.get('action', type=str)
     rents = None
     headrents = None
     if request.method == "POST":
-        agent_id = post_agent(agent_id, rent_id)
-        # return redirect(url_for('util_bp.agent', agent_id=agent_id, rent_id=rent_id))
+        agent_id, message = post_agent(agent_id, rent_id)
+        if rent_id != 0:
+            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
     if agent_id == 0:
         agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
     else:
@@ -32,29 +34,31 @@ def agent(agent_id):
         rents = get_agent_rents(agent_id, 'rent')
         headrents = get_agent_rents(agent_id, 'headrent')
 
-    return render_template('agent.html', agent=agent, rent_id=rent_id, rentcode=rentcode,
+    return render_template('agent.html', action=action, agent=agent, rent_id=rent_id, rentcode=rentcode,
                            rents=rents, headrents=headrents)
 
 
+# TODO: Delete route can be simplified if we do not allow for agent delete when the agent is linked to multiple rents
 @util_bp.route('/agent_delete/<int:agent_id>', methods=["GET", "POST"])
 @login_required
 def agent_delete(agent_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id', 0, type=int)
-        rentcode = request.args.get('rentcode', "ABC1", type=str)
         rents = get_agent_rents(agent_id, 'rent')
+        message = ""
         if rents:
             for rent in rents:
-                post_agent_update(0, rent.id)
+                post_rent_agent(0, rent.id)
         headrents = get_agent_rents(agent_id, 'headrent')
         if headrents:
             for rent in headrents:
                 post_headrent_agent_update(0, rent.id)
         delete_record(agent_id, 'agent')
         if rent_id == 0:
-            return redirect(url_for('util_bp.agents', rent_id=rent_id, rentcode=rentcode))
+            return redirect(url_for('util_bp.agents'))
         else:
-            return redirect(url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode))
+            return redirect(url_for('rent_bp.rent', rent_id=rent_id,
+                                    message=message))
 
 
 @util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
@@ -67,18 +71,13 @@ def agent_rents(agent_id):
     return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, type=type)
 
 
-@util_bp.route('/agent_unlink/<int:agent_id>', methods=["GET", "POST"])
+@util_bp.route('/agent_unlink/<int:rent_id>', methods=["GET", "POST"])
 @login_required
-def agent_unlink(agent_id):
+def agent_unlink(rent_id):
     if request.method == "POST":
-        rent_id = request.args.get('rent_id', 0, type=int)
-        rentcode = request.args.get('rentcode', '', type=str)
-        post_agent_update(0, rent_id)
-        action = request.args.get('action', type=str)
-        if action == 'from_rent':
-            return redirect(url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode))
-        else:
-            return redirect(url_for('util_bp.agent', agent_id=agent_id))
+        message = post_rent_agent(0, rent_id)
+
+        return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
 @util_bp.route('/agents', methods=['GET', 'POST'])
@@ -98,8 +97,7 @@ def agents_select():
     rent_id = request.args.get('rent_id', type=int)
     agent_id = request.args.get('agent_id', type=int)
     try:
-        post_agent_update(agent_id, rent_id)
-        message = 'Rent updated successfully!'
+        message = post_rent_agent(agent_id, rent_id)
     except Exception as e:
         message = 'Unable to update rent. Database write failed.'
     return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))

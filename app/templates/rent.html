@@ -90,13 +90,13 @@
                     {% if rent.agent_id %}
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
-                            agent_id=rent.agent_id, rent_id=rent.id, rentcode=rent.rentcode) }}"
+                            agent_id=rent.agent_id, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
                                                                                    class="btn btn-light btn-round button-icon round bolt"
                                                                                    role="button"></a>
                         {% else %}
                     <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
-                            agent_id=0, rent_id=rent.id, rentcode=rent.rentcode) }}"
+                            agent_id=0, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
                                                                                    class="btn btn-light btn-round button-icon round bolt"
                                                                                    role="button"></a>
                         {% endif %}
@@ -427,6 +427,7 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "rent.js" %}
+
 
 </script>
 {% endblock %}
