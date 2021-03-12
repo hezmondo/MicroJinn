@@ -6,7 +6,7 @@
 {% block app_content %}
 <div class="container mt-3">
     <h1>upload files for rent {{ rentcode }}</h1>
-    <form method="POST" action="{{ url_fordoc_bp.upload_file', doc_id=rent_id, rentcode=rentcode) }}"
+    <form method="POST" action="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=rentcode) }}"
           enctype="multipart/form-data">
       <p>choose one file to upload for the rentcode shown and then click the submit button:</p>
       <div class="custom-file" mb-3>
@@ -26,7 +26,7 @@
             <input type="text" class="form-control" name="rentcode" value = "{{ rentcode }}" readonly="readonly">
         </div>
         <div class="col-md-2">
-            {{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=session['doc_types'][0]) }}
+            {{ widgets.combobox(name="doc_type", items=doc_types, item_selected=doc_types[0]) }}
         </div>
         <div class="col-md-2">
             {{ widgets.combobox(name="out_in", items=["out", "in"], item_selected="in") }}

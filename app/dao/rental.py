@@ -2,7 +2,8 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.models import Rental, RentalStat, TypeAdvArr, TypeFreq\
+from app.dao.common import get_advarr_types, get_freq_types
+from app.models import Rental, RentalStat, TypeAdvArr, TypeFreq
 
 
 def get_rental(rental_id):
@@ -14,8 +15,8 @@ def get_rental(rental_id):
                       Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
                       TypeAdvArr.advarrdet, TypeFreq.freqdet) \
         .filter(Rental.id == rental_id).one_or_none()
-    advarrdets = [value for (value,) in TypeAdvArr.query.with_entities(TypeAdvArr.advarrdet).all()]
-    freqdets = [value for (value,) in TypeFreq.query.with_entities(TypeFreq.freqdet).all()]
+    advarrdets = [typeadvarr.advarrdet for typeadvarr in get_advarr_types()]
+    freqdets = [typefreq.freqdet for typefreq in get_freq_types()]
 
     return rental, advarrdets, freqdets
 

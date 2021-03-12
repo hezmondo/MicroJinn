@@ -14,8 +14,6 @@ def get_filters(type):
 
 
 def get_rent_s(action, filter_id):
-    # collect doctypes to hold in session, as this is the first trip to the server
-    session['doc_types'] = [value for (value,) in TypeDoc.query.with_entities(TypeDoc.desc).all()]
     # get filter dictionary and filtered rent objects
     qfilter = []
     # simple filter dictionary for home page

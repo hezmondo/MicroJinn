@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, send_file, url_for, current_app
 from flask_login import login_required
 from io import BytesIO
+from app.dao.common import get_doc_types
 from app.dao.doc_ import get_digfile, get_docfile, get_docfiles, create_docfile_for_upload, upload_docfile, \
     post_docfile, post_upload
 from app.email import app_send_email
@@ -15,14 +16,17 @@ def docfile(doc_id):
         rent_id = post_docfile(doc_id)
         return redirect("/views/rent/{}".format(rent_id))
     docfile, doc_dig = get_docfile(doc_id)
-    return render_template('docfile.html', docfile=docfile, doc_dig=doc_dig)
+    doc_types = [typedoc.desc for typedoc in get_doc_types()]
+    return render_template('docfile.html', docfile=docfile, doc_types=doc_types, doc_dig=doc_dig)
 
 
 @doc_bp.route('/docfiles/<int:rent_id>', methods=['GET', 'POST'])
 def docfiles(rent_id):
     docfiles, dfoutin = get_docfiles(rent_id)
+    doc_types = [typedoc.desc for typedoc in get_doc_types()]
     outins = ["all", "out", "in"]
-    return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, outins=outins)
+    return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, doc_types=doc_types,
+                           outins=outins)
 
 
 @doc_bp.route('/download/<int:doc_id>')
@@ -59,7 +63,8 @@ def upload_file(rent_id):
     if request.method == "POST":
         post_upload()
         return redirect('/rent/{}'.format(rent_id))
-    return render_template('upload_dialog.html', rentcode=rentcode, rent_id=rent_id)
+    doc_types = [typedoc.desc for typedoc in get_doc_types()]
+    return render_template('upload_dialog.html', doc_types=doc_types, rentcode=rentcode, rent_id=rent_id)
 
 # @doc_bp.route('/uploads/<filename>')
 # def upload(filename):
