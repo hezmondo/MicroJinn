@@ -11,7 +11,7 @@ class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or MyConfig.SQLALCHEMY_DATABASE_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = False
+    SQLALCHEMY_ECHO = getattr(MyConfig, 'SQLALCHEMY_ECHO', False)
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or getattr(MyConfig, 'MAIL_SERVER', None)
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or getattr(MyConfig, 'MAIL_PORT', None) or 25)
     MAIL_USE_TLS = (os.environ.get('MAIL_USE_TLS') or getattr(MyConfig, 'MAIL_USE_TLS', None)) is not None

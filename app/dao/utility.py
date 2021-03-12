@@ -1,4 +1,4 @@
-from app import db
+from app import db, cache
 from flask import request
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, IncomeAlloc, \
@@ -79,6 +79,7 @@ def delete_record_basic(item_id, item):
         PrHistory.query.filter_by(id=item_id).delete()
 
 
+@cache.cached(key_prefix='db_dates_m_all')
 def get_dates_m():
     dates_m = Date_m.query.with_entities(Date_m.code_id, Date_m.month, Date_m.day) \
         .all()
