@@ -5,6 +5,7 @@
 
 {% block app_content %}
 <form method="POST" id="target">
+
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">rentcode starts with:</label>
@@ -39,11 +40,13 @@
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('util_bp.home') }}"
-                    class="btn btn-block btn-success  button-icon search" role="button">search</button>
+                    class="btn btn-block btn-success  button-icon search" role="button">search
+            </button>
         </div>
         <div class="col-md-3">
             <button type="submit" formaction="{{ url_for('util_bp.rents_ex') }}"
-                    class="btn btn-block btn-primary  button-icon search" role="button">search external</button>
+                    class="btn btn-block btn-primary  button-icon search" role="button">search external
+            </button>
         </div>
         <div class="col-md-3">
             <a href="{{ url_for('filter_bp.filter', filter_id=0) }}"
@@ -78,7 +81,8 @@
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-            rent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+            rent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                                 data-toggle="tooltip" title="view rent" role="button"></a></td>
         </tr>
         {% endfor %}
         </tbody>

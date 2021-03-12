@@ -5,30 +5,32 @@
 
 {% block app_content %}
 <form method="POST" id="target">
-    <div class="form-group row boxed boxed-green">
-        <div class="col-md-2">
-            <label for="rentcode">code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ filterdict.rentcode }}">
+    <div id="search_div" class="collapse">
+        <div class="form-group row boxed boxed-green">
+            <div class="col-md-2">
+                <label for="rentcode">code:</label>
+                <input type="text" class="form-control" name="rentcode" value="{{ filterdict.rentcode }}">
+            </div>
+            <div class="col-md-4">
+                <label for="address">address:</label>
+                <input type="text" class="form-control" name="address" value="{{ filterdict.address }}">
+            </div>
+            <div class="col-md-4">
+                <label for="agent">agent:</label>
+                <input type="text" class="form-control" name="agent" value="{{ filterdict.agent }}">
+            </div>
+            <div class="col-md-2">
+                <label for="status">status:</label>
+                {{ widgets.multiselect_as_select(name="status", items=hr_statuses,
+                items_selected=filterdict.status) }}
+            </div>
         </div>
-        <div class="col-md-4">
-            <label for="address">address:</label>
-            <input type="text" class="form-control" name="address" value="{{ filterdict.address }}">
-        </div>
-        <div class="col-md-4">
-            <label for="agent">agent:</label>
-            <input type="text" class="form-control" name="agent" value="{{ filterdict.agent }}">
-        </div>
-        <div class="col-md-2">
-            <label for="status">status:</label>
-            {{ widgets.multiselect_as_select(name="status", items=hr_statuses,
-            items_selected=filterdict.status) }}
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-9">
-        </div>
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
+        <div class="form-group row">
+            <div class="col-md-9">
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
+            </div>
         </div>
     </div>
 </form>
@@ -44,7 +46,11 @@
             <th style="width: 8.00%">frequency</th>
             <th style="width: 8.00%">status</th>
             <th style="width: 22.00%">agent</th>
-            <th style="width: 2.00%"></th>
+            <th style="width: 2.00%" class="vertical-align">
+                <a data-toggle="collapse" href="#search_div" aria-expanded="false"
+                   aria-controls="search_div"
+                   class="btn btn-light btn-round button-icon round search" role="button"></a>
+            </th>
         </tr>
         </thead>
         <tbody>
@@ -59,7 +65,9 @@
             <td style="width: 8.00%"> {{ item.hr_status }}</td>
             <td style="width: 22.00%"> {{ item.detail }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
-            headrent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+            headrent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                                                               data-toggle="tooltip" title="view headrent"
+                                                               role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

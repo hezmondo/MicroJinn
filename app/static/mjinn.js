@@ -105,11 +105,6 @@ $(document).ready(function(){
         $('#show_more_2').addClass('arrow-down');
         $('#show_more_2').removeClass('arrow-up');
     });
-    $('.btn-modal').click(function() {
-        var rentId = $(this).attr('name');
-        var btnLink = $('#btn_unlink').attr('formaction').slice(0, -1) + rentId;
-        $('#btn_unlink').attr('formaction', btnLink);
-    });
 });
 $(function() {
   // Sidebar toggle behavior

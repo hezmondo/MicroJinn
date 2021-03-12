@@ -7,7 +7,7 @@
     <div class="form-group row flex-row-reverse">
         {% if agent_id != 0 %}
         <div class="col-md-3">
-            <a href="{{ url_for('util_bp.agent', agent_id=agent_id, rent_id=rent_id, rentcode=rentcode) }}"
+            <a href="{{ url_for('util_bp.agent', agent_id=agent_id, rent_id=rent_id, rentcode=rentcode, action='from_rent') }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to agent</a>
         </div>
         {% endif %}
@@ -46,8 +46,9 @@
                         <td style="width: 48.00%">{{ item.detail }}</td>
                         <td style="width: 25.00%">{{ item.email }}</td>
                         <td style="width: 25.00%"> {{ item.note }}</td>
-                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('util_bp.agent', agent_id=item.id,
-            rent_id=0) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('util_bp.agent',
+                        agent_id=item.id, rent_id=0) }}" class="btn btn-light btn-round button-icon round bolt"
+                        role="button" data-toggle="tooltip" title="view agent"></a>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -59,7 +60,7 @@
                         <th style="width: 40.00%">agent details</th>
                         <th style="width: 20.00%">agent email</th>
                         <th style="width: 20.00%">agent notes</th>
-                        <th style="width: 20.00%" class="align-right">add to {{ rentcode }}</th>
+                        <th style="width: 20.00%" class="align-right">link to {{ rentcode }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -70,7 +71,7 @@
                         <td style="width: 20.00%"> {{ item.note }}</td>
                         <td style="width: 20.00%" class="vertical-align align-right"><a href="{{ url_for('util_bp.agents_select',
             agent_id=item.id, rent_id=rent_id) }}" class="btn btn-success btn-round button-icon round plus"
-                                                                                        role="button"></a>
+                                                   data-toggle="tooltip" title="link agent" role="button"></a>
                     </tr>
                     {% endfor %}
                     </tbody>
@@ -85,11 +86,12 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% if rent_id %}
-                            <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode) }}"
+                            <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
+                                action='new_agent') }}"
                                class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
                                 rentcode }}</a>
                             {% else %}
-                            <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=0) }}"
+                            <a href="{{ url_for('util_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
                                class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
                             {% endif %}
                         </div>

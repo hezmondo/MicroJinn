@@ -99,10 +99,18 @@ def post_headrent(id):
 
 
 def post_headrent_agent_update(agent_id, rent_id):
-    if rent_id != 0:
-        headrent = Headrent.query.get(rent_id)
-        if agent_id != 0:
-            headrent.agent_id = agent_id
-        else:
-            headrent.agent_id = None
-    commit_to_database()
+    message = ""
+    try:
+        if rent_id != 0:
+            headrent = Headrent.query.get(rent_id)
+            if agent_id != 0:
+                headrent.agent_id = agent_id
+                message = "Success! This headrent has been linked to a new agent. " \
+                          "Please review the rent\'s mail address."
+            else:
+                headrent.agent_id = None
+                message = "Success! This headrent no longer has an agent."
+        commit_to_database()
+    except Exception as ex:
+        message = f"Update headrent failed. Error:  {str(ex)}"
+    return message
