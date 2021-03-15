@@ -4,10 +4,10 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_mail.id) }}">
+<form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}">
     <div class="form-group row flex-row-reverse">
 		<div class="col-md-3">
-			<a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_mail.id, action='view') }}"
+			<a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
 			   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr selection</a>
 		</div>
 		<div class="col-md-9">
@@ -21,15 +21,15 @@
 	</div>
 	<div class="form-group row">
 		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_mail.id) }}"
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
 			   class="btn btn-block btn-success save_pr" role="button">post</button>
 		</div>
 		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post_email', rent_id=rent_mail.id) }}"
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post_email', rent_id=rent_pr.id) }}"
 			   class="btn btn-block btn-success save_pr" role="button">post and email</button>
 		</div>
 		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_mail.id) }}"
+			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
 			   class="btn btn-block btn-success save_pr" role="button">email</button>
 		</div>
 	</div>
@@ -39,17 +39,17 @@
 		</style>
 		<div id="manager_div" contenteditable="true">
 			<div class="font-size-large manager-name" align="center">
-				<b>{{ rent_mail.managername }}</b>
+				<b>{{ rent_pr.managername }}</b>
 			</div>
 			<div class="font-size-small manager-addr" align="center">
-				{{ rent_mail.manageraddr }}
+				{{ rent_pr.manageraddr }}
 				<br />
-				{{ rent_mail.manageraddr2 }}
+				{{ rent_pr.manageraddr2 }}
 				<br />
 			</div>
 		</div>
 		<div class="font-size-medium" align="right" contenteditable="true">
-			<span id="ref_span">Our Ref: {{ rent_mail.rentcode }}</span>
+			<span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
 			<br />
 			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
 		</div>
@@ -93,7 +93,7 @@
 			{{ widgets.linebreaks_for_string(block) }}
 		</div>
 		<div id="hidden_email_dets" style="display: none;">
-			<div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to &nbsp;<span class="span-input" id="email_span" contenteditable="true"> {{ rent_mail.email if rent_mail.email else 'example@gmail.com; example2@gmail.com'}} </span></div>
+			<div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to &nbsp;<span class="span-input" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email else 'example@gmail.com; example2@gmail.com'}} </span></div>
 		</div>
 	</div>
     <div class="form-group row">

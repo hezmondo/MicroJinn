@@ -1,4 +1,4 @@
-<!-- /templates/mergedocs/RECSTA.html  -->
+<!-- /templates/mergedocs/RECSTAX.html  -->
 {% extends 'base.html' %}
 {% block app_content %}
 <form method="POST" action="{{ url_for('doc_bp.email_and_save') }}">
@@ -7,7 +7,7 @@
             <span>email to:</span>
         </div>
 		<div class="col-md-6">
-            <input type="text" class="form-control" id="email_to" name="email_to" value="{{ email_to }}">
+            <input type="text" class="form-control" id="email_to" name="email_to" value="{{ rent.email }}">
         </div>
 	</div>
 	<div class="form-group row">
@@ -15,7 +15,7 @@
             <span>subject:</span>
         </div>
 		<div class="col-md-6">
-            <input type="text" class="form-control" id="email_subject" name="email_subject" value="{{ email_subject }}">
+            <input type="text" class="form-control" id="email_subject" name="email_subject" value="{{ subject }}">
         </div>
 	</div>
     <div class="form-group row justify-content-end">
@@ -54,7 +54,7 @@
             <br/>
             <br/>
             Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to
-            <span id="span_email_to">{{ email_to }}</span>
+            <span id="span_email_to">{{ rent.email }}</span>
             <br/>
             <br/>
             Dear {{ rent.tenantname }}
@@ -62,7 +62,7 @@
         {% endif %}
         <div class="font-size-medium" align="left">
             <br/>
-            <b><span id="span_email_subject">{{ email_subject }}</span></b>
+            <b><span id="span_email_subject">{{ subject }}</span></b>
             <br/>
             <br/>
             Thank you for your {{ variables.paytypedet }} payment in the sum of {{ variables.payamount }} received by
@@ -81,8 +81,8 @@
             <br/>
             <br/>
             <br/>
-            {% if method == "email" %}
             <b>{{ rent.managername }}</b>
+            {% if method == "email" %}
             <br/>
             <br/>
             {{ rent.manageraddr }}
@@ -112,7 +112,7 @@
             <input type="hidden" id="summary" name="summary" value="{{ summary }}">
         </div>
         <div class="col-md-2">
-            <input type="hidden" id="doc_type" name="doc_type" value="{{ doctype }}">
+            <input type="hidden" id="doc_type" name="doctype_id" value="{{ doctype_id }}">
         </div>
         <div class="col-md-2">
             <input type="hidden" id="out_in" name="out_in" value="out">

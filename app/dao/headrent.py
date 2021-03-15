@@ -1,72 +1,39 @@
 from app import db
-from flask import request
-from sqlalchemy import func
-
+from flask import flash, redirect, request, url_for
+from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.main.common import get_postvals_id, inc_date_m
+from app.main.common import get_postvals_id
 from app.main.functions import strToDec
-from app.models import Agent, Headrent, Landlord, TypeAdvArr, TypeFreq, TypeStatusHr, TypeTenure\
+from app.models import Agent, Headrent, TypeStatusHr
 
 
-def get_headrents():
-    filter = []
-    filterdict = {'rentcode': '', 'address': '', 'agent': '', 'status': 'all statuses'}
-    if request.method == "POST":
-        rentcode = request.form.get("rentcode") or ""
-        filterdict['rentcode'] = rentcode
-        if rentcode and rentcode != "":
-            filter.append(Headrent.code.startswith([rentcode]))
-        address = request.form.get("address") or ""
-        filterdict['address'] = address
-        if address and address != "":
-            filter.append(Headrent.propaddr.ilike('%{}%'.format(address)))
-        agent = request.form.get("agent") or ""
-        filterdict['agent'] = agent
-        if agent and agent != "":
-            filter.append(Agent.detail.ilike('%{}%'.format(agent)))
-        status = request.form.getlist("status") or ""
-        filterdict['status'] = status
-        if status and status != "" and status != [] and status != ['all statuses']:
-            filter.append(TypeStatusHr.hr_status.in_(status))
-
-    headrents = \
-        Headrent.query \
-            .join(TypeStatusHr) \
-            .outerjoin(Agent) \
-            .with_entities(Agent.detail, Headrent.id, Headrent.code, Headrent.datecode_id, Headrent.rentpa,
-                           Headrent.arrears, Headrent.freq_id, Headrent.lastrentdate, Headrent.propaddr,
-                           TypeStatusHr.hr_status,
-                           func.mjinn.inc_date_m(Headrent.lastrentdate, Headrent.freq_id,
-                                      Headrent.datecode_id, 1).label('nextrentdate')) \
-            .filter(*filter) \
-            .limit(100).all()
-
-    return filterdict, headrents
+def create_new_headrent():
+    # create new headrent function not yet built, so return any id:
+    return 23
 
 
-def get_headrent(id):
-    if request.method == "POST":
-        id =  post_headrent(id)
-    if id != 0:
-        headrent = \
-            Headrent.query \
-                .join(Landlord) \
-                .outerjoin(Agent) \
-                .join(TypeAdvArr) \
-                .join(TypeFreq) \
-                .join(TypeStatusHr) \
-                .join(TypeTenure) \
-                .with_entities(Headrent.id, Headrent.code, Headrent.arrears, Headrent.datecode_id, Headrent.freq_id,
-                               Headrent.lastrentdate, Headrent.propaddr, Headrent.rentpa, Headrent.reference,
-                               Headrent.note, Headrent.source, Landlord.name, Agent.detail, TypeAdvArr.advarrdet,
-                               TypeFreq.freqdet, TypeStatusHr.hr_status, TypeTenure.tenuredet) \
-                .filter(Headrent.id == id) \
-                .one_or_none()
-    else:
-        headrent =  Headrent()
-        headrent.id = 0
+def get_headrent(headrent_id):  # returns all Headrent member variables as a mutable dict
+    if headrent_id == 0:
+        # take the user to create new rent function:
+        headrent_id = create_new_headrent()
+    headrent = Headrent.query.filter_by(id=headrent_id).first()
+    if headrent is None:
+        flash('Invalid rent code')
+        return redirect(url_for('auth.login'))
 
     return headrent
+
+
+def get_headrents(filter):
+    headrents = \
+            db.session.query(Headrent) \
+            .options(load_only('id', 'code', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
+                               'propaddr', 'rentpa', 'source'),
+                joinedload('agent').load_only('detail'),
+                joinedload('type_status_hr').load_only('hr_status')) \
+            .filter(*filter).order_by(Headrent.code).limit(50).all()
+
+    return headrents
 
 
 def post_headrent(id):

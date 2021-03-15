@@ -1,14 +1,15 @@
 from flask import Blueprint, render_template
 from flask_login import login_required
-from app.dao.headrent import get_headrent, get_headrents
+from app.dao.headrent import get_headrent
 from app.main.common import get_combodict_basic, get_hr_statuses, inc_date_m
+from app.main.headrent import get_headrents_p
 
 headrent_bp = Blueprint('headrent_bp', __name__)
 
 
 @headrent_bp.route('/headrents', methods=['GET', 'POST'])
 def headrents():
-    filterdict, headrents = get_headrents()
+    filterdict, headrents = get_headrents_p()
     hr_statuses = get_hr_statuses()
     hr_statuses.insert(0, "all statuses")
 

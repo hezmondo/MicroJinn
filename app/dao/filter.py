@@ -1,9 +1,9 @@
 import json
 from flask import request, session
-from app.main.common import get_idlist_recent
+from app.main.common import get_idlist_recent, inc_date_m
 from app.main.functions import strToDate
-from app.dao.rent import get_rent_s_data, post_rent__filter
-from app.models import Agent, RentExt, Jstore, Landlord, Property, Rent, TypeAcType, \
+from app.dao.rent import get_rent_sdata, post_rent__filter
+from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent, TypeAcType, \
     TypeDoc, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
@@ -62,7 +62,10 @@ def get_rent_s(action, filter_id):
     if action == "save":
         post_rent__filter(filterdict)
     # now get filtered rent objects for this filter
-    rent_s = get_rent_s_data(qfilter, action, 100)
+    rent_s = get_rent_sdata(qfilter, action, 50)
+    if action != 'external':
+        for rent in rent_s:
+            rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
     # TODO: Repeated if statement - This can be cleaned up
     if action == 'basic' and request.method == "GET":
         rent_s = sorted(rent_s, key=lambda o: id_list.index(o.id))
@@ -85,27 +88,27 @@ def get_qfilter(filterdict, action):
     for key, value in filterdict.items():
         if key == "rentcode" and value and value != "":
             if action == "external":
-                filter.append(RentExt.rentcode.startswith([value]))
+                filter.append(RentExternal.rentcode.startswith([value]))
             else:
                 filter.append(Rent.rentcode.startswith([value]))
         elif key == "agentdetail" and value and value != "":
             if action == "external":
-                filter.append(RentExt.agentdetail.ilike('%{}%'.format(value)))
+                filter.append(RentExternal.agentdetail.ilike('%{}%'.format(value)))
             else:
                 filter.append(Agent.detail.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
             if action == "external":
-                filter.append(RentExt.propaddr.ilike('%{}%'.format(value)))
+                filter.append(RentExternal.propaddr.ilike('%{}%'.format(value)))
             else:
                 filter.append(Property.propaddr.ilike('%{}%'.format(value)))
         elif key == "source" and value and value != "":
             if action == "external":
-                filter.append(RentExt.source.ilike('%{}%'.format(value)))
+                filter.append(RentExternal.source.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.source.ilike('%{}%'.format(value)))
         elif key == "tenantname" and value and value != "":
             if action == "external":
-                filter.append(RentExt.tenantname.ilike('%{}%'.format(value)))
+                filter.append(RentExternal.tenantname.ilike('%{}%'.format(value)))
             else:
                 filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":

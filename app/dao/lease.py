@@ -80,14 +80,14 @@ def get_lease_variables(rent_id):
     leasedata = get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val, calc_date)
     impval = leasedata["impvalk"] * 1000
     unimpval = leasedata["impvalk"] * leasedata["realty"] * 10 if leasedata["realty"] > 0 else impval
-    lease_variables = {'unexpired': str(leasedata["unexpired"]) if leasedata else "11.11",
-                       'relativity': str(leasedata["realty"]) if leasedata else "some relativity",
-                       'tot_val': moneyToStr(leasedata["totval"] if leasedata else 55555.55, pound=True),
-                       'unimpvalue': moneyToStr(unimpval if leasedata else 555.55, pound=True),
-                       'impvalue': moneyToStr(impval if leasedata else 555.55, pound=True),
-                       'leq200R': moneyToStr(leasedata["leq200R"] if leasedata else 55555.55, pound=True),
-                       'leq200P': moneyToStr(leasedata["leq200P"] if leasedata else 55555.55, pound=True),
-                       'gr_new': moneyToStr(leasedata["gr_new"] if leasedata else 555.55, pound=True)
+    lease_variables = {'#unexpired#': str(leasedata["unexpired"]) if leasedata else "11.11",
+                       '#relativity#': str(leasedata["realty"]) if leasedata else "some relativity",
+                       '#tot_val#': moneyToStr(leasedata["totval"] if leasedata else 55555.55, pound=True),
+                       '#unimpvalue#': moneyToStr(unimpval if leasedata else 555.55, pound=True),
+                       '#impvalue#': moneyToStr(impval if leasedata else 555.55, pound=True),
+                       '#leq200R#': moneyToStr(leasedata["leq200R"] if leasedata else 55555.55, pound=True),
+                       '#leq200P#': moneyToStr(leasedata["leq200P"] if leasedata else 55555.55, pound=True),
+                       '#gr_new#': moneyToStr(leasedata["gr_new"] if leasedata else 555.55, pound=True)
                        }
     return leasedata, lease_variables
 

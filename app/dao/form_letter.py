@@ -1,44 +1,14 @@
 from app import db
 from flask import request
-from app.models import FmLetter, FormLetter, Template, TypeDoc
+from app.models import FormLetter, TypeDoc
+from app.dao.common import get_doctype
 from app.dao.database import commit_to_database
 
 
-def get_fm_letter(fm_letter_id):
-    fm_letter = FmLetter.query.join(TypeDoc).with_entities(FmLetter.id, FmLetter.code,
-                  FmLetter.description, TypeDoc.desc.label("doctype")) \
-        .filter(FmLetter.id == fm_letter_id).one_or_none()
-
-    return fm_letter
-
-
-def get_form_letter(form_letter_id):
-    form_letter = FormLetter.query.join(TypeDoc).join(Template).with_entities(FormLetter.id, FormLetter.code,
-                                                                              FormLetter.description,
-                                                                              FormLetter.subject, FormLetter.block,
-                                                                              TypeDoc.desc.label("doctype"),
-                                                                              Template.desc.label("template")) \
-        .filter(FormLetter.id == form_letter_id).one_or_none()
-
+def get_form_letter(form_letter_id):  #returns all Rent member variables as a mutable dict
+    form_letter = FormLetter.query.filter_by(id=form_letter_id).first()
+    form_letter.doctype = get_doctype(form_letter.doctype_id)
     return form_letter
-
-
-def get_fm_letters(action='all'):
-    if request.method == "POST":
-        code = request.form.get("code") or ""
-        description = request.form.get("description") or ""
-        fm_letters = FmLetter.query.filter(FmLetter.code.ilike('%{}%'.format(code)),
-                                               FmLetter.description.ilike('%{}%'.format(description))) \
-            .all()
-    elif action == "lease":
-        fm_letters = FmLetter.query.filter(FmLetter.code.ilike('LEQ-%'))
-    elif action == "all":
-        fm_letters = FmLetter.query.all()
-    else:
-        fm_letters = FmLetter.query.filter(FmLetter.code.notilike('PR-%'),
-                           FmLetter.code.notilike('AC-%'), FmLetter.code.notilike('LEQ-%')).all()
-
-    return fm_letters
 
 
 def get_form_letters(action='all'):

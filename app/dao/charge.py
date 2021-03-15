@@ -66,8 +66,7 @@ def get_charge_type(chargetype_id):
     return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
 
 
-# TODO: Can refactor this into get_charges()
-def get_rent_charge_details(rent_id):
+def get_charges_rent(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,

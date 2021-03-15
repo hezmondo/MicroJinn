@@ -9,6 +9,45 @@ from app.models import DigFile, DocFile, Rent, TypeDoc
 from app.dao.database import commit_to_database
 
 
+def allowed_filetypes():
+    return ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']
+
+
+def convert_html_to_pdf(source_html, output_filename):
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+        source_html,  # the HTML to convert
+        dest=result_file)  # file handle to recieve result
+    # close output file
+    result_file.close()  # close output file
+    # return False on success and True on errors
+    return pisa_status.err
+
+
+def create_docfile_for_upload(doc_id):
+    rent_id = int(request.form.get('rent_id'))
+    doc_dig = request.form.get('doc_dig') or "doc"
+    # new file for id 0, otherwise existing dig or doc file:
+    if doc_id == 0:
+        # new file has to be doc as new digital file uses upload function
+        docfile = DocFile()
+    else:
+        docfile = DocFile.query.get(doc_id) if doc_dig == "doc" else DigFile.query.get(doc_id)
+    docfile.rent_id = rent_id
+    docfile.doc_date = request.form.get('doc_date')
+    if doc_dig == "doc":
+        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
+        # source_html = docfile.doc_text
+        # output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
+        # convert_html_to_pdf(source_html, output_filename)
+    docfile.doctype_id = request.form.get('doctype_id')
+    docfile.summary = request.form.get('summary')
+    docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
+    return docfile
+
+
 def get_digfile(doc_id):
     digfile = DigFile.query.filter(DigFile.id == doc_id).one_or_none()
     return digfile
@@ -93,30 +132,6 @@ def get_docfiles(rent_id):
     return docfiles, dfoutin
 
 
-def create_docfile_for_upload(doc_id):
-    rent_id = int(request.form.get('rent_id'))
-    doc_dig = request.form.get('doc_dig') or "doc"
-    # new file for id 0, otherwise existing dig or doc file:
-    if doc_id == 0:
-        # new file has to be doc as new digital file uses upload function
-        docfile = DocFile()
-    else:
-        docfile = DocFile.query.get(doc_id) if doc_dig == "doc" else DigFile.query.get(doc_id)
-    docfile.rent_id = rent_id
-    docfile.doc_date = request.form.get('doc_date')
-    if doc_dig == "doc":
-        docfile.doc_text = request.form.get('xinput').replace("£", "&pound;")
-        # source_html = docfile.doc_text
-        # output_filename = "{}-{}.pdf".format(docfile.summary, str(docfile.doc_date))
-        # convert_html_to_pdf(source_html, output_filename)
-    doctype = request.form.get('doc_type')
-    docfile.doctype_id = \
-        TypeDoc.query.with_entities(TypeDoc.id).filter(TypeDoc.desc == doctype).one()[0]
-    docfile.summary = request.form.get('summary')
-    docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
-    return docfile
-
-
 def upload_docfile(docfile):
     db.session.add(docfile)
     commit_to_database()
@@ -168,18 +183,3 @@ def validate_image(stream):
     return '.' + (format if format != 'jpeg' else 'jpg')
 
 
-def allowed_filetypes():
-    return ['.pdf', '.doc', '.docx', '.ods', '.odt', '.jpg', '.png', '.gif']
-
-
-def convert_html_to_pdf(source_html, output_filename):
-    # open output file for writing (truncated binary)
-    result_file = open(output_filename, "w+b")
-    # convert HTML to PDF
-    pisa_status = pisa.CreatePDF(
-        source_html,  # the HTML to convert
-        dest=result_file)  # file handle to recieve result
-    # close output file
-    result_file.close()  # close output file
-    # return False on success and True on errors
-    return pisa_status.err

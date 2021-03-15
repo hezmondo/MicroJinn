@@ -1,8 +1,9 @@
 from app import db, cache
 from flask import request
+from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
-    IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExt, MoneyAcc, \
+    IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExternal, MoneyAcc, \
     TypeAcType, TypeAdvArr, TypeDeed, TypeDoc, TypeEvent, TypeFreq, TypeMailTo, TypePayment, TypePrDelivery, \
     TypeProperty, TypeSaleGrade, TypeStatus, TypeStatusBatch, TypeStatusHr, TypeTenure
 
@@ -64,8 +65,8 @@ def delete_record(item_id, item):
         id_dict = {"rent_id": id_2}
     elif item == "rent":
         Rent.query.filter_by(id=item_id).delete()
-    elif item == "rent_ex":
-        RentExt.query.filter_by(id=item_id).delete()
+    elif item == "rent_external":
+        RentExternal.query.filter_by(id=item_id).delete()
     commit_to_database()
     return redir, id_dict
 
@@ -126,6 +127,10 @@ def get_deed_types():
     deed_types = TypeDeed.query.all()
 
     return deed_types
+
+
+def get_doctype(doctype_id):   #returns desc as doctype
+    return db.session.query(TypeDoc).filter_by(id=doctype_id).options(load_only('desc')).one_or_none()
 
 
 @cache.cached(key_prefix='db_doc_types_all')

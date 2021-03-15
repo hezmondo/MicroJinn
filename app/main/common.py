@@ -9,6 +9,10 @@ from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed
                         TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
 
 
+# def flat_list(thing):
+#     return ["%s" % v for v in thing]
+
+
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
     actypes = [typeactype.actypedet for typeactype in get_actypes()]
