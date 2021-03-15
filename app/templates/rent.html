@@ -13,9 +13,11 @@
                 <tr>
                     <td style="width: 25%">rent {{ rent.rentcode }}</td>
                     <td style="width: 25%"><span class="rounded-background light-green">{{ rent.tenuredet }}</span></td>
-                    <td style="width: 25%"><span id="statusdet" class="rounded-background light-purple">{{ rent.statusdet }} status</span>
+                    <td style="width: 25%"><span id="statusdet"
+                                     class="rounded-background light-purple">{{ rent.statusdet }} status</span>
                     </td>
-                    <td style="width: 25%"><span id="actypedet" class="rounded-background light-purple">{{ rent.actypedet }} actype</span>
+                    <td style="width: 25%"><span id="actypedet"
+                                         class="rounded-background light-purple">{{ rent.actypedet }} actype</span>
                     </td>
                 </tr>
                 </thead>
@@ -36,7 +38,8 @@
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rent.name }} of {{ rent.manageraddr }}</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ rent.landlordname }}
+                        of {{ rent.manageraddr }}</td>
                 </tr>
                 </tbody>
             </table>
@@ -91,14 +94,14 @@
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=rent.agent_id, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                                               class="btn btn-light btn-round button-icon round bolt"
+                                               role="button"></a>
                         {% else %}
                     <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=0, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                                                                   class="btn btn-light btn-round button-icon round bolt"
-                                                                                   role="button"></a>
+                                               class="btn btn-light btn-round button-icon round bolt"
+                                               role="button"></a>
                         {% endif %}
                 </tr>
                 </tbody>
@@ -175,8 +178,8 @@
                                    href="{{ url_for('pr_bp.pr_dialog', rent_id=rent.id) }}">new payrequest for this
                                     rent</a>
                                 <a class="dropdown-item"
-                                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id) }}">new s166 for this
-                                    rent</a>
+                                   href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='s166') }}">
+                                    new s166 for this rent</a>
                             </div>
                         </div>
                     </div>
@@ -195,13 +198,7 @@
                 <div class="form-group row">
                     <div class="col-md-12">
                         <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='rent') }}"
-                           class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-md-12">
-                        <a href="{{ url_for('mail_bp.mail_dialog_x', rent_id=rent.id, action='rent') }}"
-                           class="btn btn-block btn-success button-icon letter" role="button">send mail xray</a>
+                                class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
                     </div>
                 </div>
             </div>

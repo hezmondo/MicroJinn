@@ -2,6 +2,7 @@ from flask import request
 from sqlalchemy import desc
 from app import db
 from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent, TypePayment
+from app.dao.common import get_charge_types
 from app.dao.database import commit_to_database
 
 
@@ -66,6 +67,8 @@ def get_income_dict(type):
         "paytypes_all": paytypes_all
     }
     if type == "enhanced":
+        chargedescs = [chargetype.chargedesc for chargetype in get_charge_types()]
+
         chargedescs = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
         landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
         income_dict["chargedescs"] = chargedescs

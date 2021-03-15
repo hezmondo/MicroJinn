@@ -1,4 +1,3 @@
-import datetime
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
 from app.dao.agent import get_agent, get_agents, get_agent_rents, post_agent
@@ -7,10 +6,9 @@ from app.dao.filter import get_rent_s
 from app.dao.headrent import post_headrent_agent_update
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.dao.property import get_properties, get_property, get_proptypes, post_property
-from app.dao.rent import get_rent_ex, post_rent_agent
+from app.dao.rent import get_rent_external, post_rent_agent
 from app.email import test_email_connect, test_send_email
-from app.dao.utility import delete_record, get_deed, get_deeds, post_deed
-from app.main.common import inc_date_m
+from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -33,7 +31,6 @@ def agent(agent_id):
         agent = get_agent(agent_id)
         rents = get_agent_rents(agent_id, 'rent')
         headrents = get_agent_rents(agent_id, 'headrent')
-
     return render_template('agent.html', action=action, agent=agent, rent_id=rent_id, rentcode=rentcode,
                            rents=rents, headrents=headrents)
 
@@ -67,7 +64,6 @@ def agent_rents(agent_id):
     type = request.args.get('type', "rent", type=str)
     agent = get_agent(agent_id)
     agent_rents = get_agent_rents(agent_id, type)
-
     return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, type=type)
 
 
@@ -76,7 +72,6 @@ def agent_rents(agent_id):
 def agent_unlink(rent_id):
     if request.method == "POST":
         message = post_rent_agent(0, rent_id)
-
         return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
@@ -87,7 +82,6 @@ def agents():
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     agent_id = request.args.get('agent_id', 0, type=int)
     agents = get_agents()
-
     return render_template('agents.html', agents=agents, agent_id=agent_id, rent_id=rent_id, rentcode=rentcode)
 
 
@@ -115,7 +109,6 @@ def deed(deed_id):
         deed = {"id": 0, "deedcode": "", "nfee": 75.00, "nfeeindeed": "£10", "info": ""}
     else:
         deed = get_deed(deed_id)
-
     return render_template('deed.html', deed=deed, rent_id=rent_id, rentcode=rentcode)
 
 
@@ -124,8 +117,7 @@ def deed(deed_id):
 def deeds():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
-    deeds = get_deeds()
-
+    deeds = get_deed_types()
     return render_template('deeds.html', deeds=deeds, rent_id=rent_id, rentcode=rentcode)
 
 
@@ -133,7 +125,6 @@ def deeds():
 @login_required
 def delete_item(item_id, item=''):
     redir, id_dict = delete_record(item_id, item)
-
     return redirect(url_for(redir, **id_dict))
 
 
@@ -161,29 +152,7 @@ def email_accs():
 @login_required
 def home():
     filterdict, rent_s = get_rent_s("basic", 0)
-    rents = []
-    for rent in rent_s:
-        rent_simple = RentSimple(rent)
-        rents.append(rent_simple)
-    return render_template('home.html', filterdict=filterdict, rent_s=rents)
-
-
-# Here is a class that takes the result of get_rent_s (basic) and turns it into an object that includes
-# the nextrentdate to be passed into home.html. This is an alternative option if we don't want to use the
-# inc_date_m mysql function
-class RentSimple:
-    def __init__(self, rent):
-        self.id = rent.id
-        self.detail = rent.detail
-        self.arrears = rent.arrears
-        self.freq_id = rent.freq_id
-        self.lastrentdate = rent.lastrentdate if hasattr(rent, 'lastrentdate') else datetime.date(1991, 1, 1)
-        self.propaddr = rent.propaddr
-        self.rentcode = rent.rentcode
-        self.rentpa = rent.rentpa
-        self.source = rent.source
-        self.tenantname = rent.tenantname
-        self.nextrentdate = inc_date_m(self.lastrentdate, self.freq_id, rent.datecode_id, 1)
+    return render_template('home.html', filterdict=filterdict, rent_s=rent_s)
 
 
 @util_bp.route('/landlord/<int:landlord_id>', methods=['GET', 'POST'])
@@ -228,18 +197,18 @@ def properties(rent_id):
     return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
 
 
-@util_bp.route('/rent_ex/<int:rent_ex_id>', methods=["GET"])
+@util_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])
 @login_required
-def rent_ex(rent_ex_id):
-    rent_ex = get_rent_ex(rent_ex_id)
+def rent_external(rent_external_id):
+    rent_external = get_rent_external(rent_external_id)
 
-    return render_template('rent_ex.html', rent_ex=rent_ex)
+    return render_template('rent_external.html', rent_external=rent_external)
 
 
 @util_bp.route('/rents_ex', methods=['GET', 'POST'])
 @login_required
 def rents_ex():
-    filterdict, rent_s = get_rent_s("external", 0)
+    filterdict, rent_s = get_rent_xdata("external", 0)
 
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
 

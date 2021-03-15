@@ -3,6 +3,7 @@ from datetime import date
 from flask import request
 from app.main.functions import strToDec
 from sqlalchemy import func
+from app.dao.common import get_charge_types
 from app.models import Charge, ChargeType, Rent
 
 
@@ -34,7 +35,7 @@ def get_charge(charge_id):
                                                                    Charge.chargetotal, Charge.chargedetail,
                                                                    Charge.chargebalance) \
                 .filter(Charge.id == charge_id).one_or_none()
-    chargedescs = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
+    chargedescs = [chargetype.chargedesc for chargetype in get_charge_types()]
 
     return charge, chargedescs
 
@@ -65,8 +66,7 @@ def get_charge_type(chargetype_id):
     return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
 
 
-# TODO: Can refactor this into get_charges()
-def get_rent_charge_details(rent_id):
+def get_charges_rent(rent_id):
     qfilter = [Charge.rent_id == rent_id]
     charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
                                                                      Charge.chargestartdate, Charge.chargetotal,

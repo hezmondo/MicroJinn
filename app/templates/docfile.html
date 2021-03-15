@@ -65,7 +65,7 @@
             <input type="text" class="form-control" name="summary" value="{{ docfile.summary }}" readonly="true">
         </div>
 		<div class="col-md-2">
-			{{ widgets.combobox(name="doc_type", items=session['doc_types'], item_selected=docfile.desc) }}
+			{{ widgets.combobox(name="doc_type", items=doc_types, item_selected=docfile.desc) }}
 		</div>
         <div class="col-md-2">
             {{ widgets.combobox(name="out_in", items=["all", "out", "in"], item_selected=dgf_outin) }}

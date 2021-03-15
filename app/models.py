@@ -129,25 +129,16 @@ class Event(db.Model):
     eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
 
 
-class FmLetter(db.Model):
-    __tablename__ = 'fm_letter'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    description = db.Column(db.String(90))
-    doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
-
-
 class FormLetter(db.Model):
     __tablename__ = 'form_letter'
 
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(30))
-    description = db.Column(db.String(60))
+    description = db.Column(db.String(90))
     subject = db.Column(db.String(150))
     block = db.Column(db.Text, nullable=True)
     doctype_id = db.Column(db.Integer, db.ForeignKey('typedoc.id'))
-    template_id = db.Column(db.Integer, db.ForeignKey('template.id'))
+    template = db.Column(db.String(30))
 
 
 class Headrent(db.Model):
@@ -344,7 +335,7 @@ class ManagerExt(db.Model):
     codename = db.Column(db.String(15))
     detail = db.Column(db.String(180))
 
-    rentext_managerext = db.relationship('RentExt', backref='manager_external', lazy='dynamic')
+    rentext_managerext = db.relationship('RentExternal', backref='manager_external', lazy='dynamic')
 
     def __repr__(self):
         return '<ManagerExt {}>'.format(self.codename)
@@ -537,8 +528,8 @@ class RentalStat(db.Model):
     balance = db.Column(db.Numeric(8, 2))
 
 
-class RentExt(db.Model):
-    __tablename__ = 'rent_ex'
+class RentExternal(db.Model):
+    __tablename__ = 'rent_external'
 
     id = db.Column(db.Integer, primary_key=True)
     rentcode = db.Column(db.String(20), index=True)
@@ -553,19 +544,11 @@ class RentExt(db.Model):
     source = db.Column(db.String(15))
     status = db.Column(db.String(1))
     extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
+    datecode_id = db.Column(db.Integer, default=0)
+
 
     def __repr__(self):
-        return '<RentExt {}>'.format(self.rentcode)
-
-
-class Template(db.Model):
-    __tablename__ = 'template'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(15))
-    desc = db.Column(db.String(60))
-
-    form_letter_template = db.relationship('FormLetter', backref='template', lazy='dynamic')
+        return '<RentExternal {}>'.format(self.rentcode)
 
 
 class TypeAcType(db.Model):
@@ -610,7 +593,6 @@ class TypeDoc(db.Model):
     form_letter_typedoc = db.relationship('FormLetter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('DigFile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('DocFile', backref='typedoc', lazy='dynamic')
-    fm_letter_typedoc = db.relationship('FmLetter', backref='typedoc', lazy='dynamic')
 
 
 class TypeEvent(db.Model):

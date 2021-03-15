@@ -1,7 +1,23 @@
-<!-- /templates/mergedocs/RECSTA.html  -->
+<!-- /templates/mergedocs/RECSTAX.html  -->
 {% extends 'base.html' %}
 {% block app_content %}
-<form method="POST" action="{{ url_for('doc_bp.save_html') }}">
+<form method="POST" action="{{ url_for('doc_bp.email_and_save') }}">
+	<div class="form-group row">
+		<div class="col-md-1">
+            <span>email to:</span>
+        </div>
+		<div class="col-md-6">
+            <input type="text" class="form-control" id="email_to" name="email_to" value="{{ rent.email }}">
+        </div>
+	</div>
+	<div class="form-group row">
+		<div class="col-md-1">
+            <span>subject:</span>
+        </div>
+		<div class="col-md-6">
+            <input type="text" class="form-control" id="email_subject" name="email_subject" value="{{ subject }}">
+        </div>
+	</div>
     <div class="form-group row justify-content-end">
         <div class="col-md-3">
             <button id="savehtml" class="btn btn-block btn-success button-icon save">email and save</button>
@@ -37,7 +53,8 @@
             Our Ref: {{ rent.rentcode }}
             <br/>
             <br/>
-            Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to {{ rent.email }}
+            Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to
+            <span id="span_email_to">{{ rent.email }}</span>
             <br/>
             <br/>
             Dear {{ rent.tenantname }}
@@ -45,7 +62,7 @@
         {% endif %}
         <div class="font-size-medium" align="left">
             <br/>
-            <b>Re: {{ rent.propaddr }}</b>
+            <b><span id="span_email_subject">{{ subject }}</span></b>
             <br/>
             <br/>
             Thank you for your {{ variables.paytypedet }} payment in the sum of {{ variables.payamount }} received by
@@ -64,8 +81,8 @@
             <br/>
             <br/>
             <br/>
-            {% if method == "email" %}
             <b>{{ rent.managername }}</b>
+            {% if method == "email" %}
             <br/>
             <br/>
             {{ rent.manageraddr }}
@@ -95,11 +112,25 @@
             <input type="hidden" id="summary" name="summary" value="{{ summary }}">
         </div>
         <div class="col-md-2">
-            <input type="hidden" id="doc_type" name="doc_type" value="{{ doctype }}">
+            <input type="hidden" id="doc_type" name="doctype_id" value="{{ doctype_id }}">
         </div>
         <div class="col-md-2">
             <input type="hidden" id="out_in" name="out_in" value="out">
         </div>
     </div>
 </form>
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function(){
+    // copy "email_to" input into body
+    $('#email_to').on("input", function() {
+        $('#span_email_to').text($('#email_to').val());
+    });
+    // copy "email_subject" input into body
+    $('#email_subject').on("input", function() {
+        $('#span_email_subject').text($('#email_subject').val());
+    });
+});
+</script>
 {% endblock %}

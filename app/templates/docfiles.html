@@ -20,8 +20,7 @@
                 <input type="text" class="form-control" name="doc_text" placeholder="doc text">
             </div>
             <div class="col-md-2">
-                {{ widgets.combobox(name="doc_type", items=session['doc_types'],
-                item_selected=session['doc_types'][0]) }}
+                {{ widgets.combobox(name="doc_type", items=doc_types, item_selected=doc_types[0]) }}
             </div>
             <div class="col-md-2">
                 {{ widgets.combobox(name="out_in", items=outins, item_selected=dfoutin) }}
