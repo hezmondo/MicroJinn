@@ -4,8 +4,8 @@ from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
     IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExternal, MoneyAcc, \
-    TypeAcType, TypeAdvArr, TypeDeed, TypeDoc, TypeEvent, TypeFreq, TypeMailTo, TypePayment, TypePrDelivery, \
-    TypeProperty, TypeSaleGrade, TypeStatus, TypeStatusBatch, TypeStatusHr, TypeTenure
+    TypeAcType, TypeDeed, TypeDoc, TypeEvent, TypeFreq, TypeMailTo, TypePayment, TypePrDelivery, \
+    TypeProperty, TypeSaleGrade, TypeStatus, TypeStatusBatch, TypeTenure
 
 
 def delete_record(item_id, item):
@@ -89,13 +89,6 @@ def get_actypes():
     return actypes
 
 
-@cache.cached(key_prefix='db_advarr_types_all')
-def get_advarr_types():
-    advarr_types = TypeAdvArr.query.all()
-
-    return advarr_types
-
-
 @cache.cached(key_prefix='db_batchstatus_types_all')
 def get_batchstatus_types():
     batchstatus_types = TypeStatusBatch.query.all()
@@ -151,12 +144,6 @@ def get_freq_types():
     freq_types = TypeFreq.query.all()
 
     return freq_types
-
-
-def get_hrstatus_types():
-    hrstatus_types = TypeStatusHr.query.all()
-
-    return hrstatus_types
 
 
 def get_mailto_types():

@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
 from app.main.common import get_postvals_id
 from app.main.functions import strToDec
-from app.models import Agent, Headrent, TypeStatusHr
+from app.models import Headrent
 
 
 def create_new_headrent():
@@ -16,7 +16,12 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     if headrent_id == 0:
         # take the user to create new rent function:
         headrent_id = create_new_headrent()
-    headrent = Headrent.query.filter_by(id=headrent_id).first()
+    headrent = db.session.query(Headrent) \
+        .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
+                                       joinedload('landlord').load_only('name'),
+                                       joinedload('typefreq').load_only('freqdet'),
+                                       joinedload('typetenure').load_only('tenuredet')) \
+        .one_or_none()
     if headrent is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
@@ -29,8 +34,7 @@ def get_headrents(filter):
             db.session.query(Headrent) \
             .options(load_only('id', 'code', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
                                'propaddr', 'rentpa', 'source'),
-                joinedload('agent').load_only('detail'),
-                joinedload('type_status_hr').load_only('hr_status')) \
+                joinedload('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
 
     return headrents

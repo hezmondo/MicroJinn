@@ -1,22 +1,31 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 import json
-import datetime
-from dateutil.relativedelta import relativedelta
 from flask import request
+from dateutil.relativedelta import relativedelta
 from flask_login import current_user
-from app.dao.common import get_actypes, get_advarr_types, get_dates_m, get_freq_types, get_tenure_types
-from app.models import Agent, Jstore, Landlord, TypeAcType, TypeAdvArr, TypeDeed, TypeFreq, TypeMailTo, \
-                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeStatusHr, TypeTenure
+from app.dao.common import get_actypes, get_dates_m, get_freq_types, get_tenure_types
+from app.models import Agent, Jstore, Landlord, TypeAcType, TypeDeed, TypeFreq, TypeMailTo, \
+                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
 
-# def flat_list(thing):
-#     return ["%s" % v for v in thing]
+def get_advarrdet(advarr_id):
+    return "in advance" if advarr_id == 1 else "in arrears"
+
+
+def get_advarr_id(advarrdet):
+    return 1 if advarrdet == "in advance" else 2
+
+
+def get_advarr_types():
+    advarr_types = ['in advance', 'in arrears']
+
+    return advarr_types
 
 
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
     actypes = [typeactype.actypedet for typeactype in get_actypes()]
-    advars = [typeadvarr.advarrdet for typeadvarr in get_advarr_types()]
+    advars = get_advarr_types()
     freqs = [typefreq.freqdet for typefreq in get_freq_types()]
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
     tenures = [typetenure.tenuredet for typetenure in get_tenure_types()]
@@ -43,6 +52,7 @@ def get_combodict_rent():
     combo_dict['prdeliveries'] = prdeliveries
     combo_dict['salegrades'] = salegrades
     combo_dict['statuses'] = statuses
+
     return combo_dict
 
 
@@ -59,43 +69,36 @@ def get_combodict_filter():
     filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
     combo_dict["filternames"] = filternames
     combo_dict["filtertypes"] = ["payrequest", "rentprop", "income"]
+
     return combo_dict
 
 
-def inc_date(date1, freq, num):
-    # this function simply increments or decrements a date by num periods without modulating day of month
-    date2 = date1
-    if freq == 1:
-        date2 = date1 + relativedelta(years=num)
-    elif freq == 2:
-        date2 = date1 + relativedelta(months=num*6)
-    elif freq == 4:
-        date2 = date1 + relativedelta(months=num*3)
-    elif freq == 12:
-        date2 = date1 + relativedelta(months=num)
-    elif freq == 13:
-        date2 = date1 + relativedelta(weeks=num*4)
-    elif freq == 52:
-        date2 = date1 + relativedelta(weeks=num)
-    return date2
-
-
-def inc_date_m(date1, frequency, datecode_id, periods):
-    # first we get a new pure date calculated forwards or backwards for the number of periods
-    date2 = inc_date(date1, frequency, periods)
-    # now get special date sequences from date_m table
-    dates_m = get_dates_m()
-    if datecode_id != 0:
-        for item in dates_m:
-            if item[0] == datecode_id and item[1] == date2.month:
-                date2 = date2.replace(day=item[2])
-    return date2
+def get_hr_status(status_id):
+    if status_id == 1:
+        return "active"
+    elif status_id == 2:
+        return "dormant"
+    elif status_id == 3:
+        return "suspended"
+    else:
+        return "terminated"
 
 
 def get_hr_statuses():
-    hr_statuses = [value for (value,) in TypeStatusHr.query.with_entities(TypeStatusHr.hr_status).all()]
-    # hr_statuses = ["active", "dormant", "suspended", "terminated"]
+    hr_statuses = ["active", "dormant", "suspended", "terminated"]
+
     return hr_statuses
+
+
+def get_hr_status_id(status):
+    if status == "active":
+        return 1
+    elif status == "dormant":
+        return 2
+    elif status == "suspended":
+        return 3
+    else:
+        return 4
 
 
 def get_idlist_recent(type):
@@ -103,6 +106,7 @@ def get_idlist_recent(type):
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
         id_list = [1, 2, 3]
+
     return id_list
 
 
@@ -127,7 +131,7 @@ def get_postvals_id():
             if key == "actype":
                 actval = TypeAcType.query.with_entities(TypeAcType.id).filter(TypeAcType.actypedet == actval).one()[0]
             elif key == "advarr":
-                actval = TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == actval).one()[0]
+                actval = 1 if actval == 'in advance' else 'in arrears'
             elif key == "agent":
                 actval = Agent.query.with_entities(Agent.id).filter(Agent.detail == actval).one()[0]
             elif key == "deedcode":
@@ -149,3 +153,37 @@ def get_postvals_id():
             postvals_id[key] = actval
             print(key, value)
     return postvals_id
+
+
+def inc_date(date1, freq, num):
+    # this function simply increments or decrements a date by num periods without modulating day of month
+    date2 = date1
+    if freq == 1:
+        date2 = date1 + relativedelta(years=num)
+    elif freq == 2:
+        date2 = date1 + relativedelta(months=num*6)
+    elif freq == 4:
+        date2 = date1 + relativedelta(months=num*3)
+    elif freq == 12:
+        date2 = date1 + relativedelta(months=num)
+    elif freq == 13:
+        date2 = date1 + relativedelta(weeks=num*4)
+    elif freq == 52:
+        date2 = date1 + relativedelta(weeks=num)
+
+    return date2
+
+
+def inc_date_m(date1, frequency, datecode_id, periods):
+    # first we get a new pure date calculated forwards or backwards for the number of periods
+    date2 = inc_date(date1, frequency, periods)
+    # now get special date sequences from date_m table
+    dates_m = get_dates_m()
+    if datecode_id != 0:
+        for item in dates_m:
+            if item[0] == datecode_id and item[1] == date2.month:
+                date2 = date2.replace(day=item[2])
+
+    return date2
+
+

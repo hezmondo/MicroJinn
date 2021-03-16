@@ -1,12 +1,13 @@
-import datetime
 from datetime import date
+from flask import request
 from math import ceil
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.charge import get_charges_rent
-from app.dao.rent import get_mailaddr, get_propaddr, get_rent, get_rent_x
-from app.main.common import inc_date_m
-from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down
+from app.dao.rent import get_mailaddr, get_propaddr, get_rent, post_rent
+from app.main.common import get_advarrdet, get_advarr_id, get_postvals_id, inc_date_m
+from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
+from app.models import Rent
 
 
 def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentpa):
@@ -31,32 +32,30 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 def get_rentp(rent_id):
     # returns a mutable dict with Rent (full) plus joined and derived variables for rent screen, mail, payrequest
     rent = get_rent(rent_id)
-    rent_x = get_rent_x(rent_id)
-    rent.acc_name = rent_x.landlord.money_account.acc_name
-    rent.actypedet = rent_x.typeactype.actypedet
-    rent.acc_num = rent_x.landlord.money_account.acc_num
-    rent.advarrdet = rent_x.typeadvarr.advarrdet
-    rent.bank_name = rent_x.landlord.money_account.bank_name
+    rent.acc_name = rent.landlord.money_account.acc_name
+    rent.actypedet = rent.typeactype.actypedet
+    rent.acc_num = rent.landlord.money_account.acc_num
+    rent.advarrdet = get_advarrdet(rent.advarr_id)
+    rent.bank_name = rent.landlord.money_account.bank_name
     rent.charges = get_charges_rent(rent_id)
     rent.totcharges = get_totcharges(rent.charges)
-    rent.detail = rent_x.agent.detail if hasattr(rent_x.agent, 'detail') else "no agent",
-    rent.freqdet = rent_x.typefreq.freqdet
-    rent.info = rent_x.typedeed.info
-    rent.landlordname = rent_x.landlord.name
+    rent.freqdet = rent.typefreq.freqdet
+    rent.info = rent.typedeed.info
+    rent.landlordname = rent.landlord.name
     rent.mailaddr = get_mailaddr(rent_id, rent.agent_id, rent.mailto_id, rent.tenantname)
-    rent.managername = rent_x.landlord.manager.managername
-    rent.manageraddr = rent_x.landlord.manager.manageraddr
-    rent.manageraddr2 = rent_x.landlord.manager.manageraddr2
+    rent.managername = rent.landlord.manager.managername
+    rent.manageraddr = rent.landlord.manager.manageraddr
+    rent.manageraddr2 = rent.landlord.manager.manageraddr2
     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
-    rent.prdeliverydet = rent_x.typeprdelivery.prdeliverydet
+    rent.prdeliverydet = rent.typeprdelivery.prdeliverydet
     rent.propaddr = get_propaddr(rent_id)
     rent.rent_gale = get_rent_gale(rent.nextrentdate, rent.freq_id, rent.rentpa)
-    rent.tenuredet = rent_x.typetenure.tenuredet
+    rent.tenuredet = rent.typetenure.tenuredet
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
-    rent.statusdet = rent_x.typestatus.statusdet
-    rent.sort_code = rent_x.landlord.money_account.sort_code
+    rent.statusdet = rent.typestatus.statusdet
+    rent.sort_code = rent.landlord.money_account.sort_code
     return rent
 
 
@@ -125,8 +124,9 @@ def get_rent_strings(rent, type='mail'):
     rent_strings_2 = {'#acc_name#': rent.acc_name if hasattr(rent, 'acc_name') else "no acc_name",
                       '#acc_num#': rent.acc_num if hasattr(rent, 'acc_num') else "no acc_num",
                       '#arrearsenddate_plus1#': dateToStr(inc_date_m(rent.lastrentdate,
-                                                     rent.freq_id, rent.datecode_id, 2) + relativedelta(days=-1)) \
-                            if rent.advarrdet == "in advance" else dateToStr(rent.nextrentdate),
+                                                                     rent.freq_id, rent.datecode_id, 2) + relativedelta(
+                          days=-1)) \
+                          if rent.advarrdet == "in advance" else dateToStr(rent.nextrentdate),
                       '#bank_name#': rent.bank_name,
                       '#charges_string#': charges_string,
                       '#hashcode#': hashCode(rent.rentcode),
@@ -134,7 +134,7 @@ def get_rent_strings(rent, type='mail'):
                       '#managername#': rent.managername,
                       '#next_gale_start#': next_gale_start,
                       '#nextrentdate_plus1#': dateToStr(inc_date_m(rent.lastrentdate,
-                                                     rent.freq_id, rent.datecode_id, 2)),
+                                                                   rent.freq_id, rent.datecode_id, 2)),
                       '#pay_date#': dateToStr(date.today() + relativedelta(days=30)),
                       '#rent_stat#': rent_stat,
                       '#sort_code#': rent.sort_code,
@@ -244,3 +244,54 @@ def rent_validation(rent, message=""):
         messages.append("The mail address is currently 'None'. Please change the mail address "
                         "from mail to agent or link a new agent.")
     return messages
+
+
+def update_rent(rent_id):
+    rent = Rent.query.get(rent_id)
+    postvals_id = get_postvals_id()
+    # we need the post values with the class id generated for the actual combobox values:
+    rent.actype_id = postvals_id["actype"]
+    rent.advarr_id = get_advarr_id(request.form.get("advarr"))
+    rent.arrears = strToDec(request.form.get("arrears"))
+    # we need code to generate datecode_id from lastrentdate with user choosing sequence:
+    rent.datecode_id = int(request.form.get("datecode_id"))
+    rent.deed_id = postvals_id["deedcode"]
+    rent.freq_id = postvals_id["frequency"]
+    rent.landlord_id = postvals_id["landlord"]
+    rent.lastrentdate = request.form.get("lastrentdate")
+    price = request.form.get("price")
+    rent.price = price if (price and price != 'None') else Decimal(99999)
+    rent.rentpa = strToDec(request.form.get("rentpa"))
+    rent.salegrade_id = postvals_id["salegrade"]
+    rent.source = request.form.get("source")
+    rent.status_id = postvals_id["status"]
+    rent.tenure_id = postvals_id["tenure"]
+    rent_id = post_rent(rent)
+
+    return rent_id
+
+
+def update_roll_rent(rent_id, last_rent_date, arrears):
+    rent = Rent.query.get(rent_id)
+    rent.lastrentdate = last_rent_date
+    rent.arrears = arrears
+
+
+def update_rollback_rent(rent_id, arrears):
+    rent = Rent.query.get(rent_id)
+    last_rent_date = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, -1)
+    rent.lastrentdate = last_rent_date
+    rent.arrears = arrears
+
+
+def update_tenant(rent_id):
+    rent = Rent.query.get(rent_id)
+    rent.tenantname = request.form.get("tenantname")
+    postvals_id = get_postvals_id()
+    rent.mailto_id = postvals_id["mailto"]
+    rent.email = request.form.get("email")
+    rent.prdelivery_id = postvals_id["prdelivery"]
+    rent.note = request.form.get("note")
+    rent_id = post_rent(rent)
+
+    return rent_id
