@@ -1,8 +1,8 @@
 from flask import request
 from app.dao.headrent import get_headrents
-from app.main.common import inc_date_m
+from app.main.common import get_hr_status, inc_date_m
 
-from app.models import Agent, Headrent, TypeStatusHr
+from app.models import Agent, Headrent
 
 
 def create_new_headrent():
@@ -28,12 +28,12 @@ def get_headrents_p():
             filter.append(Agent.detail.ilike('%{}%'.format(agent)))
         status = request.form.getlist("status") or ""
         filterdict['status'] = status
-        if status and status != "" and status != [] and status != ['all statuses']:
-            filter.append(TypeStatusHr.hr_status.in_(status))
+    #     have to work out how to do this
 
     headrents = get_headrents(filter)
     for headrent in headrents:
         headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
+        headrent.status = get_hr_status(headrent.status_id)
     return filterdict, headrents
 
 

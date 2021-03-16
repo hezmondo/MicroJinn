@@ -48,12 +48,6 @@ def get_pr_forms():
     return FormLetter.query.filter(FormLetter.doctype_id == 2).all()
 
 
-def get_templates():
-    templates = [value for (value,) in Template.query.with_entities(Template.code).all()]
-
-    return templates
-
-
 def post_form_letter(form_letter_id):
     if form_letter_id == 0:
         form_letter = FormLetter()

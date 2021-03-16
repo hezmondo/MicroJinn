@@ -1,5 +1,4 @@
 import decimal
-import logging
 import os
 from config import Config
 from flask import Flask

@@ -2,9 +2,8 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.dao.common import get_advarr_types, get_freq_types
 from app.dao.database import commit_to_database
-from app.models import Loan, LoanStat, TypeAdvArr, TypeFreq
+from app.models import Loan, LoanStat, TypeFreq
 
 
 def get_loan(loan_id):
@@ -12,25 +11,16 @@ def get_loan(loan_id):
         loan_id = post_loan(loan_id)
     if loan_id != 0:
         loan = \
-            Loan.query. \
-                join(TypeAdvArr) \
+            Loan.query \
                 .join(TypeFreq) \
                 .with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa,
-                               TypeAdvArr.advarrdet, TypeFreq.freqdet) \
+                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa, TypeFreq.freqdet) \
                 .filter(Loan.id == loan_id).one_or_none()
     else:
         loan = Loan()
         loan.id = 0
+
     return loan
-
-
-def get_loan_options():
-    # return options for each multiple choice control in loan page
-    advarrdets = [typeadvarr.advarrdet for typeadvarr in get_advarr_types()]
-    freqdets = [typefreq.freqdet for typefreq in get_freq_types()]
-
-    return advarrdets, freqdets
 
 
 def get_loans(action):
@@ -72,7 +62,6 @@ def post_loan(loan_id):
     # delete_loan_interest_rate = LoanIntRate.query.filter(LoanIntRate.loan_id == id).all()
     # db.session.delete(delete_loan_interest_rate)
     # db.session.delete(delete_loan_trans)
-
     db.session.add(loan)
     db.session.flush()
     loan_id = loan.id

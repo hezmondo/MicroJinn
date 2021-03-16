@@ -147,6 +147,7 @@ class Headrent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15), index=True, unique=True)
     rentpa = db.Column(db.Numeric(8, 2))
+    advarr_id = db.Column(db.Integer)
     arrears = db.Column(db.Numeric(8, 2))
     lastrentdate = db.Column(db.Date)
     datecode_id = db.Column(db.Integer, default=0)
@@ -156,9 +157,8 @@ class Headrent(db.Model):
     note = db.Column(db.String(120))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
-    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    hr_status_id = db.Column(db.Integer, db.ForeignKey('type_status_hr.id'))
+    status_id = db.Column(db.Integer)
     tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
 
 
@@ -269,7 +269,6 @@ class Loan(db.Model):
     interest_rate = db.Column(db.Numeric(8, 2))
     end_date = db.Column(db.Date)
     frequency = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
     lender = db.Column(db.String(45))
     borrower = db.Column(db.String(45))
     notes = db.Column(db.String(45))
@@ -477,7 +476,7 @@ class Rent(db.Model):
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
     actype_id = db.Column(db.Integer, db.ForeignKey('typeactype.id'))
-    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
+    advarr_id = db.Column(db.Integer)
     deed_id = db.Column(db.Integer, db.ForeignKey('typedeed.id'))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
     mailto_id = db.Column(db.Integer, db.ForeignKey('typemailto.id'))
@@ -508,11 +507,11 @@ class Rental(db.Model):
     propaddr = db.Column(db.String(120))
     tenantname = db.Column(db.String(90))
     rentpa = db.Column(db.Numeric(8, 2))
+    advarr_id = db.Column(db.Integer)
     arrears = db.Column(db.Numeric(8, 2))
     startrentdate = db.Column(db.Date)
     note = db.Column(db.String(90))
     freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    advarr_id = db.Column(db.Integer, db.ForeignKey('typeadvarr.id'))
     astdate = db.Column(db.Date)
     lastgastest = db.Column(db.Date)
 
@@ -558,18 +557,6 @@ class TypeAcType(db.Model):
     actypedet = db.Column(db.String(45))
 
     rent_typeactype = db.relationship('Rent', backref='typeactype', lazy='dynamic')
-
-
-class TypeAdvArr(db.Model):
-    __tablename__ = 'typeadvarr'
-
-    id = db.Column(db.Integer, primary_key=True)
-    advarrdet = db.Column(db.String(45))
-
-    rent_typeadvarr = db.relationship('Rent', backref='typeadvarr', lazy='dynamic')
-    headrent_typeadvarr = db.relationship('Headrent', backref='typeadvarr', lazy='dynamic')
-    loan_typeadvarr = db.relationship('Loan', backref='typeadvarr', lazy='dynamic')
-    rental_typeadvarr = db.relationship('Rental', backref='typeadvarr', lazy='dynamic')
 
 
 class TypeDeed(db.Model):
@@ -678,15 +665,6 @@ class TypeStatusBatch(db.Model):
     status = db.Column(db.String(30))
 
     batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
-
-
-class TypeStatusHr(db.Model):
-    __tablename__ = 'type_status_hr'
-
-    id = db.Column(db.Integer, primary_key=True)
-    hr_status = db.Column(db.String(45))
-
-    headrent_type_status_hr = db.relationship('Headrent', backref='type_status_hr', lazy='dynamic')
 
 
 class TypeTenure(db.Model):

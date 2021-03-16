@@ -1,8 +1,8 @@
 import json
 from flask import request, session
-from app.main.common import get_idlist_recent, inc_date_m
+from app.main.common import get_advarrdet, get_idlist_recent, inc_date_m
 from app.main.functions import strToDate
-from app.dao.rent import get_rent_sdata, post_rent__filter
+from app.dao.rent import get_rent_sdata, get_propaddr, post_rent__filter
 from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent, TypeAcType, \
     TypeDoc, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
 
@@ -65,7 +65,10 @@ def get_rent_s(action, filter_id):
     rent_s = get_rent_sdata(qfilter, action, 50)
     if action != 'external':
         for rent in rent_s:
+            rent.advarrdet = get_advarrdet(rent.advarr_id)
+            rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
             rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
+            rent.propaddr = get_propaddr(rent.id)
     # TODO: Repeated if statement - This can be cleaned up
     if action == 'basic' and request.method == "GET":
         rent_s = sorted(rent_s, key=lambda o: id_list.index(o.id))

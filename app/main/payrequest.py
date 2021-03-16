@@ -12,11 +12,11 @@ from app.dao.doc import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
 from app.dao.payrequest import add_pr_history, get_pr_charge, get_pr_file, get_recovery_info, \
     prepare_new_pr_history_entry, add_pr_charge
-from app.dao.rent import check_pr_exists, update_roll_rent, update_rollback_rent
+from app.dao.rent import check_pr_exists
 from app.dao.common import delete_record_basic
 from app.main.common import inc_date_m
 from app.main.functions import dateToStr, doReplace, moneyToStr
-from app.main.rent import get_rent_gale, get_rentp, get_rent_strings
+from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
 
 
 def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
