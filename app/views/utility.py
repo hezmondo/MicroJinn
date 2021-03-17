@@ -54,8 +54,7 @@ def agent_delete(agent_id):
         if rent_id == 0:
             return redirect(url_for('util_bp.agents'))
         else:
-            return redirect(url_for('rent_bp.rent', rent_id=rent_id,
-                                    message=message))
+            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
 @util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])

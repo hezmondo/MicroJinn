@@ -15,8 +15,8 @@ pr_bp = Blueprint('pr_bp', __name__)
 @login_required
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
-    mail_pack = get_mail_pack(rent_id)
-    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id, mail_pack=mail_pack)
+    # mail_pack = get_mail_pack(rent_id)
+    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
 
 
 @pr_bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])
@@ -28,13 +28,14 @@ def pr_edit(pr_form_id):
         totdue_string = write_payrequest(rent_id, pr_form_id)
         pr_form = PrPostForm()
         mail_pack = get_mail_pack(rent_id)
-        if mail_pack.mailaddr:
-            mailaddr = mail_pack.mailaddr.split(", ")
+        mailaddr = mail_pack.get('mailaddr')
+        if mailaddr:
+            mailaddr = mailaddr.split(", ")
         else:
             message = 'Cannot complete payrequest, Please update mail address.'
             return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-        pr_form.mailaddr.choices = [mail_pack.mailaddr, (mail_pack.tenantname + ', ' + mail_pack.propaddr),
-                                    ('The owner/occupier, ' + mail_pack.propaddr)]
+        pr_form.mailaddr.choices = [mail_pack.get('mailaddr'), (mail_pack.get('tenantname') + ', ' + mail_pack.get('propaddr')),
+                                    ('The owner/occupier, ' + mail_pack.get('propaddr'))]
         if pr_form.validate_on_submit():
             return redirect(url_for('pr_save_send', rent_id=rent_pr.id))
         pr_save_data = serialize_pr_save_data(pr_save_data)
