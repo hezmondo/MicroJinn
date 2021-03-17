@@ -1,8 +1,11 @@
 from app import db
 from flask import flash, redirect, request, url_for
 from sqlalchemy.orm import joinedload, load_only
+from app.dao.agent import get_agent_id
 from app.dao.database import commit_to_database
-from app.main.common import get_postvals_id
+from app.dao.landlord import get_landlord_id
+from app.dao.common import get_status_id
+from app.main.common import get_advarr_id, get_freq_id, get_salegrade_id, get_tenure_id
 from app.main.functions import strToDec
 from app.models import Headrent
 
@@ -19,8 +22,7 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name'),
-                                       joinedload('typefreq').load_only('freqdet'),
-                                       joinedload('typetenure').load_only('tenuredet')) \
+                                       joinedload('typefreq').load_only('freqdet')) \
         .one_or_none()
     if headrent is None:
         flash('Invalid rent code')
@@ -36,31 +38,31 @@ def get_headrents(filter):
                                'propaddr', 'rentpa', 'source'),
                 joinedload('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
+    for rent in headrents:
+        rent.status = get_status(rent.status_id)
 
     return headrents
 
 
 def post_headrent(id):
     headrent = Headrent.query.get(id)
-    postvals_id = get_postvals_id()
     # we need the post values as class id generated for the actual combobox values:
-    headrent.advarr_id = postvals_id["advarr"]
-    headrent.agent_id = postvals_id["agent"]
+    headrent.advarr_id = get_advarr_id(request.form.get("advarr"))
+    headrent.agent_id = get_agent_id(request.form.get("agent"))
     headrent.arrears = strToDec(request.form.get("arrears"))
     # we need code to generate datecode from lastrentdate with user choosing sequence:
     headrent.code = request.form.get("rentcode")
     headrent.datecode_id = int(request.form.get("datecode_id"))
-    headrent.freq_id = postvals_id["frequency"]
-    headrent.landlord_id = postvals_id["landlord"]
+    headrent.freq_id = get_freq_id(request.form.get("frequency"))
+    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
     headrent.lastrentdate = request.form.get("lastrentdate")
     headrent.note = request.form.get("note")
     headrent.reference = request.form.get("reference")
     headrent.rentpa = strToDec(request.form.get("rentpa"))
-    headrent.salegrade_id = postvals_id["salegrade"]
+    headrent.salegrade_id = get_salegrade_id(request.form.get("salegrade"))
     headrent.source = request.form.get("source")
-    headrent.status_id = postvals_id["status"]
-    headrent.tenantname = request.form.get("tenantname")
-    headrent.tenure_id = postvals_id["tenure"]
+    headrent.status_id = get_status_id(request.form.get("status"))
+    headrent.tenure_id = get_tenure_id(request.form.get("tenure"))
     db.session.add(headrent)
     db.session.flush()
     _id = headrent.id

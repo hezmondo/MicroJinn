@@ -1,6 +1,7 @@
 from datetime import datetime
 from app import db
-from app.models import PrArrearsMatrix, PrCharge, PrHistory, Rent, TypePrDelivery
+from app.main.common import get_prdelivery_id
+from app.models import PrArrearsMatrix, PrCharge, PrHistory, Rent
 from app.dao.database import commit_to_database
 from sqlalchemy import desc
 
@@ -46,14 +47,6 @@ def get_recovery_info(suffix):
     return arrears_clause, create_case, recovery_charge
 
 
-def get_typeprdelivery(typeprdelivery_id=1):
-    return db.session.query(TypePrDelivery.prdeliverydet).filter_by(id=typeprdelivery_id).scalar()
-
-
-def get_typeprdelivery_id(prdeliverydet='email'):
-    return db.session.query(TypePrDelivery.id).filter_by(prdeliverydet=prdeliverydet).scalar()
-
-
 def post_updated_payrequest(block, pr_id):
     pr_history = PrHistory.query.get(pr_id)
     rent_id = pr_history.rent_id
@@ -74,7 +67,7 @@ def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method=
     # TODO: We are not using the typeprdelivery table yet in any meaningful way
     #  - should we remove it and make delivery_method in pr_history a string column?
     #  - We'd have to hard code the method strings in any combodict filters
-    pr_history.delivery_method = get_typeprdelivery_id(method)
+    pr_history.delivery_method = get_prdelivery_id(method)
     # TODO: Add pending / delivered functionality
     pr_history.delivered = True
     return pr_history

@@ -1,7 +1,7 @@
 import datetime
 from flask import Blueprint, render_template, request
 from flask_login import login_required
-from app.dao.common import get_freq_types
+from app.main.common import get_freqs
 from app.dao.loan import get_loan, get_loans, get_loan_statement
 from app.main.common import get_advarr_types
 
@@ -13,7 +13,7 @@ loan_bp = Blueprint('loan_bp', __name__)
 def loan(loan_id):
     loan = get_loan(loan_id)
     advarrdets = get_advarr_types()
-    freqdets = [typefreq.freqdet for typefreq in get_freq_types()]
+    freqdets = get_freqs()
 
     return render_template('loan.html', loan=loan, advarrdets=advarrdets, freqdets=freqdets)
 

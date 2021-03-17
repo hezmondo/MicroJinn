@@ -2,21 +2,16 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.dao.common import get_freq_types
-from app.main.common import get_advarr_id, get_advarr_types
-from app.models import Rental, RentalStat, TypeFreq
+from app.main.common import get_advarr_id, get_advarr_types, get_freq, get_freq_id, get_freqs
+from app.models import Rental, RentalStat
 
 
 def get_rental(rental_id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
-    rental = Rental.query.\
-        join(TypeFreq).\
-        with_entities(Rental.id, Rental.rentalcode, Rental.arrears, Rental.startrentdate, Rental.astdate,
-                      Rental.lastgastest, Rental.note, Rental.propaddr, Rental.rentpa, Rental.tenantname,
-                      TypeFreq.freqdet) \
-        .filter(Rental.id == rental_id).one_or_none()
+    rental = db.session.query(Rental).filter_by(id=rental_id).first()
+    rental.freqdet= get_freq(rental.freq_id)
     advarrdets = get_advarr_types()
-    freqdets = [typefreq.freqdet for typefreq in get_freq_types()]
+    freqdets = get_freqs()
 
     return rental, advarrdets, freqdets
 
@@ -50,9 +45,7 @@ def post_rental(rental_id):
         rental.astdate = request.form.get("astdate")
     rental.lastgastest = request.form.get("lastgastest")
     rental.note = request.form.get("note")
-    frequency = request.form.get("frequency")
-    rental.freq_id = \
-        TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == frequency).one()[0]
+    rental.freq_id = get_freq_id(request.form.get("frequency"))
     advarrdet = request.form.get("advarr")
     rental.advarr_id = get_advarr_id(advarrdet)
     db.session.add(rental)

@@ -3,19 +3,16 @@ from app import db
 from flask import request
 from sqlalchemy import func
 from app.dao.database import commit_to_database
-from app.models import Loan, LoanStat, TypeFreq
+from app.main.common import get_freq
+from app.models import Loan, LoanStat
 
 
 def get_loan(loan_id):
     if request.method == "POST":
         loan_id = post_loan(loan_id)
     if loan_id != 0:
-        loan = \
-            Loan.query \
-                .join(TypeFreq) \
-                .with_entities(Loan.id, Loan.code, Loan.interest_rate, Loan.end_date, Loan.lender, Loan.borrower,
-                               Loan.notes, Loan.val_date, Loan.valuation, Loan.interestpa, TypeFreq.freqdet) \
-                .filter(Loan.id == loan_id).one_or_none()
+        loan = db.session.query(Loan).filter_by(id=loan_id).first()
+        loan.freqdet = get_freq(loan.freq_id)
     else:
         loan = Loan()
         loan.id = 0

@@ -20,6 +20,15 @@ def get_landlord(id):
     return landlord
 
 
+# def get_agent(agent_id):
+#     return db.session.query(Agent).filter_by(id=agent_id).one()
+
+
+def get_landlord_id(landlord):
+    landlord = db.session.query(Landlord).filter_by(name=landlord).one()
+    return landlord.id
+
+
 def get_landlord_dict():
     managers = [value for (value,) in Manager.query.with_entities(Manager.managername).all()]
     emailaccs = [value for (value,) in EmailAcc.query.with_entities(EmailAcc.smtp_server).all()]

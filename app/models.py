@@ -157,9 +157,9 @@ class Headrent(db.Model):
     note = db.Column(db.String(120))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
-    freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    freq_id = db.Column(db.Integer)
     status_id = db.Column(db.Integer)
-    tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
+    tenure_id = db.Column(db.Integer)
 
 
 class Income(db.Model):
@@ -268,7 +268,7 @@ class Loan(db.Model):
     code = db.Column(db.String(30))
     interest_rate = db.Column(db.Numeric(8, 2))
     end_date = db.Column(db.Date)
-    frequency = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    freq_id = db.Column(db.Integer)
     lender = db.Column(db.String(45))
     borrower = db.Column(db.String(45))
     notes = db.Column(db.String(45))
@@ -323,9 +323,6 @@ class Manager(db.Model):
 
     landlord_manager = db.relationship('Landlord', backref='manager', lazy='dynamic')
 
-    def __repr__(self):
-        return '<Manager {}>'.format(self.name)
-
 
 class ManagerExt(db.Model):
     __tablename__ = 'manager_external'
@@ -335,9 +332,6 @@ class ManagerExt(db.Model):
     detail = db.Column(db.String(180))
 
     rentext_managerext = db.relationship('RentExternal', backref='manager_external', lazy='dynamic')
-
-    def __repr__(self):
-        return '<ManagerExt {}>'.format(self.codename)
 
 
 class MoneyAcc(db.Model):
@@ -397,7 +391,7 @@ class PrBatch(db.Model):
     date = db.Column(db.Date)
     code = db.Column(db.String(30))
     size = db.Column(db.Integer)
-    status = db.Column(db.Integer, db.ForeignKey('typebatchstatus.id'))
+    status_id = db.Column(db.Integer)
     is_account = db.Column(db.Boolean)
 
     payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
@@ -432,7 +426,7 @@ class PrHistory(db.Model):
     rent_date = db.Column(db.Date)
     total_due = db.Column(db.Numeric(8, 2))
     arrears_level = db.Column(db.String(1))
-    delivery_method = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
+    delivery_method = db.Column(db.Integer)
     delivered = db.Column(db.Boolean)
 
     pr_charge_pr_history = db.relationship('PrCharge', backref='pr_history', lazy='dynamic')
@@ -444,10 +438,7 @@ class Property(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     propaddr = db.Column(db.String(180))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    typeprop_id = db.Column(db.Integer, db.ForeignKey('typeproperty.id'))
-
-    def __repr__(self):
-        return '<Property {}>'.format(self.propaddr)
+    proptype_id = db.Column(db.Integer)
 
 
 class Recent(db.Model):
@@ -475,15 +466,15 @@ class Rent(db.Model):
     note = db.Column(db.String(120))
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'))
     agent_id = db.Column(db.Integer, db.ForeignKey('agent.id'))
-    actype_id = db.Column(db.Integer, db.ForeignKey('typeactype.id'))
+    actype_id = db.Column(db.Integer)
     advarr_id = db.Column(db.Integer)
     deed_id = db.Column(db.Integer, db.ForeignKey('typedeed.id'))
-    freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
-    mailto_id = db.Column(db.Integer, db.ForeignKey('typemailto.id'))
-    prdelivery_id = db.Column(db.Integer, db.ForeignKey('typeprdelivery.id'))
-    salegrade_id = db.Column(db.Integer, db.ForeignKey('typesalegrade.id'))
+    freq_id = db.Column(db.Integer)
+    mailto_id = db.Column(db.Integer)
+    prdelivery_id = db.Column(db.Integer)
+    salegrade_id = db.Column(db.Integer)
     status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
-    tenure_id = db.Column(db.Integer, db.ForeignKey('typetenure.id'))
+    tenure_id = db.Column(db.Integer)
 
     case_rent = db.relationship('Case', backref='rent', lazy='dynamic')
     charge_rent = db.relationship('Charge', backref='rent', lazy='dynamic')
@@ -511,7 +502,7 @@ class Rental(db.Model):
     arrears = db.Column(db.Numeric(8, 2))
     startrentdate = db.Column(db.Date)
     note = db.Column(db.String(90))
-    freq_id = db.Column(db.Integer, db.ForeignKey('typefreq.id'))
+    freq_id = db.Column(db.Integer)
     astdate = db.Column(db.Date)
     lastgastest = db.Column(db.Date)
 
@@ -531,7 +522,7 @@ class RentExternal(db.Model):
     __tablename__ = 'rent_external'
 
     id = db.Column(db.Integer, primary_key=True)
-    rentcode = db.Column(db.String(20), index=True)
+    rentcode = db.Column(db.String(20), index=True, unique=True)
     tenantname = db.Column(db.String(30))
     propaddr = db.Column(db.String(180))
     agentdetail = db.Column(db.String(45))
@@ -544,19 +535,6 @@ class RentExternal(db.Model):
     status = db.Column(db.String(1))
     extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
     datecode_id = db.Column(db.Integer, default=0)
-
-
-    def __repr__(self):
-        return '<RentExternal {}>'.format(self.rentcode)
-
-
-class TypeAcType(db.Model):
-    __tablename__ = 'typeactype'
-
-    id = db.Column(db.Integer, primary_key=True)
-    actypedet = db.Column(db.String(45))
-
-    rent_typeactype = db.relationship('Rent', backref='typeactype', lazy='dynamic')
 
 
 class TypeDeed(db.Model):
@@ -591,27 +569,6 @@ class TypeEvent(db.Model):
     event_typedoc = db.relationship('Event', backref='typeevent', lazy='dynamic')
 
 
-class TypeFreq(db.Model):
-    __tablename__ = 'typefreq'
-
-    id = db.Column(db.Integer, primary_key=True)
-    freqdet = db.Column(db.String(45))
-
-    rent_typefreq = db.relationship('Rent', backref='typefreq', lazy='dynamic')
-    headrent_typefreq = db.relationship('Headrent', backref='typefreq', lazy='dynamic')
-    loan_typefreq = db.relationship('Loan', backref='typefreq', lazy='dynamic')
-    rental_typefreq = db.relationship('Rental', backref='typefreq', lazy='dynamic')
-
-
-class TypeMailTo(db.Model):
-    __tablename__ = 'typemailto'
-
-    id = db.Column(db.Integer, primary_key=True)
-    mailtodet = db.Column(db.String(45))
-
-    rent_typemailto = db.relationship('Rent', backref='typemailto', lazy='dynamic')
-
-
 class TypePayment(db.Model):
     __tablename__ = 'typepayment'
 
@@ -621,34 +578,6 @@ class TypePayment(db.Model):
     income_paytype = db.relationship('Income', backref='typepayment', lazy='dynamic')
 
 
-class TypePrDelivery(db.Model):
-    __tablename__ = 'typeprdelivery'
-
-    id = db.Column(db.Integer, primary_key=True)
-    prdeliverydet = db.Column(db.String(45))
-
-    pr_typeprdelivery = db.relationship('PrHistory', backref='typeprdelivery', lazy='dynamic')
-    rent_typeprdelivery = db.relationship('Rent', backref='typeprdelivery', lazy='dynamic')
-
-
-class TypeProperty(db.Model):
-    __tablename__ = 'typeproperty'
-
-    id = db.Column(db.Integer, primary_key=True)
-    detail = db.Column(db.String(45))
-
-    property_typeproperty = db.relationship('Property', backref='typeproperty', lazy='dynamic')
-
-
-class TypeSaleGrade(db.Model):
-    __tablename__ = 'typesalegrade'
-
-    id = db.Column(db.Integer, primary_key=True)
-    salegradedet = db.Column(db.String(45))
-
-    rent_typesalegrade = db.relationship('Rent', backref='typesalegrade', lazy='dynamic')
-
-
 class TypeStatus(db.Model):
     __tablename__ = 'typestatus'
 
@@ -656,25 +585,6 @@ class TypeStatus(db.Model):
     statusdet = db.Column(db.String(45))
 
     rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
-
-
-class TypeStatusBatch(db.Model):
-    __tablename__ = 'typebatchstatus'
-
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String(30))
-
-    batches = db.relationship('PrBatch', backref='typebatchstatus', lazy='dynamic')
-
-
-class TypeTenure(db.Model):
-    __tablename__ = 'typetenure'
-
-    id = db.Column(db.Integer, primary_key=True)
-    tenuredet = db.Column(db.String(15))
-
-    rent_typetenure = db.relationship('Rent', backref='typetenure', lazy='dynamic')
-    headrent_typetenure = db.relationship('Headrent', backref='typetenure', lazy='dynamic')
 
 
 class User(UserMixin, db.Model):
@@ -688,19 +598,23 @@ class User(UserMixin, db.Model):
     recent_agents = db.Column(db.String(300))
 
     def __repr__(self):
+
         return '<User {}>'.format(self.username)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def check_password(self, password):
+
         return check_password_hash(self.password_hash, password)
 
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
 
     def get_reset_password_token(self, expires_in=600):
+
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
@@ -711,6 +625,7 @@ class User(UserMixin, db.Model):
             id = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])['reset_password']
         except:
             return
+
         return User.query.get(id)
 
 
@@ -722,4 +637,5 @@ def load_user(id):
     except (AttributeError, TypeError, ValueError):
         id_list = [1, 2, 3]
     current_user.most_recent_rent = id_list[0]
+
     return current_user

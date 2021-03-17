@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for
 from app.main.common import get_combodict_rent
-from app.main.rent import get_rentp, get_rent_strings, rent_validation, update_rent, update_tenant
+from app.main.rent import get_rentp, get_rent_strings, rent_validation, update_rent_rem, update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)
 
@@ -10,7 +10,7 @@ rent_bp = Blueprint('rent_bp', __name__)
 def rent(rent_id):
     message = request.args.get('message', '', type=str)
     if request.method == "POST":
-        rent_id = update_rent(rent_id)
+        rent_id = update_rent_rem(rent_id)
         return redirect(url_for('rent_bp.rent', rent_id=rent_id))
     combodict = get_combodict_rent()
     # gather rent combobox values

@@ -1,34 +1,80 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 import json
-from flask import request
 from dateutil.relativedelta import relativedelta
 from flask_login import current_user
-from app.dao.common import get_actypes, get_dates_m, get_freq_types, get_tenure_types
-from app.models import Agent, Jstore, Landlord, TypeAcType, TypeDeed, TypeFreq, TypeMailTo, \
-                        TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
+from app.dao.common import get_dates_m
+from app.models import Jstore, Landlord, TypeDeed, TypeStatus
+
+
+def get_actype(actype_id):
+    if actype_id == 1:
+        return "autopay"
+    elif actype_id == 2:
+        return "normal"
+    elif actype_id == 3:
+        return "peppercorn"
+    elif actype_id == 4:
+        return "reduced"
+    else:
+        return "special"
+
+
+def get_actype_id(actype):
+    if actype == "autopay":
+        return 1
+    elif actype == "normal":
+        return 2
+    elif actype == "peppercorn":
+        return 3
+    elif actype == "reduced":
+        return 4
+    else:
+        return 5
+
+
+def get_actypes():
+    return ["autopay", "normal", "peppercorn", "reduced", "special"]
+
+
 
 
 def get_advarrdet(advarr_id):
+
     return "in advance" if advarr_id == 1 else "in arrears"
 
 
 def get_advarr_id(advarrdet):
+
     return 1 if advarrdet == "in advance" else 2
 
 
 def get_advarr_types():
-    advarr_types = ['in advance', 'in arrears']
 
-    return advarr_types
+    return ['in advance', 'in arrears']
+
+
+def get_batchstatus(status_id):
+
+    return "completed" if status_id == 1 else "pending"
+
+
+def get_batchstatus_id(status):
+
+    return 1 if status == "completed" else 2
+
+
+def get_batchstatus_types():
+
+    return ['completed', 'pending']
 
 
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
-    actypes = [typeactype.actypedet for typeactype in get_actypes()]
+    actypes = get_actypes()
     advars = get_advarr_types()
-    freqs = [typefreq.freqdet for typefreq in get_freq_types()]
+    freqs = get_freqs()
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    tenures = [typetenure.tenuredet for typetenure in get_tenure_types()]
+    tenures = get_tenures()
     combo_dict = {
         "actypes": actypes,
         "advars": advars,
@@ -43,9 +89,9 @@ def get_combodict_rent():
     # add the values unique to rent
     combo_dict = get_combodict_basic()
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
-    mailtos = [value for (value,) in TypeMailTo.query.with_entities(TypeMailTo.mailtodet).all()]
-    prdeliveries = [value for (value,) in TypePrDelivery.query.with_entities(TypePrDelivery.prdeliverydet).all()]
-    salegrades = [value for (value,) in TypeSaleGrade.query.with_entities(TypeSaleGrade.salegradedet).all()]
+    mailtos = get_mailto_types()
+    prdeliveries = get_prdelivery_types()
+    salegrades = get_salegrades()
     statuses = [value for (value,) in TypeStatus.query.with_entities(TypeStatus.statusdet).all()]
     combo_dict['deedcodes'] = deedcodes
     combo_dict['mailtos'] = mailtos
@@ -73,6 +119,42 @@ def get_combodict_filter():
     return combo_dict
 
 
+def get_freq(freq_id):
+    if freq_id == 1:
+        return "yearly"
+    elif freq_id == 2:
+        return "half yearly"
+    elif freq_id == 4:
+        return "quarterly"
+    elif freq_id == 12:
+        return "monthly"
+    elif freq_id == 13:
+        return "four weekly"
+    else:
+        return "weekly"
+
+
+def get_freq_id(freq):
+    if freq == "yearly":
+        return 1
+    elif freq == "half yearly":
+        return 2
+    elif freq == "quarterly":
+        return 4
+    elif freq == "monthly":
+        return 12
+    elif freq == "four weekly":
+        return 13
+    else:
+        return 52
+
+
+def get_freqs():
+    return ["yearly", "half yearly", "quarterly", "monthly", "four weekly", "weekly"]
+
+
+
+
 def get_hr_status(status_id):
     if status_id == 1:
         return "active"
@@ -85,9 +167,8 @@ def get_hr_status(status_id):
 
 
 def get_hr_statuses():
-    hr_statuses = ["active", "dormant", "suspended", "terminated"]
 
-    return hr_statuses
+    return ["active", "dormant", "suspended", "terminated"]
 
 
 def get_hr_status_id(status):
@@ -110,49 +191,135 @@ def get_idlist_recent(type):
     return id_list
 
 
-def get_postvals_id():
-    # returns the post values for rent and head rent as dict with class id generated for combobox value
-    postvals_id = {
-        "actype": "",
-        "advarr": "",
-        "agent": "",
-        "deedcode": "",
-        "frequency": "",
-        "landlord": "",
-        "mailto": "",
-        "prdelivery": "",
-        "salegrade": "",
-        "status": "",
-        "tenure": ""
-    }
-    for key, value in postvals_id.items():
-        actval = request.form.get(key)
-        if actval and actval != "" and actval!= "None":
-            if key == "actype":
-                actval = TypeAcType.query.with_entities(TypeAcType.id).filter(TypeAcType.actypedet == actval).one()[0]
-            elif key == "advarr":
-                actval = 1 if actval == 'in advance' else 'in arrears'
-            elif key == "agent":
-                actval = Agent.query.with_entities(Agent.id).filter(Agent.detail == actval).one()[0]
-            elif key == "deedcode":
-                actval = TypeDeed.query.with_entities(TypeDeed.id).filter(TypeDeed.deedcode == actval).one()[0]
-            elif key == "frequency":
-                actval = TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == actval).one()[0]
-            elif key == "landlord":
-                actval = Landlord.query.with_entities(Landlord.id).filter(Landlord.name == actval).one()[0]
-            elif key == "mailto":
-                actval = TypeMailTo.query.with_entities(TypeMailTo.id).filter(TypeMailTo.mailtodet == actval).one()[0]
-            elif key == "prdelivery":
-                actval = TypePrDelivery.query.with_entities(TypePrDelivery.id).filter(TypePrDelivery.prdeliverydet == actval).one()[0]
-            elif key == "salegrade":
-                actval = TypeSaleGrade.query.with_entities(TypeSaleGrade.id).filter(TypeSaleGrade.salegradedet == actval).one()[0]
-            elif key == "status":
-                actval = TypeStatus.query.with_entities(TypeStatus.id).filter(TypeStatus.statusdet == actval).one()[0]
-            elif key == "tenure":
-                actval = TypeTenure.query.with_entities(TypeTenure.id).filter(TypeTenure.tenuredet == actval).one()[0]
-            postvals_id[key] = actval
-            print(key, value)
-    return postvals_id
+def get_mailtodet(mailto_id):
+    if mailto_id == 1:
+        return "to agent"
+    elif mailto_id == 2:
+        return "to tenant name care of agent"
+    elif mailto_id == 3:
+        return "to tenant name at property"
+    else:
+        return "to owner or occupier at property"
+
+
+def get_mailto_id(mailtodet):
+    if mailtodet == "to agent":
+        return 1
+    elif mailtodet == "to tenant name care of agent":
+        return 2
+    elif mailtodet == "to tenant name at property":
+        return 3
+    else:
+        return 4
+
+
+def get_mailto_types():
+    return ['to agent', 'to tenantname care of agent', 'to tenantname at property','to owner or occupier at property']
+
+
+def get_prdelivery(prdelivery_id=1):
+    if prdelivery_id == 1:
+        return "email"
+    elif prdelivery_id == 2:
+        return "post"
+    else:
+        return "email and post"
+
+
+def get_prdelivery_id(prdelivery='email'):
+    if prdelivery == "email":
+        return 1
+    elif prdelivery == "post":
+        return 2
+    else:
+        return 3
+
+
+def get_prdelivery_types():
+
+    return ['email', 'post', 'email and post']
+
+
+def get_proptype(proptype_id):
+    if proptype_id == 1:
+        return "commercial"
+    elif proptype_id == 2:
+        return "flat"
+    elif proptype_id == 3:
+        return "garage"
+    elif proptype_id == 4:
+        return "house"
+    elif proptype_id == 5:
+        return "land"
+    else:
+        return "multiple"
+
+
+def get_proptype_id(proptype):
+    if proptype == "commercial":
+        return 1
+    elif proptype == "flat":
+        return 2
+    elif proptype == "garage":
+        return 3
+    elif proptype == "house":
+        return 4
+    elif proptype == "land":
+        return 5
+    else:
+        return 6
+
+
+def get_proptypes():
+    return ["commercial", "flat", "garage", "house", "land", "multiple"]
+
+
+def get_salegrade(salegrade_id):
+    if salegrade_id == 1:
+        return "for sale"
+    elif salegrade_id == 2:
+        return "not for sale"
+    elif salegrade_id == 3:
+        return "intervening title"
+    else:
+        return "poor title"
+
+
+def get_salegrade_id(salegrade):
+    if salegrade == "for sale":
+        return 1
+    elif salegrade == "not for sale":
+        return 2
+    elif salegrade == "intervening title":
+        return 3
+    else:
+        return 4
+
+
+def get_salegrades():
+    return ["for sale", "not for sale", "intervening title", "poor title"]
+
+
+def get_tenure(tenure_id=1):
+    if tenure_id == 1:
+        return "freehold"
+    elif tenure_id == 2:
+        return "leasehold"
+    else:
+        return "rentcharge"
+
+
+def get_tenure_id(tenure='freehold'):
+    if tenure == "freehold":
+        return 1
+    elif tenure == "leasehold":
+        return 2
+    else:
+        return 3
+
+def get_tenures():
+
+    return ['freehold', 'leasehold', 'rentcharge']
 
 
 def inc_date(date1, freq, num):
@@ -185,5 +352,4 @@ def inc_date_m(date1, frequency, datecode_id, periods):
                 date2 = date2.replace(day=item[2])
 
     return date2
-
 

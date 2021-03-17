@@ -21,11 +21,11 @@ def get_agents():
 
 
 def get_agent(agent_id):
-    agent = Agent.query.get(agent_id)
-    pop_idlist_recent("recent_agents", agent_id)
+    return db.session.query(Agent).filter_by(id=agent_id).one()
 
-    return agent
 
+def get_agent_id(agent_detail):
+    return db.session.query(Agent).filter_by(detail=agent_detail).one()
 
 def get_agent_rents(agent_id, type='rent'):
     if agent_id and agent_id != 0:

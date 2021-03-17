@@ -2,8 +2,8 @@ from app.dao.form_letter import get_form_letter
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.dao.income import get_income_item
 from app.dao.lease import get_lease_variables
-from app.dao.rent import get_mailaddr, get_propaddr, get_rent_md
-from app.main.rent import get_rentp, get_rent_strings
+from app.dao.rent import get_rent_md
+from app.main.rent import get_mailaddr, get_propaddr, get_rentp, get_rent_strings
 
 
 def get_mail_pack(rent_id):    # get small collection of variables for mail dialog
