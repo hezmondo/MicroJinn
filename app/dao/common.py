@@ -4,8 +4,7 @@ from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
     IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExternal, MoneyAcc, \
-    TypeAcType, TypeDeed, TypeDoc, TypeEvent, TypeFreq, TypeMailTo, TypePayment, TypePrDelivery, \
-    TypeProperty, TypeSaleGrade, TypeStatus, TypeStatusBatch, TypeTenure
+    TypeDeed, TypeDoc, TypeEvent, TypePayment, TypeStatus
 
 
 def delete_record(item_id, item):
@@ -82,20 +81,6 @@ def delete_record_basic(item_id, item):
         PrHistory.query.filter_by(id=item_id).delete()
 
 
-@cache.cached(key_prefix='db_actypes_all')
-def get_actypes():
-    actypes = TypeAcType.query.all()
-
-    return actypes
-
-
-@cache.cached(key_prefix='db_batchstatus_types_all')
-def get_batchstatus_types():
-    batchstatus_types = TypeStatusBatch.query.all()
-
-    return batchstatus_types
-
-
 @cache.cached(key_prefix='db_charge_types_all')
 def get_charge_types():
     charge_types = ChargeType.query.all()
@@ -111,9 +96,12 @@ def get_dates_m():
 
 
 def get_deed(deed_id):
-    deed = TypeDeed.query.get(deed_id)
+    return TypeDeed.query.get(deed_id)
 
-    return deed
+
+def get_deed_id(deedcode):
+    deed = db.session.query(TypeDeed).filter_by(deedcode=deedcode).one()
+    return deed.id
 
 
 def get_deed_types():
@@ -139,52 +127,19 @@ def get_event_types():
     return event_types
 
 
-@cache.cached(key_prefix='db_freq_types_all')
-def get_freq_types():
-    freq_types = TypeFreq.query.all()
-
-    return freq_types
-
-
-def get_mailto_types():
-    mailto_types = TypeMailTo.query.all()
-
-    return mailto_types
-
-
 def get_pay_types():
     pay_types = TypePayment.query.all()
 
     return pay_types
 
 
-def get_prdelivery_types():
-    prdelivery_types = TypePrDelivery.query.all()
-
-    return prdelivery_types
-
-
-def get_prop_types():
-    prop_types = TypeProperty.query.all()
-
-    return prop_types
-
-
-def get_salegrade_types():
-    salegrade_types = TypeSaleGrade.query.all()
-
-    return salegrade_types
+def get_status_id(status):
+    status = db.session.query(TypeStatus).filter_by(statusdet=status).one()
+    return status.id
 
 
 def get_status_types():
     status_types = TypeStatus.query.all()
-
-    return status_types
-
-
-@cache.cached(key_prefix='db_tenure_types_all')
-def get_tenure_types():
-    status_types = TypeTenure.query.all()
 
     return status_types
 

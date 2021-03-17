@@ -1,7 +1,10 @@
 from flask import request
+from app.dao.agent import get_agent_id
 from app.dao.headrent import get_headrents
-from app.main.common import get_hr_status, inc_date_m
-
+from app.dao.common import get_status_id
+from app.dao.landlord import get_landlord_id
+from app.main.common import get_advarr_id, get_freq_id, get_hr_status, get_tenure_id, get_salegrade_id, inc_date_m
+from app.main.functions import strToDec
 from app.models import Agent, Headrent
 
 
@@ -36,4 +39,26 @@ def get_headrents_p():
         headrent.status = get_hr_status(headrent.status_id)
     return filterdict, headrents
 
+
+def update_headrent(headrent):
+    # we need the post values as class id generated for the actual combobox values:
+    headrent.advarr_id = get_advarr_id(request.form.get("advarr"))
+    headrent.agent_id = get_agent_id("agent")
+    headrent.arrears = strToDec(request.form.get("arrears"))
+    headrent.code = request.form.get("rentcode")
+    # we need code to generate datecode_id from lastrentdate with user choosing sequence:
+    headrent.datecode_id = int(request.form.get("datecode_id"))
+    headrent.freq_id = get_freq_id('frequency')
+    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
+    headrent.lastrentdate = request.form.get("lastrentdate")
+    headrent.note = request.form.get("note")
+    headrent.reference = request.form.get("reference")
+    headrent.rentpa = strToDec(request.form.get("rentpa"))
+    headrent.salegrade_id = get_salegrade_id(request.form.get("salegrade"))
+    headrent.source = request.form.get("source")
+    headrent.status_id = get_status_id(request.form.get("status"))
+    headrent.tenantname = request.form.get("tenantname")
+    headrent.tenure_id = get_tenure_id(request.form.get("tenure"))
+
+    return headrent
 

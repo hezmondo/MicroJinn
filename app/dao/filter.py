@@ -1,10 +1,10 @@
 import json
-from flask import request, session
-from app.main.common import get_advarrdet, get_idlist_recent, inc_date_m
+from flask import request
+from app.main.common import get_advarrdet, get_idlist_recent, get_prdelivery_id, inc_date_m
 from app.main.functions import strToDate
-from app.dao.rent import get_rent_sdata, get_propaddr, post_rent__filter
-from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent, TypeAcType, \
-    TypeDoc, TypePrDelivery, TypeSaleGrade, TypeStatus, TypeTenure
+from app.main.rent import get_propaddr
+from app.dao.rent import get_rent_sdata, post_rent__filter
+from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent, TypeStatus
 
 
 def get_filters(type):
@@ -116,7 +116,7 @@ def get_qfilter(filterdict, action):
                 filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":
             if value and value != "" and value != [] and value != ["all actypes"]:
-                filter.append(TypeAcType.actypedet.in_(value))
+                filter.append("")
             else: filterdict[key] = ["all actypes"]
         elif key == "agentmailto":
             if value and value == "exclude":
@@ -143,7 +143,9 @@ def get_qfilter(filterdict, action):
             else: filterdict[key] = ["all landlords"]
         elif key == "prdelivery":
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
-                filter.append(TypePrDelivery.prdeliverydet.in_(value))
+                for item in value:
+                    item = get_prdelivery_id(item)
+                filter.append(Rent.prdelivery_id.in_(value))
             else: filterdict[key] = ["all prdeliveries"]
         # elif key == "rentpa" and value and value != "":
         #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
@@ -151,7 +153,7 @@ def get_qfilter(filterdict, action):
         #     filter.append(Rent.rentpa == strToDec('{}'.format(value)))
         elif key == "salegrade":
             if value and value != "" and value != "list" and value != [] and value != ["all salegrades"]:
-                filter.append(TypeSaleGrade.salegradedet.in_('{}'.format(value)))
+                filter.append("")
             else:
                 filterdict[key] = ["all salegrades"]
         elif key == "status":
@@ -161,7 +163,7 @@ def get_qfilter(filterdict, action):
                 filterdict[key] = ["all statuses"]
         elif key == "tenure":
             if value and value != "" and value != [] and value != ["all tenures"]:
-                filter.append(TypeTenure.tenuredet.in_(value))
+                filter.append("")
             else:
                 filterdict[key] = ["all tenures"]
 

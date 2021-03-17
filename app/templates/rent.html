@@ -91,7 +91,7 @@
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
                     {% if rent.agent_id %}
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.agent.detail }}</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=rent.agent_id, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
                                                class="btn btn-light btn-round button-icon round bolt"
@@ -258,11 +258,6 @@
                                     <input type="date" class="form-control" name="lastrentdate"
                                            value="{{ rent.lastrentdate }}">
                                 </div>
-                                <div class="col-md-3">
-                                    <label for="nextrentdate">next rent date:</label>
-                                    <input type="date" class="form-control" name="nextrentdate"
-                                           value="{{ rentstats.nextrentdate }}">
-                                </div>
                             </div>
                             <div class="form-group row align-items-end">
                                 <div class="col-md-2">
@@ -324,7 +319,7 @@
                                        class="btn btn-block btn-danger button-icon trash" role="button">delete item</a>
                                 </div>
                                 <div class="col-md-2">
-                                    <input type="text" class="form-control" name="rent_id" value="id: {{ rent.id }}"
+                                    <input type="hidden" class="form-control" name="rent_id" value="id: {{ rent.id }}"
                                            readonly="true">
                                 </div>
                                 <div class="col-md-2">
@@ -373,7 +368,7 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <label for="mailto">mail to:</label>
-                            {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailtodet) }}
+                            {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailto) }}
                         </div>
                     </div>
                     <div class="form-group row">

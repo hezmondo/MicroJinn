@@ -5,7 +5,7 @@ from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.filter import get_rent_s
 from app.dao.headrent import post_headrent_agent_update
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
-from app.dao.property import get_properties, get_property, get_proptypes, post_property
+from app.dao.property import get_properties, get_property, get_prop_types, post_property
 from app.dao.rent import get_rent_external, post_rent_agent
 from app.email import test_email_connect, test_send_email
 from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
@@ -183,7 +183,7 @@ def property(property_id):
         property_id = post_property(property_id, rent_id)
         return redirect(url_for('util_bp.property', property_id=property_id))
     property_ = get_property(property_id, rent_id)
-    proptypes = get_proptypes("basic")
+    proptypes = get_prop_types("basic")
 
     return render_template('property.html', property_=property_, proptypes=proptypes)
 

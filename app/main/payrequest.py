@@ -27,7 +27,7 @@ def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
 def build_charges_suffix(rent_pr):
     periods = calculate_periods(rent_pr.arrears, rent_pr.freq_id, rent_pr.rentpa)
     charges_total = rent_pr.totcharges if rent_pr.totcharges else 0
-    pr_exists = True if rent_pr.prexists == 1 else False
+    pr_exists = True if rent_pr.pr_exists == 1 else False
     last_arrears_level = rent_pr.lastarrearslevel if pr_exists else ""
     charge_start_date = get_charge_start_date(rent_pr.id)
     charge_90_days = charge_start_date and date.today() - charge_start_date > timedelta(90)
