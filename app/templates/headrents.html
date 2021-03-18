@@ -62,8 +62,8 @@
             <td style="width: 10.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 24.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.freq_id }}</td>
-            <td style="width: 8.00%"> {{ item.hr_status }}</td>
-            <td style="width: 22.00%"> {{ item.detail }}</td>
+            <td style="width: 8.00%"> {{ item.status }}</td>
+            <td style="width: 22.00%"> {{ item.agent.detail }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
             headrent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt"
                                                                data-toggle="tooltip" title="view headrent"

@@ -30,8 +30,7 @@ def get_rent(rent_id):  # returns all Rent member variables plus associated item
                 .options(load_only('name'), joinedload('manager') \
                     .load_only('managername', 'manageraddr', 'manageraddr2'), joinedload('money_account') \
                          .load_only('acc_name', 'acc_num', 'bank_name', 'sort_code')),
-               joinedload('typedeed').load_only('deedcode', 'info'),
-               joinedload('typestatus').load_only('statusdet')) \
+               joinedload('typedeed').load_only('deedcode', 'info')) \
         .one_or_none()
     if rent is None:
         flash('Invalid rent code')
@@ -62,9 +61,8 @@ def get_rent_sdata(qfilter, action, runsize):
         # # simple search of views rents submitted from home page
         rent_s = db.session.query(Rent) \
             .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
-                               'rentpa', 'source', 'tenantname'),
-                     joinedload('agent').load_only('detail'),
-                     joinedload('typestatus').load_only('statusdet')) \
+                               'rentpa', 'source', 'status_id', 'tenantname'),
+                     joinedload('agent').load_only('detail')) \
             .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
     elif action == "external":
         # simple search of external rents submitted from home page - not yet completed
@@ -77,10 +75,9 @@ def get_rent_sdata(qfilter, action, runsize):
         # advanced search submitted from filter page
         rent_s = db.session.query(Rent) \
             .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'email', 'freq_id', 'lastrentdate', 'note',
-                               'price', 'rentpa', 'source', 'tenantname'),
+                               'price', 'rentpa', 'source', 'status_id', 'tenantname'),
                      joinedload('agent').load_only('detail'),
-                     joinedload('landlord').load_only('name'),
-                     joinedload('typestatus').load_only('statusdet')) \
+                     joinedload('landlord').load_only('name')) \
             .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
     return rent_s
 

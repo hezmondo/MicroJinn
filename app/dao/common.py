@@ -4,7 +4,7 @@ from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
     IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, Rent, RentExternal, MoneyAcc, \
-    TypeDeed, TypeDoc, TypeEvent, TypePayment, TypeStatus
+    TypeDeed, TypeDoc
 
 
 def delete_record(item_id, item):
@@ -119,29 +119,6 @@ def get_doc_types():
     doc_types = TypeDoc.query.all()
 
     return doc_types
-
-
-def get_event_types():
-    event_types = TypeEvent.query.all()
-
-    return event_types
-
-
-def get_pay_types():
-    pay_types = TypePayment.query.all()
-
-    return pay_types
-
-
-def get_status_id(status):
-    status = db.session.query(TypeStatus).filter_by(statusdet=status).one()
-    return status.id
-
-
-def get_status_types():
-    status_types = TypeStatus.query.all()
-
-    return status_types
 
 
 def get_uplift_types():

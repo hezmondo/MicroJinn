@@ -1,8 +1,9 @@
 from app.dao.form_letter import get_form_letter
-from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.dao.income import get_income_item
 from app.dao.lease import get_lease_variables
 from app.dao.rent import get_rent_md
+from app.main.common import get_paytype
+from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_mailaddr, get_propaddr, get_rentp, get_rent_strings
 
 
@@ -22,7 +23,7 @@ def writeMail(rent_id, template, form_letter_id, income_id=0):
     variables['#payamount#'] = moneyToStr(income_item.payamount, pound=True) if income_item else "no payment"
     variables['#paydate#'] = dateToStr(income_item.paydate) if income_item else "no paydate"
     variables['#payer#'] = income_item.payer if income_item else "no payer"
-    variables['#paytypedet#'] = income_item.paytypedet if income_item else "no paytype"
+    variables['#paytypedet#'] = get_paytype(income_item.paytype_id) if income_item else "no paytype"
     form_letter = get_form_letter(form_letter_id)
     if "LEQ" in form_letter.code:
         leasedata, lease_variables = get_lease_variables(rent_id)

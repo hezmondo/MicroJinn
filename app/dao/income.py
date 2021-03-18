@@ -1,9 +1,10 @@
 from flask import request
 from sqlalchemy import desc
 from app import db
-from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent, TypePayment
+from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent
 from app.dao.common import get_charge_types
 from app.dao.database import commit_to_database
+from app.main.common import get_paytype, get_paytype_id, get_paytypes
 
 
 def get_incomes(acc_id):
@@ -38,17 +39,19 @@ def get_incomes(acc_id):
             incomevals['acc_desc'] = acc_desc
         paytype = request.form.get("paytype") or ""
         if paytype and paytype != "" and paytype != "all payment types":
-            qfilter.append(TypePayment.paytypedet == paytype)
+            qfilter.append()
             incomevals['paytype'] = paytype
     else:
         # now deal with rent_id coming from the rent screen
         if rent_id != 0:
             qfilter.append(IncomeAlloc.rent_id == rent_id)
             incomevals['rent_id'] = rent_id
-    incomes = IncomeAlloc.query.join(Income).join(ChargeType).join(MoneyAcc).join(TypePayment) \
+    incomes = IncomeAlloc.query.join(Income).join(ChargeType).join(MoneyAcc) \
             .with_entities(Income.id, Income.date, IncomeAlloc.rent_id, IncomeAlloc.rentcode, Income.amount,
-                           Income.payer, MoneyAcc.acc_desc, ChargeType.chargedesc, TypePayment.paytypedet) \
+                           Income.paytype_id, Income.payer, MoneyAcc.acc_desc, ChargeType.chargedesc) \
             .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
+    # for income in incomes:
+    #     income.paytype = get_paytype(income.paytype_id)
     return incomes, incomevals
 
 
@@ -57,7 +60,7 @@ def get_income_dict(type):
     acc_descs = [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
     acc_descs_all = acc_descs
     acc_descs_all.insert(0, "all accounts")
-    paytypes = [value for (value,) in TypePayment.query.with_entities(TypePayment.paytypedet).all()]
+    paytypes = get_paytypes()
     paytypes_all = paytypes
     paytypes_all.insert(0, "all payment types")
     income_dict = {
@@ -79,9 +82,7 @@ def get_income_dict(type):
 def get_income_(income_id):
     income = Income.query \
         .join(MoneyAcc) \
-        .join(TypePayment) \
-        .with_entities(Income.id, Income.date, Income.amount, Income.payer, TypePayment.paytypedet,
-                       MoneyAcc.acc_desc) \
+        .with_entities(Income.id, Income.date, Income.amount, Income.paytype_id, Income.payer, MoneyAcc.acc_desc) \
         .filter(Income.id == income_id).one_or_none()
     incomeallocs = IncomeAlloc.query.join(ChargeType).join(Rent).with_entities(IncomeAlloc.id,
                                                                                IncomeAlloc.income_id, Rent.rentcode, IncomeAlloc.amount.label("alloctot"),
@@ -93,17 +94,13 @@ def get_income_item(rent_id, income_id=0):
     if income_id == 0:           # return most recent income posting for this rent_id
         income_item = Income.query. \
             join(IncomeAlloc) \
-            .join(TypePayment) \
-            .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
-                           TypePayment.paytypedet) \
+            .with_entities(Income.id, Income.paytype_id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount")) \
             .filter(IncomeAlloc.rent_id == rent_id).order_by(desc(Income.date)).limit(1).one_or_none()
         # income_id = income_item.id
     else:           # return income posting for a specific income id
         income_item = Income.query \
             .join(IncomeAlloc) \
-            .join(TypePayment) \
-            .with_entities(Income.id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount"),
-                           TypePayment.paytypedet) \
+            .with_entities(Income.id, Income.paytype_id, Income.payer, Income.date.label("paydate"), Income.amount.label("payamount")) \
             .filter(Income.id == income_id).first()
     # allocdata = IncomeAlloc.join(ChargeType).with_entities(IncomeAlloc.id, IncomeAlloc.income_id,
     #                     IncomeAlloc.rentcode, IncomeAlloc.amount.label("alloctot"),
@@ -125,8 +122,7 @@ def post_income_(income_id):
     income.acc_id = \
         MoneyAcc.query.with_entities(MoneyAcc.id).filter(MoneyAcc.acc_desc == acc_desc).one()[0]
     paytype = request.form.get("paytype")
-    income.paytype_id = \
-        TypePayment.query.with_entities(TypePayment.id).filter(TypePayment.paytypedet == paytype).one()[0]
+    income.paytype_id = get_paytype_id(paytype)
     # having set the column values, we add this single income record to the db session
     db.session.add(income)
     # next bit of code needs complete restructuring as bonkers!

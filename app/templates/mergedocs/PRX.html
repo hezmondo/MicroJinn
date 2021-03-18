@@ -3,12 +3,12 @@
 {% block app_content %}
 	<div contenteditable="true">
 		<div class="font-size-large" align="center">
-			<b>{{ rent.managername }}</b>
+			<b>{{ rent.landlord.manager.managername }}</b>
 		</div>
 		<div class="font-size-small" align="center">
-			{{ rent.manageraddr }}
+			{{ rent.landlord.manager.manageraddr }}
 			<br />
-			{{ rent.manageraddr2 }}
+			{{ rent.landlord.manager.manageraddr2 }}
 			<br />
 		</div>
 		<div class="font-size-medium" align="right">
@@ -42,7 +42,7 @@
 			{% else %}
 			<br />
 			<div class="font-size-small">
-				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rent.landlordname }} whose address (at which notices, including notices in proceedings, should be served) is {{ rent.manageraddr }}.
+				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rent.landlord.name }} whose address (at which notices, including notices in proceedings, should be served) is {{ rent.landlord.manager.manageraddr }}.
 			</div>
 			{% endif %}
 			<!-- %endif %ChargeType% -->

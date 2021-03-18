@@ -5,13 +5,13 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import get_deed_id, get_status_id
+from app.dao.common import get_deed_id
 from app.dao.landlord import get_landlord_id
-from app.dao.property import get_property_addrs
+from app.dao.property import get_propertyaddrs
 from app.dao.rent import get_rent, post_rent
 from app.main.common import get_actype, get_actype_id, get_advarrdet, get_advarr_id, get_freq, get_freq_id,  \
-    get_mailto_id, get_prdelivery, get_prdelivery_id, get_salegrade, get_salegrade_id, get_tenure, get_tenure_id, \
-    inc_date_m
+    get_mailto_id, get_prdelivery, get_prdelivery_id, get_salegrade, get_salegrade_id, get_status, get_status_id, \
+    get_tenure, get_tenure_id, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.models import Rent
 
@@ -33,7 +33,7 @@ def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
 
 
 def get_propaddr(rent_id):
-    p_addrs = get_property_addrs(rent_id)
+    p_addrs = get_propertyaddrs(rent_id)
     p_addr = '; '.join(each.propaddr.strip() for each in p_addrs)
     return p_addr
 
@@ -60,21 +60,12 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 def get_rentp(rent_id):
     # returns a mutable dict with Rent (full) plus joined and derived variables for rent screen, mail, payrequest
     rent = get_rent(rent_id)
-    rent.acc_name = rent.landlord.money_account.acc_name
     rent.actypedet = get_actype(rent.actype_id)
-    rent.acc_num = rent.landlord.money_account.acc_num
     rent.advarrdet = get_advarrdet(rent.advarr_id)
-    rent.bank_name = rent.landlord.money_account.bank_name
     rent.charges = get_charges_rent(rent_id)
-    rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else "no agent"
     rent.totcharges = get_totcharges(rent.charges)
     rent.freqdet = get_freq(rent.freq_id)
-    rent.info = rent.typedeed.info
-    rent.landlordname = rent.landlord.name
     rent.mailaddr = get_mailaddr(rent_id, rent.agent_id, rent.mailto_id, rent.tenantname)
-    rent.managername = rent.landlord.manager.managername
-    rent.manageraddr = rent.landlord.manager.manageraddr
-    rent.manageraddr2 = rent.landlord.manager.manageraddr2
     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
@@ -84,7 +75,7 @@ def get_rentp(rent_id):
     rent.tenuredet = get_tenure(rent.tenure_id)
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
     rent.salegrade = get_salegrade(rent.salegrade_id)
-    rent.statusdet = rent.typestatus.statusdet
+    rent.statusdet = get_status(rent.status_id)
     rent.sort_code = rent.landlord.money_account.sort_code
 
     return rent
@@ -133,9 +124,9 @@ def get_rent_strings(rent, type='mail'):
                       '#arrears#': moneyToStr(rent.arrears, pound=True),
                       '#arrears_start_date#': arrears_start_date,
                       '#arrears_end_date#': arrears_end_date,
-                      '#landlord_name#': rent.landlordname,
+                      '#landlord_name#': rent.landlord.name,
                       '#lastrentdate#': dateToStr(rent.lastrentdate),
-                      '#manageraddr#': rent.manageraddr,
+                      '#manageraddr#': rent.landlord.manager.manageraddr,
                       '#nextrentdate#': dateToStr(rent.nextrentdate),
                       '#paidtodate#': dateToStr(rent.paidtodate),
                       '#periodly#': rent.freqdet,
@@ -152,23 +143,23 @@ def get_rent_strings(rent, type='mail'):
     rent_owing = get_rent_owing(rent, rent_strings_1, rent.nextrentdate)
     price_stat = "for sale at {}".format(moneyToStr(price_quote, pound=True)) \
         if rent.salegrade_id == 1 else "not for sale"
-    rent_strings_2 = {'#acc_name#': rent.acc_name if hasattr(rent, 'acc_name') else "no acc_name",
-                      '#acc_num#': rent.acc_num if hasattr(rent, 'acc_num') else "no acc_num",
+    rent_strings_2 = {'#acc_name#': rent.landlord.money_account.acc_name,
+                      '#acc_num#': rent.landlord.money_account.acc_num,
                       '#arrearsenddate_plus1#': dateToStr(inc_date_m(rent.lastrentdate,
                                                                      rent.freq_id, rent.datecode_id, 2) + relativedelta(
                           days=-1)) \
                           if rent.advarrdet == "in advance" else dateToStr(rent.nextrentdate),
-                      '#bank_name#': rent.bank_name,
+                      '#bank_name#': rent.landlord.money_account.bank_name,
                       '#charges_string#': charges_string,
                       '#hashcode#': hashCode(rent.rentcode),
-                      '#manageraddr2#': rent.manageraddr2,
-                      '#managername#': rent.managername,
+                      '#manageraddr2#': rent.landlord.manager.manageraddr2,
+                      '#managername#': rent.landlord.manager.managername,
                       '#next_gale_start#': next_gale_start,
                       '#nextrentdate_plus1#': dateToStr(inc_date_m(rent.lastrentdate,
                                                                    rent.freq_id, rent.datecode_id, 2)),
                       '#pay_date#': dateToStr(date.today() + relativedelta(days=30)),
                       '#rent_stat#': rent_stat,
-                      '#sort_code#': rent.sort_code,
+                      '#sort_code#': rent.landlord.money_account.sort_code,
                       '#tenantname#': rent.tenantname,
                       '#today#': dateToStr(date.today()),
                       }
