@@ -60,140 +60,125 @@
             </table>
         </div>
         {% endif %}
-
-        {% if (action != 'from_rent' and action != 'new_agent') and agent.id != 0 %}
-        <div class="table-fixed" style="margin-bottom: 20px;">
-            <table class="table table-head table-narrow">
-                <thead>
-                <tr>
-                    <td class="vertical-align" style="width: 15%">rent id</td>
-                    <td class="vertical-align" style="width: 15.00%">rentcode</td>
-                    <td class="vertical-align" style="width: 70.00%">tenant</td>
-                </tr>
-                </thead>
-            </table>
+        {% if action != ('from_rent' or 'new_agent') and agent.id != 0 %}
             {% if rents %}
-            <table class="table table-rent table-body table-body-alt">
-                <tbody>
-                {% for rent in rents %}
-                {% if loop.index < 6 %}
-                <tr>
-                    <td style="width: 15.00%">{{ rent.id }}</td>
-                    <td style="width: 15.00%">{{ rent.rentcode }}</td>
-                    <td style="width: 65.00%"> {{ rent.tenantname }}</td>
-                    <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                    rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
-                    data-toggle="tooltip" title="view rent" role="button"></a></td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="collapse" id="accordion_1" aria-expanded="false">
-                <table class="table table-rent table-body">
+            <div class="table-fixed" style="margin-bottom: 20px;">
+                <table class="table table-head table-narrow">
+                    <thead>
+                    <tr>
+                        <td class="vertical-align" style="width: 15%">rent id</td>
+                        <td class="vertical-align" style="width: 15.00%">rentcode</td>
+                        <td class="vertical-align" style="width: 70.00%">tenant</td>
+                    </tr>
+                    </thead>
+                </table>
+                <table class="table table-rent table-body table-body-alt">
                     <tbody>
                     {% for rent in rents %}
-                    {% if loop.index >= 6 %}
+                    {% if loop.index < 6 %}
                     <tr>
                         <td style="width: 15.00%">{{ rent.id }}</td>
                         <td style="width: 15.00%">{{ rent.rentcode }}</td>
                         <td style="width: 65.00%"> {{ rent.tenantname }}</td>
                         <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                    rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
-                                          data-toggle="tooltip" title="view rent" role="button"></a></td>
+                        rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                        data-toggle="tooltip" title="view rent" role="button"></a></td>
                     </tr>
                     {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>
-            </div>
-            {% if rents|length > 5 %}
-            <table class="table table-rent table-base">
-                <tbody>
-                <tr data-toggle="collapse" data-target="#accordion_1">
-                    <td style="width: 100.00%"><a href="javascript:void(0);" id="show_more_1"
-                                                  class="btn btn-primary btn-block button-icon arrow-down"
-                                                  role="button">show more</a></td>
-                </tr>
-                </tbody>
-            </table>
-            {% endif%}
-            {% else %}
-            <table class="table table-rent table-body-alt table-base">
-                <tbody>
-                <tr>
-                    <td style="width: 100.00%">there are no rents associated with this agent</td>
-                </tr>
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
-        <div class="table-fixed" style="margin-bottom: 20px;">
-            <table class="table table-head table-narrow">
-                <thead>
-                <tr>
-                    <td class="vertical-align" style="width: 15%">headrent id</td>
-                    <td class="vertical-align" style="width: 15.00%">code</td>
-                    <td class="vertical-align" style="width: 70.00%">property address</td>
-                </tr>
-                </thead>
-            </table>
-            {% if headrents %}
-            <table class="table table-rent table-body table-body-alt">
-                <tbody>
-                {% for rent in headrents %}
-                {% if loop.index < 6 %}
-                    <tr>
-                        <td style="width: 15.00%">{{ rent.id }}</td>
-                        <td style="width: 15.00%">{{ rent.code }}</td>
-                        <td style="width: 65.00%"> {{ rent.propaddr }}</td>
-                        <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
-                            headrent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
-                                              data-toggle="tooltip" title="view headrent" role="button"></a></td>
+                <div class="collapse" id="accordion_1" aria-expanded="false">
+                    <table class="table table-rent table-body">
+                        <tbody>
+                        {% for rent in rents %}
+                        {% if loop.index >= 6 %}
+                        <tr>
+                            <td style="width: 15.00%">{{ rent.id }}</td>
+                            <td style="width: 15.00%">{{ rent.rentcode }}</td>
+                            <td style="width: 65.00%"> {{ rent.tenantname }}</td>
+                            <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
+                        rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                                              data-toggle="tooltip" title="view rent" role="button"></a></td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if rents|length > 5 %}
+                <table class="table table-rent table-base">
+                    <tbody>
+                    <tr data-toggle="collapse" data-target="#accordion_1">
+                        <td style="width: 100.00%"><a href="javascript:void(0);" id="show_more_1"
+                                                      class="btn btn-primary btn-block button-icon arrow-down"
+                                                      role="button">show more</a></td>
                     </tr>
-                {% endif %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="collapse" id="accordion_2" aria-expanded="false">
-                <table class="table table-rent table-body">
+                    </tbody>
+                </table>
+                {% endif%}
+            </div>
+            {% else %}
+            <div class="boxed boxed-red">there are no rents associated with this agent</div>
+            {% endif %}
+            {% if headrents %}
+            <div class="table-fixed" style="margin-bottom: 20px;">
+                <table class="table table-head table-narrow">
+                    <thead>
+                    <tr>
+                        <td class="vertical-align" style="width: 15%">headrent id</td>
+                        <td class="vertical-align" style="width: 15.00%">code</td>
+                        <td class="vertical-align" style="width: 70.00%">property address</td>
+                    </tr>
+                    </thead>
+                </table>
+                <table class="table table-rent table-body table-body-alt">
                     <tbody>
                     {% for rent in headrents %}
-                    {% if loop.index >= 6 %}
-                    <tr>
-                        <td style="width: 15.00%">{{ rent.id }}</td>
-                        <td style="width: 15.00%">{{ rent.code }}</td>
-                        <td style="width: 65.00%"> {{ rent.propaddr }}</td>
-                        <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
-                        headrent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
-                                          data-toggle="tooltip" title="view headrent" role="button"></a></td>
-                    </tr>
+                    {% if loop.index < 6 %}
+                        <tr>
+                            <td style="width: 15.00%">{{ rent.id }}</td>
+                            <td style="width: 15.00%">{{ rent.code }}</td>
+                            <td style="width: 65.00%"> {{ rent.propaddr }}</td>
+                            <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
+                                headrent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                                                  data-toggle="tooltip" title="view headrent" role="button"></a></td>
+                        </tr>
                     {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>
+                <div class="collapse" id="accordion_2" aria-expanded="false">
+                    <table class="table table-rent table-body">
+                        <tbody>
+                        {% for rent in headrents %}
+                        {% if loop.index >= 6 %}
+                        <tr>
+                            <td style="width: 15.00%">{{ rent.id }}</td>
+                            <td style="width: 15.00%">{{ rent.code }}</td>
+                            <td style="width: 65.00%"> {{ rent.propaddr }}</td>
+                            <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
+                            headrent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt"
+                                              data-toggle="tooltip" title="view headrent" role="button"></a></td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if headrents|length > 5 %}
+                <table class="table table-rent table-base">
+                    <tbody>
+                    <tr data-toggle="collapse" data-target="#accordion_2">
+                        <td style="width: 100.00%"><a href="javascript:void(0);" id="show_more_2"
+                                                      class="btn btn-primary btn-block button-icon arrow-down"
+                                                      role="button">show more</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+                {% endif %}
             </div>
-            {% if headrents|length > 5 %}
-            <table class="table table-rent table-base">
-                <tbody>
-                <tr data-toggle="collapse" data-target="#accordion_2">
-                    <td style="width: 100.00%"><a href="javascript:void(0);" id="show_more_2"
-                                                  class="btn btn-primary btn-block button-icon arrow-down"
-                                                  role="button">show more</a></td>
-                </tr>
-                </tbody>
-            </table>
             {% endif %}
-            {% else %}
-            <table class="table table-rent table-body-alt table-base">
-                <tbody>
-                <tr>
-                    <td style="width: 100.00%">there are no headrents associated with this agent</td>
-                </tr>
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
         {% endif %}
     </div>
     <div class="col-md-3">
@@ -416,7 +401,7 @@
 {% endblock %}
 <!--we show the edit agent modal on page load if a user has come from agents and chosen to create a new agent-->
 {% block message_on_load %}
-{% if action == 'new_agent' and agent.id == 0%}
+{% if action == 'new_agent' and agent.id == 0 %}
 {{ widgets.modal_on_load_js(modal_id="agent_modal") }}
 {% endif %}
 {% endblock %}

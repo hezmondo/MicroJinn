@@ -34,6 +34,7 @@ class RentForm(FlaskForm):
     submit = SubmitField('Submit')
 
 
+# TODO: We may or may nood need this form depending on how we handle sending emails
 class PrEmailForm(FlaskForm):
     email = StringField('email', [validators.Email(message='Include an email address'), DataRequired()],
                         render_kw={"placeholder": "enter email to"})

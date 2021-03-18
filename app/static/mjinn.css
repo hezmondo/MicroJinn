@@ -63,15 +63,15 @@
 }
 .bolt::before
 {
-	color: #626262;
-	content: "\f0e7";
+	color: white;
+	content: "\f192";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
 .bolt-light::before
 {
 	color: white;
-	content: "\f0e7";
+	content: "\f192";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
@@ -142,8 +142,8 @@
 }
 .btn-light, .btn-light:focus, .btn-light.focus, .btn-light:active.focus, .btn-light:active, .btn-light:not(:disabled):not(.disabled):active
 {
-	background-color: #e2e6ea;
-	border-color: #e2e6ea;
+	background-color: #7ec6b2;
+	border-color: #7ec6b2;
 }
 .btn-light:focus
 {
@@ -151,8 +151,8 @@
 }
 .btn-light:hover
 {
-	background-color: #fff;
-	border-color: #fff;
+	background-color: #599181;
+	border-color: #599181;
 }
 .btn-light:not(:disabled):not(.disabled):active:focus
 {
