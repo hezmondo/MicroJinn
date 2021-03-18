@@ -94,7 +94,7 @@ def agents_select():
     try:
         message = post_rent_agent(agent_id, rent_id)
     except Exception as e:
-        message = 'Unable to update rent. Database write failed.'
+        message = f'Unable to update rent. Database write failed with error: {str(e)}'
     return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
