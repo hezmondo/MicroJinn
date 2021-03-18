@@ -2,16 +2,16 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.main.common import get_advarr_id, get_advarr_types, get_freq, get_freq_id, get_freqs
+from app.main.common import AdvArr, Freqs
 from app.models import Rental, RentalStat
 
 
 def get_rental(rental_id):
     # This method returns "rental"; information about a rental and the list values for various comboboxes,
     rental = db.session.query(Rental).filter_by(id=rental_id).first()
-    rental.freqdet= get_freq(rental.freq_id)
-    advarrdets = get_advarr_types()
-    freqdets = get_freqs()
+    rental.freqdet= Freqs.get_name(rental.freq_id)
+    advarrdets = AdvArr.names()
+    freqdets = Freqs.names()
 
     return rental, advarrdets, freqdets
 
@@ -45,9 +45,9 @@ def post_rental(rental_id):
         rental.astdate = request.form.get("astdate")
     rental.lastgastest = request.form.get("lastgastest")
     rental.note = request.form.get("note")
-    rental.freq_id = get_freq_id(request.form.get("frequency"))
+    rental.freq_id = Freqs.get_id(request.form.get("frequency"))
     advarrdet = request.form.get("advarr")
-    rental.advarr_id = get_advarr_id(advarrdet)
+    rental.advarr_id = AdvArr.get_id(advarrdet)
     db.session.add(rental)
     db.session.flush()
     rental_id = rental.id

@@ -10,7 +10,7 @@ from app.dao.property import get_properties, get_property, get_prop_types, post_
 from app.dao.rent import get_rent_external, post_rent_agent
 from app.email import test_email_connect, test_send_email
 from app.main.agent import get_agents, update_agent
-from app.main.common import get_proptype
+from app.main.common import PropTypes
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -185,7 +185,7 @@ def property(propertyid):
         propertyid = post_property(propertyid, rent_id)
         return redirect(url_for('util_bp.property', propertyid=propertyid))
     property = get_property(propertyid, rent_id)
-    property.proptype = get_proptype(property.proptype_id)
+    property.proptype = PropTypes.get_name(property.proptype_id)
     proptypes = get_prop_types("basic")
 
     return render_template('property.html', property=property, proptypes=proptypes)

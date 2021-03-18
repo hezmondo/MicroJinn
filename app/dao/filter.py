@@ -1,6 +1,6 @@
 import json
 from flask import request
-from app.main.common import get_advarrdet, get_idlist_recent, get_prdelivery_id, get_status_id, inc_date_m
+from app.main.common import AdvArr, get_idlist_recent, PrDeliveryTypes, inc_date_m
 from app.main.functions import strToDate
 from app.main.rent import get_propaddr
 from app.dao.rent import get_rent_sdata, post_rent__filter
@@ -65,7 +65,7 @@ def get_rent_s(action, filter_id):
     rent_s = get_rent_sdata(qfilter, action, 50)
     if action != 'external':
         for rent in rent_s:
-            rent.advarrdet = get_advarrdet(rent.advarr_id)
+            rent.advarrdet = AdvArr.get_name(rent.advarr_id)
             rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
             rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
             rent.propaddr = get_propaddr(rent.id)
@@ -144,7 +144,7 @@ def get_qfilter(filterdict, action):
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
                 list = []
                 for item in value:
-                    item = get_prdelivery_id(item)
+                    item = PrDeliveryTypes.get_id(item)
                 filter.append(Rent.prdelivery_id.in_(value))
             else: filterdict[key] = ["all prdeliveries"]
         # elif key == "rentpa" and value and value != "":
