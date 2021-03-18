@@ -1,21 +1,11 @@
 from app import db
-from flask import request
-from app.main.common import get_idlist_recent
-from app.dao.database import commit_to_database, pop_idlist_recent
+from app.dao.database import commit_to_database
 from app.models import Agent, Headrent, Rent
 
 
-def get_agents():
-    if request.method == "POST":
-        detail = request.form.get("detail") or ""
-        email = request.form.get("email") or ""
-        note = request.form.get("note") or ""
-        agents = Agent.query.filter(Agent.detail.ilike('%{}%'.format(detail)),
-                    Agent.email.ilike('%{}%'.format(email)), Agent.note.ilike('%{}%'.format(note))).all()
-    else:
-        id_list = get_idlist_recent("recent_agents")
-        agents = Agent.query.filter(Agent.id.in_(id_list)).all()
-        agents = sorted(agents, key=lambda o: id_list.index(o.id))
+def get_agents_t(filter, list):
+    agents = db.session.query(Agent).filter(*filter).all()
+    # agents = sorted(agents, key=lambda o: list.index(o.id))
 
     return agents
 
@@ -25,7 +15,7 @@ def get_agent(agent_id):
 
 
 def get_agent_id(agent_detail):
-    return db.session.query(Agent).filter_by(detail=agent_detail).one()
+    return db.session.query(Agent).filter_by(detail=agent_detail).first()
 
 def get_agent_rents(agent_id, type='rent'):
     if agent_id and agent_id != 0:
@@ -43,16 +33,8 @@ def get_agent_rents(agent_id, type='rent'):
     return agent_rents
 
 
-def post_agent(agent_id, rent_id):
+def post_agent(agent, agent_id, rent_id):
     try:
-        if agent_id == 0:
-            agent = Agent()
-        else:
-            agent = Agent.query.get(agent_id)
-        agent.detail = request.form.get("detail")
-        agent.email = request.form.get("email")
-        agent.note = request.form.get("note")
-        agent.code = request.form.get("code")
         db.session.add(agent)
         db.session.flush()
         message = "Agent details updated successfully!"

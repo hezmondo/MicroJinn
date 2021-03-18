@@ -3,7 +3,7 @@ import json
 from dateutil.relativedelta import relativedelta
 from flask_login import current_user
 from app.dao.common import get_dates_m
-from app.models import Jstore, Landlord, TypeDeed, TypeStatus
+from app.models import Jstore, Landlord, TypeDeed
 
 
 def get_actype(actype_id):
@@ -34,8 +34,6 @@ def get_actype_id(actype):
 
 def get_actypes():
     return ["autopay", "normal", "peppercorn", "reduced", "special"]
-
-
 
 
 def get_advarrdet(advarr_id):
@@ -89,15 +87,11 @@ def get_combodict_rent():
     # add the values unique to rent
     combo_dict = get_combodict_basic()
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
-    mailtos = get_mailto_types()
-    prdeliveries = get_prdelivery_types()
-    salegrades = get_salegrades()
-    statuses = [value for (value,) in TypeStatus.query.with_entities(TypeStatus.statusdet).all()]
     combo_dict['deedcodes'] = deedcodes
-    combo_dict['mailtos'] = mailtos
-    combo_dict['prdeliveries'] = prdeliveries
-    combo_dict['salegrades'] = salegrades
-    combo_dict['statuses'] = statuses
+    combo_dict['mailtos'] = get_mailto_types()
+    combo_dict['prdeliveries'] = get_prdelivery_types()
+    combo_dict['salegrades'] = get_salegrades()
+    combo_dict['statuses'] = get_statuses()
 
     return combo_dict
 
@@ -217,6 +211,36 @@ def get_mailto_types():
     return ['to agent', 'to tenantname care of agent', 'to tenantname at property','to owner or occupier at property']
 
 
+def get_paytype(paytype_id):
+    if paytype_id == 1:
+        return "cheque"
+    elif paytype_id == 2:
+        return "bacs"
+    elif paytype_id == 3:
+        return "phone"
+    elif paytype_id == 4:
+        return "cash"
+    else:
+        return "web"
+
+
+def get_paytype_id(paytype):
+    if paytype == "cheque":
+        return 1
+    elif paytype == "bacs":
+        return 2
+    elif paytype == "phone":
+        return 3
+    elif paytype == "cash":
+        return 4
+    else:
+        return 5
+
+
+def get_paytypes():
+    return ["cheque", "bacs", "phone", "cash", "web"]
+
+
 def get_prdelivery(prdelivery_id=1):
     if prdelivery_id == 1:
         return "email"
@@ -298,6 +322,48 @@ def get_salegrade_id(salegrade):
 
 def get_salegrades():
     return ["for sale", "not for sale", "intervening title", "poor title"]
+
+
+def get_status(status_id):
+    if status_id == 1:
+        return "active"
+    elif status_id == 2:
+        return "case"
+    elif status_id == 3:
+        return "grouped"
+    elif status_id == 4:
+        return "managed"
+    elif status_id == 5:
+        return "new"
+    elif status_id == 6:
+        return "sold"
+    elif status_id == 7:
+        return "terminated"
+    else:
+        return "x-ray"
+
+
+def get_status_id(status):
+    if status == "active":
+        return 1
+    elif status == "case":
+        return 2
+    elif status == "grouped":
+        return 3
+    elif status == "managed":
+        return 4
+    elif status == "new":
+        return 5
+    elif status == "sold":
+        return 6
+    elif status == "terminated":
+        return 7
+    else:
+        return 8
+
+
+def get_statuses():
+    return ["active", "case", "grouped", "managed", "new", "sold", "terminated", "x-ray"]
 
 
 def get_tenure(tenure_id=1):

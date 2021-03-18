@@ -126,7 +126,7 @@ class Event(db.Model):
     date = db.Column(db.Date)
     description = db.Column(db.String(90))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
-    eventtype_id = db.Column(db.Integer, db.ForeignKey('typeevent.id'))
+    event_type_id = db.Column(db.Integer)
 
 
 class FormLetter(db.Model):
@@ -169,7 +169,7 @@ class Income(db.Model):
     date = db.Column(db.Date)
     payer = db.Column(db.String(90))
     amount = db.Column(db.Numeric(8, 2))
-    paytype_id = db.Column(db.Integer, db.ForeignKey('typepayment.id'))
+    paytype_id = db.Column(db.Integer)
     acc_id = db.Column(db.Integer, db.ForeignKey('money_account.id'))
 
     incomealloc_income = db.relationship('IncomeAlloc', backref='income', lazy='dynamic')
@@ -473,7 +473,7 @@ class Rent(db.Model):
     mailto_id = db.Column(db.Integer)
     prdelivery_id = db.Column(db.Integer)
     salegrade_id = db.Column(db.Integer)
-    status_id = db.Column(db.Integer, db.ForeignKey('typestatus.id'))
+    status_id = db.Column(db.Integer)
     tenure_id = db.Column(db.Integer)
 
     case_rent = db.relationship('Case', backref='rent', lazy='dynamic')
@@ -558,33 +558,6 @@ class TypeDoc(db.Model):
     form_letter_typedoc = db.relationship('FormLetter', backref='typedoc', lazy='dynamic')
     digfile_typedoc = db.relationship('DigFile', backref='typedoc', lazy='dynamic')
     docfile_typedoc = db.relationship('DocFile', backref='typedoc', lazy='dynamic')
-
-
-class TypeEvent(db.Model):
-    __tablename__ = 'typeevent'
-
-    id = db.Column(db.Integer, primary_key=True)
-    desc = db.Column(db.String(30))
-
-    event_typedoc = db.relationship('Event', backref='typeevent', lazy='dynamic')
-
-
-class TypePayment(db.Model):
-    __tablename__ = 'typepayment'
-
-    id = db.Column(db.Integer, primary_key=True)
-    paytypedet = db.Column(db.String(45))
-
-    income_paytype = db.relationship('Income', backref='typepayment', lazy='dynamic')
-
-
-class TypeStatus(db.Model):
-    __tablename__ = 'typestatus'
-
-    id = db.Column(db.Integer, primary_key=True)
-    statusdet = db.Column(db.String(45))
-
-    rent_typestatus = db.relationship('Rent', backref='typestatus', lazy='dynamic')
 
 
 class User(UserMixin, db.Model):

@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
-from app.dao.agent import get_agent, get_agents, get_agent_rents, post_agent
+from app.dao.agent import get_agent, get_agent_rents
+from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.filter import get_rent_s
 from app.dao.headrent import post_headrent_agent_update
@@ -8,7 +9,8 @@ from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, pos
 from app.dao.property import get_properties, get_property, get_prop_types, post_property
 from app.dao.rent import get_rent_external, post_rent_agent
 from app.email import test_email_connect, test_send_email
-from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
+from app.main.agent import get_agents, update_agent
+from app.main.common import get_proptype
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -22,7 +24,7 @@ def agent(agent_id):
     rents = None
     headrents = None
     if request.method == "POST":
-        agent_id, message = post_agent(agent_id, rent_id)
+        agent_id, message = update_agent(agent_id, rent_id)
         if rent_id != 0:
             return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
     if agent_id == 0:
@@ -175,17 +177,18 @@ def landlords():
     return render_template('landlords.html', landlords=landlords)
 
 
-@util_bp.route('/property/<int:property_id>', methods=["GET", "POST"])
+@util_bp.route('/property/<int:propertyid>', methods=["GET", "POST"])
 # @login_required
-def property(property_id):
+def property(propertyid):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     if request.method == "POST":
-        property_id = post_property(property_id, rent_id)
-        return redirect(url_for('util_bp.property', property_id=property_id))
-    property_ = get_property(property_id, rent_id)
+        propertyid = post_property(propertyid, rent_id)
+        return redirect(url_for('util_bp.property', propertyid=propertyid))
+    property = get_property(propertyid, rent_id)
+    property.proptype = get_proptype(property.proptype_id)
     proptypes = get_prop_types("basic")
 
-    return render_template('property.html', property_=property_, proptypes=proptypes)
+    return render_template('property.html', property=property, proptypes=proptypes)
 
 
 @util_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
@@ -208,7 +211,7 @@ def rent_external(rent_external_id):
 @util_bp.route('/rents_ex', methods=['GET', 'POST'])
 @login_required
 def rents_ex():
-    filterdict, rent_s = get_rent_xdata("external", 0)
+    filterdict, rent_s = get_rent_s("external", 0)
 
     return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
 

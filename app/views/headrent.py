@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.headrent import get_headrent
 from app.main.common import get_combodict_basic, get_hr_status, get_hr_statuses, inc_date_m
-from app.main.headrent import get_headrents_p
+from app.main.headrent import get_headrents_p, update_headrent
 
 headrent_bp = Blueprint('headrent_bp', __name__)
 
@@ -19,6 +19,9 @@ def headrents():
 @headrent_bp.route('/headrent/<int:headrent_id>', methods=["GET", "POST"])
 @login_required
 def headrent(headrent_id):
+    if request.method == "POST":
+        update_headrent(headrent_id)
+        return redirect(url_for('headrent_bp.headrent', headrent_id=headrent_id))
     headrent = get_headrent(headrent_id)
     headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
     headrent.status = get_hr_status(headrent.status_id)

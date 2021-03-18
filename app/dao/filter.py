@@ -1,10 +1,10 @@
 import json
 from flask import request
-from app.main.common import get_advarrdet, get_idlist_recent, get_prdelivery_id, inc_date_m
+from app.main.common import get_advarrdet, get_idlist_recent, get_prdelivery_id, get_status_id, inc_date_m
 from app.main.functions import strToDate
 from app.main.rent import get_propaddr
 from app.dao.rent import get_rent_sdata, post_rent__filter
-from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent, TypeStatus
+from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent
 
 
 def get_filters(type):
@@ -69,6 +69,7 @@ def get_rent_s(action, filter_id):
             rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
             rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
             rent.propaddr = get_propaddr(rent.id)
+
     # TODO: Repeated if statement - This can be cleaned up
     if action == 'basic' and request.method == "GET":
         rent_s = sorted(rent_s, key=lambda o: id_list.index(o.id))
@@ -98,12 +99,10 @@ def get_qfilter(filterdict, action):
             if action == "external":
                 filter.append(RentExternal.agentdetail.ilike('%{}%'.format(value)))
             else:
-                filter.append(Agent.detail.ilike('%{}%'.format(value)))
+                filter.append(Rent.Agent.detail.ilike('%{}%'.format(value)))
         elif key == "propaddr" and value and value != "":
             if action == "external":
                 filter.append(RentExternal.propaddr.ilike('%{}%'.format(value)))
-            else:
-                filter.append(Property.propaddr.ilike('%{}%'.format(value)))
         elif key == "source" and value and value != "":
             if action == "external":
                 filter.append(RentExternal.source.ilike('%{}%'.format(value)))
@@ -116,7 +115,7 @@ def get_qfilter(filterdict, action):
                 filter.append(Rent.tenantname.ilike('%{}%'.format(value)))
         elif key == "actype":
             if value and value != "" and value != [] and value != ["all actypes"]:
-                filter.append("")
+                filter.append()
             else: filterdict[key] = ["all actypes"]
         elif key == "agentmailto":
             if value and value == "exclude":
@@ -139,10 +138,11 @@ def get_qfilter(filterdict, action):
             filter.append(Rent.lastrentdate <= strToDate('{}'.format(value)))
         elif key == "landlord":
             if value and value != "" and value != [] and value != ["all landlords"]:
-                filter.append(Landlord.name.in_(value))
+                filter.append(Rent.Landlord.name.in_(value))
             else: filterdict[key] = ["all landlords"]
         elif key == "prdelivery":
             if value and value != "" and value != [] and value != ["all prdeliveries"]:
+                list = []
                 for item in value:
                     item = get_prdelivery_id(item)
                 filter.append(Rent.prdelivery_id.in_(value))
@@ -158,12 +158,12 @@ def get_qfilter(filterdict, action):
                 filterdict[key] = ["all salegrades"]
         elif key == "status":
             if value and value != "" and value != [] and value != ["all statuses"]:
-                filter.append(TypeStatus.statusdet.in_(value))
+                filter.append()
             else:
                 filterdict[key] = ["all statuses"]
         elif key == "tenure":
             if value and value != "" and value != [] and value != ["all tenures"]:
-                filter.append("")
+                filter.append()
             else:
                 filterdict[key] = ["all tenures"]
 

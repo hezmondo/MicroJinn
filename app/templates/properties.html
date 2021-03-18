@@ -12,7 +12,7 @@
                    class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('util_bp.property', property_id=0, rent_id=rent_id) }}"
+                <a href="{{ url_for('util_bp.property', propertyid=0, rent_id=rent_id) }}"
                    class="btn btn-block btn-danger button-icon plus" role="button">new property for this rent</a>
             </div>
         {% else %}
@@ -47,9 +47,9 @@
         <tr id="{{ item.id }}">
             <td style="width: 10.00%"> {{ item.rentcode }}</td>
             <td style="width: 65.00%"> {{ item.propaddr }}</td>
-            <td style="width: 15.00%"> {{ item.detail }}</td>
+            <td style="width: 15.00%"> {{ item.proptype }}</td>
             <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.property',
-            property_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+            propertyid=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

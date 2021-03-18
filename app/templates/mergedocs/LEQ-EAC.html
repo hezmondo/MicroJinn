@@ -10,12 +10,12 @@
     <div id="doc_html" contenteditable="true">
         {% if method == "letter" %}
         <div class="font-size-large" align="center">
-            <b>{{ rent.managername }}</b>
+            <b>{{ rent.landlord.manager.managername }}</b>
         </div>
         <div class="font-size-small" align="center">
-            {{ rent.manageraddr }}
+            {{ rent.landlord.manager.manageraddr }}
             <br/>
-            {{ rent.manageraddr2 }}
+            {{ rent.landlord.manager.manageraddr2 }}
             <br/>
         </div>
         <div class="font-size-medium" align="right">
@@ -118,13 +118,13 @@
             <br/>
             <br/>
             {% if method == "email" %}
-            <b>{{ rent.managername }}</b>
+            <b>{{ rent.landlord.manager.managername }}</b>
             <br/>
             <br/>
-            {{ rent.manageraddr }}
+            {{ rent.landlord.manager.manageraddr }}
             <br/>
             <br/>
-            {{ rent.manageraddr2 }}
+            {{ rent.landlord.manager.manageraddr2 }}
             <br/>
             {% endif %}
         </div>

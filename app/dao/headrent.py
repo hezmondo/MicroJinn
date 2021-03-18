@@ -1,12 +1,8 @@
 from app import db
-from flask import flash, redirect, request, url_for
+from flask import flash, redirect, url_for
 from sqlalchemy.orm import joinedload, load_only
-from app.dao.agent import get_agent_id
 from app.dao.database import commit_to_database
-from app.dao.landlord import get_landlord_id
-from app.dao.common import get_status_id
-from app.main.common import get_advarr_id, get_freq_id, get_salegrade_id, get_tenure_id
-from app.main.functions import strToDec
+from app.main.common import get_freq, get_status
 from app.models import Headrent
 
 
@@ -21,9 +17,9 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
         headrent_id = create_new_headrent()
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
-                                       joinedload('landlord').load_only('name'),
-                                       joinedload('typefreq').load_only('freqdet')) \
+                                       joinedload('landlord').load_only('name')) \
         .one_or_none()
+    headrent.freqdet = get_freq(headrent.freq_id)
     if headrent is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
@@ -44,31 +40,15 @@ def get_headrents(filter):
     return headrents
 
 
-def post_headrent(id):
-    headrent = Headrent.query.get(id)
-    # we need the post values as class id generated for the actual combobox values:
-    headrent.advarr_id = get_advarr_id(request.form.get("advarr"))
-    headrent.agent_id = get_agent_id(request.form.get("agent"))
-    headrent.arrears = strToDec(request.form.get("arrears"))
-    # we need code to generate datecode from lastrentdate with user choosing sequence:
-    headrent.code = request.form.get("rentcode")
-    headrent.datecode_id = int(request.form.get("datecode_id"))
-    headrent.freq_id = get_freq_id(request.form.get("frequency"))
-    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
-    headrent.lastrentdate = request.form.get("lastrentdate")
-    headrent.note = request.form.get("note")
-    headrent.reference = request.form.get("reference")
-    headrent.rentpa = strToDec(request.form.get("rentpa"))
-    headrent.salegrade_id = get_salegrade_id(request.form.get("salegrade"))
-    headrent.source = request.form.get("source")
-    headrent.status_id = get_status_id(request.form.get("status"))
-    headrent.tenure_id = get_tenure_id(request.form.get("tenure"))
-    db.session.add(headrent)
-    db.session.flush()
-    _id = headrent.id
-    db.session.commit()
+def post_headrent(headrent):
+    try:
+        db.session.add(headrent)
+        message = "Success! This headrent has been updated."
+        commit_to_database()
+    except Exception as ex:
+        message = f"Update headrent failed. Error:  {str(ex)}"
 
-    return _id
+    return message
 
 
 def post_headrent_agent_update(agent_id, rent_id):
@@ -86,4 +66,5 @@ def post_headrent_agent_update(agent_id, rent_id):
         commit_to_database()
     except Exception as ex:
         message = f"Update headrent failed. Error:  {str(ex)}"
+
     return message
