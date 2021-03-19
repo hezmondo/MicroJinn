@@ -35,7 +35,7 @@
             <td style="width: 12.00%"> {{ item.astdate.strftime('%d-%b-%Y') if item.astdate else 'no AST' }}</td>
             <td style="width: 10.00%"> {{ item.lastgastest.strftime('%d-%b-%Y') }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rental_bp.rental',
-            rental_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+            rental_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

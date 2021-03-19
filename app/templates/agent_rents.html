@@ -54,7 +54,7 @@
                 <td style="width: 20.00%">{{ rent.rentcode }}</td>
                 <td style="width: 60.00%"> {{ rent.tenantname }}</td>
                 <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                rent_id=rent.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                rent_id=rent.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
             </tr>
             {% endfor %}
             </tbody>
@@ -78,7 +78,7 @@
                 <td style="width: 20.00%">{{ item.code }}</td>
                 <td style="width: 60.00%"> {{ item.propaddr }}</td>
                 <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
-                headrent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                headrent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
             </tr>
             {% endfor %}
             </tbody>

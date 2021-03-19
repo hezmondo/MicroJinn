@@ -61,14 +61,7 @@
 {
 	display: block;
 }
-.bolt::before
-{
-	color: white;
-	content: "\f192";
-	font-family: "Font Awesome 5 Free";
-	font-weight: 900;
-}
-.bolt-light::before
+.circles::before
 {
 	color: white;
 	content: "\f192";
@@ -137,24 +130,24 @@
 {
 	box-shadow: 0 0 0 .2rem rgba(210, 108, 209, 0.5);
 }
-.btn-light {
-    color: #5E5E5E;
+.btn-teal-light {
+    color: white;
 }
-.btn-light, .btn-light:focus, .btn-light.focus, .btn-light:active.focus, .btn-light:active, .btn-light:not(:disabled):not(.disabled):active
+.btn-teal-light, .btn-teal-light:focus, .btn-teal-light.focus, .btn-teal-light:active.focus, .btn-teal-light:active, .btn-teal-light:not(:disabled):not(.disabled):active
 {
 	background-color: #7ec6b2;
 	border-color: #7ec6b2;
 }
-.btn-light:focus
+.btn-teal-light:focus
 {
 	box-shadow: 0 0 0 .2rem rgba(30, 30, 30, 0.5);
 }
-.btn-light:hover
+.btn-teal-light:hover
 {
 	background-color: #599181;
 	border-color: #599181;
 }
-.btn-light:not(:disabled):not(.disabled):active:focus
+.btn-teal-light:not(:disabled):not(.disabled):active:focus
 {
 	box-shadow: 0 0 0 .2rem rgba(30, 30, 30, 0.5);
 }

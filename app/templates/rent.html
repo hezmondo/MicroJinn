@@ -30,7 +30,7 @@
                     <td class="vertical-align align-right" style="width: 5.00%"><a
                             href="{{ url_for('util_bp.properties', rent_id=rent.id) }}" data-toggle="tooltip"
                             title="edit the property"
-                            class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
                 </tr>
                 </tbody>
             </table>
@@ -51,7 +51,7 @@
                     <td class="vertical-align" style="width: 94.5%">tenant and mail details</td>
                     <td class="vertical-align align-right" style="width: 5.50%">
                         <a href="#" id="edit_tenant" data-toggle="modal"
-                           data-target="#tenant_modal" class="btn btn-light btn-round button-icon round bolt"
+                           data-target="#tenant_modal" class="btn btn-teal-light btn-round button-icon round circles"
                            role="button"></a>
                     </td>
                 </tr>
@@ -94,13 +94,13 @@
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.agent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=rent.agent_id, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                               class="btn btn-light btn-round button-icon round bolt"
+                                               class="btn btn-teal-light btn-round button-icon round circles"
                                                role="button"></a>
                         {% else %}
                     <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('util_bp.agent',
                             agent_id=0, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                               class="btn btn-light btn-round button-icon round bolt"
+                                               class="btn btn-teal-light btn-round button-icon round circles"
                                                role="button"></a>
                         {% endif %}
                 </tr>
@@ -136,7 +136,7 @@
                     <td class="vertical-align align-right" style="width: 5.00%"><a
                             href="{{ url_for('charge_bp.charges', rent_id=rent.id) }}" data-toggle="tooltip"
                             title="charges for this rent"
-                            class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
                     </td>
                 </tr>
                 </tbody>

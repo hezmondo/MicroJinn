@@ -41,7 +41,7 @@
             <td style="width: 12.00%"> {{ item.val_date.strftime('%d-%b-%Y') if item.val_date else 'none'  }}</td>
             <td style="width: 8.00%"> {{ item.valuation }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('loan_bp.loan',
-            loan_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt" role="button"></a>
+            loan_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
         </tr>
         {% endfor %}
         <tr>

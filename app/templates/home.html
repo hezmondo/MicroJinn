@@ -81,7 +81,7 @@
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}</td>
             <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-            rent_id=item.id) }}" class="btn btn-light btn-round button-icon round bolt"
+            rent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles"
                                  data-toggle="tooltip" title="view rent" role="button"></a></td>
         </tr>
         {% endfor %}
