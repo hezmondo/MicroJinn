@@ -1,13 +1,13 @@
 from flask import request
 from app.main.common import get_idlist_recent
-from app.dao.agent import get_agents_t, post_agent
+from app.dao.agent import get_agent, get_agents_set, post_agent
 from app.models import Agent
 
 
 def get_agents():
     filter = []
     list = []
-    if request.method == "POST":
+    if request.method == "POST":    # get search parameters to create a filter
         detail = request.form.get("detail") or ""
         email = request.form.get("email") or ""
         note = request.form.get("note") or ""
@@ -21,7 +21,7 @@ def get_agents():
     else:
         list = get_idlist_recent("recent_agents")
         filter.append(Agent.id.in_(list))
-    agents = get_agents_t(filter, list)
+    agents = get_agents_set(filter, list)
 
     return agents
 
@@ -30,7 +30,7 @@ def update_agent(agent_id, rent_id):
     if agent_id == 0:
         agent = Agent()
     else:
-        agent = Agent.query.get(agent_id)
+        agent = get_agent(agent_id)
     agent.detail = request.form.get("detail")
     agent.email = request.form.get("email")
     agent.note = request.form.get("note")

@@ -15,15 +15,15 @@ from app.models import Rent
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
-    if agent_id and agent_id != 0 and mailto_id in (1, 2):
-        agent = get_agent(agent_id)
+    if mailto_id == 1 or mailto_id == 2:
+        agent = get_agent(agent_id) or "set as mail to agent but no agent found"
         mailaddr = agent.detail
         if mailto_id == 2:
             mailaddr = tenantname + 'care of' + mailaddr
     else:
         propaddr = get_propaddr(rent_id)
         if mailto_id == 4:
-            mailaddr = 'the owner or occupier' + propaddr
+            mailaddr = 'The owner or occupier, ' + propaddr
         else:
             mailaddr = tenantname + ', ' + propaddr
 
@@ -64,6 +64,7 @@ def get_rentp(rent_id):
     rent.totcharges = get_totcharges(rent.charges)
     rent.freqdet = Freqs.get_name(rent.freq_id)
     rent.mailaddr = get_mailaddr(rent_id, rent.agent_id, rent.mailto_id, rent.tenantname)
+    rent.mailto = MailTos.get_name(rent.mailto_id)
     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
@@ -74,7 +75,6 @@ def get_rentp(rent_id):
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
     rent.salegrade = SaleGrades.get_name(rent.salegrade_id)
     rent.statusdet = Statuses.get_name(rent.status_id)
-    rent.sort_code = rent.landlord.money_account.sort_code
 
     return rent
 
@@ -285,7 +285,9 @@ def update_rent_rem(rent_id):
     rent.source = request.form.get("source")
     rent.status_id = Statuses.get_id(request.form.get("status"))
     rent.tenure_id = Tenures.get_id(request.form.get("tenure"))
-    post_rent(rent)
+    rent_id = post_rent(rent)
+
+    return rent_id
 
 
 def update_roll_rent(rent_id, last_rent_date, arrears):

@@ -3,9 +3,8 @@ from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
-from app.dao.database import pop_idlist_recent
+from app.dao.database import commit_to_database, pop_idlist_recent
 from app.models import Jstore, ManagerExt, PrHistory, Rent, RentExternal
-from app.dao.database import commit_to_database
 
 
 def check_pr_exists(rent_id):  # check if rent has record in pr_history
@@ -53,6 +52,7 @@ def get_rent_external(id):
                        RentExternal.arrears, RentExternal.lastrentdate, RentExternal.source, RentExternal.status,
                        ManagerExt.codename, ManagerExt.detail, RentExternal.agentdetail) \
         .filter(RentExternal.id == id).one_or_none()
+
     return rent_external
 
 
@@ -79,6 +79,7 @@ def get_rent_sdata(qfilter, action, runsize):
                      joinedload('agent').load_only('detail'),
                      joinedload('landlord').load_only('name')) \
             .filter(*qfilter).order_by(Rent.rentcode).limit(runsize).all()
+
     return rent_s
 
 
@@ -100,6 +101,7 @@ def post_rent_agent(agent_id, rent_id):
         commit_to_database()
     except Exception as ex:
         message = f"Update rent failed. Error:  {str(ex)}"
+
     return message
 
 
@@ -127,14 +129,14 @@ def post_rent__filter(filterdict):
     jstore.code = jname
     jstore.content = json.dumps(filterdict)
     db.session.add(jstore)
-    db.session.commit()
+    commit_to_database()
 
 
 def post_rent(rent):
     db.session.add(rent)
     db.session.flush()
     rent_id = rent.id
-    db.session.commit()
+    commit_to_database()
 
     return rent_id
 

@@ -241,7 +241,7 @@
                                 <div class="col-md-12">
                                     <label for="landlord">landlord:</label>
                                     {{ widgets.combobox(name="landlord", items=combodict.landlords,
-                                    item_selected=rent.name) }}
+                                    item_selected=rent.landlord.name) }}
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -289,7 +289,7 @@
                                 <div class="col-md-2">
                                     <label for="deedcode">deed code:</label>
                                     {{ widgets.combobox(name="deedcode", items=combodict.deedcodes,
-                                    item_selected=rent.deedcode) }}
+                                    item_selected=rent.typedeed.deedcode) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="salegrade">sale grade:</label>
