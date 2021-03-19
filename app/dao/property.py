@@ -2,7 +2,7 @@ from app import db
 from flask import request
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.main.common import get_proptype, get_proptype_id, get_proptypes
+from app.main.common import PropTypes
 from app.models import Property, Rent
 
 
@@ -42,7 +42,7 @@ def get_propertyaddrs(rent_id):
 
 
 def get_prop_types(type):
-    proptypes = get_proptypes()
+    proptypes = PropTypes.names()
     if type == "plus":
         # add "all" as an option
         proptypes.insert(0, "all proptypes")

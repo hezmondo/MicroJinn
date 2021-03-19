@@ -2,7 +2,7 @@ from app import db
 from flask import flash, redirect, url_for
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.main.common import get_freq, get_status
+from app.main.common import Freqs, Statuses
 from app.models import Headrent
 
 
@@ -19,7 +19,7 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name')) \
         .one_or_none()
-    headrent.freqdet = get_freq(headrent.freq_id)
+    headrent.freqdet = Freqs.get_name(headrent.freq_id)
     if headrent is None:
         flash('Invalid rent code')
         return redirect(url_for('auth.login'))
@@ -35,7 +35,7 @@ def get_headrents(filter):
                 joinedload('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
     for rent in headrents:
-        rent.status = get_status(rent.status_id)
+        rent.status = Statuses.get_name(rent.status_id)
 
     return headrents
 

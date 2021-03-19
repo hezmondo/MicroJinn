@@ -19,8 +19,7 @@ def rent(rent_id):
     messages = rent_validation(rent, message)
     rentstats = get_rent_strings(rent, 'rent')
 
-    return render_template('rent.html', rent=rent, combodict=combodict,
-                           rentstats=rentstats, messages=messages)
+    return render_template('rent.html', rent=rent, combodict=combodict, rentstats=rentstats, messages=messages)
 
 
 @rent_bp.route('/tenant/<int:rent_id>', methods=['GET', 'POST'])

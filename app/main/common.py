@@ -6,73 +6,256 @@ from app.dao.common import get_dates_m
 from app.models import Jstore, Landlord, TypeDeed
 
 
-def get_actype(actype_id):
-    if actype_id == 1:
-        return "autopay"
-    elif actype_id == 2:
-        return "normal"
-    elif actype_id == 3:
-        return "peppercorn"
-    elif actype_id == 4:
-        return "reduced"
-    else:
-        return "special"
+class AcTypes:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["autopay", "normal", "peppercorn", "reduced", "special"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return AcTypes._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return AcTypes._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return AcTypes._names.index(name) + 1
 
 
-def get_actype_id(actype):
-    if actype == "autopay":
-        return 1
-    elif actype == "normal":
-        return 2
-    elif actype == "peppercorn":
-        return 3
-    elif actype == "reduced":
-        return 4
-    else:
-        return 5
+class AdvArr:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ['in advance', 'in arrears']
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return AdvArr._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return AdvArr._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return AdvArr._names.index(name) + 1
 
 
-def get_actypes():
-    return ["autopay", "normal", "peppercorn", "reduced", "special"]
+class BatchStatuses:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ['completed', 'pending']
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return BatchStatuses._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return BatchStatuses._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return BatchStatuses._names.index(name) + 1
 
 
-def get_advarrdet(advarr_id):
+class Freqs:
+    # the "names" of the types
+    _names = ["yearly", "half yearly", "quarterly", "monthly", "four weekly", "weekly"]
+    # ids are really frequencies are per annum, 1--52
+    # but are called "ids" for historical reasons
+    # this list must be kept in same order as `_names` above
+    _ids = [1, 2, 4, 12, 13, 52]
+    assert len(_ids) == len(_names)
 
-    return "in advance" if advarr_id == 1 else "in arrears"
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return Freqs._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        index = Freqs._ids.index(id)
+        return Freqs._names[index]
+
+    @staticmethod
+    def get_id(name):
+        index = Freqs._names.index(name)
+        return Freqs._ids[index]
 
 
-def get_advarr_id(advarrdet):
+class HrStatuses:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["active", "dormant", "suspended", "terminated"]
 
-    return 1 if advarrdet == "in advance" else 2
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return HrStatuses._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return HrStatuses._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return HrStatuses._names.index(name) + 1
 
 
-def get_advarr_types():
+def get_idlist_recent(type):
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
 
-    return ['in advance', 'in arrears']
-
-
-def get_batchstatus(status_id):
-
-    return "completed" if status_id == 1 else "pending"
-
-
-def get_batchstatus_id(status):
-
-    return 1 if status == "completed" else 2
+    return id_list
 
 
-def get_batchstatus_types():
+class MailTos:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ['to agent', 'to tenantname care of agent', 'to tenantname at property','to owner or occupier at property']
 
-    return ['completed', 'pending']
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return MailTos._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return MailTos._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return MailTos._names.index(name) + 1
+
+
+class PayTypes:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["cheque", "bacs", "phone", "cash", "web"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return PayTypes._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return PayTypes._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return PayTypes._names.index(name) + 1
+
+
+class PrDeliveryTypes:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ['email', 'post', 'email and post']
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return PrDeliveryTypes._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return PrDeliveryTypes._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return PrDeliveryTypes._names.index(name) + 1
+
+
+class PropTypes:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["commercial", "flat", "garage", "house", "land", "multiple"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return PropTypes._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return PropTypes._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return PropTypes._names.index(name) + 1
+
+
+class SaleGrades:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["for sale", "not for sale", "intervening title", "poor title"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return SaleGrades._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return SaleGrades._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return SaleGrades._names.index(name) + 1
+
+
+class Statuses:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["active", "case", "grouped", "managed", "new", "sold", "terminated", "x-ray"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return Statuses._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return Statuses._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return Statuses._names.index(name) + 1
+
+
+class Tenures:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ['freehold', 'leasehold', 'rentcharge']
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return Tenures._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return Tenures._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return Tenures._names.index(name) + 1
 
 
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
-    actypes = get_actypes()
-    advars = get_advarr_types()
-    freqs = get_freqs()
+    actypes = AcTypes.names()
+    advars = AdvArr.names()
+    freqs = Freqs.names()
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    tenures = get_tenures()
+    tenures = Tenures.names()
     combo_dict = {
         "actypes": actypes,
         "advars": advars,
@@ -88,10 +271,10 @@ def get_combodict_rent():
     combo_dict = get_combodict_basic()
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
     combo_dict['deedcodes'] = deedcodes
-    combo_dict['mailtos'] = get_mailto_types()
-    combo_dict['prdeliveries'] = get_prdelivery_types()
-    combo_dict['salegrades'] = get_salegrades()
-    combo_dict['statuses'] = get_statuses()
+    combo_dict['mailtos'] = MailTos.names()
+    combo_dict['prdeliveries'] = PrDeliveryTypes.names()
+    combo_dict['salegrades'] = SaleGrades.names()
+    combo_dict['statuses'] = Statuses.names()
 
     return combo_dict
 
@@ -111,281 +294,6 @@ def get_combodict_filter():
     combo_dict["filtertypes"] = ["payrequest", "rentprop", "income"]
 
     return combo_dict
-
-
-def get_freq(freq_id):
-    if freq_id == 1:
-        return "yearly"
-    elif freq_id == 2:
-        return "half yearly"
-    elif freq_id == 4:
-        return "quarterly"
-    elif freq_id == 12:
-        return "monthly"
-    elif freq_id == 13:
-        return "four weekly"
-    else:
-        return "weekly"
-
-
-def get_freq_id(freq):
-    if freq == "yearly":
-        return 1
-    elif freq == "half yearly":
-        return 2
-    elif freq == "quarterly":
-        return 4
-    elif freq == "monthly":
-        return 12
-    elif freq == "four weekly":
-        return 13
-    else:
-        return 52
-
-
-def get_freqs():
-    return ["yearly", "half yearly", "quarterly", "monthly", "four weekly", "weekly"]
-
-
-
-
-def get_hr_status(status_id):
-    if status_id == 1:
-        return "active"
-    elif status_id == 2:
-        return "dormant"
-    elif status_id == 3:
-        return "suspended"
-    else:
-        return "terminated"
-
-
-def get_hr_statuses():
-
-    return ["active", "dormant", "suspended", "terminated"]
-
-
-def get_hr_status_id(status):
-    if status == "active":
-        return 1
-    elif status == "dormant":
-        return 2
-    elif status == "suspended":
-        return 3
-    else:
-        return 4
-
-
-def get_idlist_recent(type):
-    try:
-        id_list = json.loads(getattr(current_user, type))
-    except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
-
-    return id_list
-
-
-def get_mailtodet(mailto_id):
-    if mailto_id == 1:
-        return "to agent"
-    elif mailto_id == 2:
-        return "to tenant name care of agent"
-    elif mailto_id == 3:
-        return "to tenant name at property"
-    else:
-        return "to owner or occupier at property"
-
-
-def get_mailto_id(mailtodet):
-    if mailtodet == "to agent":
-        return 1
-    elif mailtodet == "to tenant name care of agent":
-        return 2
-    elif mailtodet == "to tenant name at property":
-        return 3
-    else:
-        return 4
-
-
-def get_mailto_types():
-    return ['to agent', 'to tenantname care of agent', 'to tenantname at property','to owner or occupier at property']
-
-
-def get_paytype(paytype_id):
-    if paytype_id == 1:
-        return "cheque"
-    elif paytype_id == 2:
-        return "bacs"
-    elif paytype_id == 3:
-        return "phone"
-    elif paytype_id == 4:
-        return "cash"
-    else:
-        return "web"
-
-
-def get_paytype_id(paytype):
-    if paytype == "cheque":
-        return 1
-    elif paytype == "bacs":
-        return 2
-    elif paytype == "phone":
-        return 3
-    elif paytype == "cash":
-        return 4
-    else:
-        return 5
-
-
-def get_paytypes():
-    return ["cheque", "bacs", "phone", "cash", "web"]
-
-
-def get_prdelivery(prdelivery_id=1):
-    if prdelivery_id == 1:
-        return "email"
-    elif prdelivery_id == 2:
-        return "post"
-    else:
-        return "email and post"
-
-
-def get_prdelivery_id(prdelivery='email'):
-    if prdelivery == "email":
-        return 1
-    elif prdelivery == "post":
-        return 2
-    else:
-        return 3
-
-
-def get_prdelivery_types():
-
-    return ['email', 'post', 'email and post']
-
-
-def get_proptype(proptype_id):
-    if proptype_id == 1:
-        return "commercial"
-    elif proptype_id == 2:
-        return "flat"
-    elif proptype_id == 3:
-        return "garage"
-    elif proptype_id == 4:
-        return "house"
-    elif proptype_id == 5:
-        return "land"
-    else:
-        return "multiple"
-
-
-def get_proptype_id(proptype):
-    if proptype == "commercial":
-        return 1
-    elif proptype == "flat":
-        return 2
-    elif proptype == "garage":
-        return 3
-    elif proptype == "house":
-        return 4
-    elif proptype == "land":
-        return 5
-    else:
-        return 6
-
-
-def get_proptypes():
-    return ["commercial", "flat", "garage", "house", "land", "multiple"]
-
-
-def get_salegrade(salegrade_id):
-    if salegrade_id == 1:
-        return "for sale"
-    elif salegrade_id == 2:
-        return "not for sale"
-    elif salegrade_id == 3:
-        return "intervening title"
-    else:
-        return "poor title"
-
-
-def get_salegrade_id(salegrade):
-    if salegrade == "for sale":
-        return 1
-    elif salegrade == "not for sale":
-        return 2
-    elif salegrade == "intervening title":
-        return 3
-    else:
-        return 4
-
-
-def get_salegrades():
-    return ["for sale", "not for sale", "intervening title", "poor title"]
-
-
-def get_status(status_id):
-    if status_id == 1:
-        return "active"
-    elif status_id == 2:
-        return "case"
-    elif status_id == 3:
-        return "grouped"
-    elif status_id == 4:
-        return "managed"
-    elif status_id == 5:
-        return "new"
-    elif status_id == 6:
-        return "sold"
-    elif status_id == 7:
-        return "terminated"
-    else:
-        return "x-ray"
-
-
-def get_status_id(status):
-    if status == "active":
-        return 1
-    elif status == "case":
-        return 2
-    elif status == "grouped":
-        return 3
-    elif status == "managed":
-        return 4
-    elif status == "new":
-        return 5
-    elif status == "sold":
-        return 6
-    elif status == "terminated":
-        return 7
-    else:
-        return 8
-
-
-def get_statuses():
-    return ["active", "case", "grouped", "managed", "new", "sold", "terminated", "x-ray"]
-
-
-def get_tenure(tenure_id=1):
-    if tenure_id == 1:
-        return "freehold"
-    elif tenure_id == 2:
-        return "leasehold"
-    else:
-        return "rentcharge"
-
-
-def get_tenure_id(tenure='freehold'):
-    if tenure == "freehold":
-        return 1
-    elif tenure == "leasehold":
-        return 2
-    else:
-        return 3
-
-def get_tenures():
-
-    return ['freehold', 'leasehold', 'rentcharge']
 
 
 def inc_date(date1, freq, num):

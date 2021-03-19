@@ -4,7 +4,7 @@ from app import db
 from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent
 from app.dao.common import get_charge_types
 from app.dao.database import commit_to_database
-from app.main.common import get_paytype, get_paytype_id, get_paytypes
+from app.main.common import PayTypes
 
 
 def get_incomes(acc_id):
@@ -60,7 +60,7 @@ def get_income_dict(type):
     acc_descs = [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
     acc_descs_all = acc_descs
     acc_descs_all.insert(0, "all accounts")
-    paytypes = get_paytypes()
+    paytypes = PayTypes.names()
     paytypes_all = paytypes
     paytypes_all.insert(0, "all payment types")
     income_dict = {

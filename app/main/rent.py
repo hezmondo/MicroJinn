@@ -9,23 +9,21 @@ from app.dao.common import get_deed_id
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propertyaddrs
 from app.dao.rent import get_rent, post_rent
-from app.main.common import get_actype, get_actype_id, get_advarrdet, get_advarr_id, get_freq, get_freq_id,  \
-    get_mailto_id, get_prdelivery, get_prdelivery_id, get_salegrade, get_salegrade_id, get_status, get_status_id, \
-    get_tenure, get_tenure_id, inc_date_m
+from app.main.common import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.models import Rent
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
-    if agent_id and agent_id != 0 and mailto_id in (1, 2):
-        agent = get_agent(agent_id)
+    if mailto_id == 1 or mailto_id == 2:
+        agent = get_agent(agent_id) or "set as mail to agent but no agent found"
         mailaddr = agent.detail
         if mailto_id == 2:
             mailaddr = tenantname + 'care of' + mailaddr
     else:
         propaddr = get_propaddr(rent_id)
         if mailto_id == 4:
-            mailaddr = 'the owner or occupier' + propaddr
+            mailaddr = 'The owner or occupier, ' + propaddr
         else:
             mailaddr = tenantname + ', ' + propaddr
 
@@ -60,23 +58,23 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 def get_rentp(rent_id):
     # returns a mutable dict with Rent (full) plus joined and derived variables for rent screen, mail, payrequest
     rent = get_rent(rent_id)
-    rent.actypedet = get_actype(rent.actype_id)
-    rent.advarrdet = get_advarrdet(rent.advarr_id)
+    rent.actypedet = AcTypes.get_name(rent.actype_id)
+    rent.advarrdet = AdvArr.get_name(rent.advarr_id)
     rent.charges = get_charges_rent(rent_id)
     rent.totcharges = get_totcharges(rent.charges)
-    rent.freqdet = get_freq(rent.freq_id)
+    rent.freqdet = Freqs.get_name(rent.freq_id)
     rent.mailaddr = get_mailaddr(rent_id, rent.agent_id, rent.mailto_id, rent.tenantname)
+    rent.mailto = MailTos.get_name(rent.mailto_id)
     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
-    rent.prdeliverydet = get_prdelivery(rent.prdelivery_id)
+    rent.prdeliverydet = PrDeliveryTypes.get_name(rent.prdelivery_id)
     rent.propaddr = get_propaddr(rent_id)
     rent.rent_gale = get_rent_gale(rent.nextrentdate, rent.freq_id, rent.rentpa)
-    rent.tenuredet = get_tenure(rent.tenure_id)
+    rent.tenuredet = Tenures.get_name(rent.tenure_id)
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
-    rent.salegrade = get_salegrade(rent.salegrade_id)
-    rent.statusdet = get_status(rent.status_id)
-    rent.sort_code = rent.landlord.money_account.sort_code
+    rent.salegrade = SaleGrades.get_name(rent.salegrade_id)
+    rent.statusdet = Statuses.get_name(rent.status_id)
 
     return rent
 
@@ -270,24 +268,26 @@ def rent_validation(rent, message=""):
 
 def update_rent_rem(rent_id):
     rent = Rent.query.get(rent_id)
-    rent.actype_id = get_actype_id(request.form.get("actype"))
-    rent.advarr_id = get_advarr_id(request.form.get("advarr"))
+    rent.actype_id = AcTypes.get_id(request.form.get("actype"))
+    rent.advarr_id = AdvArr.get_id(request.form.get("advarr"))
     rent.arrears = strToDec(request.form.get("arrears"))
     # we need code to generate datecode_id from lastrentdate with user choosing sequence:
     # rent.datecode_id = int(request.form.get("datecode_id"))
     rent.deed_id = get_deed_id(request.form.get("deedcode"))
-    rent.freq_id = get_freq_id(request.form.get("frequency"))
+    rent.freq_id = Freqs.get_id(request.form.get("frequency"))
     rent.landlord_id = get_landlord_id(request.form.get("landlord"))
     rent.lastrentdate = request.form.get("lastrentdate")
     price = request.form.get("price")
-    rent.prdelivery_id = get_advarr_id(request.form.get("advarr"))
+    rent.prdelivery_id = AdvArr.get_id(request.form.get("advarr"))
     rent.price = price if (price and price != 'None') else Decimal(0)
     rent.rentpa = strToDec(request.form.get("rentpa"))
-    rent.salegrade_id = get_salegrade_id(request.form.get("salegrade"))
+    rent.salegrade_id = SaleGrades.get_id(request.form.get("salegrade"))
     rent.source = request.form.get("source")
-    rent.status_id = get_status_id(request.form.get("status"))
-    rent.tenure_id = get_tenure_id(request.form.get("tenure"))
-    post_rent(rent)
+    rent.status_id = Statuses.get_id(request.form.get("status"))
+    rent.tenure_id = Tenures.get_id(request.form.get("tenure"))
+    rent_id = post_rent(rent)
+
+    return rent_id
 
 
 def update_roll_rent(rent_id, last_rent_date, arrears):
@@ -306,9 +306,9 @@ def update_rollback_rent(rent_id, arrears):
 def update_tenant(rent_id):
     rent = Rent.query.get(rent_id)
     rent.tenantname = request.form.get("tenantname")
-    rent.mailto_id = get_mailto_id(request.form.get("mailto"))
+    rent.mailto_id = MailTos.get_id(request.form.get("mailto"))
     rent.email = request.form.get("email")
-    rent.prdelivery_id = get_prdelivery_id(request.form.get("prdelivery"))
+    rent.prdelivery_id = PrDeliveryTypes.get_id(request.form.get("prdelivery"))
     rent.note = request.form.get("note")
     rent_id = post_rent(rent)
 
