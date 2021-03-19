@@ -1,5 +1,7 @@
+import json
 from app import db, cache
 from flask import request
+from flask_login import current_user
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Income, \
@@ -120,6 +122,25 @@ def get_doc_types():
 
     return doc_types
 
+
+def get_idlist_recent(type):
+    try:
+        id_list = json.loads(getattr(current_user, type))
+    except (AttributeError, TypeError, ValueError):
+        id_list = [1, 2, 3]
+
+    return id_list
+
+
+def pop_idlist_recent(type, id):
+    id_list = get_idlist_recent(type)
+    if id in id_list:
+        id_list.remove(id)
+    id_list.insert(0, id)
+    if len(id_list) > 15:
+        id_list.pop()
+    setattr(current_user, type, json.dumps(id_list))
+    commit_to_database()
 
 def get_uplift_types():
     uplift_types = LeaseUpType.query.all()

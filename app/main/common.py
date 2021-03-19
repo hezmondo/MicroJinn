@@ -1,7 +1,5 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
-import json
 from dateutil.relativedelta import relativedelta
-from flask_login import current_user
 from app.dao.common import get_dates_m
 from app.models import Jstore, Landlord, TypeDeed
 
@@ -105,15 +103,6 @@ class HrStatuses:
     @staticmethod
     def get_id(name):
         return HrStatuses._names.index(name) + 1
-
-
-def get_idlist_recent(type):
-    try:
-        id_list = json.loads(getattr(current_user, type))
-    except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
-
-    return id_list
 
 
 class MailTos:

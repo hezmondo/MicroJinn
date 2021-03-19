@@ -1,8 +1,9 @@
 import json
 from flask import request
-from app.main.common import AdvArr, get_idlist_recent, PrDeliveryTypes, inc_date_m
+from app.main.common import AdvArr, PrDeliveryTypes, inc_date_m
 from app.main.functions import strToDate
 from app.main.rent import get_propaddr
+from app.dao.common import get_idlist_recent
 from app.dao.rent import get_rent_sdata, post_rent__filter
 from app.models import Agent, RentExternal, Jstore, Landlord, Property, Rent
 

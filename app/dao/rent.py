@@ -3,7 +3,8 @@ from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
-from app.dao.database import commit_to_database, pop_idlist_recent
+from app.dao.common import pop_idlist_recent
+from app.dao.database import commit_to_database
 from app.models import Jstore, ManagerExt, PrHistory, Rent, RentExternal
 
 
