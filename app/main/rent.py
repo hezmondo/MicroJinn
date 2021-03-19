@@ -16,10 +16,12 @@ from app.models import Rent
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
     if mailto_id == 1 or mailto_id == 2:
-        agent = get_agent(agent_id) or "set as mail to agent but no agent found"
-        mailaddr = agent.detail
+        # agent = get_agent(agent_id) or "set as mail to agent but no agent found"
+        # mailaddr = agent.detail
+        agent = get_agent(agent_id)
+        mailaddr = agent.detail if agent else "(set as mail to agent but no agent found)"
         if mailto_id == 2:
-            mailaddr = tenantname + 'care of' + mailaddr
+            mailaddr = tenantname + ' care of ' + mailaddr
     else:
         propaddr = get_propaddr(rent_id)
         if mailto_id == 4:
