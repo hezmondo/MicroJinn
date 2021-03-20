@@ -21,9 +21,9 @@ def get_agents():
     else:
         list = get_idlist_recent("recent_agents")
         filter.append(Agent.id.in_(list))
-    agents = get_agents_set(filter, list)
+    agents = get_agents_set(filter)
 
-    return agents
+    return agents, list
 
 
 def update_agent(agent_id, rent_id):

@@ -315,4 +315,3 @@ def inc_date_m(date1, frequency, datecode_id, periods):
                 date2 = date2.replace(day=item[2])
 
     return date2
-

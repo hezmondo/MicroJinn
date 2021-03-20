@@ -84,26 +84,21 @@ def get_rent_sdata(qfilter, action, runsize):
     return rent_s
 
 
-def post_rent_agent(agent_id, rent_id):
-    message = ""
-    try:
-        if rent_id != 0:
-            rent = Rent.query.get(rent_id)
-            if agent_id != 0:
-                rent.agent_id = agent_id
-                message = "Success! This rent has been linked to a new agent. Please review the rent\'s mail address."
-            else:
-                rent.agent_id = None
-                message = "Success! This rent no longer has an agent."
-                # change mailto from agent to tenant
-                if rent.mailto_id == 1 or 2:
-                    rent.mailto_id = 3
-                    message += " The mail address has been set to tenant name at the property."
-        commit_to_database()
-    except Exception as ex:
-        message = f"Update rent failed. Error:  {str(ex)}"
+def post_rent_agent_unlink(rent_id):
+    rent = Rent.query.get(rent_id)
+    rent.agent_id = None
+    # change mailto to tenant
+    if rent.mailto_id == 1 or 2:
+        rent.mailto_id = 3
+    commit_to_database()
 
-    return message
+
+def post_rent_agent_update(agent_id, rent_id):
+    rent = Rent.query.get(rent_id)
+    rent.agent_id = agent_id
+    # change mailto to agent
+    rent.mailto_id = 1
+    commit_to_database()
 
 
 def post_rent__filter(filterdict):
