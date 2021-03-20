@@ -489,6 +489,10 @@ class Rent(db.Model):
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
 
+    def funcnextrentdate(self):
+        from app.main.common import inc_date_m
+        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
+
 
 class Rental(db.Model):
     __tablename__ = 'rental'

@@ -75,7 +75,8 @@
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>
             <td style="width: 8.00%"> {{ item.arrears }}</td>
-            <td style="width: 10.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
+            <!-- <td style="width: 10.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td> -->
+            <td style="width: 10.00%"> {{ item.funcnextrentdate().strftime('%d-%b-%Y') }}</td>
             <td style="width: 15.00%"> {{ item.tenantname }}</td>
             <td style="width: 20.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
