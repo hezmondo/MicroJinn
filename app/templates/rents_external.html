@@ -1,4 +1,4 @@
-<!-- /templates/rents_ex.html  -->
+<!-- /templates/rents_external.html  -->
 {% extends 'base.html' %}
 
 {% block app_content %}
@@ -7,26 +7,26 @@
         <div class="col-md-2">
             <label for="rentcode">rentcode starts with:</label>
             <input type="text" class="form-control" name="rentcode" placeholder="any"
-                   value="{{ filterdict.rentcode }}">
+                   value="{{ fdict.rentcode }}">
         </div>
         <div class="col-md-2">
             <label for="tenantname">tenant name:</label>
             <input type="text" class="form-control" name="tenantname" placeholder="any"
-                   value="{{ filterdict.tenantname }}">
+                   value="{{ fdict.tenantname }}">
         </div>
         <div class="col-md-2">
             <label for="propaddr">property details:</label>
             <input type="text" class="form-control" name="propaddr" placeholder="any"
-                   value="{{ filterdict.propaddr }}">
+                   value="{{ fdict.propaddr }}">
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
-            <input type="text" class="form-control" name="source" placeholder="any" value="{{ filterdict.source }}">
+            <input type="text" class="form-control" name="source" placeholder="any" value="{{ fdict.source }}">
         </div>
         <div class="col-md-2">
             <label for="agentdetail">agent details:</label>
             <input type="text" class="form-control" name="agentdetail" placeholder="any"
-                   value="{{ filterdict.agentdetail }}">
+                   value="{{ fdict.agentdetail }}">
         </div>
         <div class="col-md-2">
             <label for="count">count:</label>
@@ -38,7 +38,7 @@
             <button type="submit" class="btn btn-block btn-success  button-icon search" role="button">search</button>
         </div>
         <div class="col-md-3">
-            <button type="submit" formaction="{{ url_for('util_bp.home') }}"
+            <button type="submit" formaction="{{ url_for('rent_bp.rents') }}"
                     class="btn btn-block btn-success  button-icon search" role="button">search main</button>
         </div>
     </div>
@@ -66,7 +66,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rent_s %}
+        {% for item in rents %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>
@@ -76,7 +76,7 @@
             <td style="width: 18.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
             <td style="width: 18.00%"> {{ item.agentdetail }}</td>
-            <td style="width: 9.00%" class="vertical-align"><a href="{{ url_for('util_bp.rent_external', rent_external_id=item.id) }}"
+            <td style="width: 9.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent_external', rent_external_id=item.id) }}"
                                         class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
         </tr>
         {% endfor %}

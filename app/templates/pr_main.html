@@ -17,7 +17,7 @@
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="rent_s">
+    <table class="table" id="rents">
         <thead>
         <tr>
             <th style="width: 8.00%">rentcode</th>
@@ -32,7 +32,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rent_s %}
+        {% for item in rents %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>

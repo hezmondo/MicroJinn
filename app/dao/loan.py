@@ -3,7 +3,7 @@ from app import db
 from flask import request
 from sqlalchemy import func
 from app.dao.database import commit_to_database
-from app.main.common import Freqs
+from app.dao.common import AdvArr, Freqs
 from app.models import Loan, LoanStat
 
 
@@ -44,12 +44,8 @@ def post_loan(loan_id):
     loan.code = request.form.get("loancode")
     loan.interest_rate = request.form.get("interest_rate")
     loan.end_date = request.form.get("end_date")
-    frequency = request.form.get("frequency")
-    loan.frequency = \
-        TypeFreq.query.with_entities(TypeFreq.id).filter(TypeFreq.freqdet == frequency).one()[0]
-    advarr = request.form.get("advarr")
-    loan.advarr_id = \
-        TypeAdvArr.query.with_entities(TypeAdvArr.id).filter(TypeAdvArr.advarrdet == advarr).one()[0]
+    loan.freq_id = Freqs.get_id(request.form.get("frequency"))
+    loan.advarr_id = AdvArr.get_id(request.form.get("advarr"))
     loan.lender = request.form.get("lender")
     loan.borrower = request.form.get("borrower")
     loan.notes = request.form.get("notes")

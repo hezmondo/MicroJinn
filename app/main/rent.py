@@ -1,3 +1,4 @@
+import json
 from datetime import date
 from flask import request
 from math import ceil
@@ -5,13 +6,15 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import get_deed_id
+from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_stored, MailTos, \
+    PrDeliveryTypes, SaleGrades, Statuses, Tenures
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propertyaddrs
-from app.dao.rent import get_rent, post_rent
-from app.main.common import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures, inc_date_m
+from app.dao.rent import get_rent, get_rents, get_rents_adv, get_rents_ext, post_rent, post_rent_filter
+from app.main.common import get_idlist_recent, get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
-from app.models import Rent
+from app.main.rent_filter import get_filter_advanced
+from app.models import Agent, Rent, RentExternal
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
@@ -30,12 +33,6 @@ def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
             mailaddr = tenantname + ', ' + propaddr
 
     return mailaddr
-
-
-def get_propaddr(rent_id):
-    p_addrs = get_propertyaddrs(rent_id)
-    p_addr = '; '.join(each.propaddr.strip() for each in p_addrs)
-    return p_addr
 
 
 def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentpa):
@@ -57,10 +54,29 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
         return paidtodate
 
 
+def get_propaddr(rent_id):
+    p_addrs = get_propertyaddrs(rent_id)
+    p_addr = '; '.join(each.propaddr.strip() for each in p_addrs)
+    return p_addr
+
+
+def get_rent_gale(next_rent_date, frequency, rentpa):
+    if rentpa == 0 or frequency not in (2, 4):
+        return money(rentpa)
+    missing_pennies = (rentpa * 100) % frequency
+    if missing_pennies == 0:
+        return money(rentpa / frequency)
+    rent_gale = money(round_decimals_down(rentpa / frequency))
+    if (frequency == 2 and next_rent_date.month > 6) or (frequency == 4 and next_rent_date.month > 9):
+        return rent_gale + (missing_pennies / 100)
+    else:
+        return money(rent_gale)
+
+
 def get_rentp(rent_id):
     # returns a mutable dict with Rent (full) plus joined and derived variables for rent screen, mail, payrequest
     rent = get_rent(rent_id)
-    rent.actypedet = AcTypes.get_name(rent.actype_id)
+    rent.actype = AcTypes.get_name(rent.actype_id)
     rent.advarrdet = AdvArr.get_name(rent.advarr_id)
     rent.charges = get_charges_rent(rent_id)
     rent.totcharges = get_totcharges(rent.charges)
@@ -79,19 +95,6 @@ def get_rentp(rent_id):
     rent.statusdet = Statuses.get_name(rent.status_id)
 
     return rent
-
-
-def get_rent_gale(next_rent_date, frequency, rentpa):
-    if rentpa == 0 or frequency not in (2, 4):
-        return money(rentpa)
-    missing_pennies = (rentpa * 100) % frequency
-    if missing_pennies == 0:
-        return money(rentpa / frequency)
-    rent_gale = money(round_decimals_down(rentpa / frequency))
-    if (frequency == 2 and next_rent_date.month > 6) or (frequency == 4 and next_rent_date.month > 9):
-        return rent_gale + (missing_pennies / 100)
-    else:
-        return money(rent_gale)
 
 
 def get_rent_strings(rent, type='mail'):
@@ -228,6 +231,79 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
                         sold off or terminated"
 
     return rent_owing
+
+
+def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
+    fdict = get_rents_fdict('advanced')
+    filtr = []
+    if action == "load":        # load predefined filter dictionary from jstore
+        fdict = get_filter_stored(filtr_id)
+        fdict = json.loads(fdict.content)
+        for key, value in fdict.items():
+            fdict[key] = value
+    # now we construct advanced sqlalchemy filter using this filter dictionary
+    filtr, fdict = get_filter_advanced(fdict)
+    if action == "save":
+        post_rent_filter(fdict)
+    # now get filtered rent objects for this filter
+    rents = get_rents_adv(filtr, 50)
+    # for rent in rents:
+    #     rent.advarr = AdvArr.get_name(rent.advarr_id)
+    #     rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
+    #     rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
+    #     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
+    #     rent.propaddr = get_propaddr(rent.id)
+
+    return fdict, rents
+
+
+def get_rents_basic():  # get rents for home rents page with simple search option
+    dict = get_rents_fdict()
+    filtr = []
+    if request.method == "GET":
+        id_list = get_idlist_recent("recent_rents")
+        filtr.append(Rent.id.in_(id_list))
+    else:  # create filter from post values
+        for key, value in dict.items():
+            val = request.form.get(key) or ""
+            dict[key] = val
+        if dict.get('rentcode') and dict.get('rentcode') != "":
+            filtr.append(Rent.rentcode.startswith([dict.get('rentcode')]))
+        if dict.get('agentdetail') and dict.get('agentdetail') != "":
+            filtr.append(Agent.detail.ilike('%{}%'.format(dict.get('agentdetail'))))
+        if dict.get('propaddr') and dict.get('propaddr') != "":
+            filtr.append(Rent.propaddr.ilike('%{}%'.format(dict.get('propaddr'))))
+        if dict.get('source') and dict.get('source') != "":
+            filtr.append(Rent.source.ilike('%{}%'.format(dict.get('source'))))
+        if dict.get('tenantname') and dict.get('tenantname') != "":
+            filtr.append(Rent.tenantname.ilike('%{}%'.format(dict.get('tenantname'))))
+    rents = get_rents(filtr)
+    for rent in rents:
+        rent.propaddr = get_propaddr(rent.id)
+
+    return dict, rents
+
+
+def get_rents_external():
+    dict = get_rents_fdict()
+    if request.method == "POST":    #create filter from post values
+        for key, value in dict.items():
+            val = request.form.get(key) or ""
+            dict[key] = val
+    filtr = []
+    if dict.get('rentcode') and dict.get('rentcode') != "":
+        filtr.append(RentExternal.rentcode.startswith([dict.get('rentcode')]))
+    if dict.get('agentdetail') and dict.get('agentdetail') != "":
+        filtr.append(RentExternal.agentdetail.ilike('%{}%'.format(dict.get('agentdetail'))))
+    if dict.get('propaddr') and dict.get('propaddr') != "":
+        filtr.append(RentExternal.propaddr.ilike('%{}%'.format(dict.get('propaddr'))))
+    if dict.get('source') and dict.get('source') != "":
+        filtr.append(RentExternal.source.ilike('%{}%'.format(dict.get('source'))))
+    if dict.get('tenantname') and dict.get('tenantname') != "":
+        filtr.append(RentExternal.tenantname.ilike('%{}%'.format(dict.get('tenantname'))))
+    rents = get_rents_ext(filtr)
+
+    return dict, rents
 
 
 def get_rent_stat(rent, rent_strings):

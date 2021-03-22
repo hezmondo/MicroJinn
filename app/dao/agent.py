@@ -16,18 +16,12 @@ def get_agent_id(agent_detail):
     return db.session.query(Agent).filter_by(detail=agent_detail).first()
 
 
-def get_agent_rents(agent_id, type='rent'):
-    if agent_id and agent_id != 0:
-        if type == 'rent':
-            agent_rents = db.session.query(Rent).filter_by(agent_id=agent_id) \
-                .options(load_only('id', 'rentcode', 'tenantname')).all()
-        else:
-            agent_rents = db.session.query(Headrent).filter_by(agent_id=agent_id) \
-                .options(load_only('id', 'code', 'propaddr')).all()
-    else:
-        agent_rents = None
+def get_agent_rents(agent_id):
+    return db.session.query(Rent).filter_by(agent_id=agent_id).options(load_only('id', 'rentcode', 'tenantname')).all()
 
-    return agent_rents
+
+def get_agent_headrents(agent_id):
+    return db.session.query(Headrent).filter_by(agent_id=agent_id).options(load_only('id', 'code', 'propaddr')).all()
 
 
 def post_agent(agent, agent_id, rent_id):

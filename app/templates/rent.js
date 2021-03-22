@@ -7,9 +7,9 @@ $(document).ready(function(){
         $('#statusdet').removeClass("light-purple");
         $('#statusdet').addClass("light-red");
     }
-    if ($('#actypedet').text() == 'normal actype') {
-        $('#actypedet').removeClass("light-purple");
-        $('#actypedet').addClass("light-green");
+    if ($('#actype').text() == 'normal actype') {
+        $('#actype').removeClass("light-purple");
+        $('#actype').addClass("light-green");
     }
     //copy text from readonly input on click
     $('.copyable-input').click(function(e) {

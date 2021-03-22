@@ -12,7 +12,7 @@
     </div>
     {% else %}
     <div class="col-md-3">
-        <a href="{{ url_for('util_bp.agents') }}"
+        <a href="{{ url_for('agent_bp.agents') }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to agents</a>
     </div>
     {% endif %}
@@ -193,7 +193,7 @@
                            role="button">edit agent
                         </a>
                         {% if rent_id != 0 and action == 'from_rent' %}
-                        <a href="{{ url_for('util_bp.agents', agent_id=agent.id, rent_id=rent_id, rentcode=rentcode) }}"
+                        <a href="{{ url_for('agent_bp.agents', agent_id=agent.id, rent_id=rent_id, rentcode=rentcode) }}"
                            class="btn btn-block btn-primary button-icon sync" role="button">change agent for {{ rentcode
                             }}
                         </a>
@@ -205,7 +205,7 @@
                            data-target="#agent_modal"
                            class="btn btn-primary btn-block button-icon plus"
                            role="button">add new agent to rent {{ rentcode }}</a>
-                        <a href="{{ url_for('util_bp.agents', agent_id=agent.id, rent_id=rent_id, rentcode=rentcode) }}"
+                        <a href="{{ url_for('agent_bp.agents', agent_id=agent.id, rent_id=rent_id, rentcode=rentcode) }}"
                            class="btn btn-block btn-primary button-icon sync" role="button">link existing agent to {{
                             rentcode }}
                         </a>
@@ -266,7 +266,7 @@
                              <div class="row flex-row-reverse align-items-end">
                                 <div class="col" style="margin-bottom:20px;">
                                     <a type="button" class="btn btn-block btn-primary button-icon circles"
-                                       href="{{ url_for('util_bp.agent', agent_id=agent.id, rent_id=rent_id,
+                                       href="{{ url_for('agent_bp.agent', agent_id=agent.id, rent_id=rent_id,
                                        action='from_agent') }}">
                                         view associated rents
                                     </a>
@@ -276,7 +276,7 @@
                             <div class="row flex-row-reverse align-items-end">
                                 <div class="col" style="margin-bottom:20px;">
                                 <button type="submit" class="btn btn-block btn-warning button-icon minus"
-                                        formaction="{{ url_for('util_bp.agent_unlink', rent_id=rent_id) }}">
+                                        formaction="{{ url_for('agent_bp.agent_unlink', rent_id=rent_id) }}">
                                         unlink from {{ rentcode }}
                                 </button>
                                 </div>
@@ -293,14 +293,14 @@
                                 {% if (rents|length + headrents|length) > 1 %}
                                 <div class="col-md-6">
                                 <button type="submit" class="btn btn-block btn-warning button-icon minus"
-                                        formaction="{{ url_for('util_bp.agent_unlink', rent_id=rent_id) }}">
+                                        formaction="{{ url_for('agent_bp.agent_unlink', rent_id=rent_id) }}">
                                         unlink from {{ rentcode }}
                                 </button>
                                 </div>
                                 {% else %}
                                 <div class="col-md-6">
                                     <button type="submit" class="btn btn-block btn-danger button-icon trash"
-                                            formaction="{{ url_for('util_bp.agent_delete', agent_id=agent.id,
+                                            formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id,
                                             rent_id=rent_id) }}">delete agent
                                     </button>
                                 </div>
@@ -309,7 +309,7 @@
                                 {% if (rents|length + headrents|length) == 1 %}
                                 <div class="col-md-6">
                                     <button type="submit" class="btn btn-block btn-danger button-icon trash"
-                                            formaction="{{ url_for('util_bp.agent_delete', agent_id=agent.id) }}">
+                                            formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id) }}">
                                         delete agent
                                     </button>
                                 </div>
@@ -318,7 +318,7 @@
                         {% else %}
                                 <div class="col-md-6">
                                     <button type="submit" class="btn btn-block btn-danger button-icon trash"
-                                            formaction="{{ url_for('util_bp.agent_delete', agent_id=agent.id) }}">
+                                            formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id) }}">
                                         delete agent
                                     </button>
                                 </div>
@@ -372,7 +372,7 @@
                             <div class="row align-items-end" style="margin-top: 20px;">
                                 <div class="col">
                                     <a type="button" class="btn btn-block btn-primary button-icon circles"
-                                       href="{{ url_for('util_bp.agent', agent_id=agent.id,
+                                       href="{{ url_for('agent_bp.agent', agent_id=agent.id,
                                        rent_id=rent_id, action='from_agent') }}">view associated rents
                                     </a>
                                 </div>

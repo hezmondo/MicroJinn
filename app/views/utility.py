@@ -1,112 +1,12 @@
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
-from app.dao.agent import get_agent, get_agent_rents
-from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
+from app.dao.common import delete_record, get_deed, get_deed_types, post_deed, PropTypes
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
-from app.dao.filter import get_rent_s
-from app.dao.database import pop_idlist_recent
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.dao.property import get_properties, get_property, get_prop_types, post_property
-from app.dao.rent import get_rent_external, post_rent_agent_unlink, post_rent_agent_update
 from app.email import test_email_connect, test_send_email
-from app.main.agent import get_agents, update_agent
-from app.main.common import PropTypes
 
 util_bp = Blueprint('util_bp', __name__)
-
-
-# TODO: move agent routes into views/agent, then simply routes so that the heavy lifting occurs in main/agent
-@util_bp.route('/agent/<int:agent_id>', methods=["GET", "POST"])
-@login_required
-def agent(agent_id):
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    rentcode = request.args.get('rentcode', "ABC1", type=str)
-    action = request.args.get('action', type=str)
-    rents = None
-    headrents = None
-    if request.method == "POST":
-        agent_id, message = update_agent(agent_id, rent_id)
-        if rent_id != 0:
-            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-    if agent_id == 0:
-        agent = {"id": 0, "detail": "", "email": "", "note": "", "code": ""}
-    else:
-        # update the user recent_agents before we do the main database work
-        pop_idlist_recent("recent_agents", agent_id)
-        agent = get_agent(agent_id)
-        rents = get_agent_rents(agent_id, 'rent')
-        headrents = get_agent_rents(agent_id, 'headrent')
-    return render_template('agent.html', action=action, agent=agent, rent_id=rent_id, rentcode=rentcode,
-                           rents=rents, headrents=headrents)
-
-
-@util_bp.route('/agent_delete/<int:agent_id>', methods=["GET", "POST"])
-@login_required
-def agent_delete(agent_id):
-    if request.method == "POST":
-        rent_id = request.args.get('rent_id', 0, type=int)
-        message = ""
-        try:
-            if rent_id != 0:
-                post_rent_agent_unlink(rent_id)
-                message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
-            delete_record(agent_id, 'agent')
-            message += "The agent has been deleted. "
-        except Exception as ex:
-            message = f"Error deleting agent: {str(ex)}"
-        if rent_id == 0:
-            return redirect(url_for('util_bp.agents'))
-        else:
-            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-
-
-# TODO: Remove agent_rents route
-@util_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
-@login_required
-def agent_rents(agent_id):
-    type = request.args.get('type', "rent", type=str)
-    agent = get_agent(agent_id)
-    agent_rents = get_agent_rents(agent_id, type)
-    return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, type=type)
-
-
-@util_bp.route('/agent_unlink/<int:rent_id>', methods=["GET", "POST"])
-@login_required
-def agent_unlink(rent_id):
-    if request.method == "POST":
-        try:
-            post_rent_agent_unlink(rent_id)
-            message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
-        except Exception as ex:
-            message = f"Error deleting agent: {str(ex)}"
-        return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-
-
-@util_bp.route('/agents', methods=['GET', 'POST'])
-@login_required
-def agents():
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    rentcode = request.args.get('rentcode', "ABC1", type=str)
-    agent_id = request.args.get('agent_id', 0, type=int)
-    agents, list = get_agents()
-    if request.method == 'GET':
-        agents = sorted(agents, key=lambda o: list.index(o.id))
-    return render_template('agents.html', agents=agents, agent_id=agent_id, rent_id=rent_id, rentcode=rentcode)
-
-
-@util_bp.route('/agents_select', methods=['GET', 'POST'])
-@login_required
-def agents_select():
-    rent_id = request.args.get('rent_id', type=int)
-    agent_id = request.args.get('agent_id', type=int)
-    # TODO: refactor message from post_rent_agent
-    try:
-        post_rent_agent_update(agent_id, rent_id)
-        message = "Success! This rent has been linked to a new agent. Mail is set to agent. " \
-                  "Please review the rent\'s mail address."
-    except Exception as ex:
-        message = f'Unable to update rent. Database write failed with error: {str(ex)}'
-    return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
 @util_bp.route('/deed/<int:deed_id>', methods=["GET", "POST"])
@@ -159,14 +59,6 @@ def email_accs():
     return render_template('email_accs.html', emailaccs=emailaccs)
 
 
-@util_bp.route('/', methods=['GET', 'POST'])
-@util_bp.route('/home', methods=['GET', 'POST'])
-@login_required
-def home():
-    filterdict, rent_s = get_rent_s("basic", 0)
-    return render_template('home.html', filterdict=filterdict, rent_s=rent_s)
-
-
 @util_bp.route('/landlord/<int:landlord_id>', methods=['GET', 'POST'])
 @login_required
 def landlord(landlord_id):
@@ -208,22 +100,6 @@ def properties(rent_id):
     print(rent_id)
 
     return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
-
-
-@util_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])
-@login_required
-def rent_external(rent_external_id):
-    rent_external = get_rent_external(rent_external_id)
-
-    return render_template('rent_external.html', rent_external=rent_external)
-
-
-@util_bp.route('/rents_ex', methods=['GET', 'POST'])
-@login_required
-def rents_ex():
-    filterdict, rent_s = get_rent_s("external", 0)
-
-    return render_template('rents_ex.html', filterdict=filterdict, rent_s=rent_s)
 
 
 @util_bp.route('/test_emailing', methods=['GET'])

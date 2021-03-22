@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for, json
 from flask_login import login_required
 from app.forms import PrPostForm
-from app.dao.filter import get_filters
+from app.dao.common import get_filters
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
 from app.main.mail import get_mail_pack
@@ -72,14 +72,14 @@ def pr_history(rent_id):
 # @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
 # @login_required
 # def pr_main(id):
-#     actypedets, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
+#     actypes, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
 #     landlords, statusdets, tenuredets = get_queryoptions_common()
 #     if id == 0:
 #         rentprops = get_rentobjs_filter(1)
 #     else:
 #         rentprops = get_rentobjs_filter(id)
 #
-#     return render_template('pr_main.html', actypedets=actypedets, floads=floads, options=options,
+#     return render_template('pr_main.html', actypes=actypes, floads=floads, options=options,
 #                            prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
 #                            statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
 
