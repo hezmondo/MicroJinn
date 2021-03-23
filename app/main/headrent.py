@@ -2,7 +2,8 @@ from flask import request
 from app.dao.agent import get_agent_id
 from app.dao.headrent import get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
-from app.main.common import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures, inc_date_m
+from app.main.common import inc_date_m
+from app.dao.common import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 from app.main.functions import strToDec
 from app.models import Agent, Headrent
 
@@ -30,8 +31,8 @@ def get_headrents_p():
             filter.append(Agent.detail.ilike('%{}%'.format(agent)))
         status = request.form.getlist("status") or ""
         filterdict['status'] = status
-    #     have to work out how to do this
-
+    else:
+        filter.append(Headrent.status_id==1)
     headrents = get_headrents(filter)
     for headrent in headrents:
         headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)

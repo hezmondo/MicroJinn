@@ -2,7 +2,7 @@ from app.dao.form_letter import get_form_letter
 from app.dao.income import get_income_item
 from app.dao.lease import get_lease_variables
 from app.dao.rent import get_rent_md
-from app.main.common import PayTypes
+from app.dao.common import PayTypes
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_mailaddr, get_propaddr, get_rentp, get_rent_strings
 

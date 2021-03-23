@@ -161,6 +161,10 @@ class Headrent(db.Model):
     status_id = db.Column(db.Integer)
     tenure_id = db.Column(db.Integer)
 
+    def nextrentdate(self):
+        from app.main.common import inc_date_m
+        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
+
 
 class Income(db.Model):
     __tablename__ = 'income'
@@ -488,6 +492,10 @@ class Rent(db.Model):
 
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
+
+    def nextrentdate(self):
+        from app.main.common import inc_date_m
+        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
 
 
 class Rental(db.Model):
