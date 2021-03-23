@@ -1,8 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.agent import get_agent, get_agent_rents, get_agent_headrents
-from app.dao.common import delete_record
-from app.dao.database import pop_idlist_recent
+from app.dao.common import delete_record, pop_idlist_recent
 from app.dao.rent import post_rent_agent_unlink, post_rent_agent_update
 from app.main.agent import get_agents, update_agent
 

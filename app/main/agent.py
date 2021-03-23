@@ -1,5 +1,5 @@
 from flask import request
-from app.main.common import get_idlist_recent
+from app.dao.common import get_idlist_recent
 from app.dao.agent import get_agent, get_agents_set, post_agent
 from app.models import Agent
 

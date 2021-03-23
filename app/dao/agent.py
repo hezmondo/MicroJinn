@@ -1,6 +1,7 @@
 from sqlalchemy.orm import load_only
 from app import db
-from app.dao.database import commit_to_database, pop_idlist_recent
+from app.dao.common import pop_idlist_recent
+from app.dao.database import commit_to_database
 from app.models import Agent, Headrent, Rent
 
 

@@ -53,15 +53,6 @@ def get_combodict_filter():
     return combo_dict
 
 
-def get_idlist_recent(type):
-    try:
-        id_list = json.loads(getattr(current_user, type))
-    except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
-
-    return id_list
-
-
 def get_rents_fdict(action='basic'):
     # get simple filter dictionary for rents and rents external pages
     dict_basic = {

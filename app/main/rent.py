@@ -7,11 +7,11 @@ from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
 from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_stored, MailTos, \
-    PrDeliveryTypes, SaleGrades, Statuses, Tenures
+    PrDeliveryTypes, SaleGrades, Statuses, Tenures, get_idlist_recent
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propertyaddrs
 from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
-from app.main.common import get_idlist_recent, get_rents_fdict, inc_date_m
+from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import filter_advanced, filter_basic
 from app.models import Rent, RentExternal
