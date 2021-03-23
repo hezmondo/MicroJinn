@@ -88,7 +88,7 @@ def get_rents_fdict(action='basic'):
         "status": ["all statuses"],
         "tenure": ["all tenures"]
     }
-    return dict_basic if action in ("basic", "external") else {**dict_basic, **dict_plus}
+    return dict_basic if action in ("basic", "external") else dict_plus
 
 
 def inc_date(date1, freq, num):

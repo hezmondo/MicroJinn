@@ -35,12 +35,12 @@ def rent(rent_id):
 
 
 @rent_bp.route('/', methods=['GET', 'POST'])
-@rent_bp.route('/rents', methods=['GET', 'POST'])
+@rent_bp.route('/rents_basic', methods=['GET', 'POST'])
 @login_required
-def rents():  # get rents for home rents page with simple search option
+def rents_basic():  # get rents_basic for home rents_basic page with simple search option
     fdict, rents = get_rents_basic()
 
-    return render_template('rents.html', fdict=fdict, rents=rents)
+    return render_template('rents_basic.html', fdict=fdict, rents=rents)
 
 
 @rent_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])

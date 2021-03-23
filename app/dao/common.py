@@ -244,7 +244,7 @@ class Tenures:
 def delete_record(item_id, item):
     id_2 = request.args.get('id_2')
     id_dict = {}
-    redir = "rent_bp.rents"
+    redir = "rent_bp.rents_basic"
     if item == "agent":
         Agent.query.filter_by(id=item_id).delete()
         redir = "agent_bp.agents"

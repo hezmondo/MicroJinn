@@ -10,11 +10,11 @@ from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_store
     PrDeliveryTypes, SaleGrades, Statuses, Tenures
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propertyaddrs
-from app.dao.rent import get_rent, get_rents, get_rents_adv, get_rents_ext, post_rent, post_rent_filter
+from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
 from app.main.common import get_idlist_recent, get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
-from app.main.rent_filter import get_filter_advanced
-from app.models import Agent, Rent, RentExternal
+from app.main.rent_filter import filter_advanced, filter_basic
+from app.models import Rent, RentExternal
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
@@ -234,25 +234,30 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
 
 
 def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
-    fdict = get_rents_fdict('advanced')
-    filtr = []
     if action == "load":        # load predefined filter dictionary from jstore
-        fdict = get_filter_stored(filtr_id)
-        fdict = json.loads(fdict.content)
-        for key, value in fdict.items():
-            fdict[key] = value
+        dict = get_filter_stored(filtr_id)
+        dict = json.loads(dict.content)
+        for key, value in dict.items():
+            dict[key] = value
+    else:
+        dict = get_rents_fdict('advanced')
     # now we construct advanced sqlalchemy filter using this filter dictionary
-    filtr, fdict = get_filter_advanced(fdict)
+    if request.method == "POST" or action == "load":
+        fdict, filtr = filter_advanced(dict)
+    else:
+        filtr = []
+        filtr.append(Rent.id > 0)
+        fdict = dict
     if action == "save":
         post_rent_filter(fdict)
     # now get filtered rent objects for this filter
-    rents = get_rents_adv(filtr, 50)
-    # for rent in rents:
-    #     rent.advarr = AdvArr.get_name(rent.advarr_id)
-    #     rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
-    #     rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
-    #     rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
-    #     rent.propaddr = get_propaddr(rent.id)
+    rents = getrents_advanced(filtr, 50)
+    for rent in rents:
+        # rent.advarr = AdvArr.get_name(rent.advarr_id)
+        # rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
+        # rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
+        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
+        rent.propaddr = get_propaddr(rent.id)
 
     return fdict, rents
 
@@ -263,21 +268,9 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
     if request.method == "GET":
         id_list = get_idlist_recent("recent_rents")
         filtr.append(Rent.id.in_(id_list))
-    else:  # create filter from post values
-        for key, value in dict.items():
-            val = request.form.get(key) or ""
-            dict[key] = val
-        if dict.get('rentcode') and dict.get('rentcode') != "":
-            filtr.append(Rent.rentcode.startswith([dict.get('rentcode')]))
-        if dict.get('agentdetail') and dict.get('agentdetail') != "":
-            filtr.append(Agent.detail.ilike('%{}%'.format(dict.get('agentdetail'))))
-        if dict.get('propaddr') and dict.get('propaddr') != "":
-            filtr.append(Rent.propaddr.ilike('%{}%'.format(dict.get('propaddr'))))
-        if dict.get('source') and dict.get('source') != "":
-            filtr.append(Rent.source.ilike('%{}%'.format(dict.get('source'))))
-        if dict.get('tenantname') and dict.get('tenantname') != "":
-            filtr.append(Rent.tenantname.ilike('%{}%'.format(dict.get('tenantname'))))
-    rents = get_rents(filtr)
+    else:
+        dict, filtr = filter_basic(dict)
+    rents = getrents_basic(filtr)
     for rent in rents:
         rent.propaddr = get_propaddr(rent.id)
 
@@ -301,7 +294,7 @@ def get_rents_external():
         filtr.append(RentExternal.source.ilike('%{}%'.format(dict.get('source'))))
     if dict.get('tenantname') and dict.get('tenantname') != "":
         filtr.append(RentExternal.tenantname.ilike('%{}%'.format(dict.get('tenantname'))))
-    rents = get_rents_ext(filtr)
+    rents = get_rentsexternal(filtr)
 
     return dict, rents
 
