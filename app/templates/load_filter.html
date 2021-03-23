@@ -19,7 +19,8 @@
             <td style="width: 10.00%">{{ item.code }}</td>
             <td style="width: 70.00%">{{ item.description}}</td>
             <td>
-                <a href="{{ url_for('filter_bp.filter', filter_id=item.id, action='load') }}" class="btn btn-danger">load</a>
+                <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id, action='load') }}"
+                   class="btn btn-danger">load</a>
             </td>
         </tr>
         {% endfor %}

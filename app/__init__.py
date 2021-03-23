@@ -65,6 +65,9 @@ def create_app(config_class=Config):
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
+    from .views.agent import agent_bp
+    app.register_blueprint(agent_bp, url_prefix='/views')
+
     from .views.charge import charge_bp
     app.register_blueprint(charge_bp, url_prefix='/views')
 
@@ -73,9 +76,6 @@ def create_app(config_class=Config):
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
-
-    from .views.filter import filter_bp
-    app.register_blueprint(filter_bp, url_prefix='/views')
 
     from .views.form_letter import form_letter_bp
     app.register_blueprint(form_letter_bp, url_prefix='/views')
@@ -105,10 +105,10 @@ def create_app(config_class=Config):
     app.register_blueprint(rental_bp, url_prefix='/views')
 
     from .views.rent import rent_bp
-    app.register_blueprint(rent_bp, url_prefix='/views')
+    app.register_blueprint(rent_bp)
 
     from .views.utility import util_bp
-    app.register_blueprint(util_bp)
+    app.register_blueprint(util_bp, url_prefix='/views')
 
     from .views.backup import backup_bp
     app.register_blueprint(backup_bp)

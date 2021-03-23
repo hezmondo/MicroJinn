@@ -6,21 +6,25 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentcode">rent code:</label>
-            <input type="text" class="form-control" name="rentcode" value="{{ rent_external.rentcode }}" readonly="true">
+            <input type="text" class="form-control" name="rentcode"
+                   value="{{ rent_external.rentcode }}" readonly="true">
         </div>
         <div class="col-md-8">
             <label for="propaddr">property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rent_external.propaddr }}" readonly="true">
+            <input type="text" class="form-control" name="propaddr"
+                   value="{{ rent_external.propaddr }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="manager">external manager:</label>
-            <input type="text" class="form-control" name="manager" value="{{ rent_external.codename }}" readonly="true">
+            <input type="text" class="form-control" name="manager"
+                   value="{{ rent_external.manager_external.codename }}" readonly="true">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-4">
             <label for="tenantname">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rent_external.tenantname }}" readonly="true">
+            <input type="text" class="form-control" name="tenantname"
+                   value="{{ rent_external.tenantname }}" readonly="true">
         </div>
         <div class="col-md-2">
             <label for="rentpa">rent pa:</label>
@@ -54,7 +58,8 @@
     <div class="form-group row">
         <div class="col-md-12">
             <label for="managerdetail">external manager details:</label>
-            <input type="text" class="form-control" name="managerdetail" value="{{ rent_external.detail }}" readonly="true">
+            <input type="text" class="form-control" name="managerdetail"
+                   value="{{ rent_external.manager_external.detail }}" readonly="true">
         </div>
     </div>
 </form>

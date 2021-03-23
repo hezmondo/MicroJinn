@@ -81,7 +81,7 @@
         </div>
         <div class="form-group col-md-2">
             <label for="actype">actype:</label>
-            {{ widgets.multiselect_as_select(name="actype", items=actypedets, items_selected=actype or actypedets) }}
+            {{ widgets.multiselect_as_select(name="actype", items=actypes, items_selected=actype or actypes) }}
         </div>
     </div>
     <div class="form-group row">
@@ -131,7 +131,7 @@
     </div>
 </form>
 <div class="table-fixed">
-    <table class="table" id="rent_s">
+    <table class="table" id="rents_basic">
         <thead>
         <tr>
             <th style="width: 8.00%">rentcode</th>
@@ -146,7 +146,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for item in rent_s %}
+        {% for item in rents %}
         <tr id="{{ item.id }}">
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>

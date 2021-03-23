@@ -2,7 +2,7 @@ from app import db
 from flask import request
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.main.common import PropTypes
+from app.dao.common import PropTypes
 from app.models import Property, Rent
 
 

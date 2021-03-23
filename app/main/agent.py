@@ -7,7 +7,7 @@ from app.models import Agent
 def get_agents():
     filter = []
     list = []
-    if request.method == "POST":    # get search parameters to create a filter
+    if request.method == "POST":    # unpack search parameters to create a filter
         detail = request.form.get("detail") or ""
         email = request.form.get("email") or ""
         note = request.form.get("note") or ""

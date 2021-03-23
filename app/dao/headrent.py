@@ -2,7 +2,7 @@ from app import db
 from flask import flash, redirect, url_for
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.main.common import Freqs, Statuses
+from app.dao.common import Freqs, Statuses
 from app.models import Headrent
 
 

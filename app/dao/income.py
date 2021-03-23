@@ -2,9 +2,8 @@ from flask import request
 from sqlalchemy import desc
 from app import db
 from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent
-from app.dao.common import get_charge_types
+from app.dao.common import get_charge_types, PayTypes
 from app.dao.database import commit_to_database
-from app.main.common import PayTypes
 
 
 def get_incomes(acc_id):

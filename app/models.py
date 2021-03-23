@@ -214,6 +214,9 @@ class Landlord(db.Model):
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
 
+    def nextrentdate(self):
+        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
+
 
 class Lease(db.Model):
     __tablename__ = 'lease'
@@ -489,7 +492,7 @@ class Rent(db.Model):
     def __repr__(self):
         return '<Rent {}>'.format(self.rentcode)
 
-    def funcnextrentdate(self):
+    def nextrentdate(self):
         from app.main.common import inc_date_m
         return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
 
