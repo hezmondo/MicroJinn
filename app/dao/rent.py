@@ -4,7 +4,7 @@ from flask import flash, redirect, url_for, request
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database, pop_idlist_recent
-from app.models import Jstore, PrHistory, Rent, RentExternal
+from app.models import Agent, Jstore, PrHistory, Property, Rent, RentExternal
 
 
 def check_pr_exists(rent_id):  # check if rent has record in pr_history
@@ -49,37 +49,16 @@ def get_rent_external(rent_id):
         .one_or_none()
 
 
-# def getrents_basic(filtr):        # simple filtered rents for main rents page
-#     return Property.query \
-#         .join(Rent) \
-#         .outerjoin(Agent) \
-#         .with_entities(Rent.id, Agent.detail, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-#                        func.mjinn.prop_addr(Rent.id).label('propaddr'),
-#                        Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname) \
-#         .filter(*filtr).limit(50).all()
-
-
 def getrents_basic(filtr):        # simple filtered rents for main rents page
-    return db.session.query(Rent) \
+    return db.session.query(Rent).join(Property) \
         .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
                            'rentpa', 'source', 'status_id', 'tenantname'),
              joinedload('agent').load_only('detail'),) \
         .filter(*filtr).order_by(Rent.rentcode).limit(30).all()
 
 
-# def getrents_advanced(filtr, runsize):    # filtered rents for advanced queries and payrequest pages
-#     return Rent.query \
-#         .join(Landlord) \
-#         .outerjoin(Agent) \
-#         .with_entities(Rent.id, Rent.advarr_id, Rent.arrears, Rent.freq_id, Rent.lastrentdate,
-#                        func.mjinn.prop_addr(Rent.id).label('propaddr'),
-#                        Rent.prdelivery_id, Rent.rentcode, Rent.rentpa, Rent.source, Rent.tenantname,
-#                        Agent.detail, Landlord.name, Property.propaddr)  \
-#         .filter(*filtr).order_by(Rent.rentcode).limit(runsize).all()
-#
-
 def getrents_advanced(filtr, runsize):    # filtered rents for advanced queries and payrequest pages
-    return db.session.query(Rent) \
+    return db.session.query(Rent).join(Property) \
         .options(load_only('id', 'advarr_id', 'arrears', 'freq_id', 'lastrentdate',
                                                         'prdelivery_id', 'rentcode', 'rentpa', 'tenantname'),
            joinedload('landlord').load_only('name'),
