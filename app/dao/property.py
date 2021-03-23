@@ -23,7 +23,7 @@ def get_properties(rent_id):
     properties = db.session.query(Property).options(joinedload('rent').load_only('rentcode')) \
         .filter(*qfilter).order_by(Property.propaddr).limit(50).all()
     for property in properties:
-        property.proptype = get_proptype(property.proptype_id)
+        property.proptype = PropTypes.get_name(property.proptype_id)
     proptypes = get_prop_types("plus")
 
     return properties, proptypes
@@ -58,7 +58,7 @@ def post_property(propertyid, rent_id):
         property = Property.query.get(propertyid)
     propaddr = request.form.get("propaddr")
     property.propaddr = propaddr
-    property.proptype_id = get_proptype_id(request.form.get("proptype"))
+    property.proptype_id = PropTypes.get_id(request.form.get("proptype"))
     db.session.add(property)
     db.session.flush()
     propertyid = property.id

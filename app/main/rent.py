@@ -256,7 +256,7 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
         # rent.advarr = AdvArr.get_name(rent.advarr_id)
         # rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
         # rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
-        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
+        # rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
 
     return fdict, rents
