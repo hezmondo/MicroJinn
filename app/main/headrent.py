@@ -31,8 +31,8 @@ def get_headrents_p():
             filter.append(Agent.detail.ilike('%{}%'.format(agent)))
         status = request.form.getlist("status") or ""
         filterdict['status'] = status
-    #     have to work out how to do this
-
+    else:
+        filter.append(Headrent.status_id==1)
     headrents = get_headrents(filter)
     for headrent in headrents:
         headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
