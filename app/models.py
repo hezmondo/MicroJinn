@@ -491,7 +491,7 @@ class Rent(db.Model):
     payrequest_rent = db.relationship('PrHistory', backref='rent', lazy='dynamic')
 
     def __repr__(self):
-        return '<Rent {}>'.format(self.rentcode)
+        return '{}'.format(self.rentcode)
 
     def nextrentdate(self):
         from app.main.common import inc_date_m

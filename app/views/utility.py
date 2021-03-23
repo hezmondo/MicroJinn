@@ -3,8 +3,8 @@ from flask_login import login_required
 from app.dao.common import delete_record, get_deed, get_deed_types, post_deed, PropTypes
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
-from app.dao.property import get_properties, get_property, get_prop_types, post_property
 from app.email import test_email_connect, test_send_email
+from app.main.property import get_property, get_properties, post_property
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -79,27 +79,30 @@ def landlords():
     return render_template('landlords.html', landlords=landlords)
 
 
-@util_bp.route('/property/<int:propertyid>', methods=["GET", "POST"])
-# @login_required
-def property(propertyid):
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    if request.method == "POST":
-        propertyid = post_property(propertyid, rent_id)
-        return redirect(url_for('util_bp.property', propertyid=propertyid))
-    property = get_property(propertyid, rent_id)
-    property.proptype = PropTypes.get_name(property.proptype_id)
-    proptypes = get_prop_types("basic")
-
-    return render_template('property.html', property=property, proptypes=proptypes)
-
-
 @util_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
 @login_required
 def properties(rent_id):
-    properties, proptypes = get_properties(rent_id)
-    print(rent_id)
+    rentcode = request.args.get('rentcode', "0", type=str)
+    properties, fdict = get_properties(rent_id)
+    proptypes = PropTypes.names()
+    proptypes.insert(0, "all proptypes")
 
-    return render_template('properties.html', rent_id=rent_id, properties=properties, proptypes=proptypes)
+    return render_template('properties.html', fdict=fdict, rentcode=rentcode, rent_id=rent_id, properties=properties,
+                           proptypes=proptypes)
+
+
+@util_bp.route('/property/<int:prop_id>', methods=["GET", "POST"])
+# @login_required
+def property(prop_id):
+    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rentcode = request.args.get('rentcode', "0", type=str)
+    if request.method == "POST":
+        prop_id = post_property(prop_id, rent_id)
+        return redirect(url_for('util_bp.property', prop_id=prop_id))
+    property = get_property(prop_id, rent_id, rentcode)
+    proptypes = PropTypes.names()
+
+    return render_template('property.html', property=property, proptypes=proptypes)
 
 
 @util_bp.route('/test_emailing', methods=['GET'])

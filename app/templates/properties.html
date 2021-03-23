@@ -12,7 +12,7 @@
                    class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
             </div>
             <div class="col-md-3">
-                <a href="{{ url_for('util_bp.property', propertyid=0, rent_id=rent_id) }}"
+                <a href="{{ url_for('util_bp.property', prop_id=0, rent_id=rent_id, rentcode=rentcode) }}"
                    class="btn btn-block btn-danger button-icon plus" role="button">new property for this rent</a>
             </div>
         {% else %}
@@ -20,14 +20,14 @@
             <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
         </div>
         <div class="col-md-3">
-            <label for="proptype">status:</label>
-            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=proptypes[0]) }}
+            <label for="proptype">proptype:</label>
+            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=fdict.proptype) }}
         </div>
         <div class="col-md-4">
-            <input type="text" class="form-control" name="address" placeholder="address">
+            <input type="text" class="form-control" name="address" placeholder="address" value="{{ fdict.address }}">
         </div>
         <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
+            <input type="text" class="form-control" name="rentcode" placeholder="rentcode" value="{{ fdict.rentcode }}">
         </div>
         {% endif %}
     </div>
@@ -45,11 +45,12 @@
         <tbody>
         {% for item in properties %}
         <tr id="{{ item.id }}">
-            <td style="width: 10.00%"> {{ item.rentcode }}</td>
+            <td style="width: 10.00%"> {{ item.rent.rentcode }}</td>
             <td style="width: 65.00%"> {{ item.propaddr }}</td>
             <td style="width: 15.00%"> {{ item.proptype }}</td>
             <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.property',
-            propertyid=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+            prop_id=item.id, rentcode=item.rentcode) }}"
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
         </tr>
         {% endfor %}
         </tbody>

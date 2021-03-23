@@ -9,7 +9,7 @@ from app.dao.charge import get_charges_rent
 from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_stored, MailTos, \
     PrDeliveryTypes, SaleGrades, Statuses, Tenures, get_idlist_recent
 from app.dao.landlord import get_landlord_id
-from app.dao.property import get_propertyaddrs
+from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
 from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
@@ -55,9 +55,9 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 
 
 def get_propaddr(rent_id):
-    p_addrs = get_propertyaddrs(rent_id)
-    p_addr = '; '.join(each.propaddr.strip() for each in p_addrs)
-    return p_addr
+    propaddrs = get_propaddrs(rent_id)
+    propaddr = '; '.join(each.propaddr.strip() for each in propaddrs)
+    return propaddr
 
 
 def get_rent_gale(next_rent_date, frequency, rentpa):
