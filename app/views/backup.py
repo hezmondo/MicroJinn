@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 
-from flask import Blueprint, current_app, redirect, render_template, request, url_for, send_from_directory
+from flask import Blueprint, current_app, render_template, request, send_from_directory
 from sqlalchemy import engine
 from sqlalchemy.engine import url
 

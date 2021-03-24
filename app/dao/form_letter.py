@@ -62,10 +62,7 @@ def post_form_letter(form_letter_id):
     form_letter.doctype_id = \
         TypeDoc.query.with_entities(TypeDoc.id).filter \
             (TypeDoc.desc == doctype).one()[0]
-    template = request.form.get("template")
-    form_letter.template_id = \
-        Template.query.with_entities(Template.id).filter \
-            (Template.code == template).one()[0]
+    form_letter.template = request.form.get("template")
     db.session.add(form_letter)
     db.session.flush()
     form_letter_id = form_letter.id

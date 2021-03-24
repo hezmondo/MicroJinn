@@ -59,16 +59,18 @@ def delete_record(item_id, item):
         redir = "pr_bp.pr_history"
     elif item == "property":
         Property.query.filter_by(id=item_id).delete()
-        redir = "properties"
+        redir = "util_bp.properties"
+        id_dict = {"rent_id": id_2}
     elif item == "pr_file":
         PrHistory.query.filter_by(id=item_id).delete()
         redir = "pr_bp.pr_history"
         id_dict = {"rent_id": id_2}
-    elif item == "rent":
-        Rent.query.filter_by(id=item_id).delete()
-    elif item == "rent_external":
-        RentExternal.query.filter_by(id=item_id).delete()
+    # elif item == "rent":
+    #     Rent.query.filter_by(id=item_id).delete()
+    # elif item == "rent_external":
+    #     RentExternal.query.filter_by(id=item_id).delete()
     commit_to_database()
+
     return redir, id_dict
 
 
@@ -103,6 +105,7 @@ def get_deed(deed_id):
 
 def get_deed_id(deedcode):
     deed = db.session.query(TypeDeed).filter_by(deedcode=deedcode).one()
+
     return deed.id
 
 
