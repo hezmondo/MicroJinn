@@ -105,6 +105,9 @@ $(document).ready(function(){
         $('#show_more_2').addClass('arrow-down');
         $('#show_more_2').removeClass('arrow-up');
     });
+    $(document).on('shown.bs.modal', function(e) {
+        $('input:visible:enabled:first', e.target).focus();
+    });
 });
 $(function() {
   // Sidebar toggle behavior
