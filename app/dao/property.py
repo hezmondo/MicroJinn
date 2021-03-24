@@ -2,8 +2,8 @@ from app import db
 from flask import request
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.dao.common import PropTypes
 from app.models import Property, Rent
+from app.modeltypes import PropTypes
 
 
 def get_properties(rent_id):

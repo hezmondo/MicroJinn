@@ -6,8 +6,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_stored, MailTos, \
-    PrDeliveryTypes, SaleGrades, Statuses, Tenures, get_idlist_recent
+from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propertyaddrs
 from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
@@ -15,6 +14,7 @@ from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import filter_advanced, filter_basic
 from app.models import Rent, RentExternal
+from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
@@ -272,6 +272,7 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
         dict, filtr = filter_basic(dict)
     rents = getrents_basic(filtr)
     for rent in rents:
+        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
 
     return dict, rents

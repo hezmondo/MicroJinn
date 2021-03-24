@@ -3,8 +3,8 @@ from app import db
 from flask import request
 from sqlalchemy import func
 from app.dao.database import commit_to_database
-from app.dao.common import AdvArr, Freqs
 from app.models import Loan, LoanStat
+from app.modeltypes import AdvArr, Freqs
 
 
 def get_loan(loan_id):

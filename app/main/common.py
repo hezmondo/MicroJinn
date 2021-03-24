@@ -1,9 +1,8 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
-import json
 from dateutil.relativedelta import relativedelta
-from flask_login import current_user
-from app.dao.common import get_dates_m, AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
+from app.dao.common import get_dates_m
 from app.models import Jstore, Landlord, TypeDeed
+from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
 def get_combodict_basic():

@@ -2,7 +2,7 @@ import sqlalchemy
 from app import db
 from flask import request
 from sqlalchemy import func
-from app.dao.common import AdvArr, Freqs
+from app.modeltypes import AdvArr, Freqs
 from app.models import Rental, RentalStat
 
 
