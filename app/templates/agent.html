@@ -307,12 +307,21 @@
                                 {% endif %}
                             {% else %}
                                 {% if (rents|length + headrents|length) == 1 %}
-                                <div class="col-md-6">
-                                    <button type="submit" class="btn btn-block btn-danger button-icon trash"
-                                            formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id) }}">
-                                        delete agent
-                                    </button>
-                                </div>
+                                    {% if rents %}
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-block btn-danger button-icon trash"
+                                                    formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id, rent_id=rents[0].id) }}">
+                                                delete agent
+                                            </button>
+                                        </div>
+                                    {% else %}
+                                        <div class="col-md-6">
+                                            <button type="submit" class="btn btn-block btn-danger button-icon trash"
+                                                    formaction="{{ url_for('agent_bp.agent_delete', agent_id=agent.id, headrent_id=headrents[0].id) }}">
+                                                delete agent
+                                            </button>
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% else %}

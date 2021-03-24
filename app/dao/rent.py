@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Jstore, PrHistory, Property, Rent, RentExternal
+from app.models import Jstore, PrHistory, Property, Rent, RentExternal
 
 
 def check_pr_exists(rent_id):  # check if rent has record in pr_history
@@ -15,6 +15,10 @@ def check_pr_exists(rent_id):  # check if rent has record in pr_history
 def create_new_rent():
     # create new rent and property function not yet built, so return id for dummy rent:
     return 23
+
+
+def get_agent_rents(agent_id):
+    return db.session.query(Rent).filter_by(agent_id=agent_id).options(load_only('id', 'rentcode', 'tenantname')).all()
 
 
 def get_rent(rent_id):  # returns all Rent member variables plus associated items as a mutable dict
@@ -50,6 +54,10 @@ def get_rent_external(rent_id):
         .one_or_none()
 
 
+def get_rent_row(rent_id):
+    return Rent.query.get(rent_id)
+
+
 def getrents_basic(filtr):        # simple filtered rents for main rents page
     return db.session.query(Rent).join(Property) \
         .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
@@ -79,23 +87,6 @@ def get_rents_filters(typ):        # get stored advanced filter for advanced que
     filters = Jstore.query.filter(Jstore.type == typ).all()
 
     return filters
-
-
-def post_rent_agent_unlink(rent_id):
-    rent = Rent.query.get(rent_id)
-    rent.agent_id = None
-    # change mailto to tenant
-    if rent.mailto_id == 1 or 2:
-        rent.mailto_id = 3
-    commit_to_database()
-
-
-def post_rent_agent_update(agent_id, rent_id):
-    rent = Rent.query.get(rent_id)
-    rent.agent_id = agent_id
-    # change mailto to agent
-    rent.mailto_id = 1
-    commit_to_database()
 
 
 def post_rent_filter(filterdict):
@@ -133,15 +124,3 @@ def post_rent(rent):
 
     return rent_id
 
-# def update_roll_rent(rent_id, arrears):
-#     rent = Rent.query.get(rent_id)
-#  this fn now gone!  last_rent_date = db.session.execute(func.mjinn.next_rent_date(rent.id, 1, 1)).scalar()
-#     rent.lastrentdate = last_rent_date
-#     rent.arrears = arrears
-
-
-# def update_roll_rents(rent_prs):
-#     update_vals = []
-#     for rent_prop in rent_prs:
-#         update_vals.append(update_roll_rent(rent_prop.id))
-#     db.session.bulk_update_mappings(Rent, update_vals)
