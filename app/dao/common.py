@@ -92,13 +92,6 @@ def get_charge_types():
     return charge_types
 
 
-@cache.cached(key_prefix='db_dates_m_all')
-def get_dates_m():
-    dates_m = Date_m.query.with_entities(Date_m.code_id, Date_m.month, Date_m.day).all()
-
-    return dates_m
-
-
 def get_deed(deed_id):
     return TypeDeed.query.get(deed_id)
 

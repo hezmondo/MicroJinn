@@ -55,6 +55,19 @@ class BatchStatuses:
         return BatchStatuses._names.index(name) + 1
 
 
+class Date_m:
+    _table = [
+        # 2 rows for datecode_id == 1 or 2
+        # each element is a tuple: (month, day to use)
+        [(3, 25), (6, 24), (9, 29), (12, 25)],
+        [(3, 31), (6, 30), (9, 30), (12, 31)]
+    ]
+
+    @staticmethod
+    def get_dates(datecode_id):
+        return Date_m._table[datecode_id - 1]
+
+
 class Freqs:
     # the "names" of the types
     _names = ["yearly", "half yearly", "quarterly", "monthly", "four weekly", "weekly"]
