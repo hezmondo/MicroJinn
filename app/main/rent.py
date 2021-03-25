@@ -113,7 +113,7 @@ def get_rent_strings(rent, type='mail'):
     if charges and charges != 0:
         for charge in charges:
             charge_string = "{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
-                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
+                                                       charge.chargetype.chargedesc, dateToStr(charge.chargestartdate))
             charges_string += charge_string + ", "
             charges_list.append(charge_string)
     price = rent.price if rent.price else Decimal(0)

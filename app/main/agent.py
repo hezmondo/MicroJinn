@@ -7,7 +7,7 @@ from app.dao.rent import get_agent_rents, get_rent_row
 from app.models import Agent
 
 
-def get_agents():
+def mget_agents():
     filter = []
     list = []
     if request.method == "POST":    # unpack search parameters to create a filter

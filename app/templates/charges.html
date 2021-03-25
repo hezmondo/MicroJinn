@@ -25,7 +25,7 @@
         </div>
     </div>
 </form>
-{% if charge %}
+{% if charges %}
 <div class="table-fixed">
     <table class="table" id="charges">
         <thead>
@@ -42,7 +42,7 @@
         <tbody>
         {% for charge in charges %}
         <tr id="{{ charge.id }}">
-            <td style="width: 10.00%"> {{ charge.rentcode }}</td>
+            <td style="width: 10.00%"> {{ charge.rent.rentcode }}</td>
             <td style="width: 25.00%"> {{ charge.chargedesc }}</td>
             <td style="width: 10.00%"> {{ charge.chargestartdate.strftime('%d-%b-%Y') }}</td>
             <td style="width: 10.00%"> {{ charge.chargetotal }}</td>

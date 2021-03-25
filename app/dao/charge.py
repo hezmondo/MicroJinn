@@ -3,7 +3,7 @@ from datetime import date
 from flask import request
 from app.main.functions import strToDec
 from sqlalchemy import func
-from app.dao.common import get_charge_types
+from sqlalchemy.orm import joinedload, load_only
 from app.models import Charge, ChargeType, Rent
 
 
@@ -17,45 +17,14 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id, charge_details):
 
 
 def get_charge(charge_id):
-    rentcode = request.args.get('rentcode', "XNEWX", type=str)
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    # new charge has id = 0
-    if charge_id == 0:
-        charge = {
-            'id': 0,
-            'rent_id': rent_id,
-            'rentcode': rentcode,
-            'chargedesc': "notice fee",
-            'chargestartdate': date.today()
-        }
-    else:
-        charge = \
-            Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.id.label("rent_id"), Rent.rentcode,
-                                                                   ChargeType.chargedesc, Charge.chargestartdate,
-                                                                   Charge.chargetotal, Charge.chargedetail,
-                                                                   Charge.chargebalance) \
-                .filter(Charge.id == charge_id).one_or_none()
-    chargedescs = [chargetype.chargedesc for chargetype in get_charge_types()]
-
-    return charge, chargedescs
+    return db.session.query(Charge).filter_by(id=charge_id).one_or_none()
 
 
-def get_charges(rent_id):
-    qfilter = []
-    if request.method == "POST":
-        rcd = request.form.get("rentcode") or ""
-        cdt = request.form.get("chargedetail") or ""
-        qfilter.append(Rent.rentcode.startswith([rcd]))
-        qfilter.append(Charge.chargedetail.ilike('%{}%'.format(cdt)))
-    elif rent_id != "0":
-        qfilter.append(Charge.rent_id == rent_id)
-
-    charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
-                                                                     Charge.chargestartdate, Charge.chargetotal,
-                                                                     Charge.chargedetail, Charge.chargebalance) \
-        .filter(*qfilter).order_by(Rent.rentcode).all()
-
-    return charges
+def get_charges(filtr):
+    return db.session.query(Charge).join(Rent) \
+        .options(joinedload('rent').load_only('rentcode'),
+                 joinedload('chargetype').load_only('chargedesc')) \
+        .filter(*filtr).all()
 
 
 def get_charge_start_date(rent_id):
@@ -67,12 +36,10 @@ def get_charge_type(chargetype_id):
 
 
 def get_charges_rent(rent_id):
-    qfilter = [Charge.rent_id == rent_id]
-    charges = Charge.query.join(Rent).join(ChargeType).with_entities(Charge.id, Rent.rentcode, ChargeType.chargedesc,
-                                                                     Charge.chargestartdate, Charge.chargetotal,
-                                                                     Charge.chargedetail, Charge.chargebalance) \
-        .filter(*qfilter).all()
-    return charges
+    return db.session.query(Charge).join(Rent) \
+        .options(joinedload('rent').load_only('rentcode'),
+                 joinedload('chargetype').load_only('chargedesc')) \
+        .filter(Charge.rent_id == rent_id).all()
 
 
 def get_total_charges(rent_id):
