@@ -106,10 +106,8 @@ def inc_date_m(date1, frequency, datecode_id, periods):
     # first we get a new pure date calculated forwards or backwards for the number of periods
     date2 = inc_date(date1, frequency, periods)
     if datecode_id != 0:
-        # VERYTEMPORARY
-        # there are presently some rents with datecode_id == 3 which should be 2
-        if datecode_id == 3:
-            datecode_id = 2
+        if frequency not in (2, 4):
+            current_app.logger.warn(f"inc_date_m(): Unexpected 'frequency' ({frequency})")
         # now get special date sequences from date_m model type
         dates_m = Date_m.get_dates(datecode_id)
         for item in dates_m:
