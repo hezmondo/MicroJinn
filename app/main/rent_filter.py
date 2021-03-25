@@ -1,9 +1,9 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
-from app.dao.common import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 from app.main.functions import strToDate
 from app.models import Agent, Property, Rent
+from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
 def filter_advanced(dict):

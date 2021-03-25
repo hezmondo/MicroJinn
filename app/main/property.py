@@ -1,7 +1,7 @@
 from flask import request
-from app.dao.common import PropTypes
 from app.dao.property import get_prop, get_props, post_prop
 from app.models import Property, Rent
+from app.modeltypes import PropTypes
 
 
 def get_properties(rent_id):

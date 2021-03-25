@@ -3,9 +3,9 @@ from app.dao.agent import get_agent_id
 from app.dao.headrent import get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
 from app.main.common import inc_date_m
-from app.dao.common import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 from app.main.functions import strToDec
 from app.models import Agent, Headrent
+from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 
 
 def create_new_headrent():
