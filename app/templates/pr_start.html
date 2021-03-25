@@ -20,7 +20,8 @@
                 <td style="width: 10.00%"> {{ item.code }}</td>
                 <td style="width: 60.00%"> {{ item.description }}</td>
                 <td>
-                    <button type="submit" formaction="{{ url_for('rent_bp.filter', filtr_id=item.id, action='pr_query') }}"
+                    <button type="submit" formaction="{{ url_for('rent_bp.load_filter',
+                    filtr_id=item.id, action='pr_query') }}"
                             class="btn btn-success btn-small button-icon arrow-right">go</button>
                 </td>
             </tr>

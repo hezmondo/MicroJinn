@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.agent import get_agent
 from app.dao.rent import get_agent_rents
-from app.main.agent import delete_agent, delete_agent_headrent, get_agents, prepare_agent_template, select_new_agent, \
+from app.main.agent import delete_agent, delete_agent_headrent, mget_agents, prepare_agent_template, select_new_agent, \
     update_agent, unlink_agent_from_rent
 
 agent_bp = Blueprint('agent_bp', __name__)
@@ -60,7 +60,7 @@ def agents():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     agent_id = request.args.get('agent_id', 0, type=int)
-    agents, list = get_agents()
+    agents, list = mget_agents()
     if request.method == 'GET':
         agents = sorted(agents, key=lambda o: list.index(o.id))
     return render_template('agents.html', agents=agents, agent_id=agent_id, rent_id=rent_id, rentcode=rentcode)
