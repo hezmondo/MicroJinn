@@ -6,15 +6,15 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import AcTypes, AdvArr, Freqs, get_deed_id, get_filter_stored, MailTos, \
-    PrDeliveryTypes, SaleGrades, Statuses, Tenures, get_idlist_recent
+from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent
 from app.dao.landlord import get_landlord_id
-from app.dao.property import get_propertyaddrs
+from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
 from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import filter_advanced, filter_basic
 from app.models import Rent, RentExternal
+from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
@@ -55,9 +55,9 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 
 
 def get_propaddr(rent_id):
-    p_addrs = get_propertyaddrs(rent_id)
-    p_addr = '; '.join(each.propaddr.strip() for each in p_addrs)
-    return p_addr
+    propaddrs = get_propaddrs(rent_id)
+    propaddr = '; '.join(each.propaddr.strip() for each in propaddrs)
+    return propaddr
 
 
 def get_rent_gale(next_rent_date, frequency, rentpa):
@@ -113,7 +113,7 @@ def get_rent_strings(rent, type='mail'):
     if charges and charges != 0:
         for charge in charges:
             charge_string = "{} {} added on {}".format(moneyToStr(charge.chargetotal, pound=True),
-                                                       charge.chargedesc, dateToStr(charge.chargestartdate))
+                                                       charge.chargetype.chargedesc, dateToStr(charge.chargestartdate))
             charges_string += charge_string + ", "
             charges_list.append(charge_string)
     price = rent.price if rent.price else Decimal(0)
@@ -256,7 +256,7 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
         # rent.advarr = AdvArr.get_name(rent.advarr_id)
         # rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
         # rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
-        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
+        # rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
 
     return fdict, rents
@@ -272,6 +272,7 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
         dict, filtr = filter_basic(dict)
     rents = getrents_basic(filtr)
     for rent in rents:
+        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
 
     return dict, rents

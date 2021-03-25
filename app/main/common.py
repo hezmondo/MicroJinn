@@ -1,9 +1,8 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
-import json
+from flask import current_app
 from dateutil.relativedelta import relativedelta
-from flask_login import current_user
-from app.dao.common import get_dates_m, AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 from app.models import Jstore, Landlord, TypeDeed
+from app.modeltypes import AcTypes, AdvArr, Date_m, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
 def get_combodict_basic():
@@ -97,6 +96,8 @@ def inc_date(date1, freq, num):
         date2 = date1 + relativedelta(weeks=num*4)
     elif freq == 52:
         date2 = date1 + relativedelta(weeks=num)
+    else:
+        current_app.logger.warn(f"inc_date(): Unexpected 'freq' ({freq})")
 
     return date2
 
@@ -104,11 +105,14 @@ def inc_date(date1, freq, num):
 def inc_date_m(date1, frequency, datecode_id, periods):
     # first we get a new pure date calculated forwards or backwards for the number of periods
     date2 = inc_date(date1, frequency, periods)
-    # now get special date sequences from date_m table
-    dates_m = get_dates_m()
     if datecode_id != 0:
+        if frequency not in (2, 4):
+            current_app.logger.warn(f"inc_date_m(): Unexpected 'frequency' ({frequency})")
+        # now get special date sequences from date_m model type
+        dates_m = Date_m.get_dates(datecode_id)
         for item in dates_m:
-            if item[0] == datecode_id and item[1] == date2.month:
-                date2 = date2.replace(day=item[2])
+            if item[0] == date2.month:
+                return date2.replace(day=item[1])
+        current_app.logger.warn(f"inc_date_m(): Unexpected 'date2' ({date2})")
 
     return date2

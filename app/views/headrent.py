@@ -2,8 +2,8 @@ from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.headrent import get_headrent
 from app.main.common import get_combodict_basic, inc_date_m
-from app.dao.common import HrStatuses
 from app.main.headrent import get_headrents_p, update_headrent
+from app.modeltypes import HrStatuses
 
 headrent_bp = Blueprint('headrent_bp', __name__)
 

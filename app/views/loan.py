@@ -2,7 +2,7 @@ import datetime
 from flask import Blueprint, render_template, request
 from flask_login import login_required
 from app.dao.loan import get_loan, get_loans, get_loan_statement
-from app.dao.common import AdvArr, Freqs
+from app.modeltypes import AdvArr, Freqs
 
 loan_bp = Blueprint('loan_bp', __name__)
 
