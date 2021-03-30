@@ -122,7 +122,7 @@ def post_income_(income_id):
     income.acc_id = \
         MoneyAcc.query.with_entities(MoneyAcc.id).filter(MoneyAcc.acc_desc == acc_desc).one()[0]
     paytype = request.form.get("paytype")
-    income.paytype_id = get_paytype_id(paytype)
+    income.paytype_id = PayTypes.get_id(paytype)
     # having set the column values, we add this single income record to the db session
     db.session.add(income)
     # next bit of code needs complete restructuring as bonkers!
