@@ -30,7 +30,8 @@
             {{ widgets.combobox(name="acc_desc", items=income_dict.acc_descs_all, item_selected=incomevals.acc_desc) }}
         </div>
         <div class="col-md-3">
-            {{ widgets.combobox(name="paytype", items=income_dict.paytypes_all, item_selected=incomevals.paytype) }}
+            {{ widgets.combobox(name="paytype", items=PayTypes.names(), items0="all payment types",
+            item_selected=incomevals.paytype) }}
         </div>
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>

@@ -1,8 +1,14 @@
 <!-- widgets.html -- common macro definitions to be used by other templates -->
 
 <!-- combobox(): implement a single choice select via <select> element -->
-{% macro combobox(name, items, item_selected=None) -%}
+{% macro combobox(name, items, items0=None, item_selected=None) -%}
 <select class="form-control" name="{{ name }}">
+    {% if items0 %}
+    <!-- Optionally an extra item can be passed in as `items0` -->
+    <!-- This convenince allows callers to insert some "all ..." at the start of the list for a filter choice -->
+    {% set selected = 'selected' if items0 in items_selected else '' %}
+    <option value="{{items0}}" {{selected}}>{{items0}}</option>
+    {% endif %}
     {% for item in items %}
     {% set selected = 'selected' if item == item_selected else '' %}
     <option value="{{item}}" {{selected}}>{{item}}</option>

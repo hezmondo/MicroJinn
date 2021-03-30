@@ -7,13 +7,11 @@ from app.models import Rental, RentalStat
 
 
 def get_rental(rental_id):
-    # This method returns "rental"; information about a rental and the list values for various comboboxes,
+    # This method returns "rental"; information about a rental
     rental = db.session.query(Rental).filter_by(id=rental_id).first()
     rental.freqdet= Freqs.get_name(rental.freq_id)
-    advarrdets = AdvArr.names()
-    freqdets = Freqs.names()
 
-    return rental, advarrdets, freqdets
+    return rental
 
 
 def getrentals():
