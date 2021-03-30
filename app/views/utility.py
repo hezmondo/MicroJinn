@@ -85,11 +85,8 @@ def landlords():
 def properties(rent_id):
     rentcode = request.args.get('rentcode', "0", type=str)
     properties, fdict = get_properties(rent_id)
-    proptypes = PropTypes.names()
-    proptypes.insert(0, "all proptypes")
 
-    return render_template('properties.html', fdict=fdict, rentcode=rentcode, rent_id=rent_id, properties=properties,
-                           proptypes=proptypes)
+    return render_template('properties.html', fdict=fdict, rentcode=rentcode, rent_id=rent_id, properties=properties)
 
 
 @util_bp.route('/property/<int:prop_id>', methods=["GET", "POST"])
@@ -101,9 +98,8 @@ def property(prop_id):
         prop_id = post_property(prop_id, rent_id)
         return redirect(url_for('util_bp.property', prop_id=prop_id))
     property = get_property(prop_id, rent_id, rentcode)
-    proptypes = PropTypes.names()
 
-    return render_template('property.html', property=property, proptypes=proptypes)
+    return render_template('property.html', property=property)
 
 
 @util_bp.route('/test_emailing', methods=['GET'])

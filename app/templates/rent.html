@@ -262,24 +262,24 @@
                             <div class="form-group row align-items-end">
                                 <div class="col-md-2">
                                     <label for="frequency">frequency:</label>
-                                    {{ widgets.combobox(name="frequency", items=combodict.freqs,
+                                    {{ widgets.combobox(name="frequency", items=Freqs.names(),
                                     item_selected=rent.freqdet) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="actype">account type:</label>
-                                    {{ widgets.combobox(name="actype", items=combodict.actypes,
+                                    {{ widgets.combobox(name="actype", items=AcTypes.names(),
                                     item_selected=rent.actype) }}
                                 </div>
                                 <div class="col-md-2">
                                     <label for="advarr">advance or arrears:</label>
-                                    {{ widgets.combobox(name="advarr", items=combodict.advars,
+                                    {{ widgets.combobox(name="advarr", items=AdvArr.names(),
                                     item_selected=rent.advarrdet) }}
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-md-2">
                                     <label for="tenure">tenure:</label>
-                                    {{ widgets.combobox(name="tenure", items=combodict.tenures,
+                                    {{ widgets.combobox(name="tenure", items=Tenures.names(),
                                     item_selected=rent.tenuredet) }}
                                 </div>
                                 <div class="col-md-2">
@@ -293,7 +293,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="salegrade">sale grade:</label>
-                                    {{ widgets.combobox(name="salegrade", items=combodict.salegrades,
+                                    {{ widgets.combobox(name="salegrade", items=SaleGrades.names(),
                                     item_selected=rent.salegradedet)
                                     }}
                                 </div>
@@ -303,7 +303,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <label for="status">status:</label>
-                                    {{ widgets.combobox(name="status", items=combodict.statuses,
+                                    {{ widgets.combobox(name="status", items=Statuses.names(),
                                     item_selected=rent.statusdet) }}
                                 </div>
                             </div>
@@ -368,7 +368,7 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <label for="mailto">mail to:</label>
-                            {{ widgets.combobox(name="mailto", items=combodict.mailtos, item_selected=rent.mailto) }}
+                            {{ widgets.combobox(name="mailto", items=MailTos.names(), item_selected=rent.mailto) }}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -380,7 +380,7 @@
                     <div class="form-group row">
                         <div class="col-md-12">
                             <label for="prdelivery">payrequest delivery:</label>
-                            {{ widgets.combobox(name="prdelivery", items=combodict.prdeliveries,
+                            {{ widgets.combobox(name="prdelivery", items=PrDeliveryTypes.names(),
                             item_selected=rent.prdeliverydet) }}
                         </div>
                     </div>

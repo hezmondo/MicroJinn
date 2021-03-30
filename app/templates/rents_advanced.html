@@ -69,22 +69,22 @@
         </div>
         <div class="col-md-2">
             <label for="tenure">tenure:</label>
-            {{ widgets.multiselect_as_select(name="tenure", items=combodict.tenures,
+            {{ widgets.multiselect_as_select(name="tenure", items=Tenures.names(), items0="all tenures",
             items_selected=fdict.tenure) }}
         </div>
         <div class="col-md-2">
             <label for="salegrade">sale grade:</label>
-            {{ widgets.multiselect_as_select(name="salegrade", items=combodict.salegrades,
+            {{ widgets.multiselect_as_select(name="salegrade", items=SaleGrades.names(), items0="all salegrades",
             items_selected=fdict.salegrade) }}
         </div>
         <div class="col-md-2">
             <label for="status">status:</label>
-            {{ widgets.multiselect_as_select(name="status", items=combodict.statuses,
+            {{ widgets.multiselect_as_select(name="status", items=Statuses.names(), items0="all statuses",
             items_selected=fdict.status) }}
         </div>
         <div class="form-group col-md-2">
             <label for="actype">actype:</label>
-            {{ widgets.multiselect_as_select(name="actype", items=combodict.actypes,
+            {{ widgets.multiselect_as_select(name="actype", items=AcTypes.names(), items0="all actypes",
             items_selected=fdict.actype) }}
         </div>
     </div>
@@ -103,7 +103,7 @@
         </div>
         <div class="col-md-3">
             <label for="prdelivery">pr delivery:</label>
-            {{ widgets.multiselect_as_select(name="prdelivery", items=combodict.prdeliveries,
+            {{ widgets.multiselect_as_select(name="prdelivery", items=PrDeliveryTypes.names(), items0="all prdeliveries",
             items_selected=fdict.prdelivery) }}
         </div>
         <div class="col-md-2">

@@ -251,7 +251,19 @@ class Tenures:
 @app.context_processor
 def inject_model_types():
     # this is called by Flask on every request
-    # inject a dictionary of
+    # inject a dictionary of all the model types, so they are easily accessible in any template
     return {
-        'HrStatuses': HrStatuses
+        'AcTypes': AcTypes,
+        'AdvArr': AdvArr,
+        'BatchStatuses': BatchStatuses,
+        'Date_m': Date_m,
+        'Freqs': Freqs,
+        'HrStatuses': HrStatuses,
+        'MailTos': MailTos,
+        'PayTypes': PayTypes,
+        'PrDeliveryTypes': PrDeliveryTypes,
+        'PropTypes': PropTypes,
+        'SaleGrades': SaleGrades,
+        'Statuses': Statuses,
+        'Tenures': Tenures,
     }

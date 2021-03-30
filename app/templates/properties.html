@@ -21,7 +21,8 @@
         </div>
         <div class="col-md-3">
             <label for="proptype">proptype:</label>
-            {{ widgets.combobox(name="proptype", items=proptypes, item_selected=fdict.proptype) }}
+            {{ widgets.combobox(name="proptype", items=PropTypes.names(), items0="all proptypes",
+            item_selected=fdict.proptype) }}
         </div>
         <div class="col-md-4">
             <input type="text" class="form-control" name="address" placeholder="address" value="{{ fdict.address }}">

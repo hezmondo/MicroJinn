@@ -11,10 +11,8 @@ loan_bp = Blueprint('loan_bp', __name__)
 @login_required
 def loan(loan_id):
     loan = get_loan(loan_id)
-    advarrdets = AdvArr.names()
-    freqdets = Freqs.names()
 
-    return render_template('loan.html', loan=loan, advarrdets=advarrdets, freqdets=freqdets)
+    return render_template('loan.html', loan=loan)
 
 
 @loan_bp.route('/loans', methods=['GET', 'POST'])
