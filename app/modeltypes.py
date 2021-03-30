@@ -1,3 +1,6 @@
+from app import app
+
+
 class AcTypes:
     # the "names" of the types
     # ids are index into these, counting from 1
@@ -245,3 +248,10 @@ class Tenures:
         return Tenures._names.index(name) + 1
 
 
+@app.context_processor
+def inject_model_types():
+    # this is called by Flask on every request
+    # inject a dictionary of
+    return {
+        'HrStatuses': HrStatuses
+    }

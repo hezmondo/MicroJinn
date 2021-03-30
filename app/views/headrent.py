@@ -11,10 +11,8 @@ headrent_bp = Blueprint('headrent_bp', __name__)
 @headrent_bp.route('/headrents', methods=['GET', 'POST'])
 def headrents():
     filterdict, headrents = get_headrents_p()
-    hr_statuses = HrStatuses.names()
-    hr_statuses.insert(0, "all statuses")
 
-    return render_template('headrents.html', filterdict=filterdict, headrents=headrents, hr_statuses=hr_statuses)
+    return render_template('headrents.html', filterdict=filterdict, headrents=headrents)
 
 
 @headrent_bp.route('/headrent/<int:headrent_id>', methods=["GET", "POST"])
@@ -27,9 +25,6 @@ def headrent(headrent_id):
     headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
     headrent.status = HrStatuses.get_name(headrent.status_id)
     combodict = get_combodict_basic()
-    #gather combobox values in a dictionary
-    hr_statuses = HrStatuses.names()
     nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
 
-    return render_template('headrent.html', combodict=combodict, headrent=headrent, hr_statuses=hr_statuses,
-                           nextrentdate=nextrentdate)
+    return render_template('headrent.html', combodict=combodict, headrent=headrent, nextrentdate=nextrentdate)
