@@ -9,10 +9,15 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from logging.handlers import SMTPHandler, RotatingFileHandler
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
-import time
+# from sqlalchemy import event
+# from sqlalchemy.engine import Engine
+# import time
 import logging
+
+# We declare and create the global `app` instance here in this file
+# This allows us to access it, and use function decorations like `@app.context_processor`, from other modules
+# which would not be the case if we created `app` from the main `mjinn.py` module
+app = Flask(__name__)
 
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 db = SQLAlchemy()
@@ -50,8 +55,7 @@ def decimal_default(obj):
     raise TypeError
 
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
+def init_app(config_class=Config):
     app.config.from_object(config_class)
     app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024
 

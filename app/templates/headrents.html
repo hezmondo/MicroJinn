@@ -21,7 +21,7 @@
             </div>
             <div class="col-md-2">
                 <label for="status">status:</label>
-                {{ widgets.multiselect_as_select(name="status", items=hr_statuses,
+                {{ widgets.multiselect_as_select(name="status", items=HrStatuses.names(), items0="all statuses",
                 items_selected=filterdict.status) }}
             </div>
         </div>

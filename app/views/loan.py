@@ -1,7 +1,6 @@
-import datetime
 from flask import Blueprint, render_template, request
 from flask_login import login_required
-from app.dao.loan import get_loan, get_loans, get_loan_statement
+from app.main.loan import get_loan, get_loans, get_loan_stat, get_loan_statement
 from app.modeltypes import AdvArr, Freqs
 
 loan_bp = Blueprint('loan_bp', __name__)
@@ -27,11 +26,15 @@ def loans():
 
 @loan_bp.route('/loanstat_dialog/<int:loan_id>', methods=["GET", "POST"])
 def loanstat_dialog(loan_id):
-    return render_template('loanstat_dialog.html', loanid=loan_id, today=datetime.date.today())
+    code = request.args.get('code', "ABC-123", type=str)
+
+    return render_template('loanstat_dialog.html', code=code, loanid=loan_id)
 
 
 @loan_bp.route('/loan_statement/<int:loan_id>', methods=["GET", "POST"])
 @login_required
 def loan_statement(loan_id):
-    checksums, loancode, loanstatement = get_loan_statement(loan_id)
-    return render_template('loan_statement.html', checksums=checksums, loancode=loancode, loanstatement=loanstatement)
+    # checksums, loancode, loanstatement = get_loan_statement(loan_id)
+    checksums, loancode, loanstatement = get_loan_stat(loan_id)
+
+    return render_template('loan_stat.html', checksums=checksums, loancode=loancode, loanstatement=loanstatement)

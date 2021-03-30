@@ -63,7 +63,7 @@
             <button type="button" id="edit_view" class="btn btn-block btn-secondary button-icon edit">edit</button>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('loan_bp.loanstat_dialog', loan_id=loan.id) }}"
+            <a href="{{ url_for('loan_bp.loanstat_dialog', loan_id=loan.id, code=loan.code) }}"
                class="btn btn-block btn-primary button-icon receipt" role="button">Produce statement for this loan</a>
         </div>
     </div>

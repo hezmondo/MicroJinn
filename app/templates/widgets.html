@@ -111,8 +111,14 @@ completed and a page has loaded-->
 
 
 <!-- multiselect_as_select(): implement a multiple choice select via <select> element -->
-{% macro multiselect_as_select(name, items, items_selected=None) -%}
+{% macro multiselect_as_select(name, items, items0=None, items_selected=None) -%}
 <select multiple class="form-control" name="{{ name }}">
+    {% if items0 %}
+    <!-- Optionally an extra item can be passed in as `items0` -->
+    <!-- This convenince allows callers to insert some "all ..." at the start of the list for a filter choice -->
+    {% set selected = 'selected' if items0 in items_selected else '' %}
+    <option value="{{items0}}" {{selected}}>{{items0}}</option>
+    {% endif %}
     {% for item in items %}
     {% set selected = 'selected' if item in items_selected else '' %}
     <option value="{{item}}" {{selected}}>{{item}}</option>
