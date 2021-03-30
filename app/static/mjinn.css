@@ -1,3 +1,9 @@
+/*temp homepage css*/
+.main-container .container-wide {
+  width: 125%;
+	margin-left: -12%;
+}
+
 #doc_html, #email_html
 {
 	background-color: #EDEDED !important;

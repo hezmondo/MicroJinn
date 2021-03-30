@@ -81,24 +81,6 @@
         </div>
         <div class="col-md-3">
             <div class="card card-white" style="margin-bottom: 20px;">
-                <div class="card-header">actions</div>
-                <div class="card-body text-primary">
-                    <div class="row">
-                        <div class="col-md-12">
-                            {% if rent_id %}
-                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
-                                action='new_agent') }}"
-                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
-                                rentcode }}</a>
-                            {% else %}
-                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
-                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card card-white">
                 <div class="card-header">search for an agent</div>
                 <div class="card-body text-primary">
                     <div class="row">
@@ -112,6 +94,24 @@
                             <button type="submit" class="btn btn-block btn-success button-icon search"
                                     role="button">search
                             </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-white">
+                <div class="card-header">actions</div>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if rent_id %}
+                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
+                                action='new_agent') }}"
+                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
+                                rentcode }}</a>
+                            {% else %}
+                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
+                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
