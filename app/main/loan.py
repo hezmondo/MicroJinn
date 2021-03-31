@@ -1,7 +1,9 @@
+from datetime import date
 from decimal import Decimal
 from flask import request
-from app.dao.loan import dbget_loan_statement, dbget_loan_row, dbget_loans_all, dbget_loanstat_rows, \
+from app.dao.loan import dbget_loan_statement, dbget_loan_row, dbget_loans_all, dbget_loanstat_data, \
     dbget_loans_nick, post_loan
+from app.main.common import inc_date
 from app.models import Loan
 from app.modeltypes import AdvArr, Freqs
 
@@ -66,11 +68,20 @@ def get_loan_stat(loan_id):
     stat_date = request.form.get("statdate")
     loancode = request.form.get("loancode")
     loan = dbget_loan_row(loan_id)
-    loanstat_rows = dbget_loanstat_rows(loan_id)
+    rates, transactions = dbget_loanstat_data(loan_id)
+    print (rates)
     checksums = {'id': 1, 'memo': 'abc', 'advanced': 0, 'interest': 0, 'repaid': 0}
     loanstatement = []
-    for item in loanstat_rows:
-        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': '', 'balance': 0}
+    for item in transactions:
+        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
         loanstatement.append(item_row)
+    min_date = min(item['date'] for item in loanstatement)
+    int_date = inc_date(min_date, loan.freq_id, 1)
+    freqdet = Freqs.get_name(loan.freq_id)
+    while int_date <= date.today():
+        item_row = {'id': 0, 'date': int_date, 'memo': f"interest added {freqdet}", 'amount': 0, 'rate': 0, 'interest': 0, 'addinterest': 'yes', 'balance': 0}
+        loanstatement.append(item_row)
+        int_date = inc_date(int_date, loan.freq_id, 1)
+    loanstatement = sorted(loanstatement, key=lambda k: k['date'])
 
     return checksums, loancode, loanstatement
