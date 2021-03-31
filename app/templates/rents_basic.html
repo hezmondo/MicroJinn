@@ -4,101 +4,99 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<div class="container-wide">
-    <div class="row">
-        <div class="col-md-9">
-            <div class="table-fixed">
-                <table class="table" id="rents">
-                    <thead>
-                    <tr>
-                        <th style="width: 8.00%">rentcode</th>
-                        <th style="width: 8.00%">rent (pa)</th>
-                        <th style="width: 8.00%">arrears</th>
-                        <th style="width: 10.00%">next rent date</th>
-                        <th style="width: 15.00%">tenant name</th>
-                        <th style="width: 20.00%">property address</th>
-                        <th style="width: 8.00%">source</th>
-                        <th style="width: 15.00%">agent details</th>
-                        <th style="width: 2.00%"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in rents %}
-                    <tr id="{{ item.id }}">
-                        <td style="width: 8.00%">{{ item.rentcode }}</td>
-                        <td style="width: 8.00%"> {{ item.rentpa }}</td>
-                        <td style="width: 8.00%"> {{ item.arrears }}</td>
-                        <td style="width: 10.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
-                        <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                        <td style="width: 20.00%">{{ item.propaddr }}</td>
-                        <td style="width: 8.00%"> {{ item.source }}</td>
-                        <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) | truncate(40) }}
-                        </td>
-                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <table class="table" id="rents">
+                <thead>
+                <tr>
+                    <th style="width: 8.00%">rentcode</th>
+                    <th style="width: 9.00%">rent (pa)</th>
+                    <th style="width: 8.00%">arrears</th>
+                    <th style="width: 13.00%">next rent date</th>
+                    <th style="width: 15.00%">tenant name</th>
+                    <th style="width: 22.00%">property address</th>
+                    <th style="width: 8.00%">source</th>
+                    <th style="width: 15.00%">agent details</th>
+                    <th style="width: 2.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in rents %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 8.00%">{{ item.rentcode }}</td>
+                    <td style="width: 9.00%"> {{ item.rentpa }}</td>
+                    <td style="width: 8.00%"> {{ item.arrears }}</td>
+                    <td style="width: 13.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 15.00%"> {{ item.tenantname }}</td>
+                    <td style="width: 22.00%">{{ item.propaddr }}</td>
+                    <td style="width: 8.00%"> {{ item.source }}</td>
+                    <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) | truncate(40) }}
+                    </td>
+                    <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
             rent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles"
-                                                                           data-toggle="tooltip" title="view rent"
-                                                                           role="button"></a></td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                                                                       data-toggle="tooltip" title="view rent"
+                                                                       role="button"></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-        </div>
-        <div class="col-md-3">
-            <form method="POST" id="target">
-                <div class="card card-white">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col">search</div>
-                            <div class="col align-right">results: <b>{{ rents|length }}</b></div>
+    </div>
+    <div class="col-md-3">
+        <form method="POST" id="target">
+            <div class="card card-white">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                        <div class="col align-right"><b>{{ rents|length }}</b> results</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip"
+                                   title="Starts with" placeholder="rentcode starts with"
+                                   value="{{ fdict.rentcode }}">
+                            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip"
+                                   title="includes" placeholder="tenant name" value="{{ fdict.tenantname }}">
+                            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip"
+                                   title="includes" placeholder="property details" value="{{ fdict.propaddr }}">
+                            <input type="text" class="form-control" name="source" data-toggle="tooltip"
+                                   title="includes" placeholder="source" value="{{ fdict.source }}">
+                            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
+                                   title="includes" placeholder="agent details"
+                                   value="{{ fdict.agentdetail | truncate(20, True) }}">
+                            <!--                                <input type="text" class="form-control" name="count"-->
+                            <!--                                       placeholder="number of results" value="{{ rents|length }}">-->
                         </div>
                     </div>
-                    <div class="card-body text-primary">
-                        <div class="form-group row">
-                            <div class="col">
-                                <input type="text" class="form-control" name="rentcode" data-toggle="tooltip"
-                                       title="Starts with" placeholder="rentcode starts with"
-                                       value="{{ fdict.rentcode }}">
-                                <input type="text" class="form-control" name="tenantname" data-toggle="tooltip"
-                                       title="includes" placeholder="tenant name" value="{{ fdict.tenantname }}">
-                                <input type="text" class="form-control" name="propaddr" data-toggle="tooltip"
-                                       title="includes" placeholder="property details" value="{{ fdict.propaddr }}">
-                                <input type="text" class="form-control" name="source" data-toggle="tooltip"
-                                       title="includes" placeholder="source" value="{{ fdict.source }}">
-                                <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
-                                       title="includes" placeholder="agent details"
-                                       value="{{ fdict.agentdetail | truncate(20, True) }}">
-                                <!--                                <input type="text" class="form-control" name="count"-->
-                                <!--                                       placeholder="number of results" value="{{ rents|length }}">-->
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <button type="submit" formaction="{{ url_for('rent_bp.rents_basic') }}"
-                                        class="btn btn-block btn-success  button-icon search" role="button">search
-                                </button>
-                                <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0) }}"
-                                   class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
-                            </div>
+                    <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="col">
+                            <button type="submit" formaction="{{ url_for('rent_bp.rents_basic') }}"
+                                    class="btn btn-block btn-success  button-icon search" role="button">search
+                            </button>
+                            <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0) }}"
+                               class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
                         </div>
                     </div>
                 </div>
-                <div class="card card-white" style="margin-top:20px;">
-                    <div class="card-header">other actions</div>
-                    <div class="card-body text-primary">
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <button type="submit" formaction="{{ url_for('rent_bp.rents_external') }}"
-                                        class="btn btn-block btn-primary  button-icon search" role="button">search
-                                    external
-                                </button>
-                            </div>
+            </div>
+            <div class="card card-white" style="margin-top:1.5rem;">
+                <div class="card-header">other actions</div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="col">
+                            <button type="submit" formaction="{{ url_for('rent_bp.rents_external') }}"
+                                    class="btn btn-block btn-primary  button-icon search" role="button">search
+                                external
+                            </button>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

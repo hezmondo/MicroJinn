@@ -4,74 +4,81 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" id="target">
-    <div id="search_div" class="collapse">
-        <div class="form-group row boxed boxed-green">
-            <div class="col-md-2">
-                <label for="rentcode">code:</label>
-                <input type="text" class="form-control" name="rentcode" value="{{ filterdict.rentcode }}">
-            </div>
-            <div class="col-md-4">
-                <label for="address">address:</label>
-                <input type="text" class="form-control" name="address" value="{{ filterdict.address }}">
-            </div>
-            <div class="col-md-4">
-                <label for="agent">agent:</label>
-                <input type="text" class="form-control" name="agent" value="{{ filterdict.agent }}">
-            </div>
-            <div class="col-md-2">
-                <label for="status">status:</label>
-                {{ widgets.multiselect_as_select(name="status", items=HrStatuses.names(), items0="all statuses",
-                items_selected=filterdict.status) }}
-            </div>
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <table class="table table-grey" id="headrents">
+                <thead>
+                <tr>
+                    <th style="width: 10.00%">hr code</th>
+                    <th style="width: 8.00%">rent pa</th>
+                    <th style="width: 7.00%">arrears</th>
+                    <th style="width: 13.00%">next rent date</th>
+                    <th style="width: 26.00%">property address</th>
+                    <th style="width: 4.00%">freq</th>
+                    <th style="width: 8.00%">status</th>
+                    <th style="width: 22.00%">agent</th>
+                    <th style="width: 2.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in headrents %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 10.00%">{{ item.code }}</td>
+                    <td style="width: 8.00%"> {{ item.rentpa }}</td>
+                    <td style="width: 7.00%"> {{ item.arrears }}</td>
+                    <td style="width: 13.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 26.00%">{{ item.propaddr }}</td>
+                    <td style="width: 4.00%"> {{ item.freq_id }}</td>
+                    <td style="width: 8.00%"> {{ item.status }}</td>
+                    <td style="width: 22.00%"> {{ item.agent.detail }}</td>
+                    <td style="width: 2.00%" class="vertical-align">
+                        <a href="{{ url_for('headrent_bp.headrent', headrent_id=item.id) }}"
+                           class="btn btn-teal-light btn-round button-icon round circles"
+                           data-toggle="tooltip" title="view headrent"
+                           role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="form-group row">
-            <div class="col-md-9">
+    </div>
+    <div class="col-md-3">
+        <div class="card card-white">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">search</div>
+                    <div class="col align-right"><b>{{ headrents|length }}</b> results</div>
+                </div>
             </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
+            <div class="card-body text-primary">
+                <form method="POST" id="target">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="rentcode"
+                                   placeholder="rentcode" value="{{ filterdict.rentcode }}">
+                            <input type="text" class="form-control" name="address"
+                                   placeholder="address" value="{{ filterdict.address }}">
+                            <input type="text" class="form-control" name="agent"
+                                   placeholder="agent" value="{{ filterdict.agent }}">
+                            <div style="margin-top: 1rem;">
+                                {{ widgets.multiselect_as_select(name="status",
+                                items=HrStatuses.names(), items0="all
+                                statuses", items_selected=filterdict.status) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="col">
+                            <button type="submit" class="btn btn-block btn-success button-icon search"
+                                    role="button">search
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</form>
-<div class="table-fixed">
-    <table class="table" id="headrents">
-        <thead>
-        <tr>
-            <th style="width: 10.00%">hr code</th>
-            <th style="width: 8.00%">rentpa</th>
-            <th style="width: 8.00%">arrears</th>
-            <th style="width: 10.00%">nextrentdate</th>
-            <th style="width: 24.00%">property address</th>
-            <th style="width: 8.00%">frequency</th>
-            <th style="width: 8.00%">status</th>
-            <th style="width: 22.00%">agent</th>
-            <th style="width: 2.00%" class="vertical-align">
-                <a data-toggle="collapse" href="#search_div" aria-expanded="false"
-                   aria-controls="search_div"
-                   class="btn btn-teal-light btn-round button-icon round search" role="button"></a>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in headrents %}
-        <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.code }}</td>
-            <td style="width: 8.00%"> {{ item.rentpa }}</td>
-            <td style="width: 8.00%"> {{ item.arrears }}</td>
-            <td style="width: 10.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 24.00%">{{ item.propaddr }}</td>
-            <td style="width: 8.00%"> {{ item.freq_id }}</td>
-            <td style="width: 8.00%"> {{ item.status }}</td>
-            <td style="width: 22.00%"> {{ item.agent.detail }}</td>
-            <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('headrent_bp.headrent',
-            headrent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles"
-                                                               data-toggle="tooltip" title="view headrent"
-                                                               role="button"></a>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
 </div>
 {% endblock %}
 
