@@ -19,11 +19,9 @@ from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, Sal
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
     if mailto_id == 1 or mailto_id == 2:
-        # agent = get_agent(agent_id) or "set as mail to agent but no agent found"
-        # mailaddr = agent.detail
         agent = get_agent(agent_id)
-        mailaddr = agent.detail if agent else "(set as mail to agent but no agent found)"
-        if mailto_id == 2:
+        mailaddr = agent.detail if agent else None
+        if mailto_id == 2 and mailaddr:
             mailaddr = tenantname + ' care of ' + mailaddr
     else:
         propaddr = get_propaddr(rent_id)
@@ -234,7 +232,7 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
 
 
 def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
-    if action == "load":        # load predefined filter dictionary from jstore
+    if action == "load":  # load predefined filter dictionary from jstore
         dict = get_filter_stored(filtr_id)
         dict = json.loads(dict.content)
         for key, value in dict.items():
@@ -283,7 +281,7 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
 
 def get_rents_external():
     dict = get_rents_fdict()
-    if request.method == "POST":    #create filter from post values
+    if request.method == "POST":  # create filter from post values
         for key, value in dict.items():
             val = request.form.get(key) or ""
             dict[key] = val
@@ -336,8 +334,9 @@ def rent_validation(rent, message=""):
     if ('email' in rent.prdeliverydet) and ('@' not in rent.email):
         messages.append('Payrequest delivery is set to email but there is no valid email address linked to this rent.')
     if not rent.mailaddr:
-        messages.append("The mail address is currently 'None'. Please change the mail address "
-                        "from mail to agent or link a new agent.")
+        messages.append("No mail address set. Please change the mail address "
+                        "from 'mail to agent' or link a new agent.")
+        rent.mailaddr = "(set as 'mail to agent' but no agent found)"
     return messages
 
 

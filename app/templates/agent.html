@@ -4,7 +4,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<div class="row flex-row-reverse" style="margin-bottom: 20px;">
+<div class="row flex-row-reverse" style="margin-bottom: 1rem;">
     {% if rent_id != 0 %}
     <div class="col-md-3">
         <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
@@ -22,7 +22,7 @@
         {% if rent_id != 0 and action == 'from_rent' and agent.id == 0 %}
         <div class="boxed boxed-blue" style="margin-top: 0px;">add a new agent or link an existing agent - click on right as appropriate</div>
         {% else %}
-        <div class="table-fixed" style="margin-bottom: 20px;">
+        <div class="table-fixed" style="margin-bottom: 1rem;">
             <table class="table table-head table-narrow table-light-purple">
                 <thead>
                 <tr>
@@ -62,7 +62,7 @@
         {% endif %}
         {% if action != ('from_rent' or 'new_agent') and agent.id != 0 %}
             {% if rents %}
-            <div class="table-fixed" style="margin-bottom: 20px;">
+            <div class="table-fixed" style="margin-bottom: 1rem;">
                 <table class="table table-head table-narrow">
                     <thead>
                     <tr>
@@ -122,7 +122,7 @@
             <div class="boxed boxed-red">there are no rents associated with this agent</div>
             {% endif %}
             {% if headrents %}
-            <div class="table-fixed" style="margin-bottom: 20px;">
+            <div class="table-fixed" style="margin-bottom: 1rem;">
                 <table class="table table-head table-narrow">
                     <thead>
                     <tr>
@@ -186,7 +186,7 @@
             <div class="card-header">actions</div>
             <div class="card-body text-primary">
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col">
                         {% if agent.id != 0 %}
                         <a href="#" data-toggle="modal"
                            data-target="#agent_modal" class="btn btn-block btn-primary button-icon circles"
@@ -264,7 +264,7 @@
                         {% if (rents or headrents) and rent_id != 0 and action == 'from_rent' %}
                             {% if (rents|length + headrents|length) > 1 %}
                              <div class="row flex-row-reverse align-items-end">
-                                <div class="col" style="margin-bottom:20px;">
+                                <div class="col" style="margin-bottom:1rem;">
                                     <a type="button" class="btn btn-block btn-primary button-icon circles"
                                        href="{{ url_for('agent_bp.agent', agent_id=agent.id, rent_id=rent_id,
                                        action='from_agent') }}">
@@ -274,7 +274,7 @@
                             </div>
                             {% else %}
                             <div class="row flex-row-reverse align-items-end">
-                                <div class="col" style="margin-bottom:20px;">
+                                <div class="col" style="margin-bottom:1rem;">
                                 <button type="submit" class="btn btn-block btn-warning button-icon minus"
                                         formaction="{{ url_for('agent_bp.agent_unlink', rent_id=rent_id) }}">
                                         unlink from {{ rentcode }}
@@ -352,19 +352,19 @@
             <div class="modal-body">
                 <form method="POST" id="rent_tenant">
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="tenantname">agent details</label>
                             <input type="text" class="form-control" name="detail" value="{{ agent.detail }}">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="email">email address</label>
                             <input type="text" class="form-control" name="email" value="{{ agent.email }}">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="note">notes</label>
                             <input type="text" class="form-control" name="note" value="{{ agent.note }}">
                         </div>
@@ -372,13 +372,13 @@
                     {% if rents or headrents %}
                     {% if (rents|length + headrents|length) > 1 %}
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <div>
                                 Note: There are {{ rents|length + headrents|length }} rents or headrents associated
                                 with this agent.
                             </div>
                             {% if rent_id != 0 and action == 'from_rent' %}
-                            <div class="row align-items-end" style="margin-top: 20px;">
+                            <div class="row align-items-end" style="margin-top: 1rem;">
                                 <div class="col">
                                     <a type="button" class="btn btn-block btn-primary button-icon circles"
                                        href="{{ url_for('agent_bp.agent', agent_id=agent.id,
@@ -391,7 +391,7 @@
                     </div>
                     {% endif %}
                     {% endif %}
-                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 20px;">
+                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 1rem;">
                         <div class="col-md-6">
                             <button type="button" class="btn btn-block btn-secondary button-icon cross"
                                     data-dismiss="modal">close
