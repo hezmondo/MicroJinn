@@ -274,6 +274,9 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
     for rent in rents:
         rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
+    # Sort the rents by the order that they were accessed
+    if request.method == 'GET':
+        rents = sorted(rents, key=lambda o: id_list.index(o.id))
 
     return dict, rents
 
