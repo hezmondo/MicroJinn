@@ -18,9 +18,9 @@ def rental(rental_id):
         rental_id = post_rental(rental_id)
         return redirect(url_for('rental_bp.rental', rental_id=rental_id))
 
-    rental, advarrdets, freqdets = get_rental(rental_id)
+    rental = get_rental(rental_id)
 
-    return render_template('rental.html', rental=rental, advarrdets=advarrdets, freqdets=freqdets)
+    return render_template('rental.html', rental=rental)
 
 
 @rental_bp.route('/rental_statement/<int:rental_id>', methods=["GET", "POST"])

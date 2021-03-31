@@ -42,11 +42,11 @@
         </div>
         <div class="col-md-2">
             <label for="frequency">frequency:</label>
-            {{ widgets.combobox(name="frequency", items=freqdets, item_selected=rental.freqdet) }}
+            {{ widgets.combobox(name="frequency", items=Freqs.names(), item_selected=rental.freqdet) }}
         </div>
         <div class="col-md-2">
             <label for="advarr">advance/arrears:</label>
-            {{ widgets.combobox(name="advarr", items=advarrdets, item_selected=rental.advarrdet) }}
+            {{ widgets.combobox(name="advarr", items=AdvArr.names(), item_selected=rental.advarrdet) }}
         </div>
         <div class="col-md-2">
             <label for="astdate">AST start date:</label>

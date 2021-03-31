@@ -22,7 +22,7 @@
         </div>
         <div class="col-md-2">
             <label for="tenure">tenure:</label>
-            {{ widgets.combobox(name="tenure", items=combodict.tenures, item_selected=headrent.tenuredet) }}
+            {{ widgets.combobox(name="tenure", items=Tenures.names(), item_selected=headrent.tenuredet) }}
         </div>
         <div class="col-md-2">
             <label for="source">source:</label>
@@ -62,11 +62,11 @@
         </div>
         <div class="col-md-2">
             <label for="frequency">frequency:</label>
-            {{ widgets.combobox(name="frequency", items=combodict.freqs, item_selected=headrent.freqdet) }}
+            {{ widgets.combobox(name="frequency", items=Freqs.names(), item_selected=headrent.freqdet) }}
         </div>
         <div class="col-md-2">
             <label for="advarr">advance or arrears:</label>
-            {{ widgets.combobox(name="advarr", items=combodict.advars, item_selected=headrent.advarrdet) }}
+            {{ widgets.combobox(name="advarr", items=AdvArr.names(), item_selected=headrent.advarrdet) }}
         </div>
         <div class="col-md-2">
             <label for="lastrentdate">last rent date:</label>

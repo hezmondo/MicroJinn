@@ -7,17 +7,9 @@ from app.modeltypes import AcTypes, AdvArr, Date_m, Freqs, MailTos, PrDeliveryTy
 
 def get_combodict_basic():
     # combobox values for headrent and rent, without "all" as an option
-    actypes = AcTypes.names()
-    advars = AdvArr.names()
-    freqs = Freqs.names()
     landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    tenures = Tenures.names()
     combo_dict = {
-        "actypes": actypes,
-        "advars": advars,
-        "freqs": freqs,
         "landlords": landlords,
-        "tenures": tenures,
     }
     return combo_dict
 
@@ -27,10 +19,6 @@ def get_combodict_rent():
     combo_dict = get_combodict_basic()
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
     combo_dict['deedcodes'] = deedcodes
-    combo_dict['mailtos'] = MailTos.names()
-    combo_dict['prdeliveries'] = PrDeliveryTypes.names()
-    combo_dict['salegrades'] = SaleGrades.names()
-    combo_dict['statuses'] = Statuses.names()
 
     return combo_dict
 
@@ -38,12 +26,7 @@ def get_combodict_rent():
 def get_combodict_filter():
     # use the full rent combodict and insert "all values" for the filter functions, plus offer "options"
     combo_dict = get_combodict_rent()
-    combo_dict['actypes'].insert(0, "all actypes")
     combo_dict['landlords'].insert(0, "all landlords")
-    combo_dict['prdeliveries'].insert(0, "all prdeliveries")
-    combo_dict['salegrades'].insert(0, "all salegrades")
-    combo_dict['statuses'].insert(0, "all statuses")
-    combo_dict['tenures'].insert(0, "all tenures")
     combo_dict['options'] = ["include", "exclude", "only"]
     filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
     combo_dict["filternames"] = filternames

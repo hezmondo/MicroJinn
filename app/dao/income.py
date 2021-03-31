@@ -60,14 +60,9 @@ def get_income_dict(type):
     acc_descs = [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
     acc_descs_all = acc_descs
     acc_descs_all.insert(0, "all accounts")
-    paytypes = PayTypes.names()
-    paytypes_all = paytypes
-    paytypes_all.insert(0, "all payment types")
     income_dict = {
         "acc_descs": acc_descs,
         "acc_descs_all": acc_descs_all,
-        "paytypes": paytypes,
-        "paytypes_all": paytypes_all
     }
     if type == "enhanced":
         chargedescs = [chargetype.chargedesc for chargetype in get_charge_types()]
