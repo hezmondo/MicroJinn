@@ -5,51 +5,58 @@ from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent
 from app.modeltypes import PayTypes
 from app.dao.common import get_charge_types
 from app.dao.database import commit_to_database
+from app.dao.money import get_acc_id
 
 
 def get_incomes(acc_id):
     # display postings for all bank accounts if accid = 0 and pick up rent_id as arg from rent screen
     rent_id = int(request.args.get('rent_id', "0", type=str))
-    qfilter = []
+    filtr = []
     incomevals = {
-        'acc_desc': 'all accounts',
+        'acc_desc': ['all accounts'],
         'payer': '',
         'rentcode': '',
         'rent_id': rent_id,
-        'paytype': 'all payment types'
+        'paytype': ['all payment types']
     }
     if acc_id != 0:
         # first deal with bank account id being passed from money app
-        qfilter.append(MoneyAcc.id == id)
+        filtr.append(MoneyAcc.id == id)
         acc_desc = MoneyAcc.query.filter(MoneyAcc.id == id).one_or_none()
         incomevals['acc_desc'] = acc_desc.acc_desc
     # now deal with the user clicking search button to filter ibcome postings
     if request.method == "POST":
         payer = request.form.get("payer") or ""
         if payer and payer != "" and payer != "all payers":
-            qfilter.append(Income.payer.ilike('%{}%'.format(payer)))
+            filtr.append(Income.payer.ilike('%{}%'.format(payer)))
             incomevals['payer'] = payer
         rentcode = request.form.get("rentcode") or ""
         if rentcode and rentcode != "" and rentcode != "all rentcodes":
-            qfilter.append(IncomeAlloc.rentcode.startswith([rentcode]))
+            filtr.append(IncomeAlloc.rentcode.startswith([rentcode]))
             incomevals['rentcode'] = rentcode
-        acc_desc = request.form.get("acc_desc") or ""
-        if acc_desc and acc_desc != "" and acc_desc != "all accounts":
-            qfilter.append(MoneyAcc.acc_desc == acc_desc)
+        acc_desc = request.form.getlist("acc_desc")
+        if acc_desc and acc_desc != ["all accounts"]:
+            ids = []
+            for i in range(len(acc_desc)):
+                ids.append(get_acc_id(acc_desc[i]))
+            filtr.append(MoneyAcc.id.in_(ids))
             incomevals['acc_desc'] = acc_desc
-        paytype = request.form.get("paytype") or ""
-        if paytype and paytype != "" and paytype != "all payment types":
-            qfilter.append()
+        paytype = request.form.getlist("paytype")
+        if paytype and paytype != ["all payment types"]:
+            ids = []
+            for i in range(len(paytype)):
+                ids.append(PayTypes.get_id(paytype[i]))
+            filtr.append(Income.paytype_id.in_(ids))
             incomevals['paytype'] = paytype
     else:
         # now deal with rent_id coming from the rent screen
         if rent_id != 0:
-            qfilter.append(IncomeAlloc.rent_id == rent_id)
+            filtr.append(IncomeAlloc.rent_id == rent_id)
             incomevals['rent_id'] = rent_id
     incomes = IncomeAlloc.query.join(Income).join(ChargeType).join(MoneyAcc) \
             .with_entities(Income.id, Income.date, IncomeAlloc.rent_id, IncomeAlloc.rentcode, Income.amount,
                            Income.paytype_id, Income.payer, MoneyAcc.acc_desc, ChargeType.chargedesc) \
-            .filter(*qfilter).order_by(desc(Income.date)).limit(50).all()
+            .filter(*filtr).order_by(desc(Income.date)).limit(50).all()
     # for income in incomes:
     #     income.paytype = get_paytype(income.paytype_id)
     return incomes, incomevals

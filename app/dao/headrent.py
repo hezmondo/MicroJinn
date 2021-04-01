@@ -2,7 +2,7 @@ from app import db
 from flask import flash, redirect, url_for
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.database import commit_to_database
-from app.models import Headrent
+from app.models import Agent, Headrent
 from app.modeltypes import Freqs, Statuses
 
 
@@ -37,9 +37,9 @@ def get_headrent_row(headrent_id):
 
 def get_headrents(filter):
     headrents = \
-            db.session.query(Headrent) \
+            db.session.query(Headrent).join(Agent) \
             .options(load_only('id', 'code', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
-                               'propaddr', 'rentpa', 'source'),
+                               'propaddr', 'rentpa', 'source', 'status_id'),
                 joinedload('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
     for rent in headrents:
