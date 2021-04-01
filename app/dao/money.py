@@ -17,6 +17,10 @@ def get_money_acc(acc_id):
     return moneyacc
 
 
+def get_acc_id(acc_desc):
+    return MoneyAcc.query.with_entities(MoneyAcc.id).filter(acc_desc=acc_desc).first()
+
+
 def get_moneydets():
     # get values to list all accounts on the money home page, with totals at the bottom
     moneydets = MoneyAcc.query \

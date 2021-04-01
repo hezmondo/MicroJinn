@@ -39,7 +39,7 @@
                     <td style="width: 10.00%"> {{ item.amount }}</td>
                     <td style="width: 10.00%"> {{ item.rentcode }}</td>
                     <td style="width: 25.00%"> {{ item.acc_desc }}</td>
-                    <td style="width: 17.00%"> {{ item.paytypedet }}</td>
+                    <td style="width: 17.00%"> {{ PayTypes.get_name(item.paytype_id) }}</td>
                     <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('income_bp.income_item',
             income_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
                 </tr>
@@ -65,12 +65,14 @@
                             <input type="text" class="form-control" name="rentcode"
                                    value="{{ incomevals.rentcode }}" placeholder="rentcode">
                             <div style="margin-top: 1rem;">
-                                {{ widgets.combobox(name="acc_desc", items=income_dict.acc_descs_all,
-                                item_selected=incomevals.acc_desc) }}
+                                {{ widgets.multiselect_as_select(name="acc_desc",
+                                items=income_dict.acc_descs_all,
+                                items_selected=incomevals.acc_desc) }}
                             </div>
                             <div>
-                                {{ widgets.combobox(name="paytype", items=PayTypes.names(), items0="all payment types",
-                                item_selected=incomevals.paytype) }}
+                                {{ widgets.multiselect_as_select(name="paytype",
+                                items=PayTypes.names(), items0="all payment types",
+                                items_selected=incomevals.paytype) }}
                             </div>
                         </div>
                     </div>
