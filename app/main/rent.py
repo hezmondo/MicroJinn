@@ -9,10 +9,12 @@ from app.dao.charge import get_charges_rent
 from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
-from app.dao.rent import get_rent, getrents_basic, getrents_advanced, get_rentsexternal, post_rent, post_rent_filter
+from app.dao.rent import get_rent, getrents_basic, getrents_basic_sam, getrents_basic_sql, getrents_advanced, \
+    get_rentsexternal, post_rent, post_rent_filter
 from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
-from app.main.rent_filter import filter_advanced, filter_basic
+from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic, filter_basic_sql_1, \
+    filter_basic_sql_2
 from app.models import Rent, RentExternal
 from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
@@ -55,6 +57,11 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
 def get_propaddr(rent_id):
     propaddrs = get_propaddrs(rent_id)
     propaddr = '; '.join(each.propaddr.strip() for each in propaddrs)
+    return propaddr
+
+
+def get_popaddr(prop_rent):
+    propaddr = '; '.join(item.propaddr.strip() for item in prop_rent)
     return propaddr
 
 
@@ -233,50 +240,52 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
 
 def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
     if action == "load":  # load predefined filter dictionary from jstore
-        dict = get_filter_stored(filtr_id)
-        dict = json.loads(dict.content)
-        for key, value in dict.items():
-            dict[key] = value
+        fdict = get_filter_stored(filtr_id)
+        fdict = json.loads(fdict.content)
+        for key, value in fdict.items():
+            fdict[key] = value
     else:
-        dict = get_rents_fdict('advanced')
-    # now we construct advanced sqlalchemy filter using this filter dictionary
-    if request.method == "POST" or action == "load":
-        fdict, filtr = filter_advanced(dict)
-    else:
-        filtr = []
-        filtr.append(Rent.id > 0)
-        fdict = dict
+        fdict = dict_advanced()  # get request form values or default dictionary
+    # now we construct advanced sqlalchemy filter using either dictionary
+    filtr = filter_advanced(fdict)
     if action == "save":
         post_rent_filter(fdict)
     # now get filtered rent objects for this filter
     rents = getrents_advanced(filtr, 50)
     for rent in rents:
-        # rent.advarr = AdvArr.get_name(rent.advarr_id)
-        # rent.prdelivery = PrDeliveryTypes.get_name(rent.prdelivery_id)
-        # rent.detail = rent.agent.detail if hasattr(rent.agent, 'detail') else 'no agent'
-        # rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
 
     return fdict, rents
 
 
 def get_rents_basic():  # get rents for home rents page with simple search option
-    dict = get_rents_fdict()
-    filtr = []
+    fdict = dict_basic()
     if request.method == "GET":
+        filtr = []
         id_list = get_idlist_recent("recent_rents")
         filtr.append(Rent.id.in_(id_list))
     else:
-        dict, filtr = filter_basic(dict)
+        filtr = filter_basic(fdict)
     rents = getrents_basic(filtr)
     for rent in rents:
-        rent.nextrentdate = inc_date_m(rent.lastrentdate, rent.freq_id, rent.datecode_id, 1)
         rent.propaddr = get_propaddr(rent.id)
     # Sort the rents by the order that they were accessed
     if request.method == 'GET':
         rents = sorted(rents, key=lambda o: id_list.index(o.id))
 
     return dict, rents
+
+
+def get_rents_basic_sql():  # get rents for home rents page with simple search option
+    fdict = dict_basic()
+    id_list = get_idlist_recent("recent_rents") if request.method == "GET" else None
+    sql = filter_basic_sql_1() + filter_basic_sql_2(fdict, id_list)
+    rents = getrents_basic_sql(sql)
+    # Sort the rents by the order that they were accessed
+    if request.method == 'GET':
+        rents = sorted(rents, key=lambda o: id_list.index(o.id))
+
+    return fdict, rents
 
 
 def get_rents_external():

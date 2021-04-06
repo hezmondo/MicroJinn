@@ -82,6 +82,16 @@ def get_loan_stat(loan_id):
         item_row = {'id': 0, 'date': int_date, 'memo': f"interest added {freqdet}", 'amount': 0, 'rate': 0, 'interest': 0, 'addinterest': 'yes', 'balance': 0}
         loanstatement.append(item_row)
         int_date = inc_date(int_date, loan.freq_id, 1)
+    rate = rates[0]
+    bal = loanstatement[0].get('amount')
+    interest_pending = 0
+    for row in loanstatement:
+        row['rate'] = rate
+        row['interest'] = rate * (stat_date - row['date']).days / 365.25
+        interest_pending = interest_pending + row['interest']
+        if row['add interest'] == 'yes':
+            row['balance'] = bal + interest_pending
+            interest_pending = 0
     loanstatement = sorted(loanstatement, key=lambda k: k['date'])
 
     return checksums, loancode, loanstatement

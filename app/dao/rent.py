@@ -66,6 +66,19 @@ def getrents_basic(filtr):        # simple filtered rents for main rents page
         .filter(*filtr).order_by(Rent.rentcode).limit(30).all()
 
 
+def getrents_basic_sam(filtr):  # simple filtered rents for main rents page using join to prop_rent
+    return db.session.query(Rent).join(Property) \
+        .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
+                           'rentpa', 'source', 'status_id', 'tenantname'),
+                 joinedload('agent').load_only('detail'),
+                 joinedload('prop_rent').options(load_only('propaddr'))) \
+        .filter(*filtr).order_by(Rent.rentcode).limit(30).all()
+
+
+def getrents_basic_sql(sql):  # simple filtered rents for main rents page using raw sql
+    return db.session.execute(sql).fetchall()
+
+
 def getrents_advanced(filtr, runsize):    # filtered rents for advanced queries and payrequest pages
     return db.session.query(Rent).join(Property) \
         .options(load_only('id', 'advarr_id', 'arrears', 'freq_id', 'lastrentdate',
