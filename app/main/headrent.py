@@ -2,7 +2,6 @@ from flask import request
 from app.dao.agent import get_agent_id
 from app.dao.headrent import get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
-from app.main.common import inc_date_m
 from app.main.functions import strToDec
 from app.models import Agent, Headrent
 from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
@@ -40,7 +39,6 @@ def get_headrents_p():
         filter.append(Headrent.status_id==1)
     headrents = get_headrents(filter)
     for headrent in headrents:
-        headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
         headrent.status = HrStatuses.get_name(headrent.status_id)
 
     return filterdict, headrents

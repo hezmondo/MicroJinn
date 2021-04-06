@@ -76,7 +76,8 @@
         <div class="col-md-2">
             <label for="nextrentdate">next rent date:</label>
             <input type="date" class="form-control" name="nextrentdate"
-                   value="{{ nextrentdate }}" readonly="true">
+                   value="{{ next_rent_date(headrent.lastrentdate, headrent.freq_id,
+                        headrent.datecode_id, 1).strftime('%d-%b-%Y') }}" readonly="true">
         </div>
     </div>
     <div class="form-group row flex-row-reverse">

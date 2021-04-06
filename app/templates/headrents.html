@@ -27,7 +27,8 @@
                     <td style="width: 10.00%">{{ item.code }}</td>
                     <td style="width: 8.00%"> {{ item.rentpa }}</td>
                     <td style="width: 7.00%"> {{ item.arrears }}</td>
-                    <td style="width: 13.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
+                        item.datecode_id, 1).strftime('%d-%b-%Y') }}</td>
                     <td style="width: 26.00%">{{ item.propaddr }}</td>
                     <td style="width: 4.00%"> {{ item.freq_id }}</td>
                     <td style="width: 8.00%"> {{ item.status }}</td>

@@ -4,9 +4,9 @@ from flask import request
 from flask_login import current_user
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
-from app.models import Agent, Case, Charge, ChargeType, Date_m, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
+from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
     Income, IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, \
-    Rent, RentExternal, MoneyAcc, TypeDeed, TypeDoc
+    Rent, MoneyAcc, TypeDeed, TypeDoc
 
 
 def delete_record(item_id, item):

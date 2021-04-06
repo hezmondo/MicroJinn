@@ -3,8 +3,8 @@ from flask_login import login_required
 from app.dao.common import get_filters
 from app.dao.rent import get_rent_external
 from app.main.common import get_combodict_filter, get_combodict_rent
-from app.main.rent import get_rentp, get_rents_advanced, get_rents_basic, get_rents_external, get_rent_strings, \
-    rent_validation, update_rent_rem, update_tenant
+from app.main.rent import get_rentp, get_rents_advanced, get_rents_basic, get_rents_basic_sql, get_rents_external, \
+    get_rent_strings, rent_validation, update_rent_rem, update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)
 
@@ -34,15 +34,6 @@ def rent(rent_id):
     return render_template('rent.html', rent=rent, combodict=combodict, rentstats=rentstats, messages=messages)
 
 
-@rent_bp.route('/', methods=['GET', 'POST'])
-@rent_bp.route('/rents_basic', methods=['GET', 'POST'])
-@login_required
-def rents_basic():  # get rents_basic for home rents_basic page with simple search option
-    fdict, rents = get_rents_basic()
-
-    return render_template('rents_basic.html', fdict=fdict, rents=rents)
-
-
 @rent_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])
 @login_required
 def rent_external(rent_external_id):  # view external rent from home rents page
@@ -60,6 +51,15 @@ def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
 
     return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
                            fdict=fdict, rents=rents)
+
+
+@rent_bp.route('/', methods=['GET', 'POST'])
+@rent_bp.route('/rents_basic', methods=['GET', 'POST'])
+@login_required
+def rents_basic():  # get rents_basic for home rents_basic page with simple search option
+    fdict, rents = get_rents_basic_sql()
+
+    return render_template('rents_basic.html', fdict=fdict, rents=rents)
 
 
 @rent_bp.route('/rents_external', methods=['GET', 'POST'])
