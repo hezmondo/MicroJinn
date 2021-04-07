@@ -276,6 +276,28 @@ def get_rents_basic():  # get rents for home rents page with simple search optio
     return dict, rents
 
 
+# Gets the data needed to display and filter rents on the home screen, but does so twice as slowly as
+# get_rents_basic_sql
+def get_rents_basic_sam():
+    fdict = dict_basic()
+    if request.method == "GET":
+        filtr = []
+        id_list = get_idlist_recent("recent_rents")
+        filtr.append(Rent.id.in_(id_list))
+    else:
+        filtr = filter_basic(fdict)
+    rents = getrents_basic_sam(filtr)
+    for rent in rents:
+        rent.propaddr = ""
+        for address in rent.prop_rent:
+            rent.propaddr += address.propaddr + "; "
+    # Sort the rents by the order that they were accessed
+    if request.method == 'GET':
+        rents = sorted(rents, key=lambda o: id_list.index(o.id))
+
+    return fdict, rents
+
+
 def get_rents_basic_sql():  # get rents for home rents page with simple search option
     fdict = dict_basic()
     id_list = get_idlist_recent("recent_rents") if request.method == "GET" else None

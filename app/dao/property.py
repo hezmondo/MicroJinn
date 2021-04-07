@@ -1,5 +1,5 @@
 from app import db
-from sqlalchemy.orm import contains_eager, joinedload, load_only
+from sqlalchemy.orm import contains_eager,load_only
 from app.dao.database import commit_to_database
 from app.models import Property, Rent
 

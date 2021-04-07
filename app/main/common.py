@@ -98,7 +98,7 @@ def date_processor():
     def next_rent_date(date1, frequency, datecode_id, periods):
         # first we get a new pure date calculated forwards or backwards for the number of periods
         date2 = inc_date(date1, frequency, periods)
-        if datecode_id != 0:
+        if datecode_id and datecode_id != 0:
             if frequency not in (2, 4):
                 current_app.logger.warn(f"inc_date_m(): Unexpected 'frequency' ({frequency})")
             # now get special date sequences from date_m model type

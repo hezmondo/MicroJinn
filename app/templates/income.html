@@ -10,10 +10,6 @@
         <a href="{{ url_for('rent_bp.rent', rent_id=incomevals.rent_id) }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
     </div>
-    <div class="col-md-3">
-        <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
-           class="btn btn-block btn-primary" role="button">post income for this rent</a>
-    </div>
 </div>
 {% endif %}
 <div class="row">
@@ -49,7 +45,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card card-white">
+        <div class="card card-white" style="margin-bottom: 1rem;">
             <div class="card-header">
                 <div class="row">
                     <div class="col">search</div>
@@ -69,7 +65,7 @@
                                 items=income_dict.acc_descs_all,
                                 items_selected=incomevals.acc_desc) }}
                             </div>
-                            <div>
+                            <div style="margin-top: 1rem;">
                                 {{ widgets.multiselect_as_select(name="paytype",
                                 items=PayTypes.names(), items0="all payment types",
                                 items_selected=incomevals.paytype) }}
@@ -86,6 +82,24 @@
                 </form>
             </div>
         </div>
+        {% if incomevals.rent_id != 0 %}
+        <div class="card card-white">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">actions</div>
+                </div>
+            </div>
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
+                           class="btn btn-primary btn-block button-icon plus" role="button">post income for this rent</a>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
