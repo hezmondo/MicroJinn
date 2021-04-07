@@ -2,7 +2,6 @@ from flask import request
 from app.dao.agent import get_agent_id
 from app.dao.headrent import get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
-from app.main.common import inc_date_m
 from app.main.functions import strToDec
 from app.models import Agent, Headrent
 from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
@@ -15,27 +14,31 @@ def create_new_headrent():
 
 def get_headrents_p():
     filter = []
-    filterdict = {'rentcode': '', 'address': '', 'agent': '', 'status': 'all statuses'}
+    filterdict = {'rentcode': '', 'address': '', 'agent': '', 'status': ['active']}
     if request.method == "POST":
         rentcode = request.form.get("rentcode") or ""
         filterdict['rentcode'] = rentcode
-        if rentcode and rentcode != "":
+        if rentcode:
             filter.append(Headrent.code.startswith([rentcode]))
         address = request.form.get("address") or ""
         filterdict['address'] = address
-        if address and address != "":
+        if address:
             filter.append(Headrent.propaddr.ilike('%{}%'.format(address)))
         agent = request.form.get("agent") or ""
         filterdict['agent'] = agent
-        if agent and agent != "":
+        if agent:
             filter.append(Agent.detail.ilike('%{}%'.format(agent)))
-        status = request.form.getlist("status") or ""
-        filterdict['status'] = status
+        status = request.form.getlist("status") or ["all statuses"]
+        if status and status != ["all statuses"]:
+            ids = []
+            for i in range(len(status)):
+                ids.append(HrStatuses.get_id(status[i]))
+                filter.append(Headrent.status_id.in_(ids))
+            filterdict['status'] = status
     else:
         filter.append(Headrent.status_id==1)
     headrents = get_headrents(filter)
     for headrent in headrents:
-        headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
         headrent.status = HrStatuses.get_name(headrent.status_id)
 
     return filterdict, headrents

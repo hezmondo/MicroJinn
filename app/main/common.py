@@ -1,6 +1,7 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 from flask import current_app
 from dateutil.relativedelta import relativedelta
+from app import app
 from app.models import Jstore, TypeDeed
 from app.modeltypes import Date_m
 
@@ -90,3 +91,30 @@ def inc_date_m(date1, frequency, datecode_id, periods):
         current_app.logger.warn(f"inc_date_m(): Unexpected 'date2' ({date2})")
 
     return date2
+
+
+@app.context_processor
+def date_processor():
+    def next_rent_date(date1, frequency, datecode_id, periods):
+        # first we get a new pure date calculated forwards or backwards for the number of periods
+        date2 = inc_date(date1, frequency, periods)
+        if datecode_id != 0:
+            if frequency not in (2, 4):
+                current_app.logger.warn(f"inc_date_m(): Unexpected 'frequency' ({frequency})")
+            # now get special date sequences from date_m model type
+            dates_m = Date_m.get_dates(datecode_id)
+            for item in dates_m:
+                if item[0] == date2.month:
+                    return date2.replace(day=item[1])
+            current_app.logger.warn(f"inc_date_m(): Unexpected 'date2' ({date2})")
+
+        return date2
+
+    return dict(next_rent_date=next_rent_date)
+#
+#
+# @app.context_processor
+# def utility_processor():
+#     def format_price(amount, currency=u'€'):
+#         return u'{0:.2f}{1}'.format(amount, currency)
+#     return dict(format_price=format_price)

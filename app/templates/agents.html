@@ -2,121 +2,132 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<form method="POST" id="target">
 
-    <div class="form-group row flex-row-reverse">
-        {% if agent_id != 0 %}
-        <div class="col-md-3">
-            <a href="{{ url_for('agent_bp.agent', agent_id=agent_id, rent_id=rent_id, rentcode=rentcode, action='from_rent') }}"
-               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to agent</a>
-        </div>
-        {% endif %}
-        {% if rent_id != 0 %}
-        <div class="col-md-3">
-            <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
-        </div>
-        {% if agent_id != 0 %}
-        <div class="col-md-6">
-            <div class="vertical-align">select an agent to link to {{ rentcode }} below, or add a new agent</div>
-        </div>
-        {% else %}
-        <div class="col-md-9">
-            <div class="vertical-align">select an agent to link to {{ rentcode }} below, or add a new agent</div>
-        </div>
-        {% endif %}
-        {% endif %}
+{% if agent_id or rent_id %}
+<div class="form-group row flex-row-reverse">
+    {% if agent_id != 0 -%}
+    <div class="col-md-3">
+        <a href="{{ url_for('agent_bp.agent', agent_id=agent_id, rent_id=rent_id, rentcode=rentcode, action='from_rent') }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to agent</a>
     </div>
-    <div class="row">
-        <div class="col-md-9">
-            <div class="table-fixed">
-                {% if rent_id == 0 %}
-                <table class="table" id="agents">
-                    <thead>
-                    <tr>
-                        <th style="width: 40.00%">agent address</th>
-                        <th style="width: 25.00%">agent email</th>
-                        <th style="width: 25.00%">agent notes</th>
-                        <th style="width: 10.00%"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in agents %}
-                    <tr id="{{ item.id }}">
-                        <td style="width: 48.00%">{{ item.detail }}</td>
-                        <td style="width: 25.00%">{{ item.email }}</td>
-                        <td style="width: 25.00%"> {{ item.note }}</td>
-                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('agent_bp.agent',
+    {%- endif %}
+    {% if rent_id != 0 %}
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+    </div>
+    {% if agent_id != 0 %}
+    <div class="col-md-6">
+        <div class="vertical-align">select an agent to link to {{ rentcode }} below, or add a new agent</div>
+    </div>
+    {% else %}
+    <div class="col-md-9">
+        <div class="vertical-align">select an agent to link to {{ rentcode }} below, or add a new agent</div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endif %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            {% if rent_id == 0 %}
+            <table class="table" id="agents">
+                <thead>
+                <tr>
+                    <th style="width: 40.00%">agent address</th>
+                    <th style="width: 25.00%">agent email</th>
+                    <th style="width: 25.00%">agent notes</th>
+                    <th style="width: 10.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in agents %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 48.00%">{{ item.detail }}</td>
+                    <td style="width: 25.00%">{{ item.email }}</td>
+                    <td style="width: 25.00%"> {{ item.note }}</td>
+                    <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('agent_bp.agent',
                         agent_id=item.id, rent_id=0) }}" class="btn btn-teal-light btn-round button-icon round circles"
-                        role="button" data-toggle="tooltip" title="view agent"></a>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% else %}
-                <table class="table" id="agents">
-                    <thead>
-                    <tr>
-                        <th style="width: 40.00%">agent details</th>
-                        <th style="width: 20.00%">agent email</th>
-                        <th style="width: 20.00%">agent notes</th>
-                        <th style="width: 20.00%" class="align-right">link to {{ rentcode }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for item in agents %}
-                    <tr id="{{ item.id }}">
-                        <td style="width: 40.00%">{{ item.detail }}</td>
-                        <td style="width: 20.00%">{{ item.email }}</td>
-                        <td style="width: 20.00%"> {{ item.note }}</td>
-                        <td style="width: 20.00%" class="vertical-align align-right"><a href="{{ url_for('agent_bp.agents_select',
+                                                                       role="button" data-toggle="tooltip"
+                                                                       title="view agent"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <table class="table" id="agents">
+                <thead>
+                <tr>
+                    <th style="width: 40.00%">agent details</th>
+                    <th style="width: 20.00%">agent email</th>
+                    <th style="width: 20.00%">agent notes</th>
+                    <th style="width: 20.00%" class="align-right">link to {{ rentcode }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in agents %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 40.00%">{{ item.detail }}</td>
+                    <td style="width: 20.00%">{{ item.email }}</td>
+                    <td style="width: 20.00%"> {{ item.note }}</td>
+                    <td style="width: 20.00%" class="vertical-align align-right"><a href="{{ url_for('agent_bp.agents_select',
             agent_id=item.id, rent_id=rent_id) }}" class="btn btn-success btn-round button-icon round plus"
-                                                   data-toggle="tooltip" title="link agent" role="button"></a>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% endif %}
-            </div>
+                                                                                    data-toggle="tooltip"
+                                                                                    title="link agent"
+                                                                                    role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
         </div>
-        <div class="col-md-3">
-            <div class="card card-white" style="margin-bottom: 20px;">
-                <div class="card-header">actions</div>
-                <div class="card-body text-primary">
-                    <div class="row">
-                        <div class="col-md-12">
-                            {% if rent_id %}
-                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
-                                action='new_agent') }}"
-                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
-                                rentcode }}</a>
-                            {% else %}
-                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
-                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
-                            {% endif %}
-                        </div>
-                    </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-white" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">search</div>
+                    <div class="col align-right"><b>{{ agents|length }}</b> results</div>
                 </div>
             </div>
-            <div class="card card-white">
-                <div class="card-header">search for an agent</div>
-                <div class="card-body text-primary">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <input type="text" class="form-control" style="margin-bottom:5px;" name="detail"
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        <form method="POST" id="target">
+                            <input type="text" class="form-control" name="detail"
                                    placeholder="agent details">
-                            <input type="text" class="form-control" style="margin-bottom:5px;" name="email"
+                            <input type="text" class="form-control" name="email"
                                    placeholder="agent email">
-                            <input type="text" class="form-control" style="margin-bottom:5px;" name="note"
+                            <input type="text" class="form-control" style="margin-bottom:1rem;" name="note"
                                    placeholder="agent notes">
                             <button type="submit" class="btn btn-block btn-success button-icon search"
                                     role="button">search
                             </button>
-                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-white">
+            <div class="card-header">actions</div>
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        {% if rent_id %}
+                        <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
+                                action='new_agent') }}"
+                           class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
+                            rentcode }}</a>
+                        {% else %}
+                        <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
+                           class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</form>
+</div>
+
 {% endblock %}

@@ -4,67 +4,88 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" id="target">
-    {% if incomevals.rent_id != 0 %}
-        <div class="form-group row flex-row-reverse">
-            <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent', rent_id=incomevals.rent_id) }}"
-                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
-                   class="btn btn-block btn-primary" role="button">post income for this rent</a>
-            </div>
-        </div>
-    {% endif %}
-    <div class="form-group row">
-        <div class="col-md-2">
-            <input type="text" class="form-control" name="payer"
-                   value="{{ incomevals.payer }}" placeholder="all payers">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode"
-                   value="{{ incomevals.rentcode }}" placeholder="all rentcodes">
-        </div>
-        <div class="col-md-3">
-            {{ widgets.combobox(name="acc_desc", items=income_dict.acc_descs_all, item_selected=incomevals.acc_desc) }}
-        </div>
-        <div class="col-md-3">
-            {{ widgets.combobox(name="paytype", items=PayTypes.names(), items0="all payment types",
-            item_selected=incomevals.paytype) }}
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
+{% if incomevals.rent_id != 0 %}
+<div class="form-group row flex-row-reverse">
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rent', rent_id=incomevals.rent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
+           class="btn btn-block btn-primary" role="button">post income for this rent</a>
+    </div>
+</div>
+{% endif %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <table class="table" id="incomeitems">
+                <thead>
+                <tr>
+                    <th style="width: 12.00%">date</th>
+                    <th style="width: 24.00%">payer</th>
+                    <th style="width: 10.00%">amount</th>
+                    <th style="width: 10.00%">rentcode</th>
+                    <th style="width: 25.00%">bank account</th>
+                    <th style="width: 17.00%">payment type</th>
+                    <th style="width: 2.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in incomes %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 12.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 24.00%"> {{ item.payer }}</td>
+                    <td style="width: 10.00%"> {{ item.amount }}</td>
+                    <td style="width: 10.00%"> {{ item.rentcode }}</td>
+                    <td style="width: 25.00%"> {{ item.acc_desc }}</td>
+                    <td style="width: 17.00%"> {{ PayTypes.get_name(item.paytype_id) }}</td>
+                    <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('income_bp.income_item',
+            income_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
- </form>
-<div class="table-fixed">
-    <table class="table" id="incomeitems">
-        <thead>
-        <tr>
-            <th style="width: 10.00%">date</th>
-            <th style="width: 23.00%">payer</th>
-            <th style="width: 10.00%">amount</th>
-            <th style="width: 10.00%">rentcode</th>
-            <th style="width: 25.00%">bank account</th>
-            <th style="width: 15.00%">payment type</th>
-            <th style="width: 2.00%"></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in incomes %}
-        <tr id="{{ item.id }}">
-            <td style="width: 10.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
-            <td style="width: 23.00%"> {{ item.payer }}</td>
-            <td style="width: 10.00%"> {{ item.amount }}</td>
-            <td style="width: 10.00%"> {{ item.rentcode }}</td>
-            <td style="width: 25.00%"> {{ item.acc_desc }}</td>
-            <td style="width: 15.00%"> {{ item.paytypedet }}</td>
-            <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('income_bp.income_item',
-            income_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="col-md-3">
+        <div class="card card-white">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">search</div>
+                    <div class="col align-right"><b>{{ incomes|length }}</b> results</div>
+                </div>
+            </div>
+            <div class="card-body text-primary">
+                <form method="POST" id="target">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="payer"
+                                   value="{{ incomevals.payer }}" placeholder="payer">
+                            <input type="text" class="form-control" name="rentcode"
+                                   value="{{ incomevals.rentcode }}" placeholder="rentcode">
+                            <div style="margin-top: 1rem;">
+                                {{ widgets.multiselect_as_select(name="acc_desc",
+                                items=income_dict.acc_descs_all,
+                                items_selected=incomevals.acc_desc) }}
+                            </div>
+                            <div>
+                                {{ widgets.multiselect_as_select(name="paytype",
+                                items=PayTypes.names(), items0="all payment types",
+                                items_selected=incomevals.paytype) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="col">
+                            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">
+                                search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -55,16 +55,6 @@ class ChargeType(db.Model):
     incomealloc_chargetype = db.relationship('IncomeAlloc', backref='chargetype', lazy='dynamic')
 
 
-class Date_m(db.Model):
-    __tablename__ = 'date_m'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(15))
-    month = db.Column(db.Integer)
-    day = db.Column(db.Integer)
-    code_id = db.Column(db.Integer)
-
-
 class DigFile(db.Model):
     __tablename__ = 'digfile'
 
@@ -489,7 +479,7 @@ class Rent(db.Model):
     event_rent = db.relationship('Event', backref='rent', lazy='dynamic')
     incomealloc_rent = db.relationship('IncomeAlloc', backref='rent', lazy='dynamic')
     lease_rent = db.relationship('Lease', backref='rent', lazy='dynamic')
-    prop_rent = db.relationship('Property', backref='rent', lazy='dynamic')
+    prop_rent = db.relationship('Property', backref='rent')
     payrequest_rent = db.relationship('PrHistory', backref='rent', lazy='dynamic')
 
     def __repr__(self):

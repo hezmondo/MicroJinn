@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-md-9">
-        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
             <table class="table table-head">
                 <thead>
                 <tr>
@@ -44,7 +44,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed" style="margin-bottom: 20px;">
+        <div class="table-fixed" style="margin-bottom: 1.5rem;">
             <table class="table table-head table-narrow table-light-purple">
                 <thead>
                 <tr>
@@ -73,7 +73,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">mailaddr</td>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">mail address</td>
                     <td class="copyable-text vertical-align" style="width: 82.50%">{{ rent.mailaddr }}</td>
 
                 </tr>
@@ -85,7 +85,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
             <table class="table rounded-corners">
                 <tbody>
                 <tr>
@@ -107,7 +107,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="table-fixed table-rent" style="margin-bottom: 20px;">
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
             <table class="table table-head">
                 <tbody>
                 <tr>
@@ -148,20 +148,20 @@
             <div class="card-header">actions</div>
             <div class="card-body text-primary">
                 <div class="form-group row">
-                    <div class="col-md-12">
+                    <div class="col">
                         <a href="{{ url_for('lease_bp.lease', lease_id=0, rent_id=rent.id,
                             rentcode=rent.rentcode) }}"
                            class="btn btn-block btn-primary button-icon info" role="button">leaseinfo</a>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col-md-12">
+                    <div class="col">
                         <a href="{{ url_for('income_bp.income', acc_id=0, rent_id=rent.id) }}"
                            class="btn btn-block btn-primary button-icon wallet" role="button">income</a>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <div class="col-md-12">
+                <div class="row">
+                    <div class="col">
                         <div class="dropdown">
                             <button class="btn btn-warning dropdown-toggle button-icon invoice" style="width:100%"
                                     type="button" id="statementsMenuButton"
@@ -186,17 +186,17 @@
                 </div>
             </div>
         </div>
-        <div class="card card-white" style="margin-top:20px;">
+        <div class="card card-white" style="margin-top:1.5rem;">
             <div class="card-header">mail</div>
             <div class="card-body text-primary">
                 <div class="form-group row">
-                    <div class="col-md-12">
+                    <div class="col">
                         <a href="{{ url_for('doc_bp.docfiles', rent_id=rent.id) }}"
                            class="btn btn-block btn-success button-icon mail-ic" role="button">docfiles</a>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <div class="col-md-12">
+                <div class="row">
+                    <div class="col">
                         <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='rent') }}"
                                 class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
                     </div>
@@ -222,7 +222,7 @@
     <div class="col-md-3">
         <button type="button" id="open_edit_rent" data-toggle="modal" data-target="#edit_modal"
                 class="btn btn-block btn-secondary button-icon edit"
-                style="margin-bottom: 20px;">edit rent
+                style="margin-bottom: 1.5rem;">edit rent
         </button>
     </div>
 </div>
@@ -238,7 +238,7 @@
                         <div class="card-header">edit rent {{ rent.rentcode }}</div>
                         <div class="card-body text-primary">
                             <div class="form-group row">
-                                <div class="col-md-12">
+                                <div class="col">
                                     <label for="landlord">landlord:</label>
                                     {{ widgets.combobox(name="landlord", items=Landlords.names(),
                                     item_selected=rent.landlord.name) }}
@@ -330,7 +330,7 @@
                                 <div class="col-md-2">
                                     <button type="button"
                                             class="btn btn-block btn-secondary button-icon cross"
-                                            style="margin-bottom: 20px;" data-dismiss="modal">close
+                                            style="margin-bottom: 1.5rem;" data-dismiss="modal">close
                                     </button>
                                 </div>
                             </div>
@@ -365,37 +365,37 @@
             <div class="modal-body">
                 <form method="POST" id="rent_tenant">
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="tenantname">tenant name</label>
                             <input type="text" class="form-control" name="tenantname" value="{{ rent.tenantname }}">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="mailto">mail to:</label>
                             {{ widgets.combobox(name="mailto", items=MailTos.names(), item_selected=rent.mailto) }}
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="email">email addresses - separate with semicolon</label>
                             <input type="text" class="form-control" name="email" value="{{ rent.email }}">
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="prdelivery">payrequest delivery:</label>
                             {{ widgets.combobox(name="prdelivery", items=PrDeliveryTypes.names(),
                             item_selected=rent.prdeliverydet) }}
                         </div>
                     </div>
                     <div class="form-group row">
-                        <div class="col-md-12">
+                        <div class="col">
                             <label for="note">notes</label>
                             <input type="text" class="form-control" name="note" value="{{ rent.note }}">
                         </div>
                     </div>
-                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 20px;">
+                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 1.5rem;">
                         <div class="col-md-6">
                             <button type="button" class="btn btn-block btn-secondary button-icon cross"
                                     data-dismiss="modal">close
