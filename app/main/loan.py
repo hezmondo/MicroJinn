@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from flask import request
 from app.dao.loan import dbget_loan_statement, dbget_loan_row, dbget_loans_all, dbget_loanstat_data, \
     dbget_loans_nick, post_loan
 from app.main.common import inc_date
+from app.main.functions import strToDate
 from app.models import Loan
 from app.modeltypes import AdvArr, Freqs
 
@@ -65,7 +66,8 @@ def get_loan_statement(loan_id):
     return checksums, loancode, loanstatement
 
 def get_loan_stat(loan_id):
-    stat_date = request.form.get("statdate")
+    stat_date = datetime.strptime(request.form.get("statdate"), '%Y-%m-%d')
+    stat_date = stat_date.date()
     loancode = request.form.get("loancode")
     loan = dbget_loan_row(loan_id)
     rates, transactions = dbget_loanstat_data(loan_id)

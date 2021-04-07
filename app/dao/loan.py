@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import asc, text
+from sqlalchemy import asc, select, text
 from sqlalchemy.orm import joinedload, load_only
 from app import db
 from app.dao.database import commit_to_database
@@ -26,10 +26,11 @@ def dbget_loanstat_data(loan_id):
         .options(load_only('id', 'date', 'memo', 'amount')) \
         .filter(LoanTran.loan_id==loan_id)) \
         .order_by(MoneyItem.date, LoanTran.date)
-    rates = db.session.query(LoanIntRate). \
-        filter(LoanIntRate.loan_id==loan_id) \
-        .options(load_only('rate', 'start_date')).all()
-
+    # rates = db.session.query(LoanIntRate). \
+    #     filter(LoanIntRate.loan_id==loan_id) \
+    #     .options(load_only('rate', 'start_date')).all()
+    smt = " SELECT rate, start_date FROM loan_interest_rate WHERE loan_id = '{}' ".format(loan_id)
+    rates = db.session.execute(smt).fetchall()
     return rates, transactions
 
 
