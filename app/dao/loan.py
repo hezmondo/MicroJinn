@@ -26,11 +26,9 @@ def dbget_loanstat_data(loan_id):
         .options(load_only('id', 'date', 'memo', 'amount')) \
         .filter(LoanTran.loan_id==loan_id)) \
         .order_by(MoneyItem.date, LoanTran.date)
-    # rates = db.session.query(LoanIntRate). \
-    #     filter(LoanIntRate.loan_id==loan_id) \
-    #     .options(load_only('rate', 'start_date')).all()
-    smt = " SELECT rate, start_date FROM loan_interest_rate WHERE loan_id = '{}' ".format(loan_id)
-    rates = db.session.execute(smt).fetchall()
+    stmt = " SELECT rate, start_date FROM loan_interest_rate WHERE loan_id = '{}' ".format(loan_id)
+    rates = db.session.execute(stmt).fetchall()
+
     return rates, transactions
 
 

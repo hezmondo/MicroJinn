@@ -4,7 +4,7 @@ from flask import request
 from app.dao.loan import dbget_loan_statement, dbget_loan_row, dbget_loans_all, dbget_loanstat_data, \
     dbget_loans_nick, post_loan
 from app.main.common import inc_date
-from app.main.functions import strToDate
+from app.main.functions import money
 from app.models import Loan
 from app.modeltypes import AdvArr, Freqs
 
@@ -75,7 +75,7 @@ def get_loan_stat(loan_id):
     checksums = {'id': 1, 'memo': 'abc', 'advanced': 0, 'interest': 0, 'repaid': 0}
     loanstatement = []
     for item in transactions:
-        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
+        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
         loanstatement.append(item_row)
     min_date = min(item['date'] for item in loanstatement)
     int_date = inc_date(min_date, loan.freq_id, 1)
@@ -84,16 +84,24 @@ def get_loan_stat(loan_id):
         item_row = {'id': 0, 'date': int_date, 'memo': f"interest added {freqdet}", 'amount': 0, 'rate': 0, 'interest': 0, 'addinterest': 'yes', 'balance': 0}
         loanstatement.append(item_row)
         int_date = inc_date(int_date, loan.freq_id, 1)
-    rate = rates[0]
-    bal = loanstatement[0].get('amount')
-    interest_pending = 0
-    for row in loanstatement:
-        row['rate'] = rate
-        row['interest'] = rate * (stat_date - row['date']).days / 365.25
-        interest_pending = interest_pending + row['interest']
-        if row['add interest'] == 'yes':
-            row['balance'] = bal + interest_pending
-            interest_pending = 0
     loanstatement = sorted(loanstatement, key=lambda k: k['date'])
+    rate1 = rates[0][0]
+    date1 = rates[0][1]
+    bal = money(loanstatement[0]['amount'])
+    interest_pending = money(0)
+    num = len(loanstatement)
+    for i in range(1, num):
+        loanstatement[i]['rate'] = rate1
+        daysno = (loanstatement[i]['date'] - date1).days
+        daysno = Decimal(daysno)
+        interest = money(rate1 * bal * daysno / Decimal(36525)) if daysno > 0 else money(0)
+        loanstatement[i]['interest'] = interest
+        date1 = loanstatement[i]['date']
+        interest_pending = money(interest_pending + interest)
+        loanstatement[i]['balance'] = money(bal + loanstatement[i]['amount'])
+        if loanstatement[i]['addinterest'] == 'yes':
+            loanstatement[i]['balance'] = money(loanstatement[i]['balance'] + interest_pending)
+            interest_pending = money(0)
+        bal = money(loanstatement[i]['balance'])
 
     return checksums, loancode, loanstatement
