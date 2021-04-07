@@ -1,11 +1,12 @@
 from app import db
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import contains_eager,load_only
 from app.dao.database import commit_to_database
-from app.models import Property
+from app.models import Property, Rent
 
 
 def get_props(filtr):
-    properties = db.session.query(Property).options(joinedload('rent').load_only('rentcode')) \
+    properties = db.session.query(Property).join(Rent).options(
+        contains_eager('rent').load_only('rentcode')) \
         .filter(*filtr).order_by(Property.propaddr).limit(50).all()
 
     return properties

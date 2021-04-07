@@ -4,57 +4,83 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" id="target">
-    <div class="form-group row flex-row-reverse align-items-end">
-        {% if rent_id != 0 %}
-            <div class="col-md-2">
-                <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
-            </div>
-            <div class="col-md-3">
-                <a href="{{ url_for('util_bp.property', prop_id=0, rent_id=rent_id, rentcode=rentcode) }}"
-                   class="btn btn-block btn-danger button-icon plus" role="button">new property for this rent</a>
-            </div>
-        {% else %}
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
-        </div>
-        <div class="col-md-3">
-            <label for="proptype">proptype:</label>
-            {{ widgets.combobox(name="proptype", items=PropTypes.names(), items0="all proptypes",
-            item_selected=fdict.proptype) }}
-        </div>
-        <div class="col-md-4">
-            <input type="text" class="form-control" name="address" placeholder="address" value="{{ fdict.address }}">
-        </div>
-        <div class="col-md-2">
-            <input type="text" class="form-control" name="rentcode" placeholder="rentcode" value="{{ fdict.rentcode }}">
-        </div>
-        {% endif %}
+{% if rent_id != 0 %}
+<div class="form-group row flex-row-reverse">
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
     </div>
-</form>
-<div class="table-fixed">
-    <table class="table" id="properties">
-        <thead>
-        <tr>
-            <th style="width: 10.00%">rentcode</th>
-            <th style="width: 65.00%">address</th>
-            <th style="width: 15.00%">proptype</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in properties %}
-        <tr id="{{ item.id }}">
-            <td style="width: 10.00%"> {{ item.rent.rentcode }}</td>
-            <td style="width: 65.00%"> {{ item.propaddr }}</td>
-            <td style="width: 15.00%"> {{ item.proptype }}</td>
-            <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('util_bp.property',
+</div>
+{% endif %}
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <table class="table" id="properties">
+                <thead>
+                <tr>
+                    <th style="width: 10.00%">rentcode</th>
+                    <th style="width: 70.00%">address</th>
+                    <th style="width: 15.00%">property type</th>
+                    <th style="width: 5.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in properties %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 10.00%"> {{ item.rent.rentcode }}</td>
+                    <td style="width: 70.00%"> {{ item.propaddr }}</td>
+                    <td style="width: 15.00%"> {{ item.proptype }}</td>
+                    <td style="width: 5.00%" class="vertical-align"><a href="{{ url_for('util_bp.property',
             prop_id=item.id, rentcode=item.rentcode) }}"
-                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                                                                        class="btn btn-teal-light btn-round button-icon round circles"
+                                                                        role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-white" style="margin-bottom: 1rem;">
+            {% if rent_id != 0 %}
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">actions</div>
+                </div>
+            </div>
+            <div class="card-body text-primary">
+                <a href="{{ url_for('util_bp.property', prop_id=0, rent_id=rent_id, rentcode=rentcode) }}"
+                   class="btn btn-block btn-primary button-icon plus" role="button">new property for this rent</a>
+            </div>
+            {% else %}
+            <div class="card-header">
+                <div class="row">
+                    <div class="col">search</div>
+                    <div class="col align-right"><b>{{ properties|length }}</b> results</div>
+                </div>
+            </div>
+            <div class="card-body text-primary">
+                <form method="POST" id="target">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="address" placeholder="address"
+                                   value="{{ fdict.address }}">
+                            <input type="text" class="form-control" name="rentcode" placeholder="rentcode"
+                                   value="{{ fdict.rentcode }}">
+                            <div style="margin-top: 1rem;">
+                                {{ widgets.combobox(name="proptype", items=PropTypes.names(), items0="all proptypes",
+                                item_selected=fdict.proptype) }}
+                            </div>
+                            <button style="margin-top: 1rem;" type="submit"
+                                    class="btn btn-block btn-success button-icon search" role="button">
+                                search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

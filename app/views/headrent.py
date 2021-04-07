@@ -3,7 +3,7 @@ from flask_login import login_required
 from app.dao.headrent import get_headrent
 from app.main.common import get_combodict_basic
 from app.main.headrent import get_headrents_p, update_headrent
-from app.modeltypes import HrStatuses
+from app.modeltypes import HrStatuses, Tenures
 
 headrent_bp = Blueprint('headrent_bp', __name__)
 
@@ -23,6 +23,7 @@ def headrent(headrent_id):
         return redirect(url_for('headrent_bp.headrent', headrent_id=headrent_id))
     headrent = get_headrent(headrent_id)
     headrent.status = HrStatuses.get_name(headrent.status_id)
+    headrent.tenuredet = Tenures.get_name(headrent.tenure_id)
     combodict = get_combodict_basic()
 
     return render_template('headrent.html', combodict=combodict, headrent=headrent)

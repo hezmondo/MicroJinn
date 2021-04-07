@@ -4,7 +4,130 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" id="headrent">
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
+            <table class="table table-grey table-head">
+                <thead>
+                <tr>
+                    <td style="width: 25%">headrent {{ headrent.code }}</td>
+                    <td style="width: 25%"><span class="rounded-background light-green">{{ headrent.tenuredet }}</span>
+                    </td>
+                    <td style="width: 50%"><span id="statusdet"
+                                                 class="rounded-background light-purple">{{ headrent.status }}</span>
+                    </td>
+                </tr>
+                </thead>
+            </table>
+            <table class="table table-body">
+                <tbody>
+                <tr>
+                    <td class="td-title vertical-align copyable-text" style="width: 12.00%">property</td>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ headrent.propaddr }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="#"
+                            data-toggle="tooltip" title="edit the property"
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table table-base table-body-alt">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ headrent.landlord.name }}
+                        of {{ headrent.landlord.manager.manageraddr }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
+            <table class="table rounded-corners">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
+                    <td class="copyable-text vertical-align" style="width: 83%">{{ headrent.note }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="#"
+                            data-toggle="tooltip" title="edit notes"
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
+            <table class="table table-body-alt rounded-corners">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
+                    <td class="copyable-text vertical-align" style="width: 83%">{{ headrent.agent.detail }}</td>
+                    <td class="vertical-align align-right" style="width: 5.00%"><a
+                            href="#"
+                            data-toggle="tooltip" title="edit agent"
+                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
+            <table class="table table-head">
+                <tbody>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">rent</td>
+                </tr>
+                <tr>
+                    <td class="td-title copyable-text" style="width: 12.00%">owing</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-white">
+            <div class="card-header">actions</div>
+            <div class="card-body text-primary">
+                <div class="form-group row">
+                    <div class="col">
+                        <a href="#"
+                           class="btn btn-block btn-primary button-icon circles"
+                           role="button">view past payments</a>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col">
+                        <a href="#"
+                           class="btn btn-block btn-primary button-icon letter" role="button">produce remittance
+                            advice</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed table-rent">
+            <table class="table rounded-corners">
+                <thead>
+                <tr>
+                    <td style="width: 50%">reference: {{ headrent.reference }}</td>
+                    <td style="width: 50%">source: {{ headrent.source }}</td>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <button type="button" id="open_edit_rent" data-toggle="modal" data-target="#edit_modal"
+                class="btn btn-block btn-secondary button-icon edit"
+                style="margin-bottom: 1.5rem;">edit headrent
+        </button>
+    </div>
+</div>
+
+
+<!--<form method="POST" id="headrent">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-2">
             <a href="{{ url_for('headrent_bp.headrents') }}"
@@ -89,12 +212,13 @@
                class="btn btn-block btn-primary button-icon letter" role="button">produce remittance advice</a>
         </div>
         <div class="col-md-3">
-            <a href="{{ url_for('headrent_bp.headrents') }}" class="btn btn-block btn-primary button-icon circles" role="button">view past payments</a>
+            <a href="{{ url_for('headrent_bp.headrents') }}" class="btn btn-block btn-primary button-icon circles"
+               role="button">view past payments</a>
         </div>
     </div>
     <div class="form-group row">
     </div>
-    <div class="form-group row flex-row-reverse" id="save_delete" >
+    <div class="form-group row flex-row-reverse" id="save_delete">
         <div class="col-md-2">
             <button type="submit" class="btn btn-block btn-success button-icon save">save changes</button>
         </div>
@@ -104,5 +228,5 @@
                class="btn btn-block btn-warning button-icon trash" role="button">delete headrent</a>
         </div>
     </div>
-</form>
+</form>-->
 {% endblock %}
