@@ -1,22 +1,13 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 from flask import current_app
 from dateutil.relativedelta import relativedelta
-from app.models import Jstore, Landlord, TypeDeed
-from app.modeltypes import AcTypes, AdvArr, Date_m, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
-
-
-def get_combodict_basic():
-    # combobox values for headrent and rent, without "all" as an option
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    combo_dict = {
-        "landlords": landlords,
-    }
-    return combo_dict
+from app.models import Jstore, TypeDeed
+from app.modeltypes import Date_m
 
 
 def get_combodict_rent():
     # add the values unique to rent
-    combo_dict = get_combodict_basic()
+    combo_dict = {}
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
     combo_dict['deedcodes'] = deedcodes
 

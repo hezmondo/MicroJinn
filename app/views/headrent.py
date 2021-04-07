@@ -1,7 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
 from app.dao.headrent import get_headrent
-from app.main.common import get_combodict_basic, inc_date_m
+from app.main.common import inc_date_m
 from app.main.headrent import get_headrents_p, update_headrent
 from app.modeltypes import HrStatuses
 
@@ -24,7 +24,6 @@ def headrent(headrent_id):
     headrent = get_headrent(headrent_id)
     headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
     headrent.status = HrStatuses.get_name(headrent.status_id)
-    combodict = get_combodict_basic()
     nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
 
-    return render_template('headrent.html', combodict=combodict, headrent=headrent, nextrentdate=nextrentdate)
+    return render_template('headrent.html', headrent=headrent, nextrentdate=nextrentdate)

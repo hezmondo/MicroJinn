@@ -5,7 +5,7 @@ from flask import current_app, json
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
-from app import db, login
+from app import app, db, login, cache
 
 
 # As there are numerous model classes, shall we agree to keep them in alphabetic order,
@@ -213,6 +213,12 @@ class Landlord(db.Model):
 
     def __repr__(self):
         return '<Landlord {}>'.format(self.name)
+
+    @staticmethod
+    @cache.cached(key_prefix='db_landlord_names_all')
+    def names():
+        landlord_names = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
+        return landlord_names
 
 
 class Lease(db.Model):
@@ -600,6 +606,15 @@ class User(UserMixin, db.Model):
             return
 
         return User.query.get(id)
+
+
+@app.context_processor
+def inject_models():
+    # this is called by Flask on every request
+    # inject a dictionary of certain model types, so they are easily accessible in any template
+    return {
+        'Landlords': Landlord,
+    }
 
 
 @login.user_loader

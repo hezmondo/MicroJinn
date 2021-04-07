@@ -64,7 +64,7 @@
     <div class="form-group row">
         <div class="col-md-4">
             <label for="landlord">landlord:</label>
-            {{ widgets.multiselect_as_select(name="landlord", items=combodict.landlords,
+            {{ widgets.multiselect_as_select(name="landlord", items=Landlords.names(), items0="all landlords",
             items_selected=fdict.landlord) }}
         </div>
         <div class="col-md-2">
