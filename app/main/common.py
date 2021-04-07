@@ -2,22 +2,13 @@
 from flask import current_app
 from dateutil.relativedelta import relativedelta
 from app import app
-from app.models import Jstore, Landlord, TypeDeed
+from app.models import Jstore, TypeDeed
 from app.modeltypes import Date_m
-
-
-def get_combodict_basic():
-    # combobox values for headrent and rent, without "all" as an option
-    landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-    combo_dict = {
-        "landlords": landlords,
-    }
-    return combo_dict
 
 
 def get_combodict_rent():
     # add the values unique to rent
-    combo_dict = get_combodict_basic()
+    combo_dict = {}
     deedcodes = [value for (value,) in TypeDeed.query.with_entities(TypeDeed.deedcode).all()]
     combo_dict['deedcodes'] = deedcodes
 

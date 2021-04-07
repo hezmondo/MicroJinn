@@ -5,11 +5,9 @@ from app.models import Property, Rent
 
 
 def get_props(filtr):
-    properties = db.session.query(Property).join(Rent).options(
+    return db.session.query(Property).join(Rent).options(
         contains_eager('rent').load_only('rentcode')) \
         .filter(*filtr).order_by(Property.propaddr).limit(50).all()
-
-    return properties
 
 
 def get_prop(prop_id):
