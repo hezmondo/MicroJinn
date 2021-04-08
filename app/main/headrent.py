@@ -1,8 +1,10 @@
 from flask import request
 from app.dao.agent import get_agent_id
-from app.dao.headrent import get_headrents, post_headrent
+from app.dao.headrent import get_headrent, get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
+from app.main.common import inc_date_m
 from app.main.functions import strToDec
+from app.main.rent import get_paidtodate, get_rent_gale
 from app.models import Agent, Headrent
 from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 
@@ -10,6 +12,19 @@ from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 def create_new_headrent():
     # create new headrent function not yet built, so return any id:
     return 23
+
+
+def mget_headrent(headrent_id):
+    headrent = get_headrent(headrent_id)
+    headrent.status = HrStatuses.get_name(headrent.status_id)
+    headrent.tenuredet = Tenures.get_name(headrent.tenure_id)
+    headrent.advarrdet = AdvArr.get_name(headrent.advarr_id)
+    headrent.paidtodate = get_paidtodate(headrent.advarrdet, headrent.arrears, headrent.datecode_id, headrent.freq_id,
+                                         headrent.lastrentdate, headrent.rentpa)
+    headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
+    headrent.rent_gale = get_rent_gale(headrent.nextrentdate, headrent.freq_id, headrent.rentpa)
+
+    return headrent
 
 
 def get_headrents_p():
@@ -65,6 +80,20 @@ def update_headrent(headrent_id):
     headrent.tenure_id = Tenures.get_id(request.form.get("tenure"))
     post_headrent(headrent)
 
-    return
+
+def update_landlord(headrent_id):
+    headrent = Headrent.query.get(headrent_id)
+    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
+    post_headrent(headrent)
 
 
+def update_note(headrent_id):
+    headrent = Headrent.query.get(headrent_id)
+    headrent.note = request.form.get("note")
+    post_headrent(headrent)
+
+
+def update_propaddr(headrent_id):
+    headrent = Headrent.query.get(headrent_id)
+    headrent.propaddr = request.form.get("propaddr")
+    post_headrent(headrent)

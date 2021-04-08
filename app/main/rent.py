@@ -371,6 +371,14 @@ def rent_validation(rent, message=""):
     return messages
 
 
+def update_landlord(rent_id):
+    rent = Rent.query.get(rent_id)
+    rent.landlord_id = get_landlord_id(request.form.get("landlord"))
+    rent_id = post_rent(rent)
+
+    return rent_id
+
+
 def update_rent_rem(rent_id):
     rent = Rent.query.get(rent_id)
     rent.actype_id = AcTypes.get_id(request.form.get("actype"))
@@ -380,7 +388,6 @@ def update_rent_rem(rent_id):
     # rent.datecode_id = int(request.form.get("datecode_id"))
     rent.deed_id = get_deed_id(request.form.get("deedcode"))
     rent.freq_id = Freqs.get_id(request.form.get("frequency"))
-    rent.landlord_id = get_landlord_id(request.form.get("landlord"))
     rent.lastrentdate = request.form.get("lastrentdate")
     price = request.form.get("price")
     rent.prdelivery_id = AdvArr.get_id(request.form.get("advarr"))

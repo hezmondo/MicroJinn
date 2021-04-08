@@ -49,14 +49,8 @@ def get_headrents(filter):
 
 
 def post_headrent(headrent):
-    try:
-        db.session.add(headrent)
-        message = "Success! This headrent has been updated."
-        commit_to_database()
-    except Exception as ex:
-        message = f"Update headrent failed. Error:  {str(ex)}"
-
-    return message
+    db.session.add(headrent)
+    commit_to_database()
 
 
 # def post_headrent_agent_update(agent_id, rent_id):
