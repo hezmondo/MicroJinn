@@ -54,6 +54,12 @@ class ChargeType(db.Model):
     charge_chargetype = db.relationship('Charge', backref='chargetype', lazy='dynamic')
     incomealloc_chargetype = db.relationship('IncomeAlloc', backref='chargetype', lazy='dynamic')
 
+    @staticmethod
+    @cache.cached(key_prefix='db_chargetype_chargedesc_all')
+    def chargetypes():
+        charge_types = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
+        return charge_types
+
 
 class DigFile(db.Model):
     __tablename__ = 'digfile'

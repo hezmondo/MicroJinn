@@ -191,6 +191,15 @@ class PropTypes:
         return PropTypes._names.index(name) + 1
 
 
+class RentType:
+    # the "name" of the type of rent
+
+    @staticmethod
+    def rent_type(tenuredet):
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return "rent charge" if tenuredet == "rentcharge" else "ground rent"
+
+
 class SaleGrades:
     # the "names" of the types
     # ids are index into these, counting from 1
@@ -263,6 +272,7 @@ def inject_model_types():
         'PayTypes': PayTypes,
         'PrDeliveryTypes': PrDeliveryTypes,
         'PropTypes': PropTypes,
+        'RentType': RentType,
         'SaleGrades': SaleGrades,
         'Statuses': Statuses,
         'Tenures': Tenures,

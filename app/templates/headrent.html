@@ -92,15 +92,15 @@
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent</td>
                     <td class="copyable-text" style="width: 88.00%">This block of properties is subject
-                        to a {{ headrent.tenuredet }} of {{ money_str(headrent.rentpa, pound=True) }}
+                        to a {{ RentType.rent_type(headrent.tenuredet) }} of {{ money_str(headrent.rentpa, pound=True) }}
                         per annum payable {{ headrent.freqdet }} {{ headrent.advarrdet }}.
                     </td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">owing</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ headrent.tenuredet|title }} on this block of
-                        properties is paid up to {{ headrent.paidtodate.strftime('%d-%b-%Y') }}.
-                        Further {{ headrent.tenuredet }} will be due and payable {{ headrent.freqdet }}
+                    <td class="copyable-text" style="width: 88.00%">{{ RentType.rent_type(headrent.tenuredet) }} on this block
+                        of properties is paid up to {{ headrent.paidtodate.strftime('%d-%b-%Y') }}. Further
+                        {{ RentType.rent_type(headrent.tenuredet) }} will be due and payable {{ headrent.freqdet }}
                         {{ headrent.advarrdet }} on {{ headrent.nextrentdate.strftime('%d-%b-%Y') }} in the sum of
                         {{ money_str(headrent.rent_gale, pound=True) }}
                     </td>
