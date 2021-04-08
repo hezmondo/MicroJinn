@@ -27,13 +27,13 @@
         {% for item in loanstatement %}
         <tr id="{{ item.id }}">
             <td style="width: 10.00%">{{ item.id }}</td>
-            <td style="width: 10.00%">{{ item.date }}</td>
+            <td style="width: 10.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
             <td style="width: 25.00%"> {{ item.memo }}</td>
-            <td style="width: 10.00%"> {{ item.amount }}</td>
+            <td style="width: 10.00%"> {{ money_str(item.amount, pound=True) }}</td>
             <td style="width: 10.00%"> {{ item.rate }}</td>
-            <td style="width: 10.00%"> {{ item.interest }}</td>
+            <td style="width: 10.00%"> {{ money_str(item.interest, pound=True) }}</td>
             <td style="width: 15.00%"> {{ item.addinterest }}</td>
-            <td style="width: 10.00%"> {{ item.balance }}</td>
+            <td style="width: 10.00%"> {{ money_str(item.balance, pound=True) }}</td>
         </tr>
         {% endfor %}
         <tr>

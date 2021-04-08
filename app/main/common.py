@@ -1,7 +1,9 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
+import typing
 from flask import current_app
 from dateutil.relativedelta import relativedelta
 from app import app
+from app.main.functions import money
 from app.models import Jstore, TypeDeed
 from app.modeltypes import Date_m
 
@@ -111,10 +113,28 @@ def date_processor():
         return date2
 
     return dict(next_rent_date=next_rent_date)
-#
-#
+
+
 # @app.context_processor
 # def utility_processor():
 #     def format_price(amount, currency=u'€'):
 #         return u'{0:.2f}{1}'.format(amount, currency)
 #     return dict(format_price=format_price)
+
+
+@app.context_processor
+def money_processor():
+    def money_str(val: typing.Any, commas: bool=True, pound: bool=False) -> str:
+        # Given a value which is a monetary amount (e.g. as returned by `money()` above, though we call that for you)
+        # return it as a string
+        # by default the string does have comma-separators and does not have a leading £ symbol, e.g. 12,345.67
+        # value of `None` returns an empty string
+        if val is None:
+            return ""
+        val = money(val)
+        sVal = "{:,.2f}".format(val) if commas else "{:.2f}".format(val)
+        if pound:
+            sVal = "£" + sVal
+        return sVal
+    return dict(money_str=money_str)
+
