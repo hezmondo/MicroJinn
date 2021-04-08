@@ -3,9 +3,9 @@ from flask_login import login_required
 from app.dao.common import get_filters
 from app.dao.rent import get_rent_external
 from app.main.common import get_combodict_filter, get_combodict_rent
-from app.main.rent import get_rentp, get_rents_advanced, get_rents_basic, get_rents_basic_sam, \
+from app.main.rent import get_rentp, get_rents_advanced, \
     get_rents_basic_sql, get_rents_external, \
-    get_rent_strings, rent_validation, update_rent_rem, update_tenant
+    get_rent_strings, rent_validation, update_landlord, update_rent_rem, update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)
 
@@ -22,9 +22,6 @@ def load_filter():
 # @login_required
 def rent(rent_id):
     message = request.args.get('message', '', type=str)
-    if request.method == "POST":
-        rent_id = update_rent_rem(rent_id)
-        return redirect(url_for('rent_bp.rent', rent_id=rent_id))
     combodict = get_combodict_rent()
     # gather rent combobox values
     rent = get_rentp(rent_id) if rent_id != 0 else {"id": 0}    # get full enhanced rent pack
@@ -77,3 +74,22 @@ def tenant(rent_id):    # update tenant details from rent page
     update_tenant(rent_id)
 
     return redirect(url_for('rent_bp.rent', rent_id=rent_id))
+
+
+# update rent details from rent page based on action (from tenant/landlord/edit_rent modal)
+@rent_bp.route('/rent_update/<int:rent_id>', methods=['GET', 'POST'])
+# @login_required
+def rent_update(rent_id):
+    action = request.args.get('action', type=str)
+    message = ''
+    try:
+        if action == 'landlord':
+            update_landlord(rent_id)
+        elif action == 'tenant':
+            update_tenant(rent_id)
+        elif action == 'rent':
+            update_rent_rem(rent_id)
+    except Exception as ex:
+        message = f"Update rent failed. Error:  {str(ex)}"
+
+    return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))

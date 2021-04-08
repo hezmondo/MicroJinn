@@ -14,10 +14,10 @@
                     <td style="width: 25%">rent {{ rent.rentcode }}</td>
                     <td style="width: 25%"><span class="rounded-background light-green">{{ rent.tenuredet }}</span></td>
                     <td style="width: 25%"><span id="statusdet"
-                                     class="rounded-background light-purple">{{ rent.statusdet }} status</span>
+                                                 class="rounded-background light-purple">{{ rent.statusdet }} status</span>
                     </td>
                     <td style="width: 25%"><span id="actype"
-                                         class="rounded-background light-purple">{{ rent.actype }} actype</span>
+                                                 class="rounded-background light-purple">{{ rent.actype }} actype</span>
                     </td>
                 </tr>
                 </thead>
@@ -31,6 +31,7 @@
                             href="{{ url_for('util_bp.properties', rent_id=rent.id, rentcode=rent.rentcode) }}"
                             data-toggle="tooltip" title="edit the property"
                             class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -38,8 +39,14 @@
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rent.landlord.name }}
-                        of {{ rent.landlord.manager.manageraddr }}</td>
+                    <td class="copyable-text" style="width: 83.00%">{{ rent.landlord.name }}
+                        of {{ rent.landlord.manager.manageraddr }}
+                    </td>
+                    <td class="vertical-align align-right" style="width: 5.00%">
+                        <a href="#" id="edit_landlord" data-toggle="modal"
+                           data-target="#landlord_modal" class="btn btn-teal-light btn-round button-icon round circles"
+                           role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -70,7 +77,6 @@
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">emails to</td>
                     <td class="vertical-align copyable-text" style="width: 82.5%">{{ rent.email }}</td>
-                    </td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">mail address</td>
@@ -80,7 +86,6 @@
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
                     <td class="copyable-text vertical-align" style="width: 82.5%">{{ rent.note }}</td>
-
                 </tr>
                 </tbody>
             </table>
@@ -94,15 +99,17 @@
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.agent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('agent_bp.agent',
                             agent_id=rent.agent_id, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                               class="btn btn-teal-light btn-round button-icon round circles"
-                                               role="button"></a>
-                        {% else %}
+                                                                                   class="btn btn-teal-light btn-round button-icon round circles"
+                                                                                   role="button"></a>
+                    </td>
+                    {% else %}
                     <td class="copyable-text vertical-align" style="width: 83.00%">no agent</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a href="{{ url_for('agent_bp.agent',
                             agent_id=0, action='from_rent', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                                               class="btn btn-teal-light btn-round button-icon round circles"
-                                               role="button"></a>
-                        {% endif %}
+                                                                                   class="btn btn-teal-light btn-round button-icon round circles"
+                                                                                   role="button"></a>
+                    </td>
+                    {% endif %}
                 </tr>
                 </tbody>
             </table>
@@ -199,7 +206,7 @@
                 <div class="row">
                     <div class="col">
                         <a href="{{ url_for('mail_bp.mail_dialog', rent_id=rent.id, action='rent') }}"
-                                class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
+                           class="btn btn-block btn-success button-icon letter" role="button">send mail</a>
                     </div>
                 </div>
             </div>
@@ -228,6 +235,40 @@
     </div>
 </div>
 
+<!-- Modal - edit landlord -->
+<div class="modal fade" id="landlord_modal" tabindex="-1" aria-hidden="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" id="target">
+                <div class="modal-header">
+                    <h6 class="modal-title">select landlord</h6>
+                </div>
+                <div class="modal-body">
+                    {{ widgets.combobox(name="landlord", items=Landlords.names(),
+                    item_selected=rent.landlord.name) }}
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col">
+                                <button type="submit" formaction="{{ url_for('rent_bp.rent_update', rent_id=rent.id,
+                                action='landlord') }}" class="btn btn-block btn-success button-icon save">save changes
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="btn btn-block btn-secondary button-icon cross"
+                                        data-dismiss="modal">cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <!-- Modal  - edit rent - can be templated / used as widgets -->
 <div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
      aria-hidden="true">
@@ -238,13 +279,6 @@
                     <div class="card card-blue">
                         <div class="card-header">edit rent {{ rent.rentcode }}</div>
                         <div class="card-body text-primary">
-                            <div class="form-group row">
-                                <div class="col">
-                                    <label for="landlord">landlord:</label>
-                                    {{ widgets.combobox(name="landlord", items=Landlords.names(),
-                                    item_selected=rent.landlord.name) }}
-                                </div>
-                            </div>
                             <div class="form-group row">
                                 <div class="col-md-2">
                                     <label for="rentpa">rent pa:</label>
@@ -315,7 +349,8 @@
                             </div>
                             <div class="form-group row justify-content-center">
                                 <div class="col-md-2">
-                                    <button type="submit" class="btn btn-block btn-success button-icon save">save
+                                    <button type="submit" formaction="{{ url_for('rent_bp.rent_update', rent_id=rent.id,
+                                        action='rent') }}" class="btn btn-block btn-success button-icon save">save
                                         changes
                                     </button>
                                 </div>
@@ -355,7 +390,7 @@
     </div>
 </div>
 
-<!-- Modal  - edit and mail - can be templated / used as widgets-->
+<!-- Modal  - edit and mail -->
 <div class="modal fade" id="tenant_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -403,8 +438,8 @@
                             </button>
                         </div>
                         <div class="col-md-6">
-                            <button type="submit" formaction="{{ url_for('rent_bp.tenant', rent_id=rent.id) }}"
-                                    class="btn btn-block btn-success button-icon save">save changes
+                            <button type="submit" formaction="{{ url_for('rent_bp.rent_update', rent_id=rent.id,
+                            action='tenant') }}" class="btn btn-block btn-success button-icon save">save changes
                             </button>
                         </div>
                     </div>
@@ -425,7 +460,6 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "rent.js" %}
-
 
 </script>
 {% endblock %}

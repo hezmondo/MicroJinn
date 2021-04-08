@@ -31,28 +31,6 @@ def get_properties(rent_id):
     return properties, dict
 
 
-# def get_properties(rent_id):
-#     dict = {}
-#     filtr = []
-#     if request.method == "POST":
-#         dict['address'] = request.form.get("address") or ''
-#         if dict['address'] and dict['address'] != '':
-#             filtr.append(Property.propaddr.ilike('%{}%'.format(dict['address'])))
-#         dict['rentcode'] = request.form.get("rentcode") or ''
-#         if dict['rentcode'] and dict['rentcode'] != '':
-#             filtr.append(Rent.rentcode.startswith([dict.get('rentcode')]))
-#         dict['proptype'] = request.form.get("proptype") or 'all proptypes'
-#         if dict['proptype'] and dict['proptype'] != 'all proptypes':
-#             filtr.append(Property.proptype_id==PropTypes.get_id(dict['proptype']))
-#     elif rent_id != 0:
-#         filtr.append(Property.rent_id == rent_id)
-#     properties = get_props(filtr)
-#     for property in properties:
-#         property.proptype = PropTypes.get_name(property.proptype_id)
-#
-#     return properties, dict
-
-
 def get_property(prop_id, rent_id, rentcode):
     if prop_id == 0:
         property = {"id": 0, "rentcode": rentcode, "rent_id": rent_id, "proptype": "house"}

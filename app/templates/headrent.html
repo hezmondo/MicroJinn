@@ -8,14 +8,20 @@
 <div class="row">
     <div class="col-md-9">
         <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
-            <table class="table table-grey table-head">
+            <table class="table table-grey table-head table-narrow">
                 <thead>
                 <tr>
-                    <td style="width: 25%">headrent {{ headrent.code }}</td>
-                    <td style="width: 25%"><span class="rounded-background light-green">{{ headrent.tenuredet }}</span>
+                    <td class="vertical-align" style="width: 25%">headrent {{ headrent.code }}</td>
+                    <td class="vertical-align" style="width: 25%">
+                        <span class="rounded-background light-green">
+                        {{ headrent.tenuredet }}
+                        </span>
                     </td>
-                    <td style="width: 50%"><span id="statusdet"
-                                                 class="rounded-background light-purple">{{ headrent.status }}</span>
+                    <td class="vertical-align" style="width: 50%">
+                        <span id="statusdet"
+                              class="rounded-background light-purple">
+                        {{ headrent.status }}
+                        </span>
                     </td>
                 </tr>
                 </thead>
@@ -25,21 +31,28 @@
                 <tr>
                     <td class="td-title vertical-align copyable-text" style="width: 12.00%">property</td>
                     <td class="copyable-text vertical-align" style="width: 83.00%">{{ headrent.propaddr }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a
-                            href="#"
-                            data-toggle="tooltip" title="edit the property"
-                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                    <td class="vertical-align align-right" style="width: 5.00%">
+                        <a href="#" id="edit_property" data-toggle="modal"
+                           data-target="#property_modal" class="btn btn-teal-light btn-round button-icon round circles"
+                           role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
             <table class="table table-base table-body-alt">
                 <tbody>
                 <tr>
-                    <td class="td-title copyable-text" style="width: 12.00%">landlord</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ headrent.landlord.name }}
+                    <td class="td-title vertical-align copyable-text" style="width: 12.00%">landlord</td>
+                    <td class="vertical-align copyable-text" style="width: 83.00%">{{ headrent.landlord.name }}
                         of {{ headrent.landlord.manager.manageraddr }}
                     </td>
+                    <td class="vertical-align align-right" style="width: 5.00%">
+                        <a href="#" id="edit_landlord" data-toggle="modal"
+                           data-target="#landlord_modal" class="btn btn-teal-light btn-round button-icon round circles"
+                           role="button"></a>
+                    </td>
                 </tr>
+
                 </tbody>
             </table>
         </div>
@@ -49,10 +62,11 @@
                 <tr>
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">notes</td>
                     <td class="copyable-text vertical-align" style="width: 83%">{{ headrent.note }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a
-                            href="#"
-                            data-toggle="tooltip" title="edit notes"
-                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                    <td class="vertical-align align-right" style="width: 5.00%">
+                        <a href="#" id="edit_note" data-toggle="modal"
+                           data-target="#note_modal" class="btn btn-teal-light btn-round button-icon round circles"
+                           role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -67,18 +81,29 @@
                             href="#"
                             data-toggle="tooltip" title="edit agent"
                             class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
         <div class="table-fixed table-rent" style="margin-bottom: 1.5rem;">
-            <table class="table table-head">
+            <table class="table rounded-corners">
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent</td>
+                    <td class="copyable-text" style="width: 88.00%">This block of properties is subject
+                        to a {{ headrent.tenuredet }} of {{ money_str(headrent.rentpa, pound=True) }}
+                        per annum payable {{ headrent.freqdet }} {{ headrent.advarrdet }}.
+                    </td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">owing</td>
+                    <td class="copyable-text" style="width: 88.00%">{{ headrent.tenuredet|title }} on this block of
+                        properties is paid up to {{ headrent.paidtodate.strftime('%d-%b-%Y') }}.
+                        Further {{ headrent.tenuredet }} will be due and payable {{ headrent.freqdet }}
+                        {{ headrent.advarrdet }} on {{ headrent.nextrentdate.strftime('%d-%b-%Y') }} in the sum of
+                        {{ money_str(headrent.rent_gale, pound=True) }}"
+                    </td>
                 </tr>
             </table>
         </div>
@@ -123,6 +148,124 @@
                 class="btn btn-block btn-secondary button-icon edit"
                 style="margin-bottom: 1.5rem;">edit headrent
         </button>
+    </div>
+</div>
+
+
+<!-- Modal - edit property -->
+<div class="modal fade" id="property_modal" tabindex="-1" aria-hidden="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" id="target">
+                <div class="modal-header">
+                    <h6 class="modal-title">edit property address below</h6>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="propaddr" value="{{ headrent.propaddr }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col">
+                                <button type="submit" formaction="{{ url_for('headrent_bp.headrent_update',
+                                headrent_id=headrent.id, action='property') }}"
+                                        class="btn btn-block btn-success button-icon save">save changes
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-block btn-secondary button-icon cross"
+                                        data-dismiss="modal">cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal - edit landlord -->
+<div class="modal fade" id="landlord_modal" tabindex="-1" aria-hidden="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" id="target">
+                <div class="modal-header">
+                    <h6 class="modal-title">select landlord</h6>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col">
+                            {{ widgets.combobox(name="landlord", items=Landlords.names(),
+                            item_selected=headrent.landlord.name) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col">
+                                <button type="submit" formaction="{{ url_for('headrent_bp.headrent_update',
+                                headrent_id=headrent.id, action='landlord') }}"
+                                        class="btn btn-block btn-success button-icon save">save changes
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-block btn-secondary button-icon cross"
+                                        data-dismiss="modal">cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal - edit note -->
+<div class="modal fade" id="note_modal" tabindex="-1" aria-hidden="true" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="POST" id="target">
+                <div class="modal-header">
+                    <h6 class="modal-title">edit notes below</h6>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="note" value="{{ headrent.note }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="container">
+                        <div class="row align-items-end">
+                            <div class="col">
+                                <button type="submit" formaction="{{ url_for('headrent_bp.headrent_update',
+                                headrent_id=headrent.id, action='note') }}"
+                                        class="btn btn-block btn-success button-icon save">save changes
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button"
+                                        class="btn btn-block btn-secondary button-icon cross"
+                                        data-dismiss="modal">cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -229,4 +372,11 @@
         </div>
     </div>
 </form>-->
+{% endblock %}
+
+<!--if a not empty message string is passed to the template we load the message when the page loads-->
+{% block message_on_load %}
+{% if message %}
+{{ widgets.modal_message_on_load(message=message, title="Notice") }}
+{% endif %}
 {% endblock %}
