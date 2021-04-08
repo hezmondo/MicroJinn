@@ -23,7 +23,7 @@ class AcTypes:
 class AdvArr:
     # the "names" of the types
     # ids are index into these, counting from 1
-    _names = ['in advance', 'in arrears']
+    _names = ['in arrears', 'in advance']
 
     @staticmethod
     def names():
