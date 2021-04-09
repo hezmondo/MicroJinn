@@ -49,8 +49,9 @@
                 </div>
             </div>
             <div class="card-body text-primary">
-                <a href="{{ url_for('util_bp.property', prop_id=0, rent_id=rent_id, rentcode=rentcode) }}"
-                   class="btn btn-block btn-primary button-icon plus" role="button">new property for this rent</a>
+                <a href="#" id="edit_property" data-toggle="modal"
+                           data-target="#new_property_modal" class="btn btn-primary btn-block button-icon plus"
+                           role="button">new property for this rent</a>
             </div>
             {% else %}
             <div class="card-header">
@@ -83,4 +84,51 @@
         </div>
     </div>
 </div>
+
+<!-- Modal  - edit property -->
+<div class="modal fade" id="new_property_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">add details below</h6>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="rent_tenant">
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="rentcode">rentcode</label>
+                            <input type="text" class="form-control" name="rentcode"
+                                   value="{{ rentcode }}">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="new_propaddr">address</label>
+                            <input type="text" class="form-control" name="new_propaddr" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="new_proptype">type</label>
+                            {{ widgets.combobox(name="new_proptype", items=PropTypes.names()) }}
+                        </div>
+                    </div>
+                    <div class="form-group row flex-row-reverse align-items-end" style="margin-top: 1.5rem;">
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-block btn-secondary button-icon cross"
+                                    data-dismiss="modal">close
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-block btn-success button-icon save">save changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

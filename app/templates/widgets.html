@@ -17,6 +17,24 @@
 {%- endmacro %}
 
 
+<!-- combobox(): implement a single choice select via <select> element, returns an int based on selection - good for
+ use with modeltype tables which begin from id = 1. 0 is returned from the head optional item -->
+{% macro combobox_index(name, items, items0=None, item_selected=None) -%}
+<select class="form-control" name="{{ name }}">
+    {% if items0 %}
+    <!-- Optionally an extra item can be passed in as `items0` -->
+    <!-- This convenince allows callers to insert some "all ..." at the start of the list for a filter choice -->
+    {% set selected = 'selected' if items0 in items_selected else '' %}
+    <option value="0" {{selected}}>{{items0}}</option>
+    {% endif %}
+    {% for item in items %}
+    {% set selected = 'selected' if item == item_selected else '' %}
+    <option value="{{ loop.index }}" {{selected}}>{{item}}</option>
+    {% endfor %}
+</select>
+{%- endmacro %}
+
+
 <!-- combobox_id(): implement a single choice select via <select> element passing id (for js getElementbyID)-->
 {% macro combobox_id(idc, name, items, item_selected=None) -%}
 <select class="form-control" id="{{ idc }}" name="{{ name }}">

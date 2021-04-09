@@ -4,7 +4,7 @@ from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.email import test_email_connect, test_send_email
-from app.main.property import get_property, get_properties, post_property
+from app.main.property import get_property, get_properties, post_new_property, post_property
 from app.modeltypes import PropTypes
 
 util_bp = Blueprint('util_bp', __name__)
@@ -83,6 +83,10 @@ def landlords():
 @util_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
 @login_required
 def properties(rent_id):
+    if request.method == "POST":
+        propaddr = request.form.get("new_propaddr")
+        proptype_id = PropTypes.get_id(request.form.get("new_proptype"))
+        post_new_property(rent_id, propaddr, proptype_id)
     rentcode = request.args.get('rentcode', "0", type=str)
     properties, fdict = get_properties(rent_id)
 
@@ -95,7 +99,7 @@ def property(prop_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "0", type=str)
     if request.method == "POST":
-        prop_id = post_property(prop_id, rent_id)
+        prop_id = post_property(prop_id)
         return redirect(url_for('util_bp.property', prop_id=prop_id))
     property = get_property(prop_id, rent_id, rentcode)
 
