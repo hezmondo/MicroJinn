@@ -32,12 +32,17 @@ def headrent_update(headrent_id):
     action = request.args.get('action', type=str)
     message = ''
     try:
+        if action == 'headrent':
+            update_headrent(headrent_id)
         if action == 'landlord':
-            update_landlord(headrent_id)
+            landlord_id = request.form.get('landlord')
+            update_landlord(headrent_id, landlord_id)
         if action == 'property':
-            update_propaddr(headrent_id)
+            propaddr = request.form.get("propaddr")
+            update_propaddr(headrent_id, propaddr)
         if action == 'note':
-            update_note(headrent_id)
+            note = request.form.get("note")
+            update_note(headrent_id, note)
     except Exception as ex:
         message = f"Update headrent failed. Error:  {str(ex)}"
 

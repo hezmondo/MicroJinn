@@ -1,6 +1,6 @@
 from flask import request
 from app.dao.agent import get_agent_id
-from app.dao.headrent import get_headrent, get_headrents, post_headrent
+from app.dao.headrent import get_headrent, get_headrent_row, get_headrents, post_headrent
 from app.dao.landlord import get_landlord_id
 from app.main.common import inc_date_m
 from app.main.functions import strToDec
@@ -29,7 +29,7 @@ def mget_headrent(headrent_id):
 
 def get_headrents_p():
     filter = []
-    filterdict = {'rentcode': '', 'address': '', 'agent': '', 'status': ['active']}
+    filterdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses']}
     if request.method == "POST":
         rentcode = request.form.get("rentcode") or ""
         filterdict['rentcode'] = rentcode
@@ -60,40 +60,38 @@ def get_headrents_p():
 
 
 def update_headrent(headrent_id):
-    headrent = Headrent.query.get(headrent_id)
-    headrent.advarr_id = AdvArr.get_id(request.form.get("advarr"))
+    headrent = get_headrent_row(headrent_id)
+    headrent.advarr_id = request.form.get("advarr")
     headrent.agent_id = get_agent_id("agent")
     headrent.arrears = strToDec(request.form.get("arrears"))
     headrent.code = request.form.get("rentcode")
     # we need code to generate datecode_id from lastrentdate with user choosing sequence:
     # headrent.datecode_id = int(request.form.get("datecode_id"))
     headrent.freq_id = Freqs.get_id(request.form.get("frequency"))
-    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
     headrent.lastrentdate = request.form.get("lastrentdate")
-    headrent.note = request.form.get("note")
     headrent.reference = request.form.get("reference")
     headrent.rentpa = strToDec(request.form.get("rentpa"))
-    headrent.salegrade_id = SaleGrades.get_id(request.form.get("salegrade"))
+    headrent.salegrade_id = request.form.get("salegrade")
     headrent.source = request.form.get("source")
-    headrent.status_id = HrStatuses.get_id(request.form.get("status"))
+    headrent.status_id = request.form.get("status")
     headrent.tenantname = request.form.get("tenantname")
-    headrent.tenure_id = Tenures.get_id(request.form.get("tenure"))
+    headrent.tenure_id = request.form.get("tenure")
     post_headrent(headrent)
 
 
-def update_landlord(headrent_id):
-    headrent = Headrent.query.get(headrent_id)
-    headrent.landlord_id = get_landlord_id(request.form.get("landlord"))
+def update_landlord(headrent_id, landlord_id):
+    headrent = get_headrent_row(headrent_id)
+    headrent.landlord_id = landlord_id
     post_headrent(headrent)
 
 
-def update_note(headrent_id):
-    headrent = Headrent.query.get(headrent_id)
-    headrent.note = request.form.get("note")
+def update_note(headrent_id, note):
+    headrent = get_headrent_row(headrent_id)
+    headrent.note = note
     post_headrent(headrent)
 
 
-def update_propaddr(headrent_id):
-    headrent = Headrent.query.get(headrent_id)
-    headrent.propaddr = request.form.get("propaddr")
+def update_propaddr(headrent_id, propaddr):
+    headrent = get_headrent_row(headrent_id)
+    headrent.propaddr = propaddr
     post_headrent(headrent)

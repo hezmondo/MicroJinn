@@ -42,14 +42,20 @@ def get_property(prop_id, rent_id, rentcode):
     return property
 
 
-def post_property(prop_id, rent_id):
-    if prop_id == 0:
-        property = Property()
-        property.rent_id = rent_id
-    else:
-        property = Property.query.get(prop_id)
-    property.propaddr = request.form.get("propaddr")
-    property.proptype_id = PropTypes.get_id(request.form.get("proptype"))
+def post_new_property(rent_id, propaddr, proptype_id):
+    property = Property()
+    property.rent_id = rent_id
+    property.propaddr = propaddr
+    property.proptype_id = proptype_id
+    prop_id = post_prop(property)
+
+    return prop_id
+
+
+def post_property(prop_id):
+    property = get_prop(prop_id)
+    property.propaddr = request.form.get("new_propaddr")
+    property.proptype_id = PropTypes.get_id(request.form.get("new_proptype"))
     prop_id = post_prop(property)
 
     return prop_id

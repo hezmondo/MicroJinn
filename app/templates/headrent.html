@@ -92,17 +92,19 @@
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent</td>
                     <td class="copyable-text" style="width: 88.00%">This block of properties is subject
-                        to a {{ RentType.rent_type(headrent.tenuredet) }} of {{ money_str(headrent.rentpa, pound=True) }}
+                        to a {{ RentType.rent_type(headrent.tenuredet) }} of {{ money_str(headrent.rentpa, pound=True)
+                        }}
                         per annum payable {{ headrent.freqdet }} {{ headrent.advarrdet }}.
                     </td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">owing</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ RentType.rent_type(headrent.tenuredet) }} on this block
+                    <td class="copyable-text" style="width: 88.00%">{{
+                        upper_first(RentType.rent_type(headrent.tenuredet)) }} on this block
                         of properties is paid up to {{ headrent.paidtodate.strftime('%d-%b-%Y') }}. Further
                         {{ RentType.rent_type(headrent.tenuredet) }} will be due and payable {{ headrent.freqdet }}
                         {{ headrent.advarrdet }} on {{ headrent.nextrentdate.strftime('%d-%b-%Y') }} in the sum of
-                        {{ money_str(headrent.rent_gale, pound=True) }}
+                        {{ money_str(headrent.rent_gale, pound=True) }}.
                     </td>
                 </tr>
             </table>
@@ -144,7 +146,7 @@
         </div>
     </div>
     <div class="col-md-3">
-        <button type="button" id="open_edit_rent" data-toggle="modal" data-target="#edit_modal"
+        <button type="button" id="open_edit_headrent" data-toggle="modal" data-target="#edit_modal"
                 class="btn btn-block btn-secondary button-icon edit"
                 style="margin-bottom: 1.5rem;">edit headrent
         </button>
@@ -202,7 +204,7 @@
                 <div class="modal-body">
                     <div class="form-group row">
                         <div class="col">
-                            {{ widgets.combobox(name="landlord", items=Landlords.names(),
+                            {{ widgets.combobox_index(name="landlord", items=Landlords.names(),
                             item_selected=headrent.landlord.name) }}
                         </div>
                     </div>
@@ -265,6 +267,113 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal  - edit headrent -->
+<div class="modal fade" id="edit_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <form method="POST" id="rent">
+                    <div class="card card-blue">
+                        <div class="card-header">edit headrent {{ headrent.rentcode }}</div>
+                        <div class="card-body text-primary">
+                            <form method="POST" id="headrent">
+                                <div class="form-group row">
+                                    <div class="col-md-2">
+                                        <label for="rentcode">hr code:</label>
+                                        <input type="text" class="form-control" name="rentcode"
+                                               value="{{ headrent.code }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="tenure">tenure:</label>
+                                        {{ widgets.combobox_index(name="tenure", items=Tenures.names(),
+                                        item_selected=headrent.tenuredet) }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="source">source:</label>
+                                        <input type="text" class="form-control" name="source"
+                                               value="{{ headrent.source }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="reference">reference:</label>
+                                        <input type="text" class="form-control" name="reference"
+                                               value="{{ headrent.reference }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="status">status:</label>
+                                        {{ widgets.combobox_index(name="status", items=HrStatuses.names(),
+                                        item_selected=headrent.status) }}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-2">
+                                        <label for="rentpa">rent pa:</label>
+                                        <input type="text" class="form-control" name="rentpa"
+                                               value="{{ headrent.rentpa }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="arrears">rent arrears:</label>
+                                        <input type="text" class="form-control" name="arrears"
+                                               value="{{ headrent.arrears }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="frequency">frequency:</label>
+                                        {{ widgets.combobox(name="frequency", items=Freqs.names(),
+                                        item_selected=headrent.freqdet) }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="advarr">advance or arrears:</label>
+                                        {{ widgets.combobox_index(name="advarr", items=AdvArr.names(),
+                                        item_selected=headrent.advarrdet) }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="lastrentdate">last rent date:</label>
+                                        <input type="date" class="form-control" name="lastrentdate"
+                                               value="{{ headrent.lastrentdate }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label for="nextrentdate">next rent date:</label>
+                                        <input type="date" class="form-control" name="nextrentdate"
+                                               value="{{ next_rent_date(headrent.lastrentdate, headrent.freq_id,
+                                            headrent.datecode_id, 1).strftime('%d-%b-%Y') }}">
+                                    </div>
+                                </div>
+                                <div class="form-group row flex-row-reverse"
+                                     style="margin-top: 2rem; margin-bottom: 0rem;">
+                                    <div class="col-md-2">
+                                        <button type="button"
+                                                class="btn btn-block btn-secondary button-icon cross"
+                                                data-dismiss="modal">close
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" formaction="{{ url_for('headrent_bp.headrent_update', headrent_id=headrent.id,
+                                        action='headrent') }}" class="btn btn-block btn-success button-icon save">save
+                                            changes
+                                        </button>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a href="{{ url_for('util_bp.delete_item', item_id=headrent.id, item='headrent') }}"
+                                           onclick="return confirm('Are you sure you want to delete this headrent?');"
+                                           class="btn btn-block btn-danger button-icon trash" role="button">delete
+                                            headrent</a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="hidden" class="form-control" name="headrent_id"
+                                               value="id: {{ headrent.id }}"
+                                               readonly="true">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

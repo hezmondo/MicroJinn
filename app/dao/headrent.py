@@ -1,6 +1,6 @@
 from app import db
 from flask import flash, redirect, url_for
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import contains_eager, joinedload, load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Headrent
 from app.modeltypes import Freqs, Statuses
@@ -40,7 +40,7 @@ def get_headrents(filter):
             db.session.query(Headrent).join(Agent) \
             .options(load_only('id', 'code', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
                                'propaddr', 'rentpa', 'source', 'status_id'),
-                joinedload('agent').load_only('detail')) \
+                contains_eager('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
     for rent in headrents:
         rent.status = Statuses.get_name(rent.status_id)

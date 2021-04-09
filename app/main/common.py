@@ -8,6 +8,15 @@ from app.models import Jstore, TypeDeed
 from app.modeltypes import Date_m
 
 
+# convert a string so that the first letter is uppercase
+@app.context_processor
+def string_processor():
+    def upper_first(string):
+        return string[0].upper() + string[1:]
+
+    return dict(upper_first=upper_first)
+
+
 def get_combodict_rent():
     # add the values unique to rent
     combo_dict = {}
@@ -64,13 +73,13 @@ def inc_date(date1, freq, num):
     if freq == 1:
         date2 = date1 + relativedelta(years=num)
     elif freq == 2:
-        date2 = date1 + relativedelta(months=num*6)
+        date2 = date1 + relativedelta(months=num * 6)
     elif freq == 4:
-        date2 = date1 + relativedelta(months=num*3)
+        date2 = date1 + relativedelta(months=num * 3)
     elif freq == 12:
         date2 = date1 + relativedelta(months=num)
     elif freq == 13:
-        date2 = date1 + relativedelta(weeks=num*4)
+        date2 = date1 + relativedelta(weeks=num * 4)
     elif freq == 52:
         date2 = date1 + relativedelta(weeks=num)
     else:
@@ -124,7 +133,7 @@ def date_processor():
 
 @app.context_processor
 def money_processor():
-    def money_str(val: typing.Any, commas: bool=True, pound: bool=False) -> str:
+    def money_str(val: typing.Any, commas: bool = True, pound: bool = False) -> str:
         # Given a value which is a monetary amount (e.g. as returned by `money()` above, though we call that for you)
         # return it as a string
         # by default the string does have comma-separators and does not have a leading £ symbol, e.g. 12,345.67
@@ -136,5 +145,5 @@ def money_processor():
         if pound:
             sVal = "£" + sVal
         return sVal
-    return dict(money_str=money_str)
 
+    return dict(money_str=money_str)
