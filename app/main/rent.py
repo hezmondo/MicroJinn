@@ -40,7 +40,7 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
     if arrears <= 0.5:
         if advarrdet == "in advance":
             paidtodate = inc_date_m(paidtodate, freq_id, datecode_id, 1)
-            paidtodate = paidtodate + relativedelta(days=30)
+            paidtodate = paidtodate - relativedelta(days=1)
         return paidtodate
     else:
         # n is the number of periods of rent owed
@@ -48,7 +48,7 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
         if advarrdet == "in advance":
             n = n - 1
             paidtodate = inc_date_m(paidtodate, freq_id, datecode_id, -n)
-            paidtodate = paidtodate + relativedelta(days=-1)
+            paidtodate = paidtodate - relativedelta(days=1)
         else:
             paidtodate = inc_date_m(paidtodate, freq_id, datecode_id, -n)
         return paidtodate

@@ -3,7 +3,6 @@ from flask_login import login_required
 from app.main.headrent import get_headrents_p, mget_headrent, update_landlord, update_headrent, \
     update_propaddr, update_note
 
-
 headrent_bp = Blueprint('headrent_bp', __name__)
 
 
