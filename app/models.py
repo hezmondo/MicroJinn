@@ -6,6 +6,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import app, db, login, cache
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 # As there are numerous model classes, shall we agree to keep them in alphabetic order,
@@ -139,7 +140,6 @@ class FormLetter(db.Model):
 
 class Headrent(db.Model):
     __tablename__ = 'headrent'
-
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(15), index=True, unique=True)
     rentpa = db.Column(db.Numeric(8, 2))
@@ -156,6 +156,16 @@ class Headrent(db.Model):
     freq_id = db.Column(db.Integer)
     status_id = db.Column(db.Integer)
     tenure_id = db.Column(db.Integer)
+
+    @hybrid_property
+    def get_next_rent_date(self):
+        from app.main.common import inc_date_m
+        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
+
+    # @get_next_rent_date.expression
+    # def get_next_rent_date(cls):
+    #     from app.main.common import inc_date_m
+    #     return inc_date_m(cls.lastrentdate, cls.freq_id, cls.datecode_id, 1)
 
 
 class Income(db.Model):

@@ -23,3 +23,10 @@ def commit_to_database():
     except Exception as err:
         db.session.rollback()
         abort(500, err)
+
+
+def rollback_database():
+    dbLogger.info('Rolling back db...')
+    db.session.rollback()
+
+

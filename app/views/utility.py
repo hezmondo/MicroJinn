@@ -1,11 +1,13 @@
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
 from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
+from app.dao.database import rollback_database
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
 from app.email import test_email_connect, test_send_email
-from app.main.property import get_property, get_properties, post_new_property, post_property
-from app.modeltypes import PropTypes
+from app.main.property import mget_properties_dict, mget_filter, mget_property, mget_properties_from_filter, mget_properties_all, \
+    mget_properties_from_rent_id, mpost_new_property, mpost_property
+
 
 util_bp = Blueprint('util_bp', __name__)
 
@@ -80,30 +82,65 @@ def landlords():
     return render_template('landlords.html', landlords=landlords)
 
 
-@util_bp.route('/properties/<int:rent_id>', methods=['GET', 'POST'])
+@util_bp.route('/properties', methods=['GET', 'POST'])
 @login_required
-def properties(rent_id):
+def properties():
+    rent_id = request.args.get('rent_id', type=int)
+    action = request.args.get('action')
+    messages = []
+    properties = []
     if request.method == "POST":
-        propaddr = request.form.get("new_propaddr")
-        proptype_id = PropTypes.get_id(request.form.get("new_proptype"))
-        post_new_property(rent_id, propaddr, proptype_id)
-    rentcode = request.args.get('rentcode', "0", type=str)
-    properties, fdict = get_properties(rent_id)
-
-    return render_template('properties.html', fdict=fdict, rentcode=rentcode, rent_id=rent_id, properties=properties)
+        if action == 'post_new':
+            propaddr = request.form.get('new_propaddr')
+            proptype_id = request.form.get('new_proptype')
+            try:
+                mpost_new_property(rent_id, propaddr, proptype_id)
+            except Exception as ex:
+                messages.append(f"Post new property failed. Database rolled back. Error:  {str(ex)}")
+                rollback_database()
+        elif action == 'edit':
+            propaddr = request.form.get('propaddr')
+            proptype_id = request.form.get('proptype')
+            prop_id = request.args.get('prop_id')
+            try:
+                mpost_property(prop_id, propaddr, proptype_id)
+            except Exception as ex:
+                messages.append(f"Edit property failed. Database rolled back. Error:  {str(ex)}")
+                rollback_database()
+        elif action == 'search':
+            fdict, filtr = mget_filter()
+            try:
+                properties = mget_properties_from_filter(filtr)
+            except Exception as ex:
+                messages.append(f"Cannot retrieve properties. Error:  {str(ex)}")
+            return render_template('properties.html', fdict=fdict, rent_id=rent_id, properties=properties)
+    try:
+        properties = mget_properties_from_rent_id(rent_id) if rent_id else mget_properties_all()
+    except Exception as ex:
+        messages.append(f"Cannot retrieve properties. Error:  {str(ex)}")
+    # if we are posting a new property or updating a previous one, we do not include the action in the template as
+    # the action will cause the relevant modal to pop up on page load
+    if request.method == "POST":
+        return render_template('properties.html', fdict=mget_properties_dict(), rent_id=rent_id, properties=properties,
+                               messages=messages)
+    else:
+        return render_template('properties.html', action=action, fdict=mget_properties_dict(), rent_id=rent_id,
+                               properties=properties, messages=messages)
 
 
 @util_bp.route('/property/<int:prop_id>', methods=["GET", "POST"])
-# @login_required
+@login_required
 def property(prop_id):
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    rentcode = request.args.get('rentcode', "0", type=str)
+    rent_id = request.args.get('rent_id', type=int)
+    action = request.args.get('action', type=str)
     if request.method == "POST":
-        prop_id = post_property(prop_id)
+        propaddr = request.form.get('propaddr')
+        proptype_id = request.form.get('proptype')
+        prop_id = mpost_property(prop_id, propaddr, proptype_id)
         return redirect(url_for('util_bp.property', prop_id=prop_id))
-    property = get_property(prop_id, rent_id, rentcode)
+    property = mget_property(prop_id, rent_id)
 
-    return render_template('property.html', property=property)
+    return render_template('property.html', action=action, property=property)
 
 
 @util_bp.route('/test_emailing', methods=['GET'])

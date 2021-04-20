@@ -7,7 +7,13 @@ from app.models import Property, Rent
 def get_props(filtr):
     return db.session.query(Property).join(Rent).options(
         contains_eager('rent').load_only('rentcode')) \
-        .filter(*filtr).order_by(Property.propaddr).limit(50).all()
+        .filter(*filtr).order_by(Property.propaddr).limit(20).all()
+
+
+def get_props_all():
+    return db.session.query(Property).join(Rent).options(
+        contains_eager('rent').load_only('rentcode')) \
+        .order_by(Property.propaddr).limit(20).all()
 
 
 def get_prop(prop_id):

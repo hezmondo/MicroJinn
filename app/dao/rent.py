@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Jstore, PrHistory, Property, Rent, RentExternal
+from app.models import Agent, Landlord, Jstore, PrHistory, Property, Rent, RentExternal
 
 
 def check_pr_exists(rent_id):  # check if rent has record in pr_history
@@ -79,8 +79,11 @@ def getrents_basic_sql(sql):  # simple filtered rents for main rents page using 
     return db.session.execute(sql).fetchall()
 
 
+# TODO: In order to filter results we have to explicitly join filterable tables (.join(Landlord) etc) but this slows
+#  the query down. We still need to determine the most efficient way to retrieve data from complex queries with
+#  complex filters
 def getrents_advanced(filtr, runsize):    # filtered rents for advanced queries and payrequest pages
-    return db.session.query(Rent).join(Property) \
+    return db.session.query(Rent).join(Property).join(Landlord) \
         .options(load_only('id', 'advarr_id', 'arrears', 'freq_id', 'lastrentdate',
                                                         'prdelivery_id', 'rentcode', 'rentpa', 'tenantname'),
            joinedload('landlord').load_only('name'),

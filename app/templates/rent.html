@@ -26,11 +26,31 @@
                 <tbody>
                 <tr>
                     <td class="td-title vertical-align copyable-text" style="width: 12.00%">property</td>
-                    <td class="copyable-text vertical-align" style="width: 83.00%">{{ rent.propaddr }}</td>
-                    <td class="vertical-align align-right" style="width: 5.00%"><a
-                            href="{{ url_for('util_bp.properties', rent_id=rent.id, rentcode=rent.rentcode) }}"
-                            data-toggle="tooltip" title="edit the property"
-                            class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                    <td class="copyable-text vertical-align" style="width: 83.00%">
+                        {% for address in rent.propaddrs %}
+                            {{ address.propaddr }}{{ "; " if not loop.last else "" }}
+                        {% endfor %}
+                    </td>
+                    <td class="vertical-align align-right" style="width: 5.00%">
+                    {% if rent.propaddrs|length > 1 %}
+                        <a
+                                href="{{ url_for('util_bp.properties', rent_id=rent.id) }}"
+                                data-toggle="tooltip" title="edit the property"
+                                class="btn btn-teal-light btn-round button-icon round circles" role="button">
+                        </a>
+                    {% elif rent.propaddrs|length == 1 %}
+                        <a
+                                href="{{ url_for('util_bp.properties', rent_id=rent.id, action='edit') }}"
+                                data-toggle="tooltip" title="edit the property"
+                                class="btn btn-teal-light btn-round button-icon round circles" role="button">
+                        </a>
+                    {% else %}
+                        <a
+                                href="{{ url_for('util_bp.properties', rent_id=rent.id, action='create_new') }}"
+                                data-toggle="tooltip" title="edit the property"
+                                class="btn btn-teal-light btn-round button-icon round circles" role="button">
+                        </a>
+                    {% endif %}
                     </td>
                 </tr>
                 </tbody>

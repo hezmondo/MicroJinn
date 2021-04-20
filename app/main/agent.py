@@ -1,32 +1,47 @@
 from flask import request
 from app.dao.common import delete_record, get_idlist_recent, pop_idlist_recent
-from app.dao.agent import add_agent, get_agent, get_agents_set
+from app.dao.agent import add_agent, get_agent, get_agents_from_filter
 from app.dao.database import commit_to_database
 from app.dao.headrent import get_agent_headrents, get_headrent_row
 from app.dao.rent import get_agent_rents, get_rent_row
 from app.models import Agent
 
 
-def mget_agents():
-    filter = []
-    list = []
-    if request.method == "POST":    # unpack search parameters to create a filter
-        detail = request.form.get("detail") or ""
-        email = request.form.get("email") or ""
-        note = request.form.get("note") or ""
-        filter =[]
-        if detail != "":
-            filter.append(Agent.detail.ilike('%{}%'.format(detail)))
-        if email != "":
-            filter.append(Agent.email.ilike('%{}%'.format(email)))
-        if note != "":
-            filter.append(Agent.note.ilike('%{}%'.format(note)))
-    else:
-        list = get_idlist_recent("recent_agents")
-        filter.append(Agent.id.in_(list))
-    agents = get_agents_set(filter)
+def mget_agents_dict():
+    return {'detail': request.form.get('detail') or "",
+            'email': request.form.get('email') or "",
+            'note': request.form.get('note') or ""}
 
-    return agents, list
+
+def mget_agents_from_search():
+    fdict, filtr = mget_agents_filter()
+    # if the user searches but leaves all search fields empty, the results will display the recent agents
+    agents = mget_agents_from_recent() if all(value == '' for value in fdict.values()) else get_agents_from_filter(filtr)
+    return agents, fdict
+
+
+def mget_agents_from_recent():
+    filtr, list = mget_agents_recent_filter()
+    return sorted(get_agents_from_filter(filtr), key=lambda o: list.index(o.id))
+
+
+def mget_agents_filter():
+    fdict = mget_agents_dict()
+    filtr = []
+    if fdict.get('detail'):
+        filtr.append(Agent.detail.ilike('%{}%'.format(fdict.get('detail'))))
+    if fdict.get('email'):
+        filtr.append(Agent.email.ilike('%{}%'.format(fdict.get('email'))))
+    if fdict.get('note'):
+        filtr.append(Agent.note.ilike('%{}%'.format(fdict.get('note'))))
+
+    return fdict, filtr
+
+
+def mget_agents_recent_filter():
+    list = get_idlist_recent("recent_agents")
+    filtr =[Agent.id.in_(list)]
+    return filtr, list
 
 
 def delete_agent(agent_id, rent_id=0):

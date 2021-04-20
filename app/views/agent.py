@@ -1,8 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.dao.agent import get_agent
-from app.dao.rent import get_agent_rents
-from app.main.agent import delete_agent, delete_agent_headrent, mget_agents, prepare_agent_template, select_new_agent, \
+from app.main.agent import delete_agent, delete_agent_headrent, mget_agents_from_recent, mget_agents_from_search, \
+    prepare_agent_template, select_new_agent, \
     update_agent, unlink_agent_from_rent
 
 agent_bp = Blueprint('agent_bp', __name__)
@@ -10,6 +9,7 @@ agent_bp = Blueprint('agent_bp', __name__)
 
 @agent_bp.route('/agent/<int:agent_id>', methods=["GET", "POST"])
 @login_required
+# TODO: Refector so that we are not using '0' as a value for any ids.
 def agent(agent_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
@@ -36,16 +36,6 @@ def agent_delete(agent_id):
             return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
 
 
-# TODO: Remove agent_rents route
-@agent_bp.route('/agent_rents/<int:agent_id>', methods=["GET"])
-@login_required
-def agent_rents(agent_id):
-    type = request.args.get('type', "rent", type=str)
-    agent = get_agent(agent_id)
-    agent_rents = get_agent_rents(agent_id)
-    return render_template('agent_rents.html', agent=agent, agent_rents=agent_rents, type=type)
-
-
 @agent_bp.route('/agent_unlink/<int:rent_id>', methods=["GET", "POST"])
 @login_required
 def agent_unlink(rent_id):
@@ -60,10 +50,13 @@ def agents():
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     agent_id = request.args.get('agent_id', 0, type=int)
-    agents, list = mget_agents()
-    if request.method == 'GET':
-        agents = sorted(agents, key=lambda o: list.index(o.id))
-    return render_template('agents.html', agents=agents, agent_id=agent_id, rent_id=rent_id, rentcode=rentcode)
+    fdict = {}
+    if request.method == 'POST':
+        agents, fdict = mget_agents_from_search()
+    else:
+        agents = mget_agents_from_recent()
+    return render_template('agents.html', agents=agents, agent_id=agent_id, fdict=fdict, rent_id=rent_id,
+                           rentcode=rentcode)
 
 
 @agent_bp.route('/agents_select', methods=['GET', 'POST'])
