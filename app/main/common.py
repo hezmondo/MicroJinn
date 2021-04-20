@@ -29,7 +29,7 @@ def get_combodict_rent():
 def get_combodict_filter():
     # use the full rent combodict and insert "all values" for the filter functions, plus offer "options"
     combo_dict = get_combodict_rent()
-    combo_dict['landlords'].insert(0, "all landlords")
+    # combo_dict['landlords'].insert(0, "all landlords")
     combo_dict['options'] = ["include", "exclude", "only"]
     filternames = [value for (value,) in Jstore.query.with_entities(Jstore.code).all()]
     combo_dict["filternames"] = filternames

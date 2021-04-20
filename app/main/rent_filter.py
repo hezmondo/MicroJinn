@@ -1,7 +1,7 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
-from app.models import Agent, Property, Rent
+from app.models import Agent, Landlord, Property, Rent
 from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
@@ -58,7 +58,7 @@ def filter_advanced(dict):
     #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
     filtr.append(Rent.lastrentdate <= dict['enddate'])
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
-        filtr.append(Rent.name.in_(dict['landlord']))
+        filtr.append(Landlord.name.in_(dict['landlord']))
     if dict['prdelivery'] and dict['prdelivery'] != ['all prdeliveries']:
         ids = []
         for i in range(len(dict['prdelivery'])):

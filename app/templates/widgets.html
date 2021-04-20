@@ -110,6 +110,19 @@ if we do not define a button, the default close button appears-->
 {%- endmacro %}
 
 
+<!-- macro error message on page load with option to email error to mjinn/Lulu international support -->
+{% macro modal_error_message_on_load(message="", messages=[]) -%}
+{% if message %}
+{{ modal_form_action(body=message, id="modal_error_message_on_load", btn_class="btn btn-block btn-success button-icon arrow-right",
+btn_text="email error", btn_url="#", title='Error') }}
+{% elif messages %}
+{{ modal_form_action(body_as_list=messages, id="modal_error_message_on_load", btn_class="btn btn-block btn-success button-icon arrow-right",
+btn_text="email error", btn_url="#", title='Error') }}
+{% endif %}
+{{ modal_on_load_js(modal_id="modal_error_message_on_load") }}
+{%- endmacro %}
+
+
 <!-- macro message on page load - useful if we want to give feedback to a user after a process has
 completed and a page has loaded-->
 {% macro modal_message_on_load(message="", messages=[], title="") -%}

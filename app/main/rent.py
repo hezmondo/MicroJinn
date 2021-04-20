@@ -92,7 +92,10 @@ def get_rentp(rent_id):
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
     rent.prdeliverydet = PrDeliveryTypes.get_name(rent.prdelivery_id)
+    # TODO: We should not need to make a string out of the propaddrs list here as we can do this easily at template
+    #  level, using a propaddrs
     rent.propaddr = get_propaddr(rent_id)
+    rent.propaddrs = get_propaddrs(rent_id)
     rent.rent_gale = get_rent_gale(rent.nextrentdate, rent.freq_id, rent.rentpa)
     rent.tenuredet = Tenures.get_name(rent.tenure_id)
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
