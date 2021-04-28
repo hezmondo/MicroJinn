@@ -12,7 +12,7 @@
                 <tr>
                     <th style="width: 8.00%">rentcode</th>
                     <th style="width: 9.00%">rent (pa)</th>
-                    <th style="width: 8.00%">arrears</th>
+                    <th style="width: 8.00%">owing</th>
                     <th style="width: 13.00%">next rent date</th>
                     <th style="width: 15.00%">tenant name</th>
                     <th style="width: 22.00%">property address</th>
@@ -26,7 +26,7 @@
                 <tr id="{{ item.id }}">
                     <td style="width: 8.00%">{{ item.rentcode }}</td>
                     <td style="width: 9.00%"> {{ item.rentpa }}</td>
-                    <td style="width: 8.00%"> {{ item.arrears }}</td>
+                    <td style="width: 8.00%"> {{ item.owing }}</td>
                     <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
                         item.datecode_id, 1).strftime('%d-%b-%Y') }}</td>
                     <td style="width: 15.00%"> {{ item.tenantname }}</td>

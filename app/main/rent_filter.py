@@ -102,7 +102,8 @@ def filter_basic(dict):
 
 def filter_basic_sql_1():
     return """ SELECT r.id, r.rentcode, r.tenantname, r.rentpa, r.arrears, r.lastrentdate, r.source, r.status_id, 
-                r.freq_id, r.datecode_id, a.detail,
+                r.freq_id, r.datecode_id, a.detail, total_owing(r.id) AS 'owing', 
+                next_rent_date(r.id, 1) as 'nextrentdate',
                 (SELECT GROUP_CONCAT(DISTINCT propaddr SEPARATOR '; ')
                 FROM property 
                 WHERE rent_id = r.id 
