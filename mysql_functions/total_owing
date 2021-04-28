@@ -1,0 +1,15 @@
+CREATE FUNCTION `total_owing`(rentid int) RETURNS decimal(8,2)
+    DETERMINISTIC
+BEGIN
+	DECLARE r_arrears, total_charges decimal(8,2);
+
+	SELECT arrears
+	FROM rent WHERE id = rentid
+	INTO r_arrears;
+
+	SELECT IFNULL(SUM(chargebalance), 0)
+	FROM charge WHERE rent_id = rentid
+	INTO total_charges;
+
+	RETURN (IFNULL(r_arrears, 0) + total_charges);
+END
