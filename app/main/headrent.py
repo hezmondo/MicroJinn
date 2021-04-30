@@ -32,7 +32,7 @@ def mget_headrent(headrent_id):
 
 def mget_headrents_default():
     filtr = [Headrent.status_id == 1]
-    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses']} #, 'nextrentdate': date.today()}
+    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses'], 'nextrentdate': date.today()}
     headrents = mget_headrents_with_status(filtr)
 
     return fdict, headrents
@@ -42,8 +42,11 @@ def mget_headrents_dict():
     return {'rentcode': request.form.get('rentcode') or '',
             'address': request.form.get('address') or '',
             'agent': request.form.get('agent') or '',
-            'status': request.form.getlist('status') or ['active']}
-            # 'nextrentdate': request.form.get('nextrentdate') or date.today() + relativedelta(days=50)}
+            'status': request.form.getlist('status') or ['active'],
+            # Work in progress - request.args.get('date') is the date selected by the user when clicking on a date in
+            # the table. Currently this overwrites the date in the search field, which may not always be suitable
+            'nextrentdate': request.args.get('date') or request.form.get('nextrentdate')
+                            or date.today() + relativedelta(days=50)}
 
 
 def mget_headrents_filter():
@@ -60,15 +63,15 @@ def mget_headrents_filter():
         for i in range(len(fdict.get('status'))):
             ids.append(HrStatuses.get_id(fdict.get('status')[i]))
             filtr.append(Headrent.status_id.in_(ids))
-    # if fdict.get('nextrentdate'):
-    #     filtr.append(Headrent.get_next_rent_date() <= fdict.get('nextrentdate'))
+    if fdict.get('nextrentdate'):
+        filtr.append(func.mjinn.next_rent_date(Headrent.id, 2) <= fdict.get('nextrentdate'))
+        # filtr.append(Headrent.get_next_rent_date() <= fdict.get('nextrentdate'))
 
     return fdict, filtr
 
 
 def mget_headrents_from_search():
     fdict, filtr = mget_headrents_filter()
-    # if the user searches but leaves all search fields empty, the results will display the recent agents
     headrents = mget_headrents_with_status(filtr)
     return fdict, headrents
 

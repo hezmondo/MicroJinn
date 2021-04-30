@@ -4,57 +4,64 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<div class="row">
-    <div class="col-md-9">
-        <div class="table-fixed">
-            <table class="table table-grey" id="headrents">
-                <thead>
-                <tr>
-                    <th style="width: 10.00%">hr code</th>
-                    <th style="width: 8.00%">rent pa</th>
-                    <th style="width: 7.00%">arrears</th>
-                    <th style="width: 13.00%">next rent date</th>
-                    <th style="width: 26.00%">property address</th>
-                    <th style="width: 4.00%">freq</th>
-                    <th style="width: 8.00%">status</th>
-                    <th style="width: 22.00%">agent</th>
-                    <th style="width: 2.00%"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in headrents %}
-                <tr id="{{ item.id }}">
-                    <td style="width: 10.00%">{{ item.code }}</td>
-                    <td style="width: 8.00%"> {{ item.rentpa }}</td>
-                    <td style="width: 7.00%"> {{ item.arrears }}</td>
-<!--                    <td style="width: 13.00%"> {{ item.get_next_rent_date }}</td>-->
-                    <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
-                        item.datecode_id, 1).strftime('%d-%b-%Y') }}</td>
-                    <td style="width: 26.00%">{{ item.propaddr }}</td>
-                    <td style="width: 4.00%"> {{ item.freq_id }}</td>
-                    <td style="width: 8.00%"> {{ item.status }}</td>
-                    <td style="width: 22.00%"> {{ item.agent.detail }}</td>
-                    <td style="width: 2.00%" class="vertical-align">
-                        <a href="{{ url_for('headrent_bp.headrent', headrent_id=item.id) }}"
-                           class="btn btn-teal-light btn-round button-icon round circles"
-                           data-toggle="tooltip" title="view headrent"
-                           role="button"></a>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card card-white">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col">search</div>
-                    <div class="col align-right"><b>{{ headrents|length }}</b> results</div>
-                </div>
+<form method="POST" id="target">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="table-fixed">
+                <table class="table table-grey" id="headrents">
+                    <thead>
+                    <tr>
+                        <th style="width: 10.00%">hr code</th>
+                        <th style="width: 8.00%">rent pa</th>
+                        <th style="width: 7.00%">arrears</th>
+                        <th style="width: 15.00%">next rent date</th>
+                        <th style="width: 24.00%">property address</th>
+                        <th style="width: 4.00%">freq</th>
+                        <th style="width: 8.00%">status</th>
+                        <th style="width: 22.00%">agent</th>
+                        <th style="width: 2.00%"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in headrents %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 10.00%">{{ item.code }}</td>
+                        <td style="width: 8.00%"> {{ item.rentpa }}</td>
+                        <td style="width: 7.00%"> {{ item.arrears }}</td>
+                        <td style="width: 15.00%">
+                            <button type="submit" class="btn btn-primary btn-small"
+                                    role="button" data-toggle="tooltip" title="search by this next rent date"
+                                    formaction="{{ url_for('headrent_bp.headrents',
+                                    date=next_rent_date(item.lastrentdate, item.freq_id,
+                                    item.datecode_id, 1)) }}">{{ next_rent_date(item.lastrentdate, item.freq_id,
+                                    item.datecode_id, 1).strftime('%d-%b-%Y') }}
+                            </button>
+                        </td>
+                        <!--<td style="width: 13.00%"> {{ item.get_next_rent_date }}</td>-->
+                        <td style="width: 24.00%">{{ item.propaddr }}</td>
+                        <td style="width: 4.00%"> {{ item.freq_id }}</td>
+                        <td style="width: 8.00%"> {{ item.status }}</td>
+                        <td style="width: 22.00%"> {{ item.agent.detail }}</td>
+                        <td style="width: 2.00%" class="vertical-align">
+                            <a href="{{ url_for('headrent_bp.headrent', headrent_id=item.id) }}"
+                               class="btn btn-teal-light btn-round button-icon round circles"
+                               data-toggle="tooltip" title="view headrent"
+                               role="button"></a>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="card-body text-primary">
-                <form method="POST" id="target">
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                        <div class="col align-right"><b>{{ headrents|length }}</b> results</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
                     <div class="form-group row">
                         <div class="col">
                             <input type="text" class="form-control" name="rentcode"
@@ -63,9 +70,9 @@
                                    placeholder="address" value="{{ fdict.address }}">
                             <input type="text" class="form-control" name="agent"
                                    placeholder="agent" value="{{ fdict.agent }}">
-<!--                            <label for="nextrentdate">next rent date</label>-->
-<!--                            <input type="text" class="form-control" name="nextrentdate"-->
-<!--                                   placeholder="{{ today_date }}" value="{{ fdict.nextrentdate }}">-->
+                            <label for="nextrentdate" style="margin-top: 10px;">next rent date</label>
+                            <input type="date" class="form-control" name="nextrentdate"
+                                   value="{{ fdict.nextrentdate }}">
                             <div style="margin-top: 1rem;">
                                 {{ widgets.multiselect_as_select(name="status",
                                 items=HrStatuses.names(), items0="all statuses",
@@ -80,10 +87,10 @@
                             </button>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 {% endblock %}
 
