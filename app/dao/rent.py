@@ -5,7 +5,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Landlord, Jstore, PrHistory, Property, Rent, RentExternal
+from app.models import Agent, Charge, Landlord, Jstore, PrHistory, Property, Rent, RentExternal
 
 
 def check_pr_exists(rent_id):  # check if rent has record in pr_history
@@ -56,23 +56,6 @@ def get_rent_external(rent_id):
 
 def get_rent_row(rent_id):
     return Rent.query.get(rent_id)
-
-
-def getrents_basic(filtr):        # simple filtered rents for main rents page
-    return db.session.query(Rent).join(Property) \
-        .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
-                           'rentpa', 'source', 'status_id', 'tenantname'),
-             joinedload('agent').load_only('detail'),) \
-        .filter(*filtr).order_by(Rent.rentcode).limit(30).all()
-
-
-def getrents_basic_sam(filtr):  # simple filtered rents for main rents page using join to prop_rent
-    return db.session.query(Rent).join(Property).join(Agent) \
-        .options(load_only('id', 'rentcode', 'arrears', 'datecode_id', 'freq_id', 'lastrentdate',
-                           'rentpa', 'source', 'status_id', 'tenantname'),
-                 joinedload('agent').load_only('detail'),
-                 joinedload('prop_rent').options(load_only('propaddr'))) \
-        .filter(*filtr).order_by(Rent.rentcode).limit(50).all()
 
 
 def getrents_basic_sql(sql):  # simple filtered rents for main rents page using raw sql

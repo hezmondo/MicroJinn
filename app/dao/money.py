@@ -78,6 +78,10 @@ def get_money_item_new():
     return money_item
 
 
+def get_money_items_loan(loan_id):
+    return db.session.query(MoneyItem).filter(MoneyItem.cat_id==42, MoneyItem.num==loan_id).all()
+
+
 def get_money_items(acc_id): # we assemble income items and money items into one display - tricky
     money_filter = []
     income_filter = [Income.paytype_id != 1] # we do not want cheque income displayed, as not cleared income

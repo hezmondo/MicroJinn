@@ -3,8 +3,7 @@ from flask_login import login_required
 from app.dao.common import get_filters
 from app.dao.rent import get_rent_external
 from app.main.common import get_combodict_filter, get_combodict_rent
-from app.main.rent import get_rentp, get_rents_advanced, \
-    get_rents_basic_sql, get_rents_external, \
+from app.main.rent import get_rentp, get_rents_advanced, get_rents_basic_sql, get_rents_external, \
     get_rent_strings, rent_validation, update_landlord, update_rent_rem, update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)

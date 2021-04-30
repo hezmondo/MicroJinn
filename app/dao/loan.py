@@ -3,6 +3,7 @@ from sqlalchemy import asc, select, text
 from sqlalchemy.orm import joinedload, load_only
 from app import db
 from app.dao.database import commit_to_database
+from app.dao.money import get_money_items_loan
 from app.models import Loan, LoanIntRate, LoanStat, LoanTran, MoneyItem
 
 
@@ -19,17 +20,12 @@ def dbget_loans_nick():
 
 
 def dbget_loanstat_data(loan_id):
-    transactions = db.session.query(MoneyItem). \
-        filter(MoneyItem.cat_id==42, MoneyItem.num==loan_id) \
-        .options(load_only('id', 'date', 'memo', 'amount')) \
-        .union_all(db.session.query(LoanTran) \
-        .options(load_only('id', 'date', 'memo', 'amount')) \
-        .filter(LoanTran.loan_id==loan_id)) \
-        .order_by(MoneyItem.date, LoanTran.date)
+    money_items = get_money_items_loan(loan_id)
+    transactions = db.session.query(LoanTran).filter_by(loan_id=loan_id).all()
     stmt = " SELECT rate, start_date FROM loan_interest_rate WHERE loan_id = '{}' ".format(loan_id)
     rates = db.session.execute(stmt).fetchall()
 
-    return rates, transactions
+    return money_items, rates, transactions
 
 
 def post_loan(loan):

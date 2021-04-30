@@ -70,10 +70,12 @@ def get_loan_stat(loan_id):
     stat_date = stat_date.date()
     loancode = request.form.get("loancode")
     loan = dbget_loan_row(loan_id)
-    rates, transactions = dbget_loanstat_data(loan_id)
-    print (rates)
+    money_items, rates, transactions = dbget_loanstat_data(loan_id)
     checksums = {'id': 1, 'memo': 'abc', 'advanced': 0, 'interest': 0, 'repaid': 0}
     loanstatement = []
+    for item in money_items:
+        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
+        loanstatement.append(item_row)
     for item in transactions:
         item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
         loanstatement.append(item_row)

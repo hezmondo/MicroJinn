@@ -9,7 +9,7 @@ from app.dao.charge import get_charges_rent
 from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
-from app.dao.rent import get_rent, getrents_basic, getrents_basic_sam, getrents_basic_sql, getrents_advanced, \
+from app.dao.rent import get_rent, getrents_basic_sql, getrents_advanced, \
     get_rentsexternal, post_rent, post_rent_filter
 from app.main.common import get_rents_fdict, inc_date_m
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
@@ -257,46 +257,6 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
     rents = getrents_advanced(filtr, 50)
     for rent in rents:
         rent.propaddr = get_propaddr(rent.id)
-
-    return fdict, rents
-
-
-def get_rents_basic():  # get rents for home rents page with simple search option
-    fdict = dict_basic()
-    if request.method == "GET":
-        filtr = []
-        id_list = get_idlist_recent("recent_rents")
-        filtr.append(Rent.id.in_(id_list))
-    else:
-        filtr = filter_basic(fdict)
-    rents = getrents_basic(filtr)
-    for rent in rents:
-        rent.propaddr = get_propaddr(rent.id)
-    # Sort the rents by the order that they were accessed
-    if request.method == 'GET':
-        rents = sorted(rents, key=lambda o: id_list.index(o.id))
-
-    return dict, rents
-
-
-# Gets the data needed to display and filter rents on the home screen, but does so twice as slowly as
-# get_rents_basic_sql
-def get_rents_basic_sam():
-    fdict = dict_basic()
-    if request.method == "GET":
-        filtr = []
-        id_list = get_idlist_recent("recent_rents")
-        filtr.append(Rent.id.in_(id_list))
-    else:
-        filtr = filter_basic(fdict)
-    rents = getrents_basic_sam(filtr)
-    for rent in rents:
-        rent.propaddr = ""
-        for address in rent.prop_rent:
-            rent.propaddr += address.propaddr + "; "
-    # Sort the rents by the order that they were accessed
-    if request.method == 'GET':
-        rents = sorted(rents, key=lambda o: id_list.index(o.id))
 
     return fdict, rents
 
