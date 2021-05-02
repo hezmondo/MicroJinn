@@ -157,15 +157,16 @@ class Headrent(db.Model):
     status_id = db.Column(db.Integer)
     tenure_id = db.Column(db.Integer)
 
-    @hybrid_property
-    def get_next_rent_date(self):
-        from app.main.common import inc_date_m
-        return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
-
+    # @hybrid_property
+    # def get_next_rent_date(self):
+    #     from app.main.common import inc_date_m
+    #     return inc_date_m(self.lastrentdate, self.freq_id, self.datecode_id, 1)
+    #
+    # Sam: I haven't been about to get the expression below to work to filter headrents by next_rent_date
     # @get_next_rent_date.expression
     # def get_next_rent_date(cls):
-    #     from app.main.common import inc_date_m
-    #     return inc_date_m(cls.lastrentdate, cls.freq_id, cls.datecode_id, 1)
+    #     from sqlalchemy import func
+    #     return func.mjinn.next_rent_date(cls.id, 2)
 
 
 class Income(db.Model):
