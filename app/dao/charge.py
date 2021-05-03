@@ -3,7 +3,7 @@ from datetime import date
 from flask import request
 from app.main.functions import strToDec
 from sqlalchemy import func
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload
 from app.models import Charge, ChargeType, Rent
 
 
@@ -18,6 +18,10 @@ def add_charge(rent_id, recovery_charge_amount, chargetype_id, charge_details):
 
 def get_charge(charge_id):
     return db.session.query(Charge).filter_by(id=charge_id).one_or_none()
+
+
+def get_charge_descs():
+    return [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
 
 
 def get_charges(filtr):
