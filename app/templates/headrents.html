@@ -8,13 +8,13 @@
     <div class="row">
         <div class="col-md-9">
             <div class="table-fixed">
-                <table class="table table-grey" id="headrents">
-                    <thead>
+                <table class="table table-grey sortable" id="headrents">
+                    <thead class="pointer">
                     <tr>
                         <th style="width: 10.00%">hr code</th>
-                        <th style="width: 8.00%">rent pa</th>
-                        <th style="width: 7.00%">arrears</th>
-                        <th style="width: 15.00%">next rent date</th>
+                        <th style="width: 10.00%">rent pa</th>
+                        <th style="width: 6.00%">arrears</th>
+                        <th style="width: 14.00%">next rent date</th>
                         <th style="width: 24.00%">property address</th>
                         <th style="width: 4.00%">freq</th>
                         <th style="width: 8.00%">status</th>
@@ -26,18 +26,15 @@
                     {% for item in headrents %}
                     <tr id="{{ item.id }}">
                         <td style="width: 10.00%">{{ item.code }}</td>
-                        <td style="width: 8.00%"> {{ item.rentpa }}</td>
-                        <td style="width: 7.00%"> {{ item.arrears }}</td>
-                        <td style="width: 15.00%">
-                            <button type="submit" class="btn btn-primary btn-small"
-                                    role="button" data-toggle="tooltip" title="search by this next rent date"
-                                    formaction="{{ url_for('headrent_bp.headrents',
-                                    date=next_rent_date(item.lastrentdate, item.freq_id,
-                                    item.datecode_id, 1)) }}">{{ next_rent_date(item.lastrentdate, item.freq_id,
-                                    item.datecode_id, 1).strftime('%d-%b-%Y') }}
+                        <td style="width: 10.00%"> {{ item.rentpa }}</td>
+                        <td style="width: 6.00%"> {{ item.arrears }}</td>
+                        <td style="width: 14.00%">
+                            <button type="submit" class="btn btn-tog btn-small search-date"
+                                    value="{{ item.nextrentdate }}"
+                                    role="button" data-toggle="tooltip" title="search by this next rent date">
+                                {{ item.nextrentdate.strftime('%d-%m-%Y') }}
                             </button>
                         </td>
-                        <!--<td style="width: 13.00%"> {{ item.get_next_rent_date }}</td>-->
                         <td style="width: 24.00%">{{ item.propaddr }}</td>
                         <td style="width: 4.00%"> {{ item.freq_id }}</td>
                         <td style="width: 8.00%"> {{ item.status }}</td>
@@ -71,7 +68,7 @@
                             <input type="text" class="form-control" name="agent"
                                    placeholder="agent" value="{{ fdict.agent }}">
                             <label for="nextrentdate" style="margin-top: 10px;">next rent date</label>
-                            <input type="date" class="form-control" name="nextrentdate"
+                            <input type="date" class="form-control date" name="nextrentdate"
                                    value="{{ fdict.nextrentdate }}">
                             <div style="margin-top: 1rem;">
                                 {{ widgets.multiselect_as_select(name="status",

@@ -12,6 +12,12 @@ from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
 from sqlalchemy import func
 
 
+def append_headrents_next_rent_date(headrents):
+    for headrent in headrents:
+        headrent.nextrentdate = inc_date_m(headrent.lastrentdate, headrent.freq_id, headrent.datecode_id, 1)
+    return headrents
+
+
 def create_new_headrent():
     # create new headrent function not yet built, so return any id:
     return 23
@@ -32,8 +38,10 @@ def mget_headrent(headrent_id):
 
 def mget_headrents_default():
     filtr = [Headrent.status_id == 1]
-    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses'], 'nextrentdate': date.today()}
+    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses'],
+             'nextrentdate': date.today() + relativedelta(days=30)}
     headrents = mget_headrents_with_status(filtr)
+    headrents = append_headrents_next_rent_date(headrents)
 
     return fdict, headrents
 
@@ -45,8 +53,8 @@ def mget_headrents_dict():
             'status': request.form.getlist('status') or ['active'],
             # Work in progress - request.args.get('date') is the date selected by the user when clicking on a date in
             # the table. Currently this overwrites the date in the search field, which may not always be suitable
-            'nextrentdate': request.args.get('date') or request.form.get('nextrentdate')
-                            or date.today() + relativedelta(days=50)}
+            'nextrentdate': request.form.get('nextrentdate')
+                            or date.today() + relativedelta(days=30)}
 
 
 def mget_headrents_filter():
@@ -73,6 +81,7 @@ def mget_headrents_filter():
 def mget_headrents_from_search():
     fdict, filtr = mget_headrents_filter()
     headrents = mget_headrents_with_status(filtr)
+    headrents = append_headrents_next_rent_date(headrents)
     return fdict, headrents
 
 

@@ -108,6 +108,15 @@ $(document).ready(function(){
     $(document).on('shown.bs.modal', function(e) {
         $('input:visible:enabled:first', e.target).focus();
     });
+    //On selecting a next rent date element in a table, we want to copy that element value, paste it into the search
+    //field and search the database
+    $('.search-date').mousedown(function(e) {
+        var date = $(this).val();
+        $('.date').val(date);
+    });
+    $('.date').datepicker({
+        format: 'dd/mm/yyyy'
+    });
 });
 $(function() {
   // Sidebar toggle behavior
