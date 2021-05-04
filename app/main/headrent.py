@@ -84,7 +84,8 @@ def mget_headrents_filter():
 
 def mget_headrents_from_recent():
     filtr, list = mget_headrents_recent_filter()
-    fdict = json.loads(get_most_recent_search().dict) or {'rentcode': '', 'address': '', 'agent': '', 'status': ['active'],
+    recent_search = get_most_recent_search()
+    fdict = json.loads(recent_search.dict) if recent_search else {'rentcode': '', 'address': '', 'agent': '', 'status': ['active'],
              'nextrentdate': date.today() + relativedelta(days=30)}
     headrents = mget_headrents_with_status(filtr)
     headrents = append_headrents_next_rent_date(headrents)
