@@ -131,7 +131,7 @@ def get_idlist_recent(type):
     try:
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
+        id_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     return id_list
 

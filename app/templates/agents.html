@@ -1,6 +1,8 @@
 <!-- /templates/agents.html  -->
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 
 {% if agent_id or rent_id %}
@@ -30,6 +32,7 @@
 {% endif %}
 <div class="row">
     <div class="col-md-9">
+        {% if agents|length > 0 %}
         <div class="table-fixed">
             {% if rent_id == 0 %}
             <table class="table" id="agents">
@@ -82,6 +85,13 @@
             </table>
             {% endif %}
         </div>
+        {% else %}
+        {{ widgets.message_box(
+        message="There are no agents that match your search.",
+        btn_text="reset search",
+        btn_class="btn btn-block btn-primary button-icon sync",
+        btn_url=url_for('agent_bp.agents') ) }}
+        {% endif %}
     </div>
     <div class="col-md-3">
         <div class="card card-white" style="margin-bottom: 1.5rem;">

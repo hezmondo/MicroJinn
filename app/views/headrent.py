@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.main.headrent import mget_headrents_default, mget_headrents_from_search, mget_headrent, update_landlord, \
+from app.main.headrent import mget_headrents_from_recent, \
+    mget_headrents_from_search, mget_headrent, mget_recent_searches, update_landlord, \
     update_headrent, update_propaddr, update_note
 
 headrent_bp = Blueprint('headrent_bp', __name__)
@@ -11,18 +12,17 @@ def headrents():
     if request.method == "POST":
         fdict, headrents = mget_headrents_from_search()
     else:
-        fdict, headrents = mget_headrents_default()
+        fdict, headrents = mget_headrents_from_recent()
 
-    return render_template('headrents.html', fdict=fdict, headrents=headrents)
+    recent_searches = mget_recent_searches()
+
+    return render_template('headrents.html', fdict=fdict, headrents=headrents, recent_searches=recent_searches)
 
 
 @headrent_bp.route('/headrent/<int:headrent_id>', methods=["GET", "POST"])
 @login_required
 def headrent(headrent_id):
     message = request.args.get('message', '', type=str)
-    if request.method == "POST":
-        update_headrent(headrent_id)
-        return redirect(url_for('headrent_bp.headrent', headrent_id=headrent_id))
     headrent = mget_headrent(headrent_id)
 
     return render_template('headrent.html', headrent=headrent, message=message)

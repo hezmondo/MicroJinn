@@ -1,10 +1,14 @@
+import json
 from flask import request
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from app.dao.agent import get_agent_id
-from app.dao.headrent import get_headrent, get_headrent_row, get_headrents, post_headrent
+from app.dao.headrent import get_headrent, get_headrent_row, get_headrents, get_recent_searches, \
+    get_most_recent_search, post_headrent, \
+    save_search
 from app.dao.landlord import get_landlord_id
 from app.main.common import inc_date_m
+from app.dao.common import get_idlist_recent, commit_to_database
 from app.main.functions import strToDec
 from app.main.rent import get_paidtodate, get_rent_gale
 from app.models import Agent, Headrent
@@ -36,14 +40,14 @@ def mget_headrent(headrent_id):
     return headrent
 
 
-def mget_headrents_default():
-    filtr = [Headrent.status_id == 1]
-    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses'],
-             'nextrentdate': date.today() + relativedelta(days=30)}
-    headrents = mget_headrents_with_status(filtr)
-    headrents = append_headrents_next_rent_date(headrents)
-
-    return fdict, headrents
+# def mget_headrents_default():
+#     filtr = [Headrent.status_id == 1]
+#     fdict = {'code': '', 'address': '', 'agent': '', 'status': ['active'],
+#              'nextrentdate': date.today() + relativedelta(days=30)}
+#     headrents = mget_headrents_with_status(filtr)
+#     headrents = append_headrents_next_rent_date(headrents)
+#
+#     return fdict, headrents
 
 
 def mget_headrents_dict():
@@ -78,11 +82,30 @@ def mget_headrents_filter():
     return fdict, filtr
 
 
+def mget_headrents_from_recent():
+    filtr, list = mget_headrents_recent_filter()
+    fdict = json.loads(get_most_recent_search().dict) or {'rentcode': '', 'address': '', 'agent': '', 'status': ['active'],
+             'nextrentdate': date.today() + relativedelta(days=30)}
+    headrents = mget_headrents_with_status(filtr)
+    headrents = append_headrents_next_rent_date(headrents)
+    return fdict, sorted(headrents, key=lambda o: list.index(o.id))
+
+
 def mget_headrents_from_search():
     fdict, filtr = mget_headrents_filter()
+    # We save the search dict to the recent_search table. This calls a commit so must be done before we get the
+    # headrents. If we commit in between eager loading the headrents and rendering the template, sqlalchemy will
+    # have to make a trip to the database to load each headrent in the template
+    mpost_save_search(fdict)
     headrents = mget_headrents_with_status(filtr)
     headrents = append_headrents_next_rent_date(headrents)
     return fdict, headrents
+
+
+def mget_headrents_recent_filter():
+    list = get_idlist_recent("recent_headrents")
+    filtr =[Headrent.id.in_(list)]
+    return filtr, list
 
 
 def mget_headrents_with_status(filtr):
@@ -92,36 +115,21 @@ def mget_headrents_with_status(filtr):
     return headrents
 
 
-# def get_headrents_p():
-#     filter = []
-#     filterdict = {'code': '', 'address': '', 'agent': '', 'status': ['all statuses'], 'nextrentdate': date.today()}
-#     if request.method == "POST":
-#         rentcode = request.form.get("rentcode") or ""
-#         filterdict['rentcode'] = rentcode
-#         if rentcode:
-#             filter.append(Headrent.code.startswith([rentcode]))
-#         address = request.form.get("address") or ""
-#         filterdict['address'] = address
-#         if address:
-#             filter.append(Headrent.propaddr.ilike('%{}%'.format(address)))
-#         agent = request.form.get("agent") or ""
-#         filterdict['agent'] = agent
-#         if agent:
-#             filter.append(Agent.detail.ilike('%{}%'.format(agent)))
-#         status = request.form.getlist("status") or ["all statuses"]
-#         if status and status != ["all statuses"]:
-#             ids = []
-#             for i in range(len(status)):
-#                 ids.append(HrStatuses.get_id(status[i]))
-#                 filter.append(Headrent.status_id.in_(ids))
-#             filterdict['status'] = status
-#     else:
-#         filter.append(Headrent.status_id==1)
-#     headrents = get_headrents(filter)
-#     for headrent in headrents:
-#         headrent.status = HrStatuses.get_name(headrent.status_id)
-#
-#     return filterdict, headrents
+def mget_recent_searches():
+    recent_searches = get_recent_searches()
+    for recent_search in recent_searches:
+        fdict = json.loads(recent_search.dict)
+        recent_search.full_dict = fdict
+        recent_search.rentcode = recent_search.full_dict.get('rentcode')
+        recent_search.address = recent_search.full_dict.get('address')
+        recent_search.agent = recent_search.full_dict.get('agent')
+        recent_search.nextrentdate = recent_search.full_dict.get('nextrentdate')
+        recent_search.status = recent_search.full_dict.get('status')
+    return recent_searches
+
+
+def mpost_save_search(fdict, desc=""):
+    save_search(fdict, desc)
 
 
 def update_headrent(headrent_id):

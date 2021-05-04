@@ -1,8 +1,11 @@
+import json
 from app import db
 from flask import flash, redirect, url_for
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import contains_eager, joinedload, load_only
+from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Headrent
+from app.models import Agent, Headrent, RecentSearch
 from app.modeltypes import Freqs, Statuses
 
 
@@ -19,6 +22,7 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     if headrent_id == 0:
         # take the user to create new rent function:
         headrent_id = create_new_headrent()
+    pop_idlist_recent("recent_headrents", headrent_id)
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name')) \
@@ -48,10 +52,35 @@ def get_headrents(filter):
     return headrents
 
 
+def get_recent_searches():
+    return RecentSearch.query.filter(RecentSearch.type == 'headrent').all()
+
+
+def get_most_recent_search():
+    return RecentSearch.query.options(load_only('dict')).filter(RecentSearch.type == 'headrent') \
+        .order_by(desc(RecentSearch.id)).first()
+
+
 def post_headrent(headrent):
     db.session.add(headrent)
     commit_to_database()
 
+
+def add_new_recent_search(fdict):
+    recent_search = RecentSearch()
+    recent_search.type = 'headrent'
+    recent_search.desc = ''
+    recent_search.dict = json.dumps(fdict)
+    db.session.add(recent_search)
+
+
+# TODO: Decide if we want to give the user the option to name a search (desc)
+def save_search(fdict, desc=""):
+    if len(get_recent_searches()) >= 6:
+        first_record = RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).first()
+        db.session.delete(first_record)
+    add_new_recent_search(fdict)
+    db.session.commit()
 
 # def post_headrent_agent_update(agent_id, rent_id):
 #     message = ""

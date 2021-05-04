@@ -114,8 +114,21 @@ $(document).ready(function(){
         var date = $(this).val();
         $('.date').val(date);
     });
-    $('.date').datepicker({
-        format: 'dd/mm/yyyy'
+    // Selecting an item from search history will populate the search fields and complete the search
+    $('.search-history').mousedown(function(e) {
+        var dict = $.parseJSON($(this).val());
+        $('#form-rentcode').val(dict.rentcode);
+        $('#form-address').val(dict.address);
+        $('#form-agent').val(dict.agent);
+        $('#form-nextrentdate').val(dict.nextrentdate);
+        $('#form-status').val(dict.status);
+    });
+    $('.search-clear').click(function(e) {
+        $('#form-rentcode').val('');
+        $('#form-address').val('');
+        $('#form-agent').val('');
+        $('#form-nextrentdate').val((new Date()).toISOString().split('T')[0]);
+        $('#form-status').val('');
     });
 });
 $(function() {

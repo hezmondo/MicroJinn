@@ -655,6 +655,18 @@
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
 }
+.vertical-center-parent
+{
+    display: table;
+    height: 100%;
+    width: 100%;
+    text-align: left;
+}
+.vertical-center-child
+{
+    display: table-cell;
+    vertical-align: middle;
+}
 .wallet::before
 {
 	content: "\f555";

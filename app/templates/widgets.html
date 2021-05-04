@@ -141,15 +141,13 @@ completed and a page has loaded-->
     $(document).ready(function(){
     $("#{{ modal_id }}").modal('show');
 });
-
-
 </script>
 {%- endmacro %}
 
 
 <!-- multiselect_as_select(): implement a multiple choice select via <select> element -->
-{% macro multiselect_as_select(name, items, items0=None, items_selected=None) -%}
-<select multiple class="form-control" name="{{ name }}">
+{% macro multiselect_as_select(name, items, items0=None, items_selected=None, id="") -%}
+<select multiple class="form-control" name="{{ name }}" id="{{ id }}">
     {% if items0 %}
     <!-- Optionally an extra item can be passed in as `items0` -->
     <!-- This convenince allows callers to insert some "all ..." at the start of the list for a filter choice -->
@@ -182,6 +180,27 @@ completed and a page has loaded-->
 <!-- comment/uncomment whichever preferred -->
 <!--{{ multiselect_as_select(name, items, items_selected) }}-->
 {{ multiselect_as_checkboxes(name, items, items_selected) }}
+{%- endmacro %}
+
+
+<!-- adds a box with a message and an optional button - ie. Used to show no results from a search -->
+{% macro message_box(message, btn_text="", btn_class="", btn_url="" ) -%}
+<div class="boxed boxed-center boxed-blue">
+    <div class="row">
+        <div class="col-md-9">
+            <div class="vertical-center-parent">
+                <span class="vertical-center-child">{{ message }}</span>
+            </div>
+        </div>
+        {% if btn_url %}
+        <div class="col-md-3">
+            <a href="{{ btn_url }}"
+               class="{{ btn_class }}"
+               role="button">{{ btn_text }}</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {%- endmacro %}
 
 
