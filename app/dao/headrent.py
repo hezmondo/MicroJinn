@@ -9,9 +9,21 @@ from app.models import Agent, Headrent, RecentSearch
 from app.modeltypes import Freqs, Statuses
 
 
+def add_new_recent_search(fdict):
+    recent_search = RecentSearch()
+    recent_search.type = 'headrent'
+    recent_search.desc = ''
+    recent_search.dict = json.dumps(fdict)
+    db.session.add(recent_search)
+
+
 def create_new_headrent():
     # create new headrent function not yet built, so return any id:
     return 23
+
+
+def delete(headrent):
+    db.session.delete(headrent)
 
 
 def get_agent_headrents(agent_id):
@@ -46,14 +58,18 @@ def get_headrents(filter):
                                'propaddr', 'rentpa', 'source', 'status_id'),
                 contains_eager('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
-    for rent in headrents:
-        rent.status = Statuses.get_name(rent.status_id)
+    for headrent in headrents:
+        headrent.status = Statuses.get_name(headrent.status_id)
 
     return headrents
 
 
 def get_recent_searches():
     return RecentSearch.query.filter(RecentSearch.type == 'headrent').all()
+
+
+def get_recent_searches_asc():
+    return RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).all()
 
 
 def get_most_recent_search():
@@ -65,22 +81,6 @@ def post_headrent(headrent):
     db.session.add(headrent)
     commit_to_database()
 
-
-def add_new_recent_search(fdict):
-    recent_search = RecentSearch()
-    recent_search.type = 'headrent'
-    recent_search.desc = ''
-    recent_search.dict = json.dumps(fdict)
-    db.session.add(recent_search)
-
-
-# TODO: Decide if we want to give the user the option to name a search (desc)
-def save_search(fdict, desc=""):
-    if len(get_recent_searches()) >= 6:
-        first_record = RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).first()
-        db.session.delete(first_record)
-    add_new_recent_search(fdict)
-    db.session.commit()
 
 # def post_headrent_agent_update(agent_id, rent_id):
 #     message = ""

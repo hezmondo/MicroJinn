@@ -109,7 +109,7 @@
                 <div class="card-body text-primary">
                     {% for item in recent_searches|reverse %}
                     <div class="form-group row" style="margin-bottom: 5px;">
-                        <div class="col-md-10" style="padding-right:1px;">
+                        <div class="col-md-10" style="padding-right:2px;">
                             <button
                                     class="btn btn-block btn-tog search-history" style="text-align: left;"
                                     value="{{ item.dict }}" onclick="return false;">
@@ -118,8 +118,9 @@
                                 <span><b>{{ item.status[0] }}</b></span>
                             </button>
                         </div>
-                        <div class="col-md-2" style="padding-left:1px;">
+                        <div class="col-md-2" style="padding-left:3px;">
                             <button
+                                    style="height:100%;"
                                     value="{{ item.dict }}"
                                     class="btn btn-success btn-block button-icon arrow-right search-history">
                             </button>
