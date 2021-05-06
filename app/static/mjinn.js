@@ -130,6 +130,29 @@ $(document).ready(function(){
         $('#form-nextrentdate').val((new Date()).toISOString().split('T')[0]);
         $('#form-status').val('');
     });
+    // Selecting an filter from advanced filters will populate the search fields
+    $('.load-filters').mousedown(function(e) {
+        var dict = $.parseJSON($(this).val());
+        $('#filter-rentcode').val(dict.rentcode);
+        $('#filter-tenantname').val(dict.tenantname);
+        $('#filter-propaddr').val(dict.propaddr);
+        $('#filter-agentdetail').val(dict.agentdetail);
+        $('#filter-landlord').val(dict.landlord);
+        $('#filter-tenure').val(dict.tenure);
+        $('#filter-status').val(dict.status);
+        $('#filter-salegrade').val(dict.salegrade);
+        $('#filter-actype').val(dict.actype);
+        $('#filter-source').val(dict.source);
+        $('#filter-rentpa').val(dict.rentpa);
+        $('#filer-arrears').val(dict.arrears);
+        $('#filter-rentperiods').val(dict.rentperiods);
+        $('#filter-enddate').val(dict.enddate);
+        $('#filter-charges').val(dict.charges);
+        $('#filter-agentmailto').val(dict.agentmailto);
+        $('#filter-emailable').val(dict.emailable);
+        $('#filter-prdelivery').val(dict.prdelivery);
+        $('#filter-filtertype').val(dict.filtertype);
+    });
 });
 $(function() {
   // Sidebar toggle behavior

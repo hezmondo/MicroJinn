@@ -78,7 +78,8 @@
                     <td class="td-title copyable-text vertical-align" style="width: 12.00%">agent</td>
                     <td class="copyable-text vertical-align" style="width: 83%">{{ headrent.agent.detail }}</td>
                     <td class="vertical-align align-right" style="width: 5.00%"><a
-                            href="#"
+                            href="{{ url_for('agent_bp.agent',
+                            agent_id=headrent.agent_id, headrent_id=headrent.id) }}"
                             data-toggle="tooltip" title="edit agent"
                             class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
                     </td>

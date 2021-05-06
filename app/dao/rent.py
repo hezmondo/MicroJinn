@@ -110,6 +110,7 @@ def post_rent_filter(filterdict):
         jstore = Jstore()
     jstore.type = jtype
     jstore.code = jname
+    jstore.description = request.form.get("filterdesc")
     jstore.content = json.dumps(filterdict)
     db.session.add(jstore)
     commit_to_database()

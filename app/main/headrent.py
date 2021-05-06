@@ -80,7 +80,7 @@ def mget_headrents_from_recent():
 
 def mget_headrents_from_search():
     fdict, filtr = mget_headrents_filter()
-    # If the search dictionary is not in recent_search table we post it
+    # If the search dictionary is not in the recent_search table we post it
     mpost_search(fdict)
     headrents = mget_headrents(filtr)
     return fdict, headrents
