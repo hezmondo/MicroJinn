@@ -26,9 +26,8 @@ def rent(rent_id):
     rent = get_rentp(rent_id) if rent_id != 0 else {"id": 0}    # get full enhanced rent pack
     # basic validation check for mail and email variables
     messages = rent_validation(rent, message)
-    rentstats = get_rent_strings(rent, 'rent')
 
-    return render_template('rent.html', rent=rent, combodict=combodict, rentstats=rentstats, messages=messages)
+    return render_template('rent.html', rent=rent, combodict=combodict, messages=messages)
 
 
 @rent_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])

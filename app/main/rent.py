@@ -54,6 +54,15 @@ def get_paidtodate(advarrdet, arrears, datecode_id, freq_id, lastrentdate, rentp
         return paidtodate
 
 
+def get_price_quote(price, paidtodate, totcharges, rentpa):
+    if price != 0:
+        days = (date.today() - paidtodate).days
+        price_quote = price + totcharges + (days * rentpa / Decimal(365.25))
+    else:
+        price_quote = Decimal(99999)
+    return price_quote
+
+
 def get_propaddr(rent_id):
     propaddrs = get_propaddrs(rent_id)
     propaddr = '; '.join(each.propaddr.strip() for each in propaddrs)
@@ -96,6 +105,7 @@ def get_rentp(rent_id):
     #  level, using a propaddrs
     rent.propaddr = get_propaddr(rent_id)
     rent.propaddrs = get_propaddrs(rent_id)
+    rent.price_quote = get_price_quote(rent.price, rent.paidtodate, rent.totcharges, rent.rentpa)
     rent.rent_gale = get_rent_gale(rent.nextrentdate, rent.freq_id, rent.rentpa)
     rent.tenuredet = Tenures.get_name(rent.tenure_id)
     rent.rent_type = "rent charge" if rent.tenuredet == "rentcharge" else "ground rent"
@@ -124,13 +134,13 @@ def get_rent_strings(rent, type='mail'):
                                                        charge.chargetype.chargedesc, dateToStr(charge.chargestartdate))
             charges_string += charge_string + ", "
             charges_list.append(charge_string)
-    price = rent.price if rent.price else Decimal(0)
-    if price != 0:
-        days = (date.today() - rent.paidtodate).days
-        # days = Decimal(days)
-        price_quote = price + rent.totcharges + (days * rent.rentpa / Decimal(365.25))
-    else:
-        price_quote = Decimal(99999)
+    # price = rent.price if rent.price else Decimal(0)
+    # if price != 0:
+    #     days = (date.today() - rent.paidtodate).days
+    #     # days = Decimal(days)
+    #     price_quote = price + rent.totcharges + (days * rent.rentpa / Decimal(365.25))
+    # else:
+    #     price_quote = Decimal(99999)
     rent_strings_1 = {'#advarr#': rent.advarrdet,
                       '#arrears#': moneyToStr(rent.arrears, pound=True),
                       '#arrears_start_date#': arrears_start_date,
@@ -141,7 +151,7 @@ def get_rent_strings(rent, type='mail'):
                       '#nextrentdate#': dateToStr(rent.nextrentdate),
                       '#paidtodate#': dateToStr(rent.paidtodate),
                       '#periodly#': rent.freqdet,
-                      '#price_quote#': moneyToStr(price_quote, pound=True),
+                      '#price_quote#': moneyToStr(rent.price_quote, pound=True),
                       '#propaddr#': rent.propaddr,
                       '#rentcode#': rent.rentcode,
                       '#rentgale#': moneyToStr(rent.rent_gale, pound=True),
@@ -152,7 +162,7 @@ def get_rent_strings(rent, type='mail'):
                       }
     rent_stat = get_rent_stat(rent, rent_strings_1)
     rent_owing = get_rent_owing(rent, rent_strings_1, rent.nextrentdate)
-    price_stat = "for sale at {}".format(moneyToStr(price_quote, pound=True)) \
+    price_stat = "for sale at {}".format(moneyToStr(rent.price_quote, pound=True)) \
         if rent.salegrade_id == 1 else "not for sale"
     rent_strings_2 = {'#acc_name#': rent.landlord.money_account.acc_name,
                       '#acc_num#': rent.landlord.money_account.acc_num,
@@ -195,7 +205,7 @@ def get_rent_strings(rent, type='mail'):
                              'lastrentdate': dateToStr(rent.lastrentdate),
                              'nextrentdate': dateToStr(rent.nextrentdate),
                              'paidtodate': dateToStr(rent.paidtodate),
-                             'price_quote': moneyToStr(price_quote, pound=True),
+                             'price_quote': moneyToStr(rent.price_quote, pound=True),
                              '#propaddr#': rent.propaddr,
                              'rentgale': moneyToStr(rent.rent_gale, pound=True),
                              'rent_owing': rent_owing,
