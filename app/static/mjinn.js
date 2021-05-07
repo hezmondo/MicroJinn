@@ -152,6 +152,32 @@ $(document).ready(function(){
         $('#filter-emailable').val(dict.emailable);
         $('#filter-prdelivery').val(dict.prdelivery);
         $('#filter-filtertype').val(dict.filtertype);
+        // expand filters
+        $('.collapse-filter').collapse('show');
+    });
+    $('.hide-filters').mousedown(function(e) {
+        $('.collapse').collapse('hide');
+    });
+    $('.clear-filters').mousedown(function(e) {
+        $('#filter-rentcode').val('');
+        $('#filter-tenantname').val('');
+        $('#filter-propaddr').val('');
+        $('#filter-agentdetail').val('');
+        $('#filter-landlord').val('');
+        $('#filter-tenure').val('');
+        $('#filter-status').val('');
+        $('#filter-salegrade').val('');
+        $('#filter-actype').val('');
+        $('#filter-source').val('');
+        $('#filter-rentpa').val('');
+        $('#filer-arrears').val('');
+        $('#filter-rentperiods').val('');
+        $('#filter-enddate').val((new Date()).toISOString().split('T')[0]);
+        $('#filter-charges').val('');
+        $('#filter-agentmailto').val('');
+        $('#filter-emailable').val('');
+        $('#filter-prdelivery').val('');
+        $('#filter-filtertype').val('');
     });
 });
 $(function() {

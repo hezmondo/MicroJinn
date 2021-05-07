@@ -43,6 +43,7 @@ def rent_external(rent_external_id):  # view external rent from home rents page
 def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
     action = request.args.get('action', "query", type=str)
     combodict = get_combodict_filter()    # get combobox values with "all" added as an option
+
     fdict, rents = get_rents_advanced(action, filtr_id)   # get filter values and rent objects
     jfilters = get_filters(2)
 

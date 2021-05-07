@@ -273,6 +273,10 @@
 	border-radius: 5px 5px 0px 0px;
 	color: white;
 }
+.card-body
+{
+	border-radius: 0px;
+}
 .card-green
 {
 	border-radius: 5px;

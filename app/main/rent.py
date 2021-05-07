@@ -264,9 +264,12 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
     if action == "save":
         post_rent_filter(fdict)
     # now get filtered rent objects for this filter
-    rents = getrents_advanced(filtr, 50)
-    for rent in rents:
-        rent.propaddr = get_propaddr(rent.id)
+    if request.method == 'POST':
+        rents = getrents_advanced(filtr, 50)
+        for rent in rents:
+            rent.propaddr = get_propaddr(rent.id)
+    else:
+        rents = []
 
     return fdict, rents
 
