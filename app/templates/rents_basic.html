@@ -6,6 +6,7 @@
 {% block app_content %}
 <div class="row">
     <div class="col-md-9">
+        {% if rents|length > 0 %}
         <div class="table-fixed">
             <table class="table" id="rents">
                 <thead>
@@ -43,7 +44,13 @@
                 </tbody>
             </table>
         </div>
-
+        {% else %}
+        {{ widgets.message_box(
+        message="There are no rents that match your search.",
+        btn_text="reset search",
+        btn_class="btn btn-block btn-primary button-icon sync",
+        btn_url=url_for('rent_bp.rents_basic') ) }}
+        {% endif %}
     </div>
     <div class="col-md-3">
         <form method="POST" id="target">

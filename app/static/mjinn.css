@@ -273,9 +273,12 @@
 	border-radius: 5px 5px 0px 0px;
 	color: white;
 }
+.card-body
+{
+	border-radius: 0px;
+}
 .card-green
 {
-	border: 3px solid #3dbd5a !important;
 	border-radius: 5px;
 }
 .card-green .card-header
@@ -654,6 +657,18 @@
 	content: "\f2ed";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
+}
+.vertical-center-parent
+{
+    display: table;
+    height: 100%;
+    width: 100%;
+    text-align: left;
+}
+.vertical-center-child
+{
+    display: table-cell;
+    vertical-align: middle;
 }
 .wallet::before
 {

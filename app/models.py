@@ -463,6 +463,15 @@ class Recent(db.Model):
     number = db.Column(db.Integer)
 
 
+class RecentSearch(db.Model):
+    __tablename__ = 'recent_search'
+
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(45))
+    desc = db.Column(db.String(90))
+    dict = db.Column(db.Text)
+
+
 class Rent(db.Model):
     __tablename__ = 'rent'
 
@@ -578,10 +587,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    about_me = db.Column(db.String(90))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     recent_rents = db.Column(db.String(300))
     recent_agents = db.Column(db.String(300))
+    recent_headrents = db.Column(db.String(300))
 
     def __repr__(self):
 
@@ -630,7 +639,7 @@ def load_user(id):
     try:
         id_list = json.loads(getattr(current_user, "recent_rents"))
     except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
+        id_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     current_user.most_recent_rent = id_list[0]
 
     return current_user

@@ -26,9 +26,8 @@ def rent(rent_id):
     rent = get_rentp(rent_id) if rent_id != 0 else {"id": 0}    # get full enhanced rent pack
     # basic validation check for mail and email variables
     messages = rent_validation(rent, message)
-    rentstats = get_rent_strings(rent, 'rent')
 
-    return render_template('rent.html', rent=rent, combodict=combodict, rentstats=rentstats, messages=messages)
+    return render_template('rent.html', rent=rent, combodict=combodict, messages=messages)
 
 
 @rent_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])
@@ -44,10 +43,12 @@ def rent_external(rent_external_id):  # view external rent from home rents page
 def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
     action = request.args.get('action', "query", type=str)
     combodict = get_combodict_filter()    # get combobox values with "all" added as an option
+
     fdict, rents = get_rents_advanced(action, filtr_id)   # get filter values and rent objects
+    jfilters = get_filters(2)
 
     return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
-                           fdict=fdict, rents=rents)
+                           fdict=fdict, jfilters=jfilters, rents=rents)
 
 
 @rent_bp.route('/', methods=['GET', 'POST'])

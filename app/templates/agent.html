@@ -5,10 +5,15 @@
 
 {% block app_content %}
 <div class="row flex-row-reverse" style="margin-bottom: 1rem;">
-    {% if rent_id != 0 %}
+    {% if rent_id and rent_id != 0 %}
     <div class="col-md-3">
         <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+    </div>
+    {% elif headrent_id %}
+    <div class="col-md-3">
+        <a href="{{ url_for('headrent_bp.headrent', headrent_id=headrent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to headrent</a>
     </div>
     {% else %}
     <div class="col-md-3">

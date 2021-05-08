@@ -124,6 +124,16 @@ def date_processor():
     return dict(next_rent_date=next_rent_date)
 
 
+@app.context_processor
+def date_processor():
+    def relative_delta(date, days):
+        date2 = date + relativedelta(days=days)
+
+        return date2
+
+    return dict(relative_delta=relative_delta)
+
+
 # @app.context_processor
 # def utility_processor():
 #     def format_price(amount, currency=u'€'):

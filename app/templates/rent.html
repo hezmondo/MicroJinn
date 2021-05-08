@@ -139,11 +139,56 @@
                 <tbody>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">rent</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_stat }}</td>
+                    <td class="copyable-text" style="width: 88.00%">
+                        {% if rent.statusdet in ('sold off', 'terminated') %}
+                            This property has been sold off or terminated and was subject to a {{ rent.rent_type }} of
+                            {{ money_str(rent.rentpa, pound=True) }} per annum payable
+                            {{ rent.freqdet }} {{ rent.advarrdet }}, last paid to
+                            {{ rent.paidtodate.strftime('%d-%b-%Y') }}.
+                        {% elif rent.statusdet in ('grouped payment', 'managed') %}
+                            This property is subject to a {{ rent.rent_type }} of {{ money_str(rent.rentpa, pound=True) }}
+                            per annum payable {{ rent.freqdet }} {{ rent.advarrdet }} but this rent is collected within a
+                            block rent or otherwise managed elsewhere.
+                        {% else %}
+                            This property is subject to a {{ rent.rent_type }} of {{ money_str(rent.rentpa, pound=True) }}
+                            per annum payable {{ rent.freqdet }} {{ rent.advarrdet }}.
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">owing</td>
-                    <td class="copyable-text" style="width: 88.00%">{{ rentstats.rent_owing }}</td>
+                    <td class="copyable-text" style="width: 88.00%">
+                        {% if rent.statusdet not in ("grouped payment", "sold off", "terminated") %}
+                            {% if rent.arrears == 0 and rent.nextrentdate >= today_date %}
+                                There is no {{ rent.rent_type }} owing to us on this property and {{ rent.rent_type }} is paid
+                                up to {{ rent.paidtodate.strftime('%d-%b-%Y') }}.
+                                Further {{ rent.rent_type }} will be due and payable {{ rent.freqdet }} {{ rent.advarrdet }}
+                                on {{ rent.nextrentdate.strftime('%d-%b-%Y') }} in the sum of
+                                {{ money_str(rent.rent_gale, pound=True) }}.
+                            {% elif rent.arrears == 0 and rent.nextrentdate < today_date %}
+                                {{ upper_first(rent.rent_type) }} was last paid on this property up to
+                                {{ rent.paidtodate.strftime('%d-%b-%Y') }}.
+                                Further {{ rent.rent_type }} was due and payable {{ rent.freqdet }} {{ rent.advarrdet }}
+                                on {{ rent.nextrentdate.strftime('%d-%b-%Y') }} in the sum of
+                                {{ money_str(rent.rent_gale, pound=True) }} but no rent demand has yet been issued.
+                            {% elif rent.arrears > 0 and rent.lastrentdate > today_date %}
+                                A recent pay request has been issued for {{ money_str(rent.arrears + rent.totcharges, pound=True) }}
+                                 {{ rent.rent_type }} due {{ rent.freqdet }} {{ rent.advarrdet }} on {{ rent.lastrentdate }}.
+                                This amount is not payable until the date stated on the pay request.
+                            {% else %}
+                                The total amount owing to us on this property is {{ money_str(rent.arrears + rent.totcharges, pound=True) }}
+                                being {{ rent.rent_type }} owing for the period from
+                                {{ relative_delta(rent.paidtodate, 1).strftime('%d-%b-%Y') }} to
+                                {{ relative_delta(rent.nextrentdate, -1).strftime('%d-%b-%Y') }}.
+                            {% endif %}
+                            {% if rent.totcharges > 0 %}
+                                This includes charges as set out below.
+                            {% endif %}
+                        {% else %}
+                            No rent owing because the status for this rent is either grouped payment, managed, sold off
+                            or terminated.
+                        {% endif %}
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -152,9 +197,10 @@
                 <tr>
                     <td class="td-title copyable-text" style="width: 12.00%">charges</td>
                     <td class="copyable-text" style="width: 83.00%">
-                        {% if rentstats.charges_list != "no charges" %}
-                        {% for item in rentstats.charges_list %}
-                        {{ item }}
+                        {% if rent.charges|length != 0 %}
+                        {% for item in rent.charges %}
+                        {{ money_str(item.chargetotal, pound=True) }} {{ item.chargetype.chargedesc }} added on
+                        {{ item.chargestartdate.strftime('%d-%b-%Y') }}
                         <br/>
                         {% endfor %}
                         {% else %}
@@ -239,7 +285,13 @@
             <table class="table rounded-corners">
                 <thead>
                 <tr>
-                    <td style="width: 25%">{{ rentstats.price_stat }}</td>
+                    <td style="width: 25%">
+                        {% if rent.salegrade_id == 1 %}
+                            for sale at {{ money_str(rent.price_quote, pound=True) }}
+                        {% else %}
+                        not for sale
+                        {% endif %}
+                    </td>
                     <td style="width: 25%">source {{ rent.source }}</td>
                     <td style="width: 25%">nfee {{ rent.typedeed.info }}</td>
                 </tr>

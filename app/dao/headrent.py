@@ -1,14 +1,29 @@
+import json
 from app import db
 from flask import flash, redirect, url_for
+from sqlalchemy import desc, asc
 from sqlalchemy.orm import contains_eager, joinedload, load_only
+from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Headrent
+from app.models import Agent, Headrent, RecentSearch
 from app.modeltypes import Freqs, Statuses
+
+
+def add_new_recent_search(fdict):
+    recent_search = RecentSearch()
+    recent_search.type = 'headrent'
+    recent_search.desc = ''
+    recent_search.dict = json.dumps(fdict)
+    db.session.add(recent_search)
 
 
 def create_new_headrent():
     # create new headrent function not yet built, so return any id:
     return 23
+
+
+def delete(headrent):
+    db.session.delete(headrent)
 
 
 def get_agent_headrents(agent_id):
@@ -19,6 +34,7 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     if headrent_id == 0:
         # take the user to create new rent function:
         headrent_id = create_new_headrent()
+    pop_idlist_recent("recent_headrents", headrent_id)
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name')) \
@@ -42,10 +58,23 @@ def get_headrents(filter):
                                'propaddr', 'rentpa', 'source', 'status_id'),
                 contains_eager('agent').load_only('detail')) \
             .filter(*filter).order_by(Headrent.code).limit(50).all()
-    for rent in headrents:
-        rent.status = Statuses.get_name(rent.status_id)
+    for headrent in headrents:
+        headrent.status = Statuses.get_name(headrent.status_id)
 
     return headrents
+
+
+def get_recent_searches():
+    return RecentSearch.query.filter(RecentSearch.type == 'headrent').all()
+
+
+def get_recent_searches_asc():
+    return RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).all()
+
+
+def get_most_recent_search():
+    return RecentSearch.query.options(load_only('dict')).filter(RecentSearch.type == 'headrent') \
+        .order_by(desc(RecentSearch.id)).first()
 
 
 def post_headrent(headrent):

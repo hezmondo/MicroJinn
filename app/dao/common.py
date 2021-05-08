@@ -41,6 +41,10 @@ def delete_record(item_id, item):
     elif item == "incomealloc":
         IncomeAlloc.query.filter_by(id=item_id).delete()
         redir = "income_bp.income"
+    elif item == "jstore":
+        Jstore.query.filter_by(id=item_id).delete()
+        redir = "rent_bp.rents_advanced"
+        id_dict = {"filtr_id": 0}
     elif item == "landlord":
         Landlord.query.filter_by(id=item_id).delete()
         redir = "landlord_bp.landlords"
@@ -131,7 +135,7 @@ def get_idlist_recent(type):
     try:
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3]
+        id_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     return id_list
 

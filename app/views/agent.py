@@ -11,7 +11,8 @@ agent_bp = Blueprint('agent_bp', __name__)
 @login_required
 # TODO: Refector so that we are not using '0' as a value for any ids.
 def agent(agent_id):
-    rent_id = int(request.args.get('rent_id', "0", type=str))
+    headrent_id = request.args.get('headrent_id', type=int)
+    rent_id = request.args.get('rent_id', type=int)
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     action = request.args.get('action', type=str)
     if request.method == "POST":
@@ -19,8 +20,8 @@ def agent(agent_id):
         if rent_id != 0:
             return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
     agent, rents, headrents = prepare_agent_template(agent_id)
-    return render_template('agent.html', action=action, agent=agent, rent_id=rent_id, rentcode=rentcode,
-                           rents=rents, headrents=headrents)
+    return render_template('agent.html', action=action, agent=agent, headrent_id=headrent_id, rent_id=rent_id,
+                           rentcode=rentcode, rents=rents, headrents=headrents)
 
 
 @agent_bp.route('/agent_delete/<int:agent_id>', methods=["GET", "POST"])
@@ -47,7 +48,7 @@ def agent_unlink(rent_id):
 @agent_bp.route('/agents', methods=['GET', 'POST'])
 @login_required
 def agents():
-    rent_id = int(request.args.get('rent_id', "0", type=str))
+    rent_id = request.args.get('rent_id', 0, type=int)
     rentcode = request.args.get('rentcode', "ABC1", type=str)
     agent_id = request.args.get('agent_id', 0, type=int)
     fdict = {}
