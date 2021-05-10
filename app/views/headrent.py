@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.main.headrent import mget_headrents_from_recent, \
+from app.main.headrent import mget_headrents_default, \
     mget_headrents_from_search, mget_headrent, mget_recent_searches, update_landlord, \
     update_headrent, update_propaddr, update_note
 
@@ -12,7 +12,7 @@ def headrents():
     if request.method == "POST":
         fdict, headrents = mget_headrents_from_search()
     else:
-        fdict, headrents = mget_headrents_from_recent()
+        fdict, headrents = mget_headrents_default()
 
     recent_searches = mget_recent_searches()
 

@@ -257,6 +257,14 @@
 	text-rendering: auto;
 	webkit-font-smoothing: antialiased;
 }
+.button-icon-center::before
+{
+	display: inline-block;
+	font-style: normal;
+	font-variant: normal;
+	text-rendering: auto;
+	webkit-font-smoothing: antialiased;
+}
 .card
 {
 	background-color: #d9e3e7;

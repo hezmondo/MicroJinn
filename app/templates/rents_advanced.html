@@ -252,7 +252,7 @@
                    aria-controls="expand_load"
                    class="btn btn-block btn-danger button-icon filter"
                    role="button">load filter</a>
-                <div id="expand_load" class="collapse collapse-filter show">
+                <div id="expand_load" class="collapse collapse-filter">
                     <table class="table table-condensed">
                         <tbody>
                         {% for item in jfilters %}
@@ -269,7 +269,7 @@
                             </td>
                             <td>
                                 <a
-                                        class="btn btn-block btn-warning button-icon round cross"
+                                        class="btn btn-block btn-warning button-icon round trash"
                                         style="text-align: left;"
                                         href="{{ url_for('util_bp.delete_item', item_id=item.id, item='jstore') }}"
                                         data-toggle="tooltip" title="delete filter"
