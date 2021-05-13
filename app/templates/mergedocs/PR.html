@@ -6,105 +6,126 @@
 {% block app_content %}
 <form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}">
     <div class="form-group row flex-row-reverse">
-		<div class="col-md-3">
-			<a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
-			   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr selection</a>
-		</div>
-		<div class="col-md-9">
-			<span>Choose address, delivery method and edit the payrequest below </span>
-		</div>
+        <div class="col-md-3">
+            <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr selection</a>
+        </div>
+        <div class="col-md-9">
+            <span>Choose address and edit the pay request</span>
+        </div>
     </div>
-	<div class="form-group row">
-		<div id="address_fields" class="col">
-			{{ pr_form.mailaddr(class_="form-control") }}
-		</div>
-	</div>
-	<div class="form-group row">
-		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
-			   class="btn btn-block btn-success save_pr" role="button">post</button>
-		</div>
-		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='post_email', rent_id=rent_pr.id) }}"
-			   class="btn btn-block btn-success save_pr" role="button">post and email</button>
-		</div>
-		<div class="col-md-4" align="bottom">
-			<button type="submit" formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
-			   class="btn btn-block btn-success save_pr" role="button">email</button>
-		</div>
-	</div>
-	<div id="doc_html" contenteditable="false">
-		<style type="text/css">
-			{% include "mergedocs/pr_table_styles.css" %}
-		</style>
-		<div id="manager_div" contenteditable="true">
-			<div class="font-size-large manager-name" align="center">
-				<b>{{ rent_pr.managername }}</b>
-			</div>
-			<div class="font-size-small manager-addr" align="center">
-				{{ rent_pr.manageraddr }}
-				<br />
-				{{ rent_pr.manageraddr2 }}
-				<br />
-			</div>
-		</div>
-		<div class="font-size-medium" align="right" contenteditable="true">
-			<span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
-			<br />
-			Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }}
-		</div>
-		<div class="font-size-medium" align="left">
-			<span id="addr_span" class="block-text" contenteditable="true">
-				{% for item in mailaddr %}
-					{{ item }}
-					<br />
-				{% endfor %}
-			</span>
-			<br />
-			<br />
-			<b><span id="subject_span" class="block-text" contenteditable="true">
-				{{ subject }}
-			</span></b>
-			<br />
-		</div>
-		<div class="font-size-medium" align="left" contenteditable="true">
-			<div id="owings_div">
-				<table class="pr_table">
-					<colgroup>
-						<col style="width:80%">
-						<col style="width:20%">
-					</colgroup>
-					<tr class="pr_table_heading">
-						<td>Details</a></td>
-						<td>Amount</td>
-					</tr>
-					{% for statement, value in table_rows.items() %}
-					<tr>
-						<td>{{ statement }}</a></td>
-						<td class="amount_class">{{ value }}</td>
-					</tr>
-					{% endfor %}
-					<tr class="total">
-						<td>The total amount payable is:</a></td>
-						<td class="amount_class">{{ totdue_string }}</td>
-					</tr>
-				</table>
-			</div>
-			{{ widgets.linebreaks_for_string(block) }}
-		</div>
-		<div id="hidden_email_dets" style="display: none;">
-			<div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none'  }} to &nbsp;<span class="span-input" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email else 'example@gmail.com; example2@gmail.com'}} </span></div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-9">
+            <div id="address_fields" style="margin-bottom:1rem;">
+                {{ pr_form.mailaddr(class_="form-control") }}
+            </div>
+            <div id="doc_html" contenteditable="false">
+                <style type="text/css">
+					{% include "mergedocs/pr_table_styles.css" %}
+
+
+                </style>
+                <div id="manager_div" contenteditable="true">
+                    <div class="font-size-large manager-name" align="center">
+                        <b>{{ rent_pr.landlord.manager.managername }}</b>
+                    </div>
+                    <div class="font-size-small manager-addr" align="center">
+                        {{ rent_pr.landlord.manager.manageraddr }}
+                        <br/>
+                        {{ rent_pr.landlord.manager.manageraddr2 }}
+                        <br/>
+                    </div>
+                </div>
+                <div class="font-size-medium" align="right" contenteditable="true">
+                    <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
+                    <br/>
+                    Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+                </div>
+                <div class="font-size-medium" align="left">
+					<span id="addr_span" class="block-text" contenteditable="true">
+						{% for item in mailaddr %}
+							{{ item }}
+							<br/>
+						{% endfor %}
+					</span>
+                    <br/>
+                    <br/>
+                    <b><span id="subject_span" class="block-text" contenteditable="true">
+						{{ subject }}
+					</span></b>
+                    <br/>
+                </div>
+                <div class="font-size-medium" align="left" contenteditable="true">
+                    <div id="owings_div">
+                        <table class="pr_table">
+                            <colgroup>
+                                <col style="width:80%">
+                                <col style="width:20%">
+                            </colgroup>
+                            <tr class="pr_table_heading">
+                                <td>Details</a></td>
+                                <td>Amount</td>
+                            </tr>
+                            {% for statement, value in table_rows.items() %}
+                            <tr>
+                                <td>{{ statement }}</a></td>
+                                <td class="amount_class">{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                            <tr class="total">
+                                <td>The total amount payable is:</a></td>
+                                <td class="amount_class">{{ totdue_string }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    {{ widgets.linebreaks_for_string(block) }}
+                </div>
+                <div id="hidden_email_dets" style="display: none;">
+                    <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
+                            class="span-input" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email else 'example@gmail.com; example2@gmail.com'}} </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>Select an option below to send</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon letter" role="button">post
+                            </button>
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email and post', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and email
+                            </button>
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon email-ic" role="button">email
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="form-group row">
-		<div class="col-md-3">
-            <input type="hidden" id="pr_block" name="xinput" value = "xyz">
+        <div class="col-md-3">
+            <input type="hidden" id="pr_block" name="xinput" value="xyz">
         </div>
-		<div class="col-md-3">
-            <input type="hidden" id="pr_addr" name="pr_addr" value = "">
+        <div class="col-md-3">
+            <input type="hidden" id="pr_addr" name="pr_addr" value="">
         </div>
-		<div class="col-md-2">
-            <input type="hidden" id="pr_save_data" name="pr_save_data" value = "{{ pr_save_data }}">
+        <div class="col-md-2">
+            <input type="hidden" id="pr_save_data" name="pr_save_data" value="{{ pr_save_data }}">
         </div>
     </div>
 </form>

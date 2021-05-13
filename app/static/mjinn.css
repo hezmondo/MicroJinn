@@ -3,7 +3,7 @@
 	background-color: #EDEDED !important;
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
 	min-height: 100px;
-	padding: 10px;
+	padding: 5% 10%;
 }
 #nav_bar a
 {
@@ -568,6 +568,10 @@
 	content: "\f002";
 	font-family: "Font Awesome 5 Free";
 	font-weight: 900;
+}
+.sticky-top
+{
+    top: 1rem;
 }
 .sync::before
 {

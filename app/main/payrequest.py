@@ -10,13 +10,22 @@ from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, g
 from app.dao.database import commit_to_database
 from app.dao.doc import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
-from app.dao.payrequest import add_pr_history, get_pr_charge, get_pr_file, get_recovery_info, \
-    prepare_new_pr_history_entry, add_pr_charge
-from app.dao.rent import check_pr_exists
+from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, \
+    get_recovery_info, prepare_new_pr_history_entry, add_pr_charge
 from app.dao.common import delete_record_basic
 from app.main.common import inc_date_m
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
+
+
+def append_pr_history_details(rent_pr):
+    rent_pr.pr_exists = False
+    rent_pr.last_arrears_level = ''
+    last_arrears_level_row = get_last_arrears_level(rent_pr.id)
+    if last_arrears_level_row:
+        rent_pr.pr_exists = True
+        rent_pr.last_arrears_level = last_arrears_level_row[0]
+    return rent_pr
 
 
 def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
@@ -28,7 +37,7 @@ def build_charges_suffix(rent_pr):
     periods = calculate_periods(rent_pr.arrears, rent_pr.freq_id, rent_pr.rentpa)
     charges_total = rent_pr.totcharges if rent_pr.totcharges else 0
     pr_exists = True if rent_pr.pr_exists == 1 else False
-    last_arrears_level = rent_pr.lastarrearslevel if pr_exists else ""
+    last_arrears_level = rent_pr.last_arrears_level
     charge_start_date = get_charge_start_date(rent_pr.id)
     charge_90_days = charge_start_date and date.today() - charge_start_date > timedelta(90)
     return build_charges_suffix_string(periods, charges_total, pr_exists, last_arrears_level, charge_90_days)
@@ -77,7 +86,7 @@ def build_pr_charges_table(rent_pr):
     new_charge_dict = {}
     total_charges = 0
     for charge in charges:
-        charge_details = "{} added on {}:".format(charge.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
+        charge_details = "{} added on {}:".format(charge.chargetype.chargedesc.capitalize(), dateToStr(charge.chargestartdate))
         charge_total = charge.chargetotal
         charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
         total_charges = total_charges + charge_total
@@ -135,7 +144,7 @@ def calculate_periods(arrears, freq_id, rent_pa):
 def check_recovery_in_charges(charges, recovery_charge_amount):
     includes_recovery = False
     for charge in charges:
-        if charge.chargetotal == recovery_charge_amount and charge.chargedesc == "recovery costs":
+        if charge.chargetotal == recovery_charge_amount and charge.chargetype.chargedesc == "recovery costs":
             includes_recovery = True
     return includes_recovery
 
@@ -241,7 +250,7 @@ def undo_pr(pr_id):
 
 def write_payrequest(rent_id, pr_form_id):
     rent_pr = get_rentp(rent_id)    # get full enhanced rent pack
-    rent_pr.pr_exists = check_pr_exists(rent_id)
+    rent_pr = append_pr_history_details(rent_pr)
     pr_variables = get_rent_strings(rent_pr, 'payrequest')
     nextrentdate = pr_variables.get('#nextrentdate#')
     arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue = \

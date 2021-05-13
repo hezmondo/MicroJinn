@@ -301,7 +301,15 @@
             </div>
         </div>
     </div>
-    {% if rents|length == 0 %}
+    {% if rents[0] == 'initialize' %}
+    <div class="boxed boxed-center boxed-blue">
+        <div class="row">
+            <div class="col">
+                Begin by choosing or loading filters and selecting 'search'.
+            </div>
+        </div>
+    </div>
+    {% elif rents|length == 0 %}
     <div class="boxed boxed-center boxed-blue">
         <div class="row">
             <div class="col">

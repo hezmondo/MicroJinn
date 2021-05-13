@@ -20,6 +20,10 @@ def add_pr_history(pr_history):
     return pr_history.id
 
 
+def get_last_arrears_level(rent_id):
+    return db.session.query(PrHistory.arrears_level).filter_by(rent_id=rent_id).order_by(-PrHistory.id).first()
+
+
 def get_pr_charge(pr_id):
     return PrCharge.query.filter_by(id=pr_id).one_or_none()
 

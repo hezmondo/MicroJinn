@@ -1,15 +1,10 @@
 import json
 from app import db
 from flask import flash, redirect, url_for, request
-from sqlalchemy import func
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Charge, Landlord, Jstore, PrHistory, Property, Rent, RentExternal
-
-
-def check_pr_exists(rent_id):  # check if rent has record in pr_history
-    return db.session.query(func.count(PrHistory.rent_id)).filter_by(rent_id=rent_id).scalar()
+from app.models import Agent, Charge, Landlord, Jstore, Property, Rent, RentExternal
 
 
 def create_new_rent():

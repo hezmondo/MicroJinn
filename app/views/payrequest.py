@@ -24,8 +24,7 @@ def pr_dialog(rent_id):
 def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        block, pr_save_data, rent_pr, subject, table_rows, \
-        totdue_string = write_payrequest(rent_id, pr_form_id)
+        block, pr_save_data, rent_pr, subject, table_rows, totdue_string = write_payrequest(rent_id, pr_form_id)
         pr_form = PrPostForm()
         mail_pack = get_mail_pack(rent_id)
         mailaddr = mail_pack.get('mailaddr')

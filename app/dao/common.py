@@ -9,6 +9,8 @@ from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailA
     Rent, MoneyAcc, TypeDeed, TypeDoc
 
 
+# Sam: We may end up moving these into their own separate dao files as the app increases in complexity - to deal with
+# special cases such as success/failure messages
 def delete_record(item_id, item):
     id_2 = request.args.get('id_2')
     id_dict = {}

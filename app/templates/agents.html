@@ -94,45 +94,47 @@
         {% endif %}
     </div>
     <div class="col-md-3">
-        <div class="card card-white" style="margin-bottom: 1.5rem;">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col">search</div>
-                    <div class="col align-right"><b>{{ agents|length }}</b> results</div>
+        <div class="sticky-top">
+            <div class="card card-white sticky-top" style="margin-bottom: 1.5rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                        <div class="col align-right"><b>{{ agents|length }}</b> results</div>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body text-primary">
-                <div class="row">
-                    <div class="col">
-                        <form method="POST" id="target">
-                            <input type="text" class="form-control" name="detail"
-                                   placeholder="agent details" value="{{ fdict.detail }}">
-                            <input type="text" class="form-control" name="email"
-                                   placeholder="agent email" value="{{ fdict.email }}">
-                            <input type="text" class="form-control" style="margin-bottom:1rem;" name="note"
-                                   placeholder="agent notes" value="{{ fdict.note }}">
-                            <button type="submit" class="btn btn-block btn-success button-icon search"
-                                    role="button">search
-                            </button>
-                        </form>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col">
+                            <form method="POST" id="target">
+                                <input type="text" class="form-control" name="detail"
+                                       placeholder="agent details" value="{{ fdict.detail }}">
+                                <input type="text" class="form-control" name="email"
+                                       placeholder="agent email" value="{{ fdict.email }}">
+                                <input type="text" class="form-control" style="margin-bottom:1rem;" name="note"
+                                       placeholder="agent notes" value="{{ fdict.note }}">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">search
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="card card-white">
-            <div class="card-header">actions</div>
-            <div class="card-body text-primary">
-                <div class="row">
-                    <div class="col">
-                        {% if rent_id %}
-                        <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
-                                action='new_agent') }}"
-                           class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
-                            rentcode }}</a>
-                        {% else %}
-                        <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
-                           class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
-                        {% endif %}
+            <div class="card card-white">
+                <div class="card-header">actions</div>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col">
+                            {% if rent_id %}
+                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=rent_id, rentcode=rentcode,
+                                    action='new_agent') }}"
+                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent for {{
+                                rentcode }}</a>
+                            {% else %}
+                            <a href="{{ url_for('agent_bp.agent', agent_id=0, rent_id=0, action='new_agent') }}"
+                               class="btn btn-block btn-primary button-icon plus" role="button">add new agent</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
