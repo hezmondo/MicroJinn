@@ -16,6 +16,15 @@ def get_mail_pack(rent_id):    # get small collection of variables for mail dial
     return mail_pack
 
 
+def get_mail_pack(rent_id):    # get small collection of variables for mail dialog
+    rent = get_rent_md(rent_id)    # get minimal Rent variables for mail dialog
+    mail_pack = {'rent_id': rent_id, 'rentcode': rent.rentcode}
+    mail_pack['mailaddr'] = get_mailaddr(rent_id, rent.agent_id, rent.mailto_id, rent.tenantname)
+    mail_pack['propaddr'] = get_propaddr(rent_id)
+    mail_pack['tenantname'] = rent.tenantname
+    return mail_pack
+
+
 def writeMail(rent_id, template, form_letter_id, income_id=0):
     rent = get_rentp(rent_id)    # get full enhanced rent pack
     variables = get_rent_strings(rent, 'mail') if template == 'LTS' else get_rent_strings(rent, 'xray')

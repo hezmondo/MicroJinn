@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block app_content %}
+	<div contenteditable="true">
+		<div class="font-size-large" align="center">
+			<b>{{ rent.landlord.manager.managername }}</b>
+		</div>
+		<div class="font-size-small" align="center">
+			{{ rent.landlord.manager.manageraddr }}
+			<br />
+			{{ rent.landlord.manager.manageraddr2 }}
+			<br />
+		</div>
+		<div class="font-size-medium" align="right">
+			Our Ref: {{ rent.rentcode }}
+			<br />
+			Date: {{ today_date }}
+		</div>
+		<div class="font-size-medium" align="left">
+			<!-- Postal address -->
+        	{% for item in mailaddr %}
+				{{ item }}
+				<br />
+        	{% endfor %}
+			<br />
+			<br />
+			<br />
+			<br />
+			<!-- Subject -->
+			<b>{{ subject }}</b>
+			<br />
+			<br />
+			<!-- Table of owings -->
+			<!-- %include "payreq_table_normal.html" -->
+
+			<!-- Clauses -->
+			<!-- %include "payreq_clauses_normal.html" -->
+
+			<!-- %if %ChargeType% == "ground rent" % -->
+			{% if rent.tenuredet == "Rentcharge" %}
+			<br />
+			{% else %}
+			<br />
+			<div class="font-size-small">
+				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rent.landlord.name }} whose address (at which notices, including notices in proceedings, should be served) is {{ rent.landlord.manager.manageraddr }}.
+			</div>
+			{% endif %}
+			<!-- %endif %ChargeType% -->
+
+			<br />
+			This account is for %AccountSummary%. If you would like a receipt for a payment sent by post, please enclose a stamped envelope with your address on it.
+			<br />
+			<br />
+
+			<!-- Payreq footer and remittance advice -->
+			<!-- Payreq footer normal -->
+			<hr width="80%" />
+			<div align="center">
+				<b>PAYMENT ADVICE - %SendDate% - Ref: %RentCode%</b>
+				<br />
+				Please return this section with your payment
+			</div>
+			<br />
+			Please find enclosed my/our cheque/PO for %TotalDue% to pay %AccountSummary%%ExtraRentStat% for property: %PropAddr%.
+			<br />
+			<!-- Include S166 here -->
+			<!-- %if %IncludeS166% -->
+			<!-- %include "s166.html" -->
+			<!-- %endif -->
+		</div>
+	</div>
+{% endblock %}
