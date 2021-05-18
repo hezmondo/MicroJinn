@@ -6,7 +6,7 @@ from decimal import Decimal
 from flask import request
 from dateutil.relativedelta import relativedelta
 from app.dao.case import check_case_exists, add_case
-from app.dao.charge import add_charge, get_charge_start_date, get_charge_type, get_total_charges, get_charges_rent
+from app.dao.charge import add_charge, get_charge_type, get_total_charges, get_charges_rent
 from app.dao.database import commit_to_database
 from app.dao.doc import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
@@ -15,6 +15,7 @@ from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_ch
 from app.dao.common import delete_record_basic
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
+from app.main.common import inc_date_m
 
 
 def append_pr_history_details(rent_pr):
@@ -35,11 +36,10 @@ def build_arrears_statement(rent_type, arrears_start_date, arrears_end_date):
 def build_charges_suffix(rent_pr):
     periods = calculate_periods(rent_pr.arrears, rent_pr.freq_id, rent_pr.rentpa)
     charges_total = rent_pr.totcharges if rent_pr.totcharges else 0
-    pr_exists = True if rent_pr.pr_exists == 1 else False
-    last_arrears_level = rent_pr.last_arrears_level
-    charge_start_date = get_charge_start_date(rent_pr.id)
+    charge_start_date = mget_recent_charge_date(rent_pr) if rent_pr.totcharges else False
     charge_90_days = charge_start_date and date.today() - charge_start_date > timedelta(90)
-    return build_charges_suffix_string(periods, charges_total, pr_exists, last_arrears_level, charge_90_days)
+    return build_charges_suffix_string(periods, charges_total, rent_pr.pr_exists, rent_pr.last_arrears_level,
+                                       charge_90_days)
 
 
 def build_charges_suffix_string(periods, charges_total, pr_exists, last_arrears_level, charge_90_days):
@@ -82,51 +82,47 @@ def build_new_arrears_level_string(suffix):
 def build_pr_charges_table(rent_pr):
     charge_table_items = {}
     new_charge_dict = {}
-    total_charges = 0
     for charge in rent_pr.charges:
         charge_details = "{} added on {}:".format(charge.chargetype.chargedesc.capitalize(),
                                                   dateToStr(charge.chargestartdate))
-        charge_total = charge.chargetotal
-        charge_table_items.update({charge_details: moneyToStr(charge_total, pound=True)})
-        total_charges = total_charges + charge_total
+        charge_table_items.update({charge_details: moneyToStr(charge.chargetotal, pound=True)})
     suffix = build_charges_suffix(rent_pr)
     arrears_clause, create_case, recovery_charge_amount = get_recovery_info(suffix)
     new_arrears_level = build_new_arrears_level_string(suffix)
     if recovery_charge_amount > 0 and not check_recovery_in_charges(rent_pr.charges, recovery_charge_amount):
         charge_details = "{} added on {}:".format("Recovery costs", dateToStr(date.today()))
         charge_table_items.update({charge_details: moneyToStr(recovery_charge_amount, pound=True)})
-        total_charges = total_charges + recovery_charge_amount
+        rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
         new_charge_dict = {
             'rent_id': rent_pr.id,
             'charge_total': recovery_charge_amount,
             'charge_type_id': 10
         }
-    return arrears_clause, charge_table_items, create_case, total_charges, new_charge_dict, new_arrears_level
+    return arrears_clause, charge_table_items, create_case, new_charge_dict, new_arrears_level
 
 
 def build_pr_table(rent_pr, pr_variables):
     arrears_start_date = pr_variables.get('#arrears_start_date#')
     arrears_end_date = pr_variables.get('#arrears_end_date#')
-    rent_type = pr_variables.get('#rent_type#')
     table_rows = {}
     if rent_pr.rent_gale:
-        rent_statement = build_rent_statement(rent_pr, rent_type, rent_pr.nextrentdate)
+        rent_statement = build_rent_statement(rent_pr)
         table_rows.update({rent_statement: moneyToStr(rent_pr.rent_gale, pound=True)})
     if rent_pr.arrears:
-        arrears_statement = build_arrears_statement(rent_type, arrears_start_date, arrears_end_date)
+        arrears_statement = build_arrears_statement(rent_pr.rent_type, arrears_start_date, arrears_end_date)
         table_rows.update({arrears_statement: moneyToStr(rent_pr.arrears, pound=True)})
-    arrears_clause, charge_table_items, create_case, total_charges, \
+    arrears_clause, charge_table_items, create_case, \
     new_charge_dict, new_arrears_level = build_pr_charges_table(rent_pr)
-    if total_charges:
+    if rent_pr.totcharges:
         table_rows.update(charge_table_items)
-    totdue = rent_pr.rent_gale + rent_pr.arrears + total_charges
+    totdue = rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges
     new_arrears = rent_pr.arrears + rent_pr.rent_gale
-    return arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, rent_type, table_rows, totdue
+    return arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, table_rows, totdue
 
 
-def build_rent_statement(rent_pr, rent_type, next_rent_date):
-    statement = "{0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_type, rent_pr.advarrdet,
-                                                             dateToStr(next_rent_date))
+def build_rent_statement(rent_pr):
+    statement = "{0} {1} due and payable {2} on {3}:".format(rent_pr.freqdet, rent_pr.rent_type, rent_pr.advarrdet,
+                                                             dateToStr(rent_pr.nextrentdate))
     statement = statement[0].upper() + statement[1:]
     return statement
 
@@ -174,6 +170,22 @@ def forward_rent_case_and_charges(pr_id, pr_save_data, rent_id):
     return case_created, charge_id
 
 
+def mget_recent_charge_date(rent_pr):
+    charge_start_dates = []
+    for charge in rent_pr.charges:
+        charge_start_dates.append(charge.chargestartdate)
+    return max(charge_start_dates)
+
+
+def create_new_pr_history_entry(method):
+    block = request.form.get('xinput').replace("£", "&pound;")
+    pr_save_data = json.loads(request.form.get('pr_save_data'))
+    rent_id = request.args.get('rent_id', type=int)
+    mailaddr = request.form.get('pr_addr')
+    pr_history = prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method)
+    return block, pr_save_data, pr_history, rent_id
+
+
 def save_charge(rent_id, recovery_charge_amount, chargetype_id):
     today_string = dateToStr(date.today())
     charge_type = get_charge_type(chargetype_id)
@@ -192,15 +204,6 @@ def save_new_payrequest(method):
         add_pr_charge(pr_id, charge_id, case_created)
     commit_to_database()
     return pr_id, pr_save_data, rent_id
-
-
-def create_new_pr_history_entry(method):
-    block = request.form.get('xinput').replace("£", "&pound;")
-    pr_save_data = json.loads(request.form.get('pr_save_data'))
-    rent_id = request.args.get('rent_id', type=int)
-    mailaddr = request.form.get('pr_addr')
-    pr_history = prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method)
-    return block, pr_save_data, pr_history, rent_id
 
 
 def serialize_pr_save_data(pr_save_data):
@@ -246,11 +249,10 @@ def write_payrequest(rent_id, pr_form_id):
     rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
     rent_pr = append_pr_history_details(rent_pr)
     pr_variables = get_rent_strings(rent_pr, 'payrequest')
-    nextrentdate = pr_variables.get('#nextrentdate#')
-    arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, rent_type, table_rows, \
+    arrears_clause, create_case, new_arrears, new_arrears_level, new_charge_dict, table_rows, \
         rent_pr.totdue = build_pr_table(rent_pr, pr_variables)
     pr_variables.update({'#totdue#': moneyToStr(rent_pr.totdue, pound=True) if rent_pr.totdue else "no total due"})
-    subject = "{} account for property: #propaddr#".format(rent_type.capitalize())
+    subject = "{} account for property: #propaddr#".format(rent_pr.rent_type.capitalize())
     subject = doReplace(pr_variables, subject)
     pr_form = get_pr_form(pr_form_id)
     arrears_clause = doReplace(pr_variables, arrears_clause) + '\n\n' if arrears_clause else ""
@@ -262,19 +264,36 @@ def write_payrequest(rent_id, pr_form_id):
         'new_arrears_level': new_arrears_level,
         'new_charge_dict': new_charge_dict,
         'pr_code': pr_form.code,
-        'rent_date_string': nextrentdate,
+        'rent_date_string': dateToStr(rent_pr.nextrentdate),
         'tot_due': rent_pr.totdue,
         'pr_variables': pr_variables
     }
     return block, pr_save_data, rent_pr, subject, table_rows
 
 
-# TODO: Finish next week
+# TODO: Tomorrow - Clean up, save pr and allow emails to be written (hidden form input pr_email)
 def write_payrequest_x(rent_id, pr_form_id):
     rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
     rent_pr = append_pr_history_details(rent_pr)
     pr_form = get_pr_form(pr_form_id)
-
+    rent_pr.suffix = build_charges_suffix(rent_pr)
+    # Note: we are not using the arrears_clause
+    arrears_clause, create_case, recovery_charge_amount = get_recovery_info(rent_pr.suffix)
+    new_arrears_level = build_new_arrears_level_string(rent_pr.suffix)
+    includes_recovery = check_recovery_in_charges(rent_pr.charges, recovery_charge_amount)
+    if recovery_charge_amount > 0 and not includes_recovery:
+        rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
+    rent_pr.arrears_start_date = rent_pr.paidtodate + relativedelta(days=1)
+    rent_pr.arrears_end_date = rent_pr.nextrentdate + relativedelta(days=-1)
+    rent_pr.create_case = create_case
+    rent_pr.new_arrears_level = new_arrears_level
+    rent_pr.recovery_charge_amount = recovery_charge_amount
+    rent_pr.pr_code = pr_form.code
+    rent_pr.pay_date = date.today() + relativedelta(days=30)
+    rent_pr.next_gale_start = rent_pr.nextrentdate if rent_pr.advarrdet == "in advance" else \
+        rent_pr.lastrentdate + relativedelta(days=1)
+    rent_pr.arrears_end_date_1 = inc_date_m(rent_pr.lastrentdate, rent_pr.freq_id, rent_pr.datecode_id, 2) + relativedelta(
+                          days=-1) if rent_pr.advarrdet == "in advance" else rent_pr.nextrentdate
     return rent_pr
 
 

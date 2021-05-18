@@ -4,6 +4,7 @@ from app.models import PrArrearsMatrix, PrCharge, PrHistory, Rent
 from app.modeltypes import PrDeliveryTypes
 from app.dao.database import commit_to_database
 from sqlalchemy import desc
+from sqlalchemy.orm import load_only
 
 
 def add_pr_charge(pr_id, charge_id, case_created):
@@ -41,10 +42,10 @@ def get_pr_history(rent_id):
 
 
 def get_recovery_info(suffix):
-    recovery_info = PrArrearsMatrix.query.with_entities(PrArrearsMatrix.arrears_clause,
-                                                        PrArrearsMatrix.recovery_charge,
-                                                        PrArrearsMatrix.create_case). \
-        filter_by(suffix=suffix).one_or_none()
+    recovery_info = db.session.query(PrArrearsMatrix).filter_by(suffix=suffix).options(load_only('arrears_clause',
+                                                                                                 'recovery_charge',
+                                                                                                 'create_case')).\
+        one_or_none()
     arrears_clause = recovery_info.arrears_clause
     create_case = recovery_info.create_case
     recovery_charge = recovery_info.recovery_charge

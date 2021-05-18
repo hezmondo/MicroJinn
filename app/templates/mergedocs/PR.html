@@ -63,17 +63,17 @@
                                 <col style="width:20%">
                             </colgroup>
                             <tr class="pr_table_heading">
-                                <td>Details</a></td>
+                                <td>Details</td>
                                 <td>Amount</td>
                             </tr>
                             {% for statement, value in table_rows.items() %}
                             <tr>
-                                <td>{{ statement }}</a></td>
+                                <td>{{ statement }}</td>
                                 <td class="amount_class">{{ value }}</td>
                             </tr>
                             {% endfor %}
                             <tr class="total">
-                                <td>The total amount payable is:</a></td>
+                                <td>The total amount payable is:</td>
                                 <td class="amount_class">{{ money_str(rent_pr.totdue, pound=True) }}</td>
                             </tr>
                         </table>

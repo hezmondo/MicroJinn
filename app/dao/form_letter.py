@@ -39,7 +39,6 @@ def get_email_form_by_code(code):
 
 def get_pr_form(pr_form_id):
     pr_form = FormLetter.query.filter(FormLetter.id == pr_form_id).one_or_none()
-
     return pr_form
 
 

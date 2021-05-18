@@ -39,10 +39,9 @@ def pr_edit(pr_form_id):
 def pr_edit_xray(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        pr_save_data, rent_pr, table_rows = write_payrequest_x(rent_id, pr_form_id)
-        pr_save_data = serialize_pr_save_data(pr_save_data)
-        return render_template('mergedocs/PRX.html', pr_save_data=pr_save_data, rent_pr=rent_pr,
-                               table_rows=table_rows)
+        rent_pr = write_payrequest_x(rent_id, pr_form_id)
+        # pr_save_data = serialize_pr_save_data(rent_pr)
+        return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
 
 
 # TODO: improve pr_file editing functionality (beyond edit summary/block)
