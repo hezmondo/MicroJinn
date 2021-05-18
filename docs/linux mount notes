@@ -1,0 +1,26 @@
+https://askubuntu.com/questions/1332371/creating-a-pc-boot-able-ubuntu-installation/1332619#1332619
+
+https://askubuntu.com/questions/626353/how-to-list-unmounted-partition-of-a-harddisk-and-mount-them
+
+Listing Unmounted Partitions
+
+To address the listing of the unmounted partitions part, there are several ways - lsblk, fdisk, parted, blkid
+
+One could use a little bit of AWK magic to parse output of lsblk to list all the unmounted partitions :
+
+    lsblk  --noheadings --raw | awk '$1~/s.*[[:digit:]]/ && $7==""'
+
+sda1 8:1 1 3.8G 0 part
+sdb4 8:20 0 6.8G 0 part
+sdb2 8:18 0 1M 0 part
+sdb5 8:21 0 213.5G 0 part
+sdb3 8:19 0 300M 0 part
+sdb1 8:17 0 2.9G 0 part
+
+Mounting Partitions
+
+I've found that mount can be picky： it needs to know exact filesystem, it needs to be run as root, etc. udisksctl mount -b /dev/sXY is a much better command, can be ran as regular user, and mounts automatically to the /media/$USER/ folder. For example,
+
+    udisksctl mount -b /dev/sdb3
+
+Mounted /dev/sdb3 at /media/richard/073A-5DCF
