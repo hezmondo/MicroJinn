@@ -101,9 +101,6 @@ def get_rentp(rent_id):
     rent.paidtodate = get_paidtodate(rent.advarrdet, rent.arrears, rent.datecode_id, rent.freq_id, rent.lastrentdate,
                                      rent.rentpa)
     rent.prdeliverydet = PrDeliveryTypes.get_name(rent.prdelivery_id)
-    # TODO: We should not need to make a string out of the propaddrs list here as we can do this easily at template
-    #  level, using a propaddrs
-    rent.propaddr = get_propaddr(rent_id)
     rent.propaddrs = get_propaddrs(rent_id)
     rent.price_quote = get_price_quote(rent.price, rent.paidtodate, rent.totcharges, rent.rentpa)
     rent.rent_gale = get_rent_gale(rent.nextrentdate, rent.freq_id, rent.rentpa)
@@ -116,7 +113,7 @@ def get_rentp(rent_id):
 
 
 def get_rent_strings(rent, type='mail'):
-    # this function creates strings needed for mail, pay requests and rent screen statements
+    # this function creates strings needed for mail, pay requests
     # first we test and manipulate certain items from rent
     lastrentdate = rent.lastrentdate
     arrears_start_date = dateToStr(rent.paidtodate + relativedelta(days=1))
@@ -141,6 +138,7 @@ def get_rent_strings(rent, type='mail'):
     #     price_quote = price + rent.totcharges + (days * rent.rentpa / Decimal(365.25))
     # else:
     #     price_quote = Decimal(99999)
+    propaddr = '; '.join(each.propaddr.strip() for each in rent.propaddrs)
     rent_strings_1 = {'#advarr#': rent.advarrdet,
                       '#arrears#': moneyToStr(rent.arrears, pound=True),
                       '#arrears_start_date#': arrears_start_date,
@@ -152,7 +150,7 @@ def get_rent_strings(rent, type='mail'):
                       '#paidtodate#': dateToStr(rent.paidtodate),
                       '#periodly#': rent.freqdet,
                       '#price_quote#': moneyToStr(rent.price_quote, pound=True),
-                      '#propaddr#': rent.propaddr,
+                      '#propaddr#': propaddr,
                       '#rentcode#': rent.rentcode,
                       '#rentgale#': moneyToStr(rent.rent_gale, pound=True),
                       '#rentpa#': moneyToStr(rent.rentpa, pound=True),
@@ -206,7 +204,7 @@ def get_rent_strings(rent, type='mail'):
                              'nextrentdate': dateToStr(rent.nextrentdate),
                              'paidtodate': dateToStr(rent.paidtodate),
                              'price_quote': moneyToStr(rent.price_quote, pound=True),
-                             '#propaddr#': rent.propaddr,
+                             '#propaddr#': propaddr,
                              'rentgale': moneyToStr(rent.rent_gale, pound=True),
                              'rent_owing': rent_owing,
                              'rentpa': moneyToStr(rent.rentpa, pound=True),
@@ -269,7 +267,8 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
         for rent in rents:
             rent.propaddr = get_propaddr(rent.id)
     else:
-        rents = []
+        # string to tell jinja to provide initial message to user on rents_advanced load up.
+        rents = ['initialize']
 
     return fdict, rents
 

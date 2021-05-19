@@ -1,12 +1,10 @@
 from flask import Blueprint, redirect, render_template, request, url_for, json
 from flask_login import login_required
-from app.forms import PrPostForm
 from app.dao.common import get_filters
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
-from app.main.mail import get_mail_pack
 from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, \
-    undo_pr, write_payrequest, write_payrequest_email
+    undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -15,7 +13,6 @@ pr_bp = Blueprint('pr_bp', __name__)
 @login_required
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
-    # mail_pack = get_mail_pack(rent_id)
     return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
 
 
@@ -24,24 +21,27 @@ def pr_dialog(rent_id):
 def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        block, pr_save_data, rent_pr, subject, table_rows, \
-        totdue_string = write_payrequest(rent_id, pr_form_id)
-        pr_form = PrPostForm()
-        mail_pack = get_mail_pack(rent_id)
-        mailaddr = mail_pack.get('mailaddr')
-        if mailaddr:
-            mailaddr = mailaddr.split(", ")
-        else:
+        block, pr_save_data, rent_pr, subject, table_rows = write_payrequest(rent_id, pr_form_id)
+        # TODO: what property address do we use for rents with multiple properties if not the agent address?
+        # propaddr = '; '.join(each.propaddr.strip() for each in rent_pr.propaddrs)
+        if not rent_pr.mailaddr:
             message = 'Cannot complete payrequest, Please update mail address.'
             return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-        pr_form.mailaddr.choices = [mail_pack.get('mailaddr'), (mail_pack.get('tenantname') + ', ' + mail_pack.get('propaddr')),
-                                    ('The owner/occupier, ' + mail_pack.get('propaddr'))]
-        if pr_form.validate_on_submit():
-            return redirect(url_for('pr_save_send', rent_id=rent_pr.id))
         pr_save_data = serialize_pr_save_data(pr_save_data)
-        return render_template('mergedocs/PR.html', mailaddr=mailaddr, pr_save_data=pr_save_data, pr_form=pr_form,
+        return render_template('mergedocs/PR.html', pr_save_data=pr_save_data,
                                block=block, rent_pr=rent_pr, subject=subject,
-                               table_rows=table_rows, totdue_string=totdue_string)
+                               table_rows=table_rows)
+
+
+# TODO: finish next week
+@pr_bp.route('/pr_edit_xray/<int:pr_form_id>', methods=["GET", "POST"])
+@login_required
+def pr_edit_xray(pr_form_id):
+    if request.method == "POST":
+        rent_id = request.args.get('rent_id')
+        rent_pr = write_payrequest_x(rent_id, pr_form_id)
+        # pr_save_data = serialize_pr_save_data(rent_pr)
+        return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
 
 
 # TODO: improve pr_file editing functionality (beyond edit summary/block)

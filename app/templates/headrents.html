@@ -59,7 +59,47 @@
             {% endif %}
         </div>
         <div class="col-md-3">
+            {% if recent_searches|length > 0 %}
             <div class="card card-white">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">recent searches</div>
+                        <div class="col align-right">
+                            <a href="#expand_searches" data-toggle="collapse" aria-expanded="false"
+                               id="expand_searches_toggle" aria-controls="expand_searches"
+                               class="button-icon btn-round round plus"
+                               role="button"></a>
+                        </div>
+                    </div>
+                </div>
+                <div id="expand_searches" class="collapse">
+                    <div class="card-body text-primary">
+                        {% for item in recent_searches|reverse %}
+                        <div class="form-group row" style="margin-bottom: 5px;">
+                            <div class="col-md-9" style="padding-right:2px;">
+                                <button
+                                        class="btn btn-block btn-tog search-history" style="text-align: left;"
+                                        value="{{ item.dict }}" onclick="return false;">
+                                    <span><b>{{ item.rentcode }} </b></span><span>{{ item.address }} </span>
+                                    <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
+                                    <span><b>{{ item.status[0] }}</b></span>
+                                </button>
+                            </div>
+                            <div class="col-md-3" style="padding-left:3px;">
+                                <button
+                                        style="height:100%;"
+                                        value="{{ item.dict }}"
+                                        data-toggle="tooltip" title="search database"
+                                        class="btn btn-success btn-block button-icon-center arrow-right search-history">
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="card card-white sticky-top" style="margin-top: 20px;">
                 <div class="card-header">
                     <div class="row">
                         <div class="col">search</div>
@@ -75,9 +115,47 @@
                                    placeholder="address" value="{{ fdict.address }}">
                             <input id="form-agent" type="text" class="form-control" name="agent"
                                    placeholder="agent" value="{{ fdict.agent }}">
-                            <label for="nextrentdate" style="margin-top: 10px;">next rent date</label>
-                            <input id="form-nextrentdate" type="date" class="form-control date" name="nextrentdate"
-                                   value="{{ fdict.nextrentdate }}">
+                            {% if fdict.nextrentdate != '' %}
+                            <div style="margin-top: 10px;">
+                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
+                                   aria-controls="expand_next_rent_date"
+                                   class="button-icon minus remove-date">next rent date</a>
+                            </div>
+                            <div id="expand_next_rent_date" class="form-group row collapse show"
+                                 style="margin-top: 10px;">
+                                <div class="col-md-9" style="padding-right:5px">
+                                    <input id="form-nextrentdate" type="date" class="form-control date"
+                                           name="nextrentdate"
+                                           value="{{ fdict.nextrentdate }}">
+                                </div>
+                                <div class="col-md-3 align-self-end" style="padding-left:5px">
+                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
+                                       data-toggle="tooltip" title="set next rent date to today + 35 days"
+                                       onclick="return false;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div style="margin-top: 10px;">
+                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
+                                   aria-controls="expand_next_rent_date"
+                                   class="button-icon plus remove-date">next rent date</a>
+                            </div>
+                            <div id="expand_next_rent_date" class="form-group row collapse"
+                                 style="margin-top: 10px;">
+                                <div class="col-md-9" style="padding-right:5px">
+                                    <input id="form-nextrentdate" type="date" class="form-control date"
+                                           name="nextrentdate"
+                                           value="{{ fdict.nextrentdate }}">
+                                </div>
+                                <div class="col-md-3 align-self-end" style="padding-left:5px">
+                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
+                                       data-toggle="tooltip" title="set next rent date to today + 35 days"
+                                       onclick="return false;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
                             <div style="margin-top: 1rem;">
                                 {{ widgets.multiselect_as_select(name="status",
                                 items=HrStatuses.names(), items0="all statuses",
@@ -99,39 +177,14 @@
                     </div>
                 </div>
             </div>
-            {% if recent_searches|length > 0 %}
-            <div class="card card-white" style="margin-top: 20px;">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">recent searches</div>
-                    </div>
-                </div>
-                <div class="card-body text-primary">
-                    {% for item in recent_searches|reverse %}
-                    <div class="form-group row" style="margin-bottom: 5px;">
-                        <div class="col-md-10" style="padding-right:2px;">
-                            <button
-                                    class="btn btn-block btn-tog search-history" style="text-align: left;"
-                                    value="{{ item.dict }}" onclick="return false;">
-                                <span><b>{{ item.rentcode }} </b></span><span>{{ item.address }} </span>
-                                <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
-                                <span><b>{{ item.status[0] }}</b></span>
-                            </button>
-                        </div>
-                        <div class="col-md-2" style="padding-left:3px;">
-                            <button
-                                    style="height:100%;"
-                                    value="{{ item.dict }}"
-                                    class="btn btn-success btn-block button-icon arrow-right search-history">
-                            </button>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
 </form>
 {% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    {% include "headrents.js" %}
 
+
+</script>
+{% endblock %}

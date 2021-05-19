@@ -9,6 +9,8 @@ from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailA
     Rent, MoneyAcc, TypeDeed, TypeDoc
 
 
+# Sam: We may end up moving these into their own separate dao files as the app increases in complexity - to deal with
+# special cases such as success/failure messages
 def delete_record(item_id, item):
     id_2 = request.args.get('id_2')
     id_dict = {}
@@ -135,7 +137,7 @@ def get_idlist_recent(type):
     try:
         id_list = json.loads(getattr(current_user, type))
     except (AttributeError, TypeError, ValueError):
-        id_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        id_list = [1, 2, 3, 4, 5]
 
     return id_list
 

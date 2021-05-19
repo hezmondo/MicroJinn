@@ -4,10 +4,10 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from app.dao.agent import get_agent_id
 from app.dao.headrent import add_new_recent_search, delete, get_headrent, get_headrent_row, get_headrents, \
-    get_recent_searches, get_recent_searches_asc, get_most_recent_search, post_headrent
+    get_recent_searches, get_recent_searches_asc, post_headrent
 from app.main.common import inc_date_m
 from app.dao.common import get_idlist_recent, commit_to_database
-from app.main.functions import dateToStr, strToDec, strToDate
+from app.main.functions import strToDec
 from app.main.rent import get_paidtodate, get_rent_gale
 from app.models import Agent, Headrent
 from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
@@ -45,8 +45,8 @@ def mget_headrents_dict():
             'address': request.form.get('address') or '',
             'agent': request.form.get('agent') or '',
             'status': request.form.getlist('status') or ['active'],
-            'nextrentdate': request.form.get('nextrentdate')
-                            or date.today() + relativedelta(days=30)}
+            'nextrentdate': request.form.get('nextrentdate') or ''}
+    # dateToStrJson(date.today() + relativedelta(days=35))}
 
 
 def mget_headrents_filter():
@@ -63,19 +63,19 @@ def mget_headrents_filter():
         for i in range(len(fdict.get('status'))):
             ids.append(HrStatuses.get_id(fdict.get('status')[i]))
             filtr.append(Headrent.status_id.in_(ids))
-    if fdict.get('nextrentdate'):
+    if fdict.get('nextrentdate') and fdict.get('nextrentdate') != '':
         filtr.append(func.mjinn.next_rent_date(Headrent.id, 2) <= fdict.get('nextrentdate'))
 
     return fdict, filtr
 
 
-def mget_headrents_from_recent():
-    filtr, list = mget_headrents_recent_filter()
-    recent_search = get_most_recent_search()
-    fdict = json.loads(recent_search.dict) if recent_search else {'rentcode': '', 'address': '', 'agent': '', 'status': ['active'],
-             'nextrentdate': date.today() + relativedelta(days=30)}
+def mget_headrents_default():
+    filtr = [Headrent.status_id == 1]
+    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['active'],
+             'nextrentdate': ''}
     headrents = mget_headrents(filtr)
-    return fdict, sorted(headrents, key=lambda o: list.index(o.id))
+
+    return fdict, headrents
 
 
 def mget_headrents_from_search():
@@ -92,13 +92,6 @@ def mget_headrents_recent_filter():
     return filtr, list
 
 
-def mget_headrents_with_status(filtr):
-    headrents = get_headrents(filtr)
-    for headrent in headrents:
-        headrent.status = HrStatuses.get_name(headrent.status_id)
-    return headrents
-
-
 def mget_recent_searches():
     recent_searches = get_recent_searches()
     for recent_search in recent_searches:
@@ -107,7 +100,8 @@ def mget_recent_searches():
         recent_search.rentcode = fdict.get('rentcode')
         recent_search.address = fdict.get('address')
         recent_search.agent = fdict.get('agent')
-        recent_search.nextrentdate = datetime.strptime(fdict.get('nextrentdate'), '%Y-%m-%d').strftime("%d-%m-%Y")
+        if fdict.get('nextrentdate') and fdict.get('nextrentdate') != '':
+             recent_search.nextrentdate = datetime.strptime(fdict.get('nextrentdate'), '%Y-%m-%d').strftime("%d-%m-%Y")
         recent_search.status = fdict.get('status')
     return recent_searches
 

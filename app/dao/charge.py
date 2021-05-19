@@ -31,10 +31,6 @@ def get_charges(filtr):
         .filter(*filtr).all()
 
 
-def get_charge_start_date(rent_id):
-    return db.session.execute(func.mjinn.newest_charge(rent_id)).scalar()
-
-
 def get_charge_type(chargetype_id):
     return db.session.query(ChargeType.chargedesc).filter_by(id=chargetype_id).scalar()
 

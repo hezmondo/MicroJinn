@@ -72,9 +72,9 @@ def get_recent_searches_asc():
     return RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).all()
 
 
-def get_most_recent_search():
-    return RecentSearch.query.options(load_only('dict')).filter(RecentSearch.type == 'headrent') \
-        .order_by(desc(RecentSearch.id)).first()
+# def get_most_recent_search():
+#     return RecentSearch.query.options(load_only('dict')).filter(RecentSearch.type == 'headrent') \
+#         .order_by(desc(RecentSearch.id)).first()
 
 
 def post_headrent(headrent):

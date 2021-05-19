@@ -45,7 +45,9 @@
         {% endif %}
         <div class="font-size-medium" align="left">
             <br/>
-            <b>Re: {{ rent.propaddr }} - subject to contract</b>
+            <b>Re: {% for address in rent.propaddrs %}
+                            {{ address.propaddr }}{{ "; " if not loop.last else "" }}
+                        {% endfor %} - subject to contract</b>
             <br/>
             <br/>
             Thank you for your enquiry about extending the Lease for the above property.

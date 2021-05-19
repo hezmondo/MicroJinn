@@ -43,7 +43,3 @@ class PrEmailForm(FlaskForm):
     submit = SubmitField('save and send payrequest', id='savehtml')
 
 
-class PrPostForm(FlaskForm):
-    mailaddr = SelectField('mailaddr')
-    submit = SubmitField('save and send payrequest', id='savehtml')
-

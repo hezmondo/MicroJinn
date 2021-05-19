@@ -23,13 +23,23 @@
         </thead>
         <tbody>
         {% for item in pr_forms %}
-        <tr>
-            <td style="width: 60.00%">{{ item.description }}</td>
-            <td>
-                <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id) }}"
-                        class="btn btn-small btn-success button-icon arrow-right">select</button>
-            </td>
-        </tr>
+            {% if item.template != 'PRX' %}
+                <tr>
+                    <td style="width: 60.00%">{{ item.description }}</td>
+                    <td>
+                        <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id) }}"
+                                class="btn btn-small btn-success button-icon arrow-right">select</button>
+                    </td>
+                </tr>
+            {% else %}
+                 <tr>
+                    <td style="width: 60.00%">{{ item.description }} - XRAY</td>
+                    <td>
+                        <button type="submit" formaction="{{ url_for('pr_bp.pr_edit_xray', pr_form_id=item.id, rent_id=rent_id) }}"
+                                class="btn btn-small btn-danger button-icon arrow-right">select</button>
+                    </td>
+                </tr>
+            {% endif %}
         {% endfor %}
         </tbody>
     </table>

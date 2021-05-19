@@ -1,72 +1,257 @@
+<!-- /templates/mergedocs/PRX.html  -->
 {% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-	<div contenteditable="true">
-		<div class="font-size-large" align="center">
-			<b>{{ rent.landlord.manager.managername }}</b>
-		</div>
-		<div class="font-size-small" align="center">
-			{{ rent.landlord.manager.manageraddr }}
-			<br />
-			{{ rent.landlord.manager.manageraddr2 }}
-			<br />
-		</div>
-		<div class="font-size-medium" align="right">
-			Our Ref: {{ rent.rentcode }}
-			<br />
-			Date: {{ today_date }}
-		</div>
-		<div class="font-size-medium" align="left">
-			<!-- Postal address -->
-        	{% for item in mailaddr %}
-				{{ item }}
-				<br />
-        	{% endfor %}
-			<br />
-			<br />
-			<br />
-			<br />
-			<!-- Subject -->
-			<b>{{ subject }}</b>
-			<br />
-			<br />
-			<!-- Table of owings -->
-			<!-- %include "payreq_table_normal.html" -->
+<form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}"
+      xmlns="http://www.w3.org/1999/html">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr selection</a>
+        </div>
+        <div class="col-md-9">
+            <span>Choose address and edit the pay request</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div id="address_fields" style="margin-bottom:1rem;">
+                {{ widgets.combobox(name="address_fields", id="address_fields", items=[rent_pr.mailaddr,
+                (rent_pr.tenantname + ', ' + rent_pr.propaddrs[0].propaddr),
+                ('The owner/occupier, ' + rent_pr.propaddrs[0].propaddr)], item_selected=rent_pr.mailaddr) }}
+            </div>
+            <div id="doc_html" contenteditable="false">
+                <style type="text/css">
+					{% include "mergedocs/pr_table_styles.css" %}
 
-			<!-- Clauses -->
-			<!-- %include "payreq_clauses_normal.html" -->
+                </style>
+                <div id="manager_div" contenteditable="true">
+                    <div class="font-size-large manager-name" align="center">
+                        <b>{{ rent_pr.landlord.manager.managername }}</b>
+                    </div>
+                    <div class="font-size-small manager-addr" align="center">
+                        {{ rent_pr.landlord.manager.manageraddr }}
+                        <br/>
+                        {{ rent_pr.landlord.manager.manageraddr2 }}
+                        <br/>
+                    </div>
+                </div>
+                <div class="font-size-medium" align="right" contenteditable="true">
+                    <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
+                    <br/>
+                    Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+                </div>
+                <div class="font-size-medium" align="left">
+					<span id="addr_span" class="block-text" contenteditable="true">
+						{% set addr_list = rent_pr.mailaddr.split(',') %}
+                        {% for item in addr_list %}
+                            {{ item }}
+                            <br/>
+                        {% endfor %}
+					</span>
+                    <br/>
+                    <br/>
+                    <b><span id="subject_span" class="block-text" contenteditable="true">
+						{{ rent_pr.rent_type.capitalize() }} account for property:
+                        {% for addr in rent_pr.propaddrs %}
+                            {{ addr.propaddr }}
+                        {% endfor %}
+					</span></b>
+                    <br/>
+                </div>
+                <div class="font-size-medium" align="left" contenteditable="true">
+                    <div id="owings_div">
+                        <table class="pr_table">
+                            <colgroup>
+                                <col style="width:80%">
+                                <col style="width:20%">
+                            </colgroup>
+                            <tr class="pr_table_heading">
+                                <td>Details</td>
+                                <td>Amount</td>
+                            </tr>
+                            {% if rent_pr.rent_gale %}
+                            <tr>
+                                <td>{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
+                                    {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:
+                                </td>
+                                <td class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if rent_pr.arrears %}
+                            <tr>
+                                <td>Unpaid {{ rent_pr.rent_type }} is owing for the period
+                                    {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} to
+                                    {{ rent_pr.arrears_end_date.strftime('%d-%b-%Y') }}:
+                                </td>
+                                <td class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if rent_pr.charges %}
+                            {% for charge in rent_pr.charges %}
+                            <tr>
+                                <td>
+                                    {{ charge.chargetype.chargedesc.capitalize() }} added on
+                                    {{ charge.chargestartdate.strftime('%d-%b-%Y') }}:
+                                </td>
+                                <td class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                            <tr class="total">
+                                <td>The total amount payable is:</td>
+                                <td class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                                    rent_pr.totcharges, pound=True) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    {% if rent_pr.suffix %}
+                    <p>
+                        {% if rent_pr.suffix == 'ARC1' %}
+                        Recovery costs have been charged to your account because {{ rent_pr.rent_type }} was not paid when
+                        due for at least two prior rent dates. If this account has not been paid in full within 35 days then
+                        further costs of not less than £34.95 will be charged to cover our costs in respect of immediate legal
+                        proceedings to recover the debt.
+                        {% elif rent_pr.suffix == 'ARC2' %}
+                        Further recovery costs have been charged to your account because {{ rent_pr.rent_type }} was not
+                        paid when due for at least two prior rent dates. If this account has not been paid in full within 35
+                        days then further costs of not less than £34.95 will be charged to cover our costs in respect of immediate
+                        legal proceedings to recover the debt.
+                        {% elif rent_pr.suffix == 'ARC3' %}
+                        Further recovery costs have been charged to your account because {{ rent_pr.rent_type }} was not
+                        paid when due for at least three prior rent dates. If this account has not been paid in full within
+                        35 days then further costs of not less than £34.95 will be charged to cover our costs in respect of immediate
+                        legal proceedings to recover the debt.
+                        {% elif rent_pr.suffix == 'ARC4' %}
+                        Further recovery costs have been charged to your account because {{ rent_pr.rent_type }} was not paid when due
+                        for at least four prior rent dates. If this account has not been paid in full within 35 days then
+                        further costs of not less than £34.95 will be charged to cover our costs in respect of immediate
+                        legal proceedings to recover the debt.
+                        {% elif rent_pr.suffix == 'ARW' %}
+                        {{ rent_pr.rent_type.capitalize() }} is outstanding from prior periods. If this account has not been
+                        paid in full within 35 days, an administration fee of not less than £20 will be charged to pay for initial
+                        investigation at the Land Registry to identify any parties who may need to be informed prior to proceedings for
+                        recovery of the unpaid amounts owing on this property.
+                        {% elif rent_pr.suffix == 'ZERACH' %}
+                        Charges are outstanding as listed above. If this account has not been paid in full within 35 days,
+                        an administration fee of not less than £20 will be charged to pay for initial investigation at the
+                        Land Registry to identify any parties who may need to be informed prior to proceedings for recovery
+                        of the unpaid amounts owing on this property.
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                    <p>
+                        Please make your cheque/PO payable to {{ rent_pr.landlord.manager.managername }} with your reference
+                        {{ rent_pr.rentcode }} written on the back. If you prefer to pay us the {{
+                        money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }} by BACS or faster
+                        payments, our bank is {{ rent_pr.landlord.money_account.bank_name }}, our account is {{
+                        rent_pr.landlord.money_account.acc_name }}, the sort code is {{
+                        rent_pr.landlord.money_account.sort_code }} and our account number is {{
+                        rent_pr.landlord.money_account.acc_num }}. Please make sure that you give the property reference
+                        {{ rent_pr.rentcode }} with any BACS payment and please email us to confirm any BACS payment.
+                    </p>
+                    <p>
+                        <b>COMMONHOLD AND LEASEHOLD REFORM ACT 2002 - SECTION 166 NOTICE TO LONG LEASEHOLDERS OF RENT
+                            DUE</b>
+                    </p>
+                    <p>
+                        To: {{ rent_pr.tenantname }}
+                    </p>
+                    <p>
+                        This notice is given in respect of {% for addr in rent_pr.propaddrs %} {{ addr.propaddr }} {% endfor %}
+                        and requires you to pay rent of {{ money_str(rent_pr.rent_gale, pound=True) }} on
+                        {{ rent_pr.pay_date.strftime('%d-%b-%Y') }}
+                    </p>
+                    <p>
+                        This rent is payable in respect of the period from {{ rent_pr.next_gale_start.strftime('%d-%b-%Y') }} to {{
+                        rent_pr.arrears_end_date_1.strftime('%d-%b-%Y') }}
+                    </p>
+                    <p>
+                        In accordance with the terms of your lease the amount of {{ money_str(rent_pr.rent_gale, pound=True) }}
+                        is or was due on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}
+                    </p>
+                    <p>
+                        Payment should be made to {{ rent_pr.landlord.manager.managername }} of {{
+                        rent_pr.landlord.manager.manageraddr }}
+                    </p>
+                    <p>
+                        This notice is given by {{ rent_pr.landlord.name }} of {{ rent_pr.landlord.manager.manageraddr }}
+                    </p>
+                    <p>
+                        **NOTES FOR LEASEHOLDERS** - Read this notice carefully. It sets out the amount of rent due from
+                        you and the date by which you must pay it. You are advised to seek help immediately, if you cannot
+                        pay, or dispute the amount. Those who can help you include a citizens' advice bureau, a housing
+                        advice centre, a law centre and a solicitor. Show this notice and a copy of your lease to whoever helps
+                        you.
+                    </p>
+                </div>
+                <div id="hidden_email_dets" style="display: none;">
+                    <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
+                            class="span-input" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email
+                        else 'example@gmail.com; example2@gmail.com'}} </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>Select an option below to send</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon letter" role="button">post
+                            </button>
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email and post', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and
+                                email
+                            </button>
+                            <button type="submit"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
+                                    class="btn btn-block btn-success save_pr button-icon email-ic" role="button">email
+                            </button>
+                        </div>
 
-			<!-- %if %ChargeType% == "ground rent" % -->
-			{% if rent.tenuredet == "Rentcharge" %}
-			<br />
-			{% else %}
-			<br />
-			<div class="font-size-small">
-				Pursuant to Sections 47 and 48 of the Landlord & Tenant Act 1987, your Landlord is {{ rent.landlord.name }} whose address (at which notices, including notices in proceedings, should be served) is {{ rent.landlord.manager.manageraddr }}.
-			</div>
-			{% endif %}
-			<!-- %endif %ChargeType% -->
-
-			<br />
-			This account is for %AccountSummary%. If you would like a receipt for a payment sent by post, please enclose a stamped envelope with your address on it.
-			<br />
-			<br />
-
-			<!-- Payreq footer and remittance advice -->
-			<!-- Payreq footer normal -->
-			<hr width="80%" />
-			<div align="center">
-				<b>PAYMENT ADVICE - %SendDate% - Ref: %RentCode%</b>
-				<br />
-				Please return this section with your payment
-			</div>
-			<br />
-			Please find enclosed my/our cheque/PO for %TotalDue% to pay %AccountSummary%%ExtraRentStat% for property: %PropAddr%.
-			<br />
-			<!-- Include S166 here -->
-			<!-- %if %IncludeS166% -->
-			<!-- %include "s166.html" -->
-			<!-- %endif -->
-		</div>
-	</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-3">
+            <input type="hidden" id="pr_block" name="xinput" value="xyz">
+        </div>
+        <div class="col-md-3">
+            <input type="hidden" id="pr_addr" name="pr_addr" value="">
+        </div>
+        <div class="col-md-2">
+            <input type="hidden" id="pr_save_data" name="pr_save_data" value="{{ pr_save_data }}">
+        </div>
+        <div class="col-md-2">
+            <input type="hidden" id="pr_email" name="pr_email"
+                   value="Please find attached a summary account for the above property along with a rent demand in the
+                    statutory form for the {{ rent_pr.advarrdet }} ground rent due {{ rent_pr.advarrdet }} on
+                    {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}.
+                    <br>
+                    <br>
+                    If you would like to pay us the {{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                    rent_pr.totcharges, pound=True) }} by BACS or standing order, our bank is
+                    {{ rent_pr.landlord.money_account.bank_name }} the sort code is {{
+                    rent_pr.landlord.money_account.sort_code }} and our account number is {{
+                    rent_pr.landlord.money_account.acc_num }}. Please make sure that you give the property
+                    reference {{ rent_pr.rentcode }} with any BACS payment, so that we can identify your property
+                    correctly.">
+        </div>
+    </div>
+</form>
 {% endblock %}

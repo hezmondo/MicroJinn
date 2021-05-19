@@ -108,28 +108,6 @@ $(document).ready(function(){
     $(document).on('shown.bs.modal', function(e) {
         $('input:visible:enabled:first', e.target).focus();
     });
-    //On selecting a next rent date element in a table, we want to copy that element value, paste it into the search
-    //field and search the database
-    $('.search-date').mousedown(function(e) {
-        var date = $(this).val();
-        $('.date').val(date);
-    });
-    // Selecting an item from search history will populate the search fields and complete the search
-    $('.search-history').mousedown(function(e) {
-        var dict = $.parseJSON($(this).val());
-        $('#form-rentcode').val(dict.rentcode);
-        $('#form-address').val(dict.address);
-        $('#form-agent').val(dict.agent);
-        $('#form-nextrentdate').val(dict.nextrentdate);
-        $('#form-status').val(dict.status);
-    });
-    $('.search-clear').click(function(e) {
-        $('#form-rentcode').val('');
-        $('#form-address').val('');
-        $('#form-agent').val('');
-        $('#form-nextrentdate').val((new Date()).toISOString().split('T')[0]);
-        $('#form-status').val('');
-    });
     // Selecting an filter from advanced filters will populate the search fields
     $('.load-filters').mousedown(function(e) {
         var dict = $.parseJSON($(this).val());
@@ -190,7 +168,6 @@ $(function() {
 $(function () {
     $('[data-toggle="tooltip"]').tooltip();
 });
-
 //allow display and navbar to change for smaller screens / phones
 function resizeView() {
         var viewportwidth;
