@@ -1,48 +1,37 @@
-### basic start up guide for installing mjinn - last updated 16 Feb 2021
+### basic start up guide for installing lulu - last updated 8 May 2021
 
 ### install mysql server and mysql workbench using the mysql server and workbench installation guide
  
-**Now install Python 3.7, 3.8 or 3.9 (already in Linux). Easy and quick to install in Windows - https://www.python.org/downloads/**
+**Now install Python 3.9.4 (already in Linux) and pip. 
 
-It is then very easy (10 minutes) to install flask and other dependencies using a terminal in Linux or Powershell in Windows:
+**Easy and quick to install in Windows - https://www.python.org/downloads/**
 
-**In Linux, simplest may be to install pip3** 
+remember to tick for all users and for pip
+
+**In Linux, you may need to install pip3** 
 
 	sudo apt install python3-pip
 
-and then use pip3 to install these dependencies:
-	
-	pip3 install flask
-	
-	pip3 install flask-sqlalchemy
-	
-	pip3 install flask-migrate
-	
-	pip3 install flask-login
-	
-	pip3 install flask-mail
-	
-	pip3 install flask-pymysql
-	
-	pip3 install flask-bootstrap
-	
-	pip3 install flask-wtf
-	
-	pip3 install email_validator
-	
-	pip3 install PyJWT (requirements already satisfied)
-	
-	pip3 install cryptography
-	
-	pip3 install xhtml2pdf
+It is then very easy (10 minutes) to install flask and other dependencies using a terminal in Linux or Powershell in Windows:
 
-    pip3 install flask-table
+first save these dependencies as lulu_dependencies.txt:
 
-    pip3 install flask-caching
-
-**In Windows, pip is already installed, so just do the same pip installs as above but use pip instead of pip3**
+flask
+flask-sqlalchemy
+flask-migrate
+flask-login
+flask-mail
+flask-pymysql
+flask-bootstrap
+flask-wtf
+email_validator
+PyJWT
+cryptography
+xhtml2pdf
+flask-table
+flask-caching
 	
-### Now download the mjinn code from the github repo, maintaining the directory structure.  
+### Now download the lulu code from the github repo, maintaining the directory structure.  
 
 ### Edit the file named samplemyconfig.py to insert your mysql user name and password details, then rename as myconfig.py
 
