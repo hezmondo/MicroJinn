@@ -1,84 +1,10 @@
 from flask import request
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload, load_only
 from app import db
-from app.models import ChargeType, Income, IncomeAlloc, Landlord, MoneyAcc, Rent
+from app.models import ChargeType, Income, IncomeAlloc, MoneyAcc, Rent
 from app.modeltypes import PayTypes
-from app.dao.common import get_charge_types
 from app.dao.database import commit_to_database
-from app.dao.money import get_acc_id
-
-
-def get_incomes(acc_id):
-    # display postings for all bank accounts if accid = 0 and pick up rent_id as arg from rent screen
-    rent_id = int(request.args.get('rent_id', "0", type=str))
-    filtr = []
-    incomevals = {
-        'acc_desc': ['all accounts'],
-        'payer': '',
-        'rentcode': '',
-        'rent_id': rent_id,
-        'paytype': ['all payment types']
-    }
-    if acc_id != 0:
-        # first deal with bank account id being passed from money app
-        filtr.append(MoneyAcc.id == id)
-        acc_desc = MoneyAcc.query.filter(MoneyAcc.id == id).one_or_none()
-        incomevals['acc_desc'] = acc_desc.acc_desc
-    # now deal with the user clicking search button to filter ibcome postings
-    if request.method == "POST":
-        payer = request.form.get("payer") or ""
-        if payer and payer != "" and payer != "all payers":
-            filtr.append(Income.payer.ilike('%{}%'.format(payer)))
-            incomevals['payer'] = payer
-        rentcode = request.form.get("rentcode") or ""
-        if rentcode and rentcode != "" and rentcode != "all rentcodes":
-            filtr.append(IncomeAlloc.rentcode.startswith([rentcode]))
-            incomevals['rentcode'] = rentcode
-        acc_desc = request.form.getlist("acc_desc")
-        if acc_desc and acc_desc != ["all accounts"]:
-            ids = []
-            for i in range(len(acc_desc)):
-                ids.append(get_acc_id(acc_desc[i]))
-            filtr.append(MoneyAcc.id.in_(ids))
-            incomevals['acc_desc'] = acc_desc
-        paytype = request.form.getlist("paytype")
-        if paytype and paytype != ["all payment types"]:
-            ids = []
-            for i in range(len(paytype)):
-                ids.append(PayTypes.get_id(paytype[i]))
-            filtr.append(Income.paytype_id.in_(ids))
-            incomevals['paytype'] = paytype
-    else:
-        # now deal with rent_id coming from the rent screen
-        if rent_id != 0:
-            filtr.append(IncomeAlloc.rent_id == rent_id)
-            incomevals['rent_id'] = rent_id
-    incomes = IncomeAlloc.query.join(Income).join(ChargeType).join(MoneyAcc) \
-            .with_entities(Income.id, Income.date, IncomeAlloc.rent_id, IncomeAlloc.rentcode, Income.amount,
-                           Income.paytype_id, Income.payer, MoneyAcc.acc_desc, ChargeType.chargedesc) \
-            .filter(*filtr).order_by(desc(Income.date)).limit(50).all()
-    # for income in incomes:
-    #     income.paytype = get_paytype(income.paytype_id)
-    return incomes, incomevals
-
-
-def get_income_dict(type):
-    # return options for multiple choice controls in income object
-    acc_descs = [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
-    acc_descs_all = acc_descs
-    acc_descs_all.insert(0, "all accounts")
-    income_dict = {
-        "acc_descs": acc_descs,
-        "acc_descs_all": acc_descs_all,
-    }
-    if type == "enhanced":
-        chargedescs = [chargetype.chargedesc for chargetype in get_charge_types()]
-
-        chargedescs = [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
-        landlords = [value for (value,) in Landlord.query.with_entities(Landlord.name).all()]
-        income_dict["chargedescs"] = chargedescs
-        income_dict["landlords"] = landlords
-    return income_dict
 
 
 def get_income_(income_id):
@@ -109,6 +35,19 @@ def get_income_item(rent_id, income_id=0):
     #                     ChargeType.chargedesc).filter(IncomeAlloc.income_id == income_id).all()
     allocdata = None
     return income_item, allocdata
+
+
+def get_incomes_sql(sql):  # simple filtered rents for main rents page using raw sql
+    return db.session.execute(sql).fetchall()
+
+
+# def get_incomes_main(filtr, runsize):    # filtered incomedata for main income page
+#     return db.session.query(Income).join(MoneyAcc).join(Income.allocs) \
+#         .options(load_only('id', 'date', 'amount', 'payer', 'paytype_id'),
+#            joinedload('money_account').load_only('acc_desc'),
+#            joinedload(Income.allocs).load_only('rentcode'),
+#            db.contains_eager(Income.allocs)) \
+#         .filter(*filtr).limit(runsize).all()
 
 
 def post_income_(income_id):

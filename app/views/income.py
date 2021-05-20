@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, redirect, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required
-from app.dao.income import get_income_dict, get_income_, get_incomes, post_income_
+from app.dao.income import get_income_, post_income_
+from app.main.income import get_income_dict, get_incomes
 
 income_bp = Blueprint('income_bp', __name__)
 
