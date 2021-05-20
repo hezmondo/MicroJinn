@@ -1,0 +1,102 @@
+<!-- /templates/docfile.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="pr_file">
+    <div class="form-group row">
+        <div class="col-md-7">
+            <h6>The pay request has been saved. Edit the email address(es), subject and email below</h6>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div id="email_html" class="post_div font-size-medium" contenteditable="false">
+                <span id="email_dets_span" class="block-text" contenteditable="false"></span>
+                <br/>
+                <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
+                <br/>
+                <span id="email_owings_span" class="block-text" contenteditable="true"></span>
+                <br/>
+                <span id="email_body_span" class="block-text" contenteditable="true">
+                {{ email_block|safe }}
+            </span>
+                <br/>
+                <span id="email_manager_span" class="block-text" contenteditable="true"></span>
+                <br/>
+                <div class="font-size-medium" contenteditable="false">
+                    <hr class="hr-thick">
+                    {{ pr_file.block|safe }}
+                </div>
+                <input type="hidden" id="email_dict" name="email_dict" value="">
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>Select an option below to send</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <div class="btn-group btn-group-toggle full-width" data-toggle="buttons">
+                                <label class="btn btn-tog">
+                                    <input type="checkbox" class="btn-check" name="pr_attached" id="pr_attached"
+                                           autocomplete="off"> include
+                                    pr as attachment
+                                </label>
+                            </div>
+                            <button style="margin-top:1rem;" class="btn btn-block btn-success" id="send_email"
+                                    role="button" disabled>&#10140;
+                                send
+                                email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--    <div class="btn-group btn-group-toggle col-md-3" data-toggle="buttons">
+            <label class="btn btn-tog">
+                <input type="checkbox" class="btn-check" name="pr_attached" id="pr_attached" autocomplete="off"> include
+                pr as attachment
+            </label>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-block btn-success" id="send_email" role="button" disabled>&#10140; send email
+            </button>
+        </div>
+        </div>
+        <div id="email_html" class="post_div font-size-medium" contenteditable="false">
+            <span id="email_dets_span" class="block-text" contenteditable="false"></span>
+            <br/>
+            <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
+            <br/>
+            <span id="email_owings_span" class="block-text" contenteditable="true"></span>
+            <br/>
+            <span id="email_body_span" class="block-text" contenteditable="true">
+                    {{ email_block|safe }}
+                </span>
+            <br/>
+            <span id="email_manager_span" class="block-text" contenteditable="true"></span>
+            <br/>
+            <div class="font-size-medium" contenteditable="false">
+                <hr class="hr-thick">
+                {{ pr_file.block|safe }}
+            </div>
+            <input type="hidden" id="email_dict" name="email_dict" value="">
+        </div> -->
+</form>
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+    {% include "pr_send_email.js" %}
+</script>
+{% endblock %}
+
+

@@ -73,7 +73,6 @@
 	background: #d9e4e8;
 	border-radius: 5px;
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
-	margin: 20px 0px;
 	padding: 20px;
 }
 .boxed-blue
@@ -206,14 +205,6 @@
 {
 	background-color: #007bff;
 	border-color: #007bff;
-	color: #fff;
-}
-.btn-tog.focus,
-.btn-tog:focus
-{
-	background-color: #0069d9;
-	border-color: #0062cc;
-	box-shadow: 0 0 0 .2rem rgba(38,143,255,.5);
 	color: #fff;
 }
 .btn-tog:hover
@@ -424,6 +415,10 @@
 .font-size-small
 {
 	font-size: 9.5pt;
+}
+.full-width
+{
+    width: 100%;
 }
 .hr-invisible
 {
@@ -765,8 +760,11 @@ span.italic
 }
 span.span-input
 {
-	min-width: 100px;
-	position: absolute;
+    min-width: 100px;
+    background-color: white;
+    position: absolute;
+    padding: 0.1rem 0.5rem;
+    border-radius: 5px;
 }
 table
 {

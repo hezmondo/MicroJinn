@@ -10,87 +10,106 @@
             <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            {% if pr_history.count() > 0 %}
+            {{ widgets.modal_action(
+            body="Are you sure you want to undo this payrequest?",
+            id="modal_undo_pr",
+            btn_class="btn btn-block btn-danger button-icon trash",
+            btn_text="undo payrequest",
+            btn_url=url_for('pr_bp.pr_undo', pr_id=pr_history[0].id),
+            form="true",
+            title="warning"
+            ) }}
+            <div class="table-fixed">
+                <table class="table table-head" id="docfiles">
+                    <thead>
+                    <tr>
+                        <th style="width: 10.00%">date</th>
+                        <th style="width: 30.00%">summary</th>
+                        <th style="width: 10.00%">rent date</th>
+                        <th style="width: 10.00%">total due</th>
+                        <th style="width: 20.00%"></th>
+                    </tr>
+                    </thead>
+                </table>
+                <table class="table table-body table-body-alt">
+                    <tbody>
+                    <tr id="{{ pr_history[0].id }}">
+                        <td style="width: 10.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
+                            pr_history[0].datetime else 'none' }}
+                        </td>
+                        <td style="width: 30.00%"> {{ pr_history[0].summary }}</td>
+                        <td style="width: 10.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
+                            pr_history[0].rent_date
+                            else 'none' }}
+                        </td>
+                        <td style="width: 10.00%"> {{ pr_history[0].total_due }}</td>
+                        <td style="width: 10.00%" class="vertical-align"><a
+                                href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id) }}"
+                                class="btn btn-teal-light btn-small button-icon circles" role="button">view</a>
+                        <td style="width: 10.00%" class="vertical-align">
+                            <a data-toggle="modal" data-target="#modal_undo_pr"
+                               class="btn btn-danger btn-small button-icon trash" role="button">undo
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table table-base">
+                    <tbody>
+                    {% for item in pr_history %}
+                    {% if loop.index > 1 %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 10.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else
+                            'none' }}
+                        </td>
+                        <td style="width: 30.00%"> {{ item.summary }}</td>
+                        <td style="width: 10.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
+                            }}
+                        </td>
+                        <td style="width: 10.00%"> {{ item.total_due }}</td>
+                        <td style="width: 20.00%" class="vertical-align"><a
+                                href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
+                                class="btn btn-teal-light btn-small button-icon circles"
+                                role="button">view</a></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="boxed boxed-center boxed-blue">
+                There are no previous payrequests for this rent.
+            </div>
+            {% endif %}
+        </div>
         <div class="col-md-3">
-            <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_id) }}"
-               class="btn btn-block btn-success button-icon plus" role="button">create new payrequest</a>
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>options</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_id) }}"
+                               class="btn btn-block btn-success button-icon plus" role="button">create new
+                                payrequest</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="form-group row">
-    </div>
-    {% if pr_history.count() > 0 %}
-    {{ widgets.modal_action(
-    body="Are you sure you want to undo this payrequest?",
-    id="modal_undo_pr",
-    btn_class="btn btn-block btn-danger button-icon trash",
-    btn_text="undo payrequest",
-    btn_url=url_for('pr_bp.pr_undo', pr_id=pr_history[0].id),
-    form="true",
-    title="warning"
-    ) }}
-    <div class="table-fixed">
-        <table class="table table-head" id="docfiles">
-            <thead>
-            <tr>
-                <th style="width: 10.00%">date</th>
-                <th style="width: 30.00%">summary</th>
-                <th style="width: 10.00%">rent date</th>
-                <th style="width: 10.00%">total due</th>
-                <th style="width: 20.00%"></th>
-            </tr>
-            </thead>
-        </table>
-        <table class="table table-body table-body-alt">
-            <tbody>
-            <tr id="{{ pr_history[0].id }}">
-                <td style="width: 10.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
-                    pr_history[0].datetime else 'none' }}
-                </td>
-                <td style="width: 30.00%"> {{ pr_history[0].summary }}</td>
-                <td style="width: 10.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if pr_history[0].rent_date
-                    else 'none' }}
-                </td>
-                <td style="width: 10.00%"> {{ pr_history[0].total_due }}</td>
-                <td style="width: 10.00%" class="vertical-align"><a
-                        href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id) }}"
-                        class="btn btn-teal-light btn-small button-icon circles" role="button">view</a>
-                <td style="width: 10.00%" class="vertical-align">
-                    <a data-toggle="modal" data-target="#modal_undo_pr"
-                       class="btn btn-danger btn-small button-icon trash" role="button">undo
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="table table-base">
-            <tbody>
-            {% for item in pr_history %}
-            {% if loop.index > 1 %}
-            <tr id="{{ item.id }}">
-                <td style="width: 10.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else 'none' }}
-                </td>
-                <td style="width: 30.00%"> {{ item.summary }}</td>
-                <td style="width: 10.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none' }}</td>
-                <td style="width: 10.00%"> {{ item.total_due }}</td>
-                <td style="width: 20.00%" class="vertical-align"><a href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
-                                                                    class="btn btn-teal-light btn-small button-icon circles"
-                                                                    role="button">view</a></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="boxed boxed-center boxed-blue">
-        There are no previous payrequests for this rent.
-    </div>
-    {% endif %}
-
 </form>
 {% endblock %}
 
-<!-- this modal message opens when the page loads (if we send a message argument to the url) to provide
-user feedback - ie 'pay request undone' -->
 {% block message_on_load %}
 {% if message %}
 {{ widgets.modal_message_on_load(message=message, title="message") }}

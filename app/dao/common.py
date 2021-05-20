@@ -24,7 +24,7 @@ def delete_record(item_id, item):
     elif item == "charge":
         Charge.query.filter_by(id=item_id).delete()
         redir = "rent_bp.rent"
-        id_dict = {"id": id_2}
+        id_dict = {"rent_id": id_2}
     elif item == "doc":
         DocFile.query.filter_by(id=item_id).delete()
         redir = "doc_bp.docfiles"

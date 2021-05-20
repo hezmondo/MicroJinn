@@ -4,8 +4,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}"
-      xmlns="http://www.w3.org/1999/html">
+<form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
             <a href="{{ url_for('pr_bp.pr_dialog', rent_id=rent_pr.id, action='view') }}"
@@ -63,51 +62,52 @@
                 </div>
                 <div class="font-size-medium" align="left" contenteditable="true">
                     <div id="owings_div">
-                        <table class="pr_table">
+                        <table class="pr_table" style="font-size:12.5px;">
                             <colgroup>
                                 <col style="width:80%">
                                 <col style="width:20%">
                             </colgroup>
                             <tr class="pr_table_heading">
-                                <td>Details</td>
-                                <td>Amount</td>
+                                <td style="width:80%">Details</td>
+                                <td style="width:20%">Amount</td>
                             </tr>
                             {% if rent_pr.rent_gale %}
                             <tr>
-                                <td>{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
-                                    {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:
+                                <td style="width:80%"><span class="pr_table_font">{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
+                                    {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:</span>
                                 </td>
-                                <td class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
+                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.arrears %}
                             <tr>
-                                <td>Unpaid {{ rent_pr.rent_type }} is owing for the period
+                                <td style="width:80%">Unpaid {{ rent_pr.rent_type }} is owing for the period
                                     {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} to
                                     {{ rent_pr.arrears_end_date.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
+                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.charges %}
                             {% for charge in rent_pr.charges %}
                             <tr>
-                                <td>
+                                <td style="width:80%">
                                     {{ charge.chargetype.chargedesc.capitalize() }} added on
                                     {{ charge.chargestartdate.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
+                                <td style="width:20%" class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
                             </tr>
                             {% endfor %}
                             {% endif %}
                             <tr class="total">
-                                <td>The total amount payable is:</td>
-                                <td class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                                <td style="width:80%">The total amount payable is:</td>
+                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
                                     rent_pr.totcharges, pound=True) }}
                                 </td>
                             </tr>
                         </table>
                     </div>
+                    <br>
                     {% if rent_pr.suffix %}
                     <p>
                         {% if rent_pr.suffix == 'ARC1' %}
@@ -181,7 +181,7 @@
                         This notice is given by {{ rent_pr.landlord.name }} of {{ rent_pr.landlord.manager.manageraddr }}
                     </p>
                     <p>
-                        **NOTES FOR LEASEHOLDERS** - Read this notice carefully. It sets out the amount of rent due from
+                        <b>NOTES FOR LEASEHOLDERS</b> - Read this notice carefully. It sets out the amount of rent due from
                         you and the date by which you must pay it. You are advised to seek help immediately, if you cannot
                         pay, or dispute the amount. Those who can help you include a citizens' advice bureau, a housing
                         advice centre, a law centre and a solicitor. Show this notice and a copy of your lease to whoever helps
@@ -194,6 +194,7 @@
                         else 'example@gmail.com; example2@gmail.com'}} </span>
                     </div>
                 </div>
+
             </div>
         </div>
         <div class="col-md-3">
@@ -208,39 +209,37 @@
                     <div class="form-group row" style="margin-bottom:0px;">
                         <div class="col">
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send_x', method='post', rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon letter" role="button">post
                             </button>
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email and post', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send_x', method='email and post', rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and
                                 email
                             </button>
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send_x', method='email', rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon email-ic" role="button">email
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-3">
+        <div class="col">
             <input type="hidden" id="pr_block" name="xinput" value="xyz">
-        </div>
-        <div class="col-md-3">
             <input type="hidden" id="pr_addr" name="pr_addr" value="">
-        </div>
-        <div class="col-md-2">
-            <input type="hidden" id="pr_save_data" name="pr_save_data" value="{{ pr_save_data }}">
-        </div>
-        <div class="col-md-2">
+            <input type="hidden" id="pr_code" name="pr_code" value="{{ rent_pr.pr_code }}">
+            <input type="hidden" id="rent_date" name="rent_date" value="{{ rent_pr.nextrentdate }}">
+            <input type="hidden" id="tot_due" name="tot_due" value="{{ rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges }}">
+            <input type="hidden" id="new_arrears_level" name="new_arrears_level" value="{{ rent_pr.new_arrears_level }}">
+            <input type="hidden" id="new_arrears" name="new_arrears" value="{{ rent_pr.arrears + rent_pr.rent_gale }}">
+            <input type="hidden" id="charge_total" name="charge_total" value="{{ rent_pr.recovery_charge_amount }}">
             <input type="hidden" id="pr_email" name="pr_email"
                    value="Please find attached a summary account for the above property along with a rent demand in the
-                    statutory form for the {{ rent_pr.advarrdet }} ground rent due {{ rent_pr.advarrdet }} on
+                    statutory form for the {{ rent_pr.freqdet }} ground rent due {{ rent_pr.advarrdet }} on
                     {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}.
                     <br>
                     <br>
