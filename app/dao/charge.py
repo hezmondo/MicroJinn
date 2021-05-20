@@ -2,8 +2,7 @@ from app import db
 from datetime import date
 from flask import request
 from app.main.functions import strToDec
-from sqlalchemy import func
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload
 from app.models import Charge, ChargeType, Rent
 
 

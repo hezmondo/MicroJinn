@@ -52,6 +52,15 @@ def get_recovery_info(suffix):
     return arrears_clause, create_case, recovery_charge
 
 
+def get_recovery_info_x(suffix):
+    recovery_info = db.session.query(PrArrearsMatrix).filter_by(suffix=suffix).options(load_only('recovery_charge',
+                                                                                                 'create_case')).\
+        one_or_none()
+    create_case = recovery_info.create_case
+    recovery_charge = recovery_info.recovery_charge
+    return create_case, recovery_charge
+
+
 def post_updated_payrequest(block, pr_id):
     pr_history = PrHistory.query.get(pr_id)
     rent_id = pr_history.rent_id
@@ -75,4 +84,19 @@ def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method=
     pr_history.delivery_method = PrDeliveryTypes.get_id(method)
     # TODO: Add pending / delivered functionality
     pr_history.delivered = True
+    return pr_history
+
+
+def prepare_new_pr_history_entry_x(pr_history_data, rent_id, method='email'):
+    summary = pr_history_data.get('pr_code') + "-" + method + "-" + pr_history_data.get('mailaddr')[0:25]
+    pr_history = PrHistory(block=pr_history_data.get('block').replace("£", "&pound;"), rent_id=rent_id,
+                           summary=summary, datetime=datetime.now(),
+                           rent_date=datetime.strptime(pr_history_data.get('rent_date'), '%Y-%m-%d'),
+                           total_due=pr_history_data.get('tot_due'),
+                           arrears_level=pr_history_data.get('new_arrears_level'),
+                           delivery_method=PrDeliveryTypes.get_id(method), delivered=True)
+    # TODO: We are not using the typeprdelivery table yet in any meaningful way
+    #  - should we remove it and make delivery_method in pr_history a string column?
+    #  - We'd have to hard code the method strings in any combodict filters
+    # TODO: Add pending / delivered functionality
     return pr_history

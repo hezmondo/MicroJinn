@@ -31,7 +31,7 @@ bootstrap = Bootstrap()
 # logging to determine sqlalchemy query times
 # logging.basicConfig()
 # logger = logging.getLogger('sqlalchemy.engine')
-# logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.INFO)
 
 
 # @event.listens_for(Engine, "before_cursor_execute")

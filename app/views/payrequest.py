@@ -3,8 +3,8 @@ from flask_login import login_required
 from app.dao.common import get_filters
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
-from app.main.payrequest import serialize_pr_save_data, save_new_payrequest, \
-    undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
+from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, serialize_pr_save_data, save_new_payrequest, \
+    save_new_payrequest_x, undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -33,14 +33,12 @@ def pr_edit(pr_form_id):
                                table_rows=table_rows)
 
 
-# TODO: finish next week
 @pr_bp.route('/pr_edit_xray/<int:pr_form_id>', methods=["GET", "POST"])
 @login_required
 def pr_edit_xray(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
         rent_pr = write_payrequest_x(rent_id, pr_form_id)
-        # pr_save_data = serialize_pr_save_data(rent_pr)
         return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
 
 
@@ -95,6 +93,23 @@ def pr_save_send():
         else:
             pr_save_data = serialize_pr_save_data(pr_save_data)
             return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, pr_save_data=pr_save_data, method='email'))
+
+
+@pr_bp.route('/pr_save_send_x', methods=['GET', 'POST'])
+@login_required
+def pr_save_send_x():
+    method = request.args.get('method', type=str)
+    rent_id = request.args.get('rent_id', type=int)
+    if request.method == 'POST':
+        pr_history_data = collect_pr_history_data()
+        pr_rent_data = collect_pr_rent_data()
+        pr_id = save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id)
+        if method == 'post':
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
+        else:
+            pr_email = request.form.get('pr_email')
+            pr_file = get_pr_file(pr_id)
+            return render_template('pr_send_email.html', email_block=pr_email, method=method, pr_file=pr_file)
 
 
 @pr_bp.route('/pr_start', methods=['GET', 'POST'])
