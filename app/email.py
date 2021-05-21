@@ -109,7 +109,7 @@ def app_send_email(appmail, recipients, subject, html_body, attachments=None):
                    html_body,
                    attachments,
                    sync=True)
-    response += f"The test email appears to have been sent successfully to '{recipients}'."
+    response += f"The test email appears to have been sent successfully to {''.join(recipients)}."
 
     return response
 

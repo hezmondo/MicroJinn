@@ -1,5 +1,6 @@
-from flask import Blueprint, redirect, render_template, request, url_for, json
+from flask import Blueprint, current_app, redirect, render_template, request, url_for, json
 from flask_login import login_required
+from app.email import app_send_email
 from app.dao.common import get_filters
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
@@ -108,8 +109,23 @@ def pr_save_send_x():
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
         else:
             pr_email = request.form.get('pr_email')
+            pr_email_addr = request.form.get('pr_email_addr')
             pr_file = get_pr_file(pr_id)
-            return render_template('pr_send_email.html', email_block=pr_email, method=method, pr_file=pr_file)
+            return render_template('pr_email_edit.html', email_block=pr_email, pr_email_addr=pr_email_addr,
+                                   method=method, pr_file=pr_file)
+
+
+@pr_bp.route('/pr_send_email', methods=['GET', 'POST'])
+@login_required
+def pr_send_email():
+    if request.method == 'POST':
+        appmail = current_app.extensions['mail']
+        rent_id = request.form.get('rent_id')
+        html_body = request.form.get('html_body')
+        subject = request.form.get('subject')
+        recipients = request.form.get('recipients')
+        response = app_send_email(appmail, recipients, subject, html_body)
+        return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=response))
 
 
 @pr_bp.route('/pr_start', methods=['GET', 'POST'])

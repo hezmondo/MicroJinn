@@ -21,9 +21,6 @@
                                     ('The owner/occupier, ' + rent_pr.propaddrs[0].propaddr)], item_selected=rent_pr.mailaddr) }}
             </div>
             <div id="doc_html" contenteditable="false">
-                <style type="text/css">
-					{% include "mergedocs/pr_table_styles.css" %}
-                </style>
                 <div id="manager_div" contenteditable="true">
                     <div class="font-size-large manager-name" align="center">
                         <b>{{ rent_pr.landlord.manager.managername }}</b>
