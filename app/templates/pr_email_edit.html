@@ -1,4 +1,4 @@
-<!-- /templates/docfile.html  -->
+<!-- /templates/pr_email_edit.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -13,15 +13,20 @@
     <div class="row">
         <div class="col-md-9">
             <div id="email_html" class="post_div font-size-medium" contenteditable="false">
-                <span id="email_dets_span" class="block-text" contenteditable="false"></span>
+                <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
+                        class="span-input" id="email_span" contenteditable="true"> {{ pr_email_addr }} </span>
+                </div>
+                <br/>
                 <br/>
                 <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
+                <br/>
                 <br/>
                 <span id="email_owings_span" class="block-text" contenteditable="true"></span>
                 <br/>
                 <span id="email_body_span" class="block-text" contenteditable="true">
                 {{ email_block|safe }}
-            </span>
+                </span>
+                <br/>
                 <br/>
                 <span id="email_manager_span" class="block-text" contenteditable="true"></span>
                 <br/>
@@ -44,19 +49,29 @@
                     <div class="form-group row" style="margin-bottom:0px;">
                         <div class="col">
                             <div class="btn-group btn-group-toggle full-width" data-toggle="buttons">
-                                <label class="btn btn-tog">
+                                <label class="btn btn-tog button-icon">
                                     <input type="checkbox" class="btn-check" name="pr_attached" id="pr_attached"
                                            autocomplete="off"> include
                                     pr as attachment
                                 </label>
                             </div>
-                            <button style="margin-top:1rem;" class="btn btn-block btn-success" id="send_email"
-                                    role="button" disabled>&#10140;
-                                send
-                                email
-                            </button>
+                            <a id="send_email" data-toggle="modal" data-target="#modal_send_pr" style="margin-top:1rem;"
+                               class="btn btn-block btn-success button-icon arrow-right" role="button">send email
+                            </a>
                         </div>
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <input type="hidden" id="rent_id" name="rent_id" value="{{ pr_file.rent_id }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="hidden" id="html_body" name="html_body" value="">
+                </div>
+                <div class="col-md-2">
+                    <input type="hidden" id="subject" name="subject" value="">
+                </div>
+                <div class="col-md-2">
+                    <input type="hidden" id="recipients" name="recipients" value="">
                 </div>
             </div>
         </div>
@@ -91,11 +106,22 @@
             </div>
             <input type="hidden" id="email_dict" name="email_dict" value="">
         </div> -->
+    {{ widgets.modal_action(
+    body="This will send the pay request as an email to",
+    id="modal_send_pr",
+    btn_class="btn btn-block btn-success button-icon arrow-right",
+    btn_text="send email",
+    btn_url=url_for('pr_bp.pr_send_email'),
+    form="true",
+    title="send email"
+    ) }}
 </form>
 {% endblock %}
 {% block javascript %}
 <script type="text/javascript">
-    {% include "pr_send_email.js" %}
+    {% include "pr_email_edit.js" %}
+
+
 </script>
 {% endblock %}
 

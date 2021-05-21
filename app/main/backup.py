@@ -21,6 +21,7 @@ backup_path = os.path.join(root_path, "sqldumps")
 def mget_backup_path():
     return backup_path
 
+
 def mget_SQLAlchemy_engine() -> engine.Engine:
     # return the SQLAlchemy `Engine` bound into the current session
     return app.db.session.get_bind()
