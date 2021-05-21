@@ -21,8 +21,8 @@
                     <th style="width: 12.00%">date</th>
                     <th style="width: 24.00%">payer</th>
                     <th style="width: 10.00%">amount</th>
-                    <th style="width: 10.00%">rentcode</th>
-                    <th style="width: 25.00%">bank account</th>
+                    <th style="width: 15.00%">rentcode</th>
+                    <th style="width: 20.00%">bank account</th>
                     <th style="width: 17.00%">payment type</th>
                     <th style="width: 2.00%"></th>
                 </tr>
@@ -33,8 +33,8 @@
                     <td style="width: 12.00%">{{ item.date.strftime('%d-%b-%Y') }}</td>
                     <td style="width: 24.00%"> {{ item.payer }}</td>
                     <td style="width: 10.00%"> {{ item.amount }}</td>
-                    <td style="width: 10.00%"> {{ item.rentcode }}</td>
-                    <td style="width: 25.00%"> {{ item.acc_desc }}</td>
+                    <td style="width: 15.00%"> {{ item.rentcode }}</td>
+                    <td style="width: 20.00%"> {{ item.acc_desc }}</td>
                     <td style="width: 17.00%"> {{ PayTypes.get_name(item.paytype_id) }}</td>
                     <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('income_bp.income_item',
             income_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>

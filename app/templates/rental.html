@@ -14,21 +14,21 @@
     <div class="form-group row">
         <div class="col-md-2">
             <label for="rentalcode">code:</label>
-            <input type="text" class="form-control" name="rentalcode" value="{{ rental.rentalcode }}" readonly="true">
+            <input type="text" class="form-control" name="rentalcode" value="{{ rental.rentalcode }}">
         </div>
         <div class="col-md-10">
             <label for="propaddr">property address:</label>
-            <input type="text" class="form-control" name="propaddr" value="{{ rental.propaddr }}" readonly="true">
+            <input type="text" class="form-control" name="propaddr" value="{{ rental.propaddr }}">
         </div>
     </div>
     <div class="form-group row">
         <div class="col-md-6">
             <label for="tenantname">tenant name:</label>
-            <input type="text" class="form-control" name="tenantname" value="{{ rental.tenantname }}" readonly="true">
+            <input type="text" class="form-control" name="tenantname" value="{{ rental.tenantname }}">
         </div>
         <div class="col-md-6">
             <label for="note">notes:</label>
-            <input type="text" class="form-control" name="note" value="{{ rental.note }}" readonly="true">
+            <input type="text" class="form-control" name="note" value="{{ rental.note }}">
         </div>
     </div>
     <div class="form-group row">
@@ -38,7 +38,7 @@
         </div>
         <div class="col-md-2">
             <label for="arrears">rent arrears:</label>
-            <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}" readonly="true">
+            <input type="text" class="form-control" name="arrears" value="{{ rental.arrears }}">
         </div>
         <div class="col-md-2">
             <label for="frequency">frequency:</label>
@@ -50,18 +50,15 @@
         </div>
         <div class="col-md-2">
             <label for="astdate">AST start date:</label>
-            <input type="date" class="form-control" name="astdate" value="{{ rental.astdate }}" readonly="true">
+            <input type="date" class="form-control" name="astdate" value="{{ rental.astdate }}">
         </div>
         <div class="col-md-2">
             <label for="lastgastest">last gas safe test:</label>
             <input type="date" class="form-control" name="lastgastest"
-                   value="{{ rental.lastgastest }}" readonly="true">
+                   value="{{ rental.lastgastest }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse align-items-end">
-        <div class="col-md-2">
-            <button type="button" id="edit_view" class="btn btn-block btn-secondary button-icon edit">edit</button>
-        </div>
         <div class="col-md-2">
             <a href="{{ url_for('rental_bp.rental_statement', rental_id=rental.id) }}"
                class="btn btn-block btn-primary button-icon receipt" role="button">get statement</a>
@@ -69,7 +66,7 @@
         <div class="col-md-2">
             <label for="startrentdate">statement from:</label>
             <input type="date" class="form-control" name="startrentdate"
-                   value="{{ rental.startrentdate }}" readonly="true">
+                   value="{{ rental.startrentdate }}">
         </div>
     </div>
     <div class="form-group row flex-row-reverse" id="save_delete" >

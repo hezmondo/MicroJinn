@@ -39,9 +39,10 @@ def get_lease(lease_id):
 
 
 def get_leasedata(rent_id, fh_rate, gr_rate, gr_new, yp_val, calc_date):
+    # date_str = calc_date.strftime("%Y-%m-%d")
     resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c, :d, :e, :f)"),
                      params={"a": rent_id, "b": fh_rate, "c": gr_rate, "d": gr_new, "e": yp_val, "f": calc_date})
-    leasedata = [{column: value for column, value in rowproxy.items()} for rowproxy in resultproxy][0]
+    leasedata = [dict(row) for row in resultproxy][0]
     commit_to_database()
     return leasedata
 

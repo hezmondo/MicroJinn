@@ -19,6 +19,10 @@ def get_charge(charge_id):
     return db.session.query(Charge).filter_by(id=charge_id).one_or_none()
 
 
+def get_charge_descs():
+    return [value for (value,) in ChargeType.query.with_entities(ChargeType.chargedesc).all()]
+
+
 def get_charges(filtr):
     return db.session.query(Charge).join(Rent) \
         .options(joinedload('rent').load_only('rentcode'),

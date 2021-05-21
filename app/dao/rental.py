@@ -1,7 +1,9 @@
+import datetime
 import sqlalchemy
-from app import db
 from flask import request
 from sqlalchemy import func
+from app import db
+from app.main.functions import strToDate
 from app.modeltypes import AdvArr, Freqs
 from app.models import Rental, RentalStat
 
@@ -22,7 +24,8 @@ def getrentals():
 
 
 def get_rentalstatement(rental_id):
-    db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x)"), params={"x": rental_id})
+    today = datetime.date.today()
+    db.session.execute(sqlalchemy.text("CALL pop_rental_statement(:x, :y)"), params={'x': rental_id, 'y': today })
     db.session.commit()
     rentalstatement = RentalStat.query.all()
 

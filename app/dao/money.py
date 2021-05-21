@@ -7,6 +7,18 @@ from app.dao.database import commit_to_database
 from app.models import Income, IncomeAlloc, MoneyAcc, MoneyCat, MoneyItem
 
 
+def get_acc_desc(acc_id):
+    return db.session.query.filter(MoneyAcc.id == acc_id).one_or_none()
+
+
+def get_acc_descs():
+    return [value for (value,) in MoneyAcc.query.with_entities(MoneyAcc.acc_desc).all()]
+
+
+def get_acc_id(acc_desc):
+    return db.session.query(MoneyAcc.id).filter(MoneyAcc.acc_desc == acc_desc).scalar()
+
+
 def get_money_acc(acc_id):
     # get values for a single account and deal with post
     if acc_id == 0:
@@ -15,10 +27,6 @@ def get_money_acc(acc_id):
     else:
         moneyacc = MoneyAcc.query.filter(MoneyAcc.id == acc_id).one_or_none()
     return moneyacc
-
-
-def get_acc_id(acc_desc):
-    return MoneyAcc.query.with_entities(MoneyAcc.id).filter(acc_desc=acc_desc).first()
 
 
 def get_moneydets():
