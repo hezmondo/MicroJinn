@@ -17,7 +17,7 @@ It is then very easy (10 minutes) to install flask and other dependencies using 
 first save these dependencies as lulu_dependencies.txt:
 
 flask
-flask-sqlalchemy
+flask-sqlalchemy==1.3.24
 flask-migrate
 flask-login
 flask-mail
