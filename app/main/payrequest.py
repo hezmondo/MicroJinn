@@ -250,8 +250,8 @@ def save_new_payrequest(method):
 
 def save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id):
     pr_history = prepare_new_pr_history_entry_x(pr_history_data, rent_id, method)
-    if method != 'email':
-        convert_html_to_pdf(pr_history_data.get('block'), 'pr.pdf')
+    # make a pdf to post or send as an attachment
+    convert_html_to_pdf(pr_history_data.get('block'), 'pr.pdf')
     pr_id = add_pr_history(pr_history)
     case_created, charge_id = forward_rent_case_and_charges_x(pr_id, pr_rent_data, rent_id)
     if charge_id or case_created:
