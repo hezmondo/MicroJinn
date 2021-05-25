@@ -13,28 +13,45 @@
     <div class="row">
         <div class="col-md-9">
             <div id="email_html" class="post_div font-size-medium" contenteditable="false">
-                <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
-                        class="span-input" id="email_span" contenteditable="true"> {{ pr_email_addr }} </span>
+                <div id="email_block">
+                    <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
+                            class="span-input" id="email_span" contenteditable="true"> {{ pr_email_addr }} </span>
+                    </div>
+                    <br/>
+                    <br/>
+                    <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
+                    <br/>
+                    <br/>
+                    <span id="email_owings_span" class="block-text" contenteditable="true"></span>
+                    <br/>
+                    <span id="email_body_span" class="block-text" contenteditable="true">
+                    {{ email_block|safe }}
+                    </span>
+                    <br/>
+                    <br/>
+                    <span id="email_manager_span" class="block-text" contenteditable="true"></span>
+                    <br/>
                 </div>
-                <br/>
-                <br/>
-                <b><span id="email_subject_span" class="block-text" contenteditable="true"></span></b>
-                <br/>
-                <br/>
-                <span id="email_owings_span" class="block-text" contenteditable="true"></span>
-                <br/>
-                <span id="email_body_span" class="block-text" contenteditable="true">
-                {{ email_block|safe }}
-                </span>
-                <br/>
-                <br/>
-                <span id="email_manager_span" class="block-text" contenteditable="true"></span>
-                <br/>
-                <div class="font-size-medium" contenteditable="false">
+                <div id="pr_file_block" class="font-size-medium" contenteditable="false">
                     <hr class="hr-thick">
                     {{ pr_file.block|safe }}
                 </div>
-                <input type="hidden" id="email_dict" name="email_dict" value="">
+            </div>
+            <div id="attachment" class="boxed" style="margin-top:1rem; display:none;">
+                <div class="row">
+                    <div class="col-md-1">
+                        <i class="fas fa-paperclip" style="font-size:1.5rem; color: #6c757d"></i>
+                    </div>
+                    <div class="col-md-9">
+                        <span>pdf attached</span>
+                    </div>
+                    <div class="col-md-2">
+                        <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=pr_file.id) }}"
+                           class="btn btn-primary btn-small button-icon letter" role="button"
+                            data-target="tooltip" title="opens the pdf in a new tab">view
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-md-3">
@@ -51,8 +68,9 @@
                             <div class="btn-group btn-group-toggle full-width" data-toggle="buttons">
                                 <label class="btn btn-tog button-icon">
                                     <input type="checkbox" class="btn-check" name="pr_attached" id="pr_attached"
-                                           autocomplete="off"> include
-                                    pr as attachment
+                                           data-toggle="tooltip" title="include the pay request as a pdf attachment or
+                                           in the body of the email" autocomplete="off" onclick="changeAttachment()">
+                                    include pdf as attachment
                                 </label>
                             </div>
                             <a id="send_email" data-toggle="modal" data-target="#modal_send_pr" style="margin-top:1rem;"
@@ -120,6 +138,7 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "pr_email_edit.js" %}
+
 
 
 </script>

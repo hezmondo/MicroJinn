@@ -36,7 +36,7 @@
                 <div class="font-size-medium" align="right" contenteditable="true">
                     <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
                     <br/>
-                    Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+                    Date: {{ today_date.strftime('%d-%b-%Y') }}
                 </div>
                 <div class="font-size-medium" align="left">
 					<span id="addr_span" class="block-text" contenteditable="true">
@@ -59,7 +59,7 @@
                 </div>
                 <div class="font-size-medium" align="left" contenteditable="true">
                     <div id="owings_div">
-                        <table class="pr_table" style="border-collapse: collapse; font-size:12.5px;
+                        <table class="pr_table font-size-medium" style="border-collapse: collapse;
                         width: 100%; border-radius: 5px; margin-left: auto; margin-right: auto;">
                             <colgroup>
                                 <col style="width:80%; padding:3px;">
@@ -184,6 +184,25 @@
                         pay, or dispute the amount. Those who can help you include a citizens' advice bureau, a housing
                         advice centre, a law centre and a solicitor. Show this notice and a copy of your lease to whoever helps
                         you.
+                    </p>
+                    <br>
+                    <p>
+                        <hr class="hr-thick" />
+                        <br>
+                        <div align="center">
+                            <b>PAYMENT ADVICE - {{ today_date.strftime('%d-%b-%Y') }} - Ref: {{ rent_pr.rentcode }}</b>
+                            <br />
+                            Please return this section with your payment
+                        </div>
+                        <br />
+                        Please find enclosed my/our cheque/PO for {{
+                        money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }}
+                        to pay {{ rent_pr.landlord.manager.managername }} %ExtraRentStat% for property:
+                        {% for addr in rent_pr.propaddrs %}
+                            {{ addr.propaddr }}
+                        {% endfor %}
+                        <br />
+                        <br />
                     </p>
                 </div>
             </div>

@@ -271,7 +271,7 @@ def undo_pr(pr_id):
     try:
         rentobj = get_rentp(rent_id)  # get full enhanced rent pack
         if pr_file.rent_date != rentobj.lastrentdate:
-            message = "Cannot complete undo. The pr rent date is not the same as the rent's last rent date."
+            message = "Cannot complete undo. The pay request rent date is not the same as the rent's last rent date."
             return message, rent_id
         charges = get_total_charges(rent_id)
         tot_charges = 0

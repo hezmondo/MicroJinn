@@ -1,6 +1,6 @@
 #doc_html, #email_html
 {
-	background-color: #EDEDED !important;
+	background-color: #f8f8f8;
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
 	min-height: 100px;
 	padding: 5% 10%;
@@ -425,6 +425,12 @@
 {
 	border-top: 0px;
 }
+.hr-thick
+{
+    width: 80%;
+    border: 2px solid rgba(0,0,0,.15);
+    border-radius: 3px;
+}
 .info::before
 {
 	content: "\f129";
@@ -835,7 +841,4 @@ thead
     color: #ffffff;
     font-weight: bold;
 }
-.hr-thick {
-    border: 3px solid rgba(0,0,0,.15);
-    border-radius: 5px;
-}*/
+*/
