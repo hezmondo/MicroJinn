@@ -23,22 +23,22 @@
             </div>
             <div id="doc_html" contenteditable="false">
                 <div id="manager_div" contenteditable="true">
-                    <div class="font-size-large manager-name" align="center">
+                    <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
                         <b>{{ rent_pr.landlord.manager.managername }}</b>
                     </div>
-                    <div class="font-size-small manager-addr" align="center">
+                    <div class="font-size-small manager-addr" align="center" style="font-size:9.5pt;">
                         {{ rent_pr.landlord.manager.manageraddr }}
                         <br/>
                         {{ rent_pr.landlord.manager.manageraddr2 }}
                         <br/>
                     </div>
                 </div>
-                <div class="font-size-medium" align="right" contenteditable="true">
+                <div class="font-size-medium" align="right" contenteditable="true" style="font-size:10.5pt;">
                     <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
                     <br/>
                     Date: {{ today_date.strftime('%d-%b-%Y') }}
                 </div>
-                <div class="font-size-medium" align="left">
+                <div class="font-size-medium" align="left" style="font-size:10.5pt;">
 					<span id="addr_span" class="block-text" contenteditable="true">
 						{% set addr_list = rent_pr.mailaddr.split(',') %}
                         {% for item in addr_list %}
@@ -48,7 +48,7 @@
 					</span>
                     <br/>
                     <br/>
-                    <b><span id="subject_span" class="block-text" contenteditable="true">
+                    <b><span id="subject_span" class="block-text" contenteditable="true" style="font-size:10.5pt;">
 						{{ rent_pr.rent_type.capitalize() }} account for property:
                         {% for addr in rent_pr.propaddrs %}
                             {{ addr.propaddr }}
@@ -57,54 +57,60 @@
                     <br/>
                     <br/>
                 </div>
-                <div class="font-size-medium" align="left" contenteditable="true">
+                <div align="left" contenteditable="true">
                     <div id="owings_div">
-                        <table class="pr_table font-size-medium" style="border-collapse: collapse;
+                        <table class="pr_table" style="border-collapse: collapse;
                         width: 100%; border-radius: 5px; margin-left: auto; margin-right: auto;">
                             <colgroup>
-                                <col style="width:80%; padding:3px;">
+                                <col style="width:80%;">
                                 <col style="width:20%">
                             </colgroup>
-                            <tr class="pr_table_heading" style="background-color: #86A9DC; color: #ffffff; font-weight: bold;">
-                                <td style="width:80%; padding:3px;">Details</td>
-                                <td style="width:20%">Amount</td>
+                            <tr style="background-color: #86A9DC; color: white; font-weight: bold;">
+                                <td style="width:80%; font-size:10.5pt; padding-top:5px; padding-left:5px;">Details</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px; ">Amount</td>
                             </tr>
                             {% if rent_pr.rent_gale %}
                             <tr>
-                                <td style="width:80%; padding:3px;"><span class="pr_table_font">{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;"><span>{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
                                     {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:</span>
                                 </td>
-                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.arrears %}
                             <tr>
-                                <td style="width:80%; padding:3px;">Unpaid {{ rent_pr.rent_type }} is owing for the period
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">Unpaid {{ rent_pr.rent_type }} is owing for the period
                                     {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} to
                                     {{ rent_pr.arrears_end_date.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.charges %}
                             {% for charge in rent_pr.charges %}
                             <tr>
-                                <td style="width:80%; padding:3px;">
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
                                     {{ charge.chargetype.chargedesc.capitalize() }} added on
                                     {{ charge.chargestartdate.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td style="width:20%" class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px; " class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
                             </tr>
                             {% endfor %}
                             {% endif %}
                             <tr class="total" style="font-weight: bold; background-color:#e3e3e3;">
-                                <td style="width:80%; padding:3px;">The total amount payable is:</td>
-                                <td style="width:20%" class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">The total amount payable is:</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
                                     rent_pr.totcharges, pound=True) }}
                                 </td>
                             </tr>
                         </table>
                     </div>
+                    <style>
+                        p
+                        {
+                            font-size: 10.5pt;
+                        }
+                    </style>
                     <br>
                     {% if rent_pr.suffix %}
                     <p>
@@ -190,17 +196,21 @@
                         <hr class="hr-thick" />
                         <br>
                         <div align="center">
+                            <p>
                             <b>PAYMENT ADVICE - {{ today_date.strftime('%d-%b-%Y') }} - Ref: {{ rent_pr.rentcode }}</b>
                             <br />
                             Please return this section with your payment
+                            </p>
                         </div>
                         <br />
+                        <p>
                         Please find enclosed my/our cheque/PO for {{
                         money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }}
                         to pay {{ rent_pr.landlord.manager.managername }} %ExtraRentStat% for property:
                         {% for addr in rent_pr.propaddrs %}
                             {{ addr.propaddr }}
                         {% endfor %}
+                        </p>
                         <br />
                         <br />
                     </p>

@@ -798,7 +798,11 @@ thead
 	color: #ffffff;
 	font-weight: bold;
 }
-
+/*Extra padding to counter the padding added by the pdf code*/
+.pr_table tr, td, th
+{
+    padding-bottom: 5px;
+}
 .pr_table thead {
     background-color: #86A9DC;
     color: #ffffff;
