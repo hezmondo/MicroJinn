@@ -3,8 +3,9 @@ from flask_login import login_required
 from app.dao.common import get_filters
 from app.dao.rent import get_rent_external
 from app.main.common import get_combodict_filter, get_combodict_rent
-from app.main.rent import get_rentp, get_rents_advanced, get_rents_basic_sql, get_rents_external, \
-    get_rent_strings, rent_validation, update_landlord, update_rent_rem, update_tenant
+from app.main.rent import get_rentp, mget_recent_searches, get_rents_advanced, mpost_search, get_rents_basic_sql, \
+    get_rents_external, rent_validation, update_landlord, update_rent_rem, \
+    update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)
 
@@ -56,8 +57,12 @@ def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
 @login_required
 def rents_basic():  # get rents_basic for home rents_basic page with simple search option
     fdict, rents = get_rents_basic_sql()
-
-    return render_template('rents_basic.html', fdict=fdict, rents=rents)
+    if request.method == "POST":
+        # We save the search if it is not already in the recent_search table and if there are values in the dictionary
+        if not all(value == '' for value in fdict.values()):
+            mpost_search(fdict, 'rent')
+    recent_searches = mget_recent_searches('rent')
+    return render_template('rents_basic.html', fdict=fdict, rents=rents, recent_searches=recent_searches)
 
 
 @rent_bp.route('/rents_external', methods=['GET', 'POST'])

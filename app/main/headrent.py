@@ -1,16 +1,14 @@
 import json
 from flask import request
-from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 from app.dao.agent import get_agent_id
-from app.dao.headrent import add_new_recent_search, delete, get_headrent, get_headrent_row, get_headrents, \
-    get_recent_searches, get_recent_searches_asc, post_headrent
-from app.main.common import inc_date_m
-from app.dao.common import get_idlist_recent, commit_to_database
+from app.dao.headrent import get_headrent, get_headrent_row, get_headrents, post_headrent
+from app.main.common import inc_date_m, mpost_search
+from app.dao.common import get_idlist_recent, get_recent_searches
 from app.main.functions import strToDec
 from app.main.rent import get_paidtodate, get_rent_gale
 from app.models import Agent, Headrent
-from app.modeltypes import AdvArr, Freqs, HrStatuses, SaleGrades, Tenures
+from app.modeltypes import AdvArr, Freqs, HrStatuses, Tenures
 from sqlalchemy import func
 
 
@@ -41,11 +39,11 @@ def mget_headrents(filtr):
 
 
 def mget_headrents_dict():
-    return {'rentcode': request.form.get('rentcode') or '',
-            'address': request.form.get('address') or '',
-            'agent': request.form.get('agent') or '',
-            'status': request.form.getlist('status') or ['active'],
-            'nextrentdate': request.form.get('nextrentdate') or ''}
+    return {'agent': request.form.get('agent') or '',
+            'nextrentdate': request.form.get('nextrentdate') or '',
+            'propaddr': request.form.get('propaddr') or '',
+            'rentcode': request.form.get('rentcode') or '',
+            'status': request.form.getlist('status') or ['active']}
     # dateToStrJson(date.today() + relativedelta(days=35))}
 
 
@@ -54,8 +52,8 @@ def mget_headrents_filter():
     fdict = mget_headrents_dict()
     if fdict.get('rentcode'):
         filtr.append(Headrent.code.startswith([fdict.get('rentcode')]))
-    if fdict.get('address'):
-        filtr.append(Headrent.propaddr.ilike('%{}%'.format(fdict.get('address'))))
+    if fdict.get('propaddr'):
+        filtr.append(Headrent.propaddr.ilike('%{}%'.format(fdict.get('propaddr'))))
     if fdict.get('agent'):
         filtr.append(Agent.detail.ilike('%{}%'.format(fdict.get('agent'))))
     if fdict.get('status') and fdict.get('status') != ["all statuses"]:
@@ -71,7 +69,7 @@ def mget_headrents_filter():
 
 def mget_headrents_default():
     filtr = [Headrent.status_id == 1]
-    fdict = {'code': '', 'address': '', 'agent': '', 'status': ['active'],
+    fdict = {'rentcode': '', 'propaddr': '', 'agent': '', 'status': ['active'],
              'nextrentdate': ''}
     headrents = mget_headrents(filtr)
 
@@ -81,7 +79,7 @@ def mget_headrents_default():
 def mget_headrents_from_search():
     fdict, filtr = mget_headrents_filter()
     # If the search dictionary is not in the recent_search table we post it
-    mpost_search(fdict)
+    mpost_search(fdict, 'headrent')
     headrents = mget_headrents(filtr)
     return fdict, headrents
 
@@ -92,34 +90,18 @@ def mget_headrents_recent_filter():
     return filtr, list
 
 
-def mget_recent_searches():
-    recent_searches = get_recent_searches()
+def mget_recent_searches(type):
+    recent_searches = get_recent_searches(type)
     for recent_search in recent_searches:
         fdict = json.loads(recent_search.dict)
         recent_search.full_dict = fdict
         recent_search.rentcode = fdict.get('rentcode')
-        recent_search.address = fdict.get('address')
+        recent_search.propaddr = fdict.get('propaddr')
         recent_search.agent = fdict.get('agent')
         if fdict.get('nextrentdate') and fdict.get('nextrentdate') != '':
              recent_search.nextrentdate = datetime.strptime(fdict.get('nextrentdate'), '%Y-%m-%d').strftime("%d-%m-%Y")
         recent_search.status = fdict.get('status')
     return recent_searches
-
-
-def mpost_search(fdict):
-    recent_searches = get_recent_searches_asc()
-    # convert fdict into a string, as this is how it is saved in the db
-    str_dict = json.dumps(fdict)
-    # If the search dict already exists in the table we do nothing
-    for recent_search in recent_searches:
-        if str_dict == recent_search.dict:
-            return
-    # If there are already 6 records in the table we delete the oldest
-    if len(recent_searches) >= 6:
-        first_record = recent_searches[0]
-        delete(first_record)
-    add_new_recent_search(fdict)
-    commit_to_database()
 
 
 def update_headrent(headrent_id):

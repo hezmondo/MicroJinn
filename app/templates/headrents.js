@@ -9,7 +9,7 @@ $(document).ready(function(){
     $('.search-history').mousedown(function(e) {
         var dict = $.parseJSON($(this).val());
         $('#form-rentcode').val(dict.rentcode);
-        $('#form-address').val(dict.address);
+        $('#form-propaddr').val(dict.propaddr);
         $('#form-agent').val(dict.agent);
         $('#form-nextrentdate').val(dict.nextrentdate);
         if(dict.nextrentdate  == '')
@@ -24,7 +24,7 @@ $(document).ready(function(){
     });
     $('.search-clear').click(function(e) {
         $('#form-rentcode').val('');
-        $('#form-address').val('');
+        $('#form-propaddr').val('');
         $('#form-agent').val('');
         $('#form-nextrentdate').val('');
         $('#expand_next_rent_date').collapse('hide')

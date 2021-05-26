@@ -6,7 +6,7 @@ from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenur
 
 
 def dict_basic():
-    return {'agentdetail': request.form.get('agentdetail') or "",
+    return {'agent': request.form.get('agent') or "",
             'propaddr': request.form.get('propaddr') or "",
             'rentcode': request.form.get('rentcode') or "",
             'source': request.form.get('source') or "",
@@ -119,7 +119,7 @@ def filter_basic_sql_2(dict, id_list):
     if id_list:
         sql2 = " r.id IN {}".format(tuple(id_list))
     else:
-        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agentdetail')) if dict.get('agentdetail') else ""
+        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agent')) if dict.get('agent') else ""
         # todo additional filter for amount owing:  owingSql = " {} <= Owing AND
         #  Owing <= {}".format(owing - money(0.03), owing + money(0.03)) if owing is not None else ""
         propaddr_sql = " propaddr LIKE '%{}%' ".format(dict.get('propaddr')) if dict.get('propaddr') else ""

@@ -19,6 +19,9 @@ $(document).ready(function(){
         $('#recipients').val(recipients);
         $('.modal-body').append(' '+ recipients)
     });
+    $('#btn_send').click(function() {
+        $(".modal-body").append("<br><br>Email sending. Please wait.")
+    });
 });
 function changeAttachment() {
   // Get the checkbox

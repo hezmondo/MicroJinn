@@ -49,9 +49,10 @@
 <!-- macro action modal - produces a modal with a message, optional title and optional
 two buttons ('cancel' and an action button - which submits a form if form='true')
 if we do not define a button, the default close button appears-->
-{% macro modal_action(id, body="", body_as_list=[], btn_class="", btn_id="", btn_text="", btn_url="", form="", title="") -%}
+{% macro modal_action(id, class="", body="", body_as_list=[], btn_class="", btn_id="", btn_on_click="", btn_text="", btn_url="",
+form="", title="") -%}
 <div class="modal fade" id="{{ id }}" tabindex="-1" aria-hidden="true" role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog {{ class }}" role="document">
         <div class="modal-content">
             {% if title -%}
             <div class="modal-header">
@@ -83,11 +84,11 @@ if we do not define a button, the default close button appears-->
                         <div class="col">
                             {% if form == 'true' %}
                             <button type="submit" id="{{ btn_id }}" class="{{ btn_class }}"
-                                    formaction="{{ btn_url }}">{{ btn_text }}
+                                    formaction="{{ btn_url }}" onclick="{{ btn_on_click }}">{{ btn_text }}
                             </button>
                             {% else %}
                             <a id="{{ btn_id }}" class="{{ btn_class }}"
-                                    href="{{ btn_url }}">{{ btn_text }}
+                                    href="{{ btn_url }}" onclick="{{ btn_on_click }}">{{ btn_text }}
                             </a>
                             {% endif %}
                         </div>

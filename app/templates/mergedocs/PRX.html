@@ -71,19 +71,23 @@
                             </tr>
                             {% if rent_pr.rent_gale %}
                             <tr>
-                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;"><span>{{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;"><span>
+                                    {{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
                                     {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:</span>
                                 </td>
-                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.rent_gale, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">
+                                    {{ money_str(rent_pr.rent_gale, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.arrears %}
                             <tr>
-                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">Unpaid {{ rent_pr.rent_type }} is owing for the period
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">Unpaid
+                                    {{ rent_pr.rent_type }} is owing for the period
                                     {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} to
                                     {{ rent_pr.arrears_end_date.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.arrears, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">
+                                    {{ money_str(rent_pr.arrears, pound=True) }}</td>
                             </tr>
                             {% endif %}
                             {% if rent_pr.charges %}
@@ -93,13 +97,25 @@
                                     {{ charge.chargetype.chargedesc.capitalize() }} added on
                                     {{ charge.chargestartdate.strftime('%d-%b-%Y') }}:
                                 </td>
-                                <td style="width:20%; font-size:10.5pt; padding-top:5px; " class="amount_class">{{ money_str(charge.chargetotal, pound=True) }}</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px; " class="amount_class">
+                                    {{ money_str(charge.chargetotal, pound=True) }}</td>
                             </tr>
                             {% endfor %}
                             {% endif %}
+                            {% if rent_pr.recovery_charge_amount > 0 %}
+                            <tr>
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
+                                    Recovery costs added on {{ today_date.strftime('%d-%b-%Y') }}:
+                                </td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px; " class="amount_class">
+                                    {{ money_str(rent_pr.recovery_charge_amount, pound=True) }}</td>
+                            </tr>
+                            {% endif %}
                             <tr class="total" style="font-weight: bold; background-color:#e3e3e3;">
-                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">The total amount payable is:</td>
-                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">{{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                                <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
+                                    The total amount payable is:</td>
+                                <td style="width:20%; font-size:10.5pt; padding-top:5px;" class="amount_class">
+                                    {{ money_str(rent_pr.rent_gale + rent_pr.arrears +
                                     rent_pr.totcharges, pound=True) }}
                                 </td>
                             </tr>

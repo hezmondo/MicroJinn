@@ -6,12 +6,12 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent
+from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent, get_recent_searches
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic_sql, getrents_advanced, \
     get_rentsexternal, post_rent, post_rent_filter
-from app.main.common import get_rents_fdict, inc_date_m
+from app.main.common import get_rents_fdict, inc_date_m, mpost_search
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic, filter_basic_sql_1, \
     filter_basic_sql_2
@@ -74,8 +74,21 @@ def get_popaddr(prop_rent):
     return propaddr
 
 
+def mget_recent_searches(type):
+    recent_searches = get_recent_searches(type)
+    for recent_search in recent_searches:
+        fdict = json.loads(recent_search.dict)
+        recent_search.full_dict = fdict
+        recent_search.rentcode = fdict.get('rentcode')
+        recent_search.tenantname = fdict.get('tenantname')
+        recent_search.propaddr = fdict.get('propaddr')
+        recent_search.source = fdict.get('source')
+        recent_search.agent = fdict.get('agent')
+    return recent_searches
+
+
 def get_rent_gale(next_rent_date, frequency, rentpa):
-    if rentpa == 0 or frequency not in (2, 4):
+    if rentpa == 0:
         return money(rentpa)
     missing_pennies = (rentpa * 100) % frequency
     if missing_pennies == 0:
@@ -294,8 +307,8 @@ def get_rents_external():
     filtr = []
     if dict.get('rentcode') and dict.get('rentcode') != "":
         filtr.append(RentExternal.rentcode.startswith([dict.get('rentcode')]))
-    if dict.get('agentdetail') and dict.get('agentdetail') != "":
-        filtr.append(RentExternal.agentdetail.ilike('%{}%'.format(dict.get('agentdetail'))))
+    if dict.get('agent') and dict.get('agent') != "":
+        filtr.append(RentExternal.agentdetail.ilike('%{}%'.format(dict.get('agent'))))
     if dict.get('propaddr') and dict.get('propaddr') != "":
         filtr.append(RentExternal.propaddr.ilike('%{}%'.format(dict.get('propaddr'))))
     if dict.get('source') and dict.get('source') != "":
