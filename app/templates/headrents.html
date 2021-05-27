@@ -63,22 +63,49 @@
             <div class="card card-white" style="margin-bottom:1rem;">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col">recent searches</div>
-                        <div class="col align-right">
-                            <a href="#expand_searches" data-toggle="collapse" aria-expanded="false"
-                               id="expand_searches_toggle" aria-controls="expand_searches"
+                        <div class="col-md-9">most recent search</div>
+                        <div class="col-md-3 align-right">
+                            <a href="#expand_div" data-toggle="collapse" aria-expanded="false"
+                               id="expand_div_toggle" aria-controls="expand_div"
                                class="button-icon btn-round round plus"
-                               role="button"></a>
+                               role="button" style="box-shadow:none;"></a>
                         </div>
                     </div>
                 </div>
-                <div id="expand_searches" class="collapse">
-                    <div class="card-body text-primary">
+                <div class="card-body text-primary">
+                    {% for item in recent_searches|reverse %}
+                    {% if loop.index == 1 %}
+                    <div class="form-group row" style="margin-bottom: 5px;">
+                        <div class="col-md-9" style="padding-right:2px;">
+                            <button
+                                    class="btn btn-block btn-light search-history" style="text-align: left; box-shadow:none;"
+                                    value="{{ item.dict }}" onclick="return false;">
+                                <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
+                                <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
+                                <span><b>{{ item.status[0] }}</b></span>
+                            </button>
+                        </div>
+                        <div class="col-md-3" style="padding-left:3px;">
+                            <button
+                                    style="height:100%; box-shadow:none;"
+                                    value="{{ item.dict }}"
+                                    data-toggle="tooltip" title="search database"
+                                    class="btn btn-success btn-block button-icon-center arrow-right search-history">
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="expand_div" class="collapse">
+                    <div class="card-body text-primary" style="padding-top:0;">
+                        <p>previous searches</p>
                         {% for item in recent_searches|reverse %}
+                        {% if loop.index > 1 %}
                         <div class="form-group row" style="margin-bottom: 5px;">
                             <div class="col-md-9" style="padding-right:2px;">
                                 <button
-                                        class="btn btn-block btn-tog search-history" style="text-align: left;"
+                                        class="btn btn-block btn-light search-history" style="text-align: left; box-shadow:none;"
                                         value="{{ item.dict }}" onclick="return false;">
                                     <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
                                     <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
@@ -87,16 +114,18 @@
                             </div>
                             <div class="col-md-3" style="padding-left:3px;">
                                 <button
-                                        style="height:100%;"
+                                        style="height:100%; box-shadow:none;"
                                         value="{{ item.dict }}"
                                         data-toggle="tooltip" title="search database"
                                         class="btn btn-success btn-block button-icon-center arrow-right search-history">
                                 </button>
                             </div>
                         </div>
+                        {% endif %}
                         {% endfor %}
                     </div>
                 </div>
+
             </div>
             {% endif %}
             <div class="card card-white sticky-top">
@@ -184,5 +213,7 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "headrents.js" %}
+
+
 </script>
 {% endblock %}

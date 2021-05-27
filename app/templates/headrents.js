@@ -49,11 +49,5 @@ $(document).ready(function(){
         }
         $('.remove-date').removeClass('plus').addClass('minus');
     });
-    $('#expand_searches').on('hidden.bs.collapse', function () {
-        $('#expand_searches_toggle').removeClass('minus').addClass('plus');
-    });
-    $('#expand_searches').on('shown.bs.collapse', function () {
-        $('#expand_searches_toggle').removeClass('plus').addClass('minus');
-    });
 });
 

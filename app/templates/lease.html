@@ -6,11 +6,11 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('rent_bp.rent', rent_id=lease.rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('lease_bp.leases') }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to leases</a>
         </div>

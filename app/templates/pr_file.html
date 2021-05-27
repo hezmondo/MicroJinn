@@ -41,15 +41,15 @@
     </div>
     {% else %}
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('pr_bp.pr_history', rent_id=pr_file.rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr history</a>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('rent_bp.rent', rent_id=pr_file.rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
-        <div class="col-md-8">
+        <div class="col-md-6">
             <span><b>Summary | {{ pr_file.summary }} </b></span>
         </div>
     </div>
@@ -181,12 +181,6 @@ $(document).ready(function(){
 });
 
 </script>
-{% endblock %}
-
-{% block message_on_load %}
-{% if message %}
-{{ widgets.modal_message_on_load(message=message, title="message") }}
-{% endif %}
 {% endblock %}
 
 

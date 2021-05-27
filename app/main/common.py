@@ -45,10 +45,10 @@ def mpost_search(fdict, type):
     recent_searches = get_recent_searches_asc(type)
     # convert fdict into a string, as this is how it is saved in the db
     str_dict = json.dumps(fdict)
-    # If the search dict already exists in the table we do nothing
+    # If the search dict already exists in the table we replace it so it becomes the most recent search
     for recent_search in recent_searches:
         if str_dict == recent_search.dict:
-            return
+            delete(recent_search)
     # If there are already 6 records in the table we delete the oldest
     if len(recent_searches) >= 6:
         first_record = recent_searches[0]

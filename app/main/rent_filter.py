@@ -19,7 +19,7 @@ def dict_advanced():
     dict['actype'] = request.form.getlist('actype') or ['all actypes']
     dict['agentmailto'] = request.form.get('agentmailto') or 'include'
     dict['emailable'] = request.form.get('emailable') or 'include'
-    dict['enddate'] = request.form.get('enddate') or date.today() + relativedelta(days=50)
+    dict['enddate'] = request.form.get('enddate') or ''
     dict['landlord'] = request.form.getlist('landlord') or ['all landlords']
     dict['prdelivery'] = request.form.getlist('prdelivery') or ['all prdeliveries']
     dict['salegrade'] = request.form.getlist('salegrade') or ['all salegrades']
@@ -56,7 +56,7 @@ def filter_advanced(dict):
     #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
     # elif key == "rentperiods" and value and value != "":
     #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
-    filtr.append(Rent.lastrentdate <= dict['enddate'])
+    filtr.append(Rent.lastrentdate <= (dict['enddate'] or (date.today() + relativedelta(days=30))))
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
         filtr.append(Landlord.name.in_(dict['landlord']))
     if dict['prdelivery'] and dict['prdelivery'] != ['all prdeliveries']:

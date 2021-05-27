@@ -131,7 +131,7 @@ def update_agent(agent_id, rent_id=0):
         message = "Agent details updated successfully! "
         if rent_id != 0:
             set_rent_agent(agent_id, rent_id)
-            message += "Mail has been set to agent. Please review this rent\'s mailto details."
+            message += "Mail has been set to agent. Please review this rent\'s mail-to details."
         commit_to_database()
         # update the user recent_agents to include a newly created agent (after we have done the main database work)
         pop_idlist_recent("recent_agents", agent_id)

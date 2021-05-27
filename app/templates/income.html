@@ -45,61 +45,65 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="card card-white" style="margin-bottom: 1rem;">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col">search</div>
-                    <div class="col align-right"><b>{{ incomes|length }}</b> results</div>
+        <div class="sticky-top">
+            <div class="card card-white" style="margin-bottom: 1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                        <div class="col align-right"><b>{{ incomes|length }}</b> results</div>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body text-primary">
-                <form method="POST" id="target">
-                    <div class="form-group row">
-                        <div class="col">
-                            <input type="text" class="form-control" name="payer"
-                                   value="{{ incomevals.payer }}" placeholder="payer">
-                            <input type="text" class="form-control" name="rentcode"
-                                   value="{{ incomevals.rentcode }}" placeholder="rentcode">
-                            <div style="margin-top: 1rem;">
-                                {{ widgets.multiselect_as_select(name="acc_desc",
-                                items=income_dict.acc_descs_all,
-                                items_selected=incomevals.acc_desc) }}
-                            </div>
-                            <div style="margin-top: 1rem;">
-                                {{ widgets.multiselect_as_select(name="paytype",
-                                items=PayTypes.names(), items0="all payment types",
-                                items_selected=incomevals.paytype) }}
+                <div class="card-body text-primary">
+                    <form method="POST" id="target">
+                        <div class="form-group row">
+                            <div class="col">
+                                <input type="text" class="form-control" name="payer"
+                                       value="{{ incomevals.payer }}" placeholder="payer">
+                                <input type="text" class="form-control" name="rentcode"
+                                       value="{{ incomevals.rentcode }}" placeholder="rentcode">
+                                <div style="margin-top: 1rem;">
+                                    {{ widgets.multiselect_as_select(name="acc_desc",
+                                    items=income_dict.acc_descs_all,
+                                    items_selected=incomevals.acc_desc) }}
+                                </div>
+                                <div style="margin-top: 1rem;">
+                                    {{ widgets.multiselect_as_select(name="paytype",
+                                    items=PayTypes.names(), items0="all payment types",
+                                    items_selected=incomevals.paytype) }}
+                                </div>
                             </div>
                         </div>
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <div class="col">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">
+                                    search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% if incomevals.rent_id != 0 %}
+            <div class="card card-white">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">actions</div>
                     </div>
-                    <div class="form-group row" style="margin-bottom: 0px;">
+                </div>
+                <div class="card-body text-primary">
+                    <div class="row">
                         <div class="col">
-                            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">
-                                search
-                            </button>
+                            <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
+                               class="btn btn-primary btn-block button-icon plus" role="button">post income for this
+                                rent</a>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
-        {% if incomevals.rent_id != 0 %}
-        <div class="card card-white">
-            <div class="card-header">
-                <div class="row">
-                    <div class="col">actions</div>
+                    </form>
                 </div>
             </div>
-            <div class="card-body text-primary">
-                <div class="row">
-                    <div class="col">
-                        <a href="{{ url_for('income_bp.income_item', income_id=0, rent_id=incomevals.rent_id) }}"
-                           class="btn btn-primary btn-block button-icon plus" role="button">post income for this rent</a>
-                    </div>
-                </div>
-                </form>
-            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

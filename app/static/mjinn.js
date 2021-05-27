@@ -33,6 +33,12 @@ $(document).ready(function(){
             $("#save_delete").hide();
         }
     });
+    $('#expand_div').on('hidden.bs.collapse', function () {
+        $('#expand_div_toggle').removeClass('minus').addClass('plus');
+    });
+    $('#expand_div').on('shown.bs.collapse', function () {
+        $('#expand_div_toggle').removeClass('plus').addClass('minus');
+    });
     //add tick icon on click to toggle button
     $(".btn-check").click(function(){
         if($(".btn-tog").hasClass('check')){

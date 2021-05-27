@@ -156,6 +156,11 @@
 	background-color: #518ADD;
 	border-color: #518ADD;
 }
+.btn-light
+{
+    color: #656565;
+	background-color: #f7f7f7;
+}
 .btn-round
 {
 	border-radius: 25px;

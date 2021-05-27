@@ -5,7 +5,7 @@
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         {% if rent_id != "0" %}
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
                    class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
             </div>

@@ -102,7 +102,11 @@
 {% block javascript %}{% endblock %}
 <!-- we can add a modal message when a page loads, for example after we post
 something to the db and want to give the user feedback -->
-{% block message_on_load %}{% endblock %}
+{% if message %}
+{{ widgets.modal_message_on_load(message=message, title="Notice") }}
+{% elif messages %}
+{{ widgets.modal_message_on_load(messages=messages, title="Notice") }}
+{% endif %}
 </body>
 {% endblock %}
 </html>
