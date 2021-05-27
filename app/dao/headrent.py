@@ -26,7 +26,6 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     if headrent_id == 0:
         # take the user to create new rent function:
         headrent_id = create_new_headrent()
-    pop_idlist_recent("recent_headrents", headrent_id)
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name')) \

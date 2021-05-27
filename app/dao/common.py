@@ -165,6 +165,8 @@ def get_recent_searches_asc(type):
 
 def pop_idlist_recent(type, id):
     id_list = get_idlist_recent(type)
+    # make sure the id is an int
+    id = int(id)
     if id in id_list:
         id_list.remove(id)
     id_list.insert(0, id)
