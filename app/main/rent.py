@@ -4,9 +4,10 @@ from flask import request
 from math import ceil
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+from app.dao.action import add_action
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import get_deed_id, get_filter_stored, get_idlist_recent, get_recent_searches
+from app.dao.common import commit_to_database, get_deed_id, get_filter_stored, get_idlist_recent, get_recent_searches
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic_sql, getrents_advanced, \
@@ -350,12 +351,19 @@ def get_totcharges(charges):
 # simple check that there are no mail/post conflicts. If there are, a message is displayed on rent page load
 def rent_validation(rent, message=""):
     messages = [message] if message else []
+    action_message = ''
     if ('email' in rent.prdeliverydet) and ('@' not in rent.email):
         messages.append('Payrequest delivery is set to email but there is no valid email address linked to this rent.')
+        action_message = 'No valid email '
     if not rent.mailaddr:
         messages.append("No mail address set. Please change the mail address "
                         "from 'mail to agent' or link a new agent.")
-        rent.mailaddr = "(set as 'mail to agent' but no agent found)"
+        action_message = action_message + 'No valid mail address'
+    if action_message:
+        # save alert to actions table
+        action_str = 'Rent '+ rent.rentcode + ': ' + action_message
+        add_action(3, 1, action_str, 'rent_bp.rent', {'rent_id': rent.id})
+        commit_to_database()
     return messages
 
 

@@ -1,0 +1,99 @@
+<!-- /templates/income.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-md-9">
+        {% if actions|length > 0 %}
+        <div class="table-fixed">
+            <table class="table" id="actionitems">
+                <thead>
+                <tr>
+                    <th style="width: 15.00%">date and time</th>
+                    <th style="width: 10.00%">type</th>
+                    <th style="width: 50.00%">detail</th>
+                    <th style="width: 10.00%">level</th>
+                    <th style="width: 10.00%"></th>
+                    <th style="width: 5.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for action in actions|reverse %}
+                {% if action.alert %}
+                <tr id="{{ action.id }}" style="color: red;">
+                    {% else %}
+                <tr id="{{ action.id }}">
+                    {% endif %}
+                    <td style="width: 15.00%">{{ action.datetime.strftime('%d-%b-%Y %H:%M') }}</td>
+                    <td style="width: 10.00%">{{ ActionTypes.get_name(action.actiontype_id) }}</td>
+                    <td style="width: 50.00%">{{ action.detail }}</td>
+                    <td style="width: 10.00%">
+                        {% if action.alert == 1 %}
+                        <span style="margin-right:15px;">alert</span>
+                        <a  data-toggle="tooltip" title="set this as resolved"
+                            href="{{ url_for('util_bp.action_resolve', action_id=action.id) }}"
+                            class="btn btn-success btn-round round button-icon check"></a>
+                        {% else %} info {% endif %}
+                    </td>
+                    <td style="width: 10.00%"><a
+                            href="{{ url_for('util_bp.action_link', url=action.link, url_vars=action.link_vars) }}"
+                            class="btn btn-primary btn-small button-icon arrow-right">view</a></td>
+                    <td style="width: 5.00%"><a href="{{ url_for('util_bp.action_delete', action_id=action.id) }}"
+                                                data-toggle="tooltip" title="clear this action"
+                                                class="btn btn-danger btn-round button-icon round cross"></a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="boxed boxed-center boxed-blue">
+            There are no actions. Actions and alerts will be saved here.
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-3">
+        <div class="sticky-top">
+            <div class="card card-white" style="margin-bottom: 1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search - not yet operational</div>
+                        <div class="col align-right"><b>{{ actions|length }}</b> actions</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input id="form-type" type="text" class="form-control" name="type"
+                                   placeholder="type" value="">
+                            <input id="form-detail" type="text" class="form-control" name="detail"
+                                   placeholder="detail" value="">
+                            <input id="form-level" type="text" class="form-control" name="level"
+                                   placeholder="level" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 0px;">
+                        <div class="col">
+                            <div class="form-group row" style="margin-bottom: 1rem;">
+                                <div class="col-md-5" style="padding-right:5px;">
+                                    <button class="btn btn-block btn-primary button-icon sync search-clear"
+                                            onclick="return false;">clear
+                                    </button>
+                                </div>
+                                <div class="col-md-7" style="padding-left:5px;">
+                                    <button type="submit" formaction="{{ url_for('util_bp.actions') }}"
+                                            class="btn btn-block btn-success  button-icon search" role="button">
+                                        search
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,7 @@
+import json
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
+from app.dao.action import delete_action, get_actions, resolve_action
 from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.dao.database import rollback_database
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
@@ -10,6 +12,34 @@ from app.main.property import mget_properties_dict, mget_filter, mget_property, 
 
 
 util_bp = Blueprint('util_bp', __name__)
+
+
+@util_bp.route('/action_link/<url>', methods=["GET", "POST"])
+@login_required
+def action_link(url):
+    url_vars = json.loads(request.args.get('url_vars'))
+    return redirect(url_for(url, **url_vars))
+
+
+@util_bp.route('/action_delete/<int:action_id>', methods=["GET", "POST"])
+@login_required
+def action_delete(action_id):
+    delete_action(action_id)
+    return redirect(url_for('util_bp.actions'))
+
+
+@util_bp.route('/action_resolve/<int:action_id>', methods=["GET", "POST"])
+@login_required
+def action_resolve(action_id):
+    resolve_action(action_id)
+    return redirect(url_for('util_bp.actions'))
+
+
+@util_bp.route('/actions', methods=["GET", "POST"])
+@login_required
+def actions():
+    actions = get_actions()
+    return render_template('actions.html', actions=actions)
 
 
 @util_bp.route('/deed/<int:deed_id>', methods=["GET", "POST"])

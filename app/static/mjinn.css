@@ -1,3 +1,33 @@
+/*icon names:
+arrow-down
+arrow-left
+arrow-right
+arrow-up
+bell
+circles
+check
+cross
+download
+edit
+email-ic
+exclamation
+filter
+info
+invoice
+letter
+mail-ic
+meteor
+minus
+plus
+receipt
+save
+search
+sync
+trash
+wallet
+*/
+
+
 #doc_html, #email_html
 {
 	background-color: #f8f8f8;
@@ -56,6 +86,12 @@
 {
 	background-color: #6c757d !important;
 	color: white;
+}
+.bell::before
+{
+	content: "\f0f3";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
 }
 .block-text
 {
@@ -814,40 +850,3 @@ thead
     font-weight: bold;
 }
 .pr_table tbody tr td {background-color:transparent;}
-/*
-.pr_table tbody tr:nth-child(odd) td   { background-color:transparent; }
-
-.pr_table tbody tr:nth-child(even) td   { background-color:transparent; }
-
-.pr_table {
-    font-size: 10.5pt;
-    table-layout: fixed;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    border: solid #86A9DC 1px;
-}
-.pr_table th {
-    text-align: center;
-    background-color: #6666ff;
-    color: white
-}
-.pr_table tr td {
-    padding: 5px;
-    background-color: transparent;
-}
-.total {
-    font-weight: bold;
-    border: solid #86A9DC 1px;
-    background-color: #fafafa;
-}
-.pr_table .amount-class {
-    text-align: right;
-    width: 20%;
-}
-.pr_table_heading {
-    background-color: #86A9DC;
-    color: #ffffff;
-    font-weight: bold;
-}
-*/
