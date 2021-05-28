@@ -259,7 +259,7 @@ def save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id):
         add_pr_charge(pr_id, charge_id, case_created)
     # save action to actions table
     action_str = 'Pay request for rent ' + str(rent_id) + ' totalling ' + str(pr_history_data.get('tot_due')) + ' saved'
-    add_action(2, 0, action_str, 'pr_bp.pr_file', {'pr_id': pr_id})
+    add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
     commit_to_database()
     return pr_id
 
