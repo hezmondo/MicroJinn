@@ -2,8 +2,10 @@ from flask import Blueprint, current_app, redirect, render_template, request, ur
 from flask_login import login_required
 from app.email import app_send_email
 from app.dao.common import get_filters
+from app.dao.rent import get_rentcode
 from app.dao.form_letter import get_pr_forms
-from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, post_updated_payrequest
+from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, \
+    post_updated_payrequest_delivery
 from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, serialize_pr_save_data, save_new_payrequest, \
     save_new_payrequest_x, undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
 from app.dao.doc import convert_html_to_pdf
@@ -17,6 +19,21 @@ pr_bp = Blueprint('pr_bp', __name__)
 def pr_dialog(rent_id):
     pr_forms = get_pr_forms()
     return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
+
+
+@pr_bp.route('/pr_delivery/<int:pr_id>', methods=["GET", "POST"])
+@login_required
+def pr_delivery(pr_id):
+    rent_id = request.args.get('rent_id')
+    delivered = request.args.get('delivered')
+    delivered = True if delivered == 'True' else False
+    try:
+        post_updated_payrequest_delivery(delivered, get_pr_history_row(pr_id))
+        string = " set to 'delivered'" if delivered else " set to 'undelivered'"
+        message = 'Pay request ' + str(pr_id) + string
+    except Exception as ex:
+        message = f"Unable to update pay request. Error: {str(ex)}"
+    return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
 @pr_bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])
@@ -41,8 +58,12 @@ def pr_edit(pr_form_id):
 def pr_edit_xray(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        rent_pr = write_payrequest_x(rent_id, pr_form_id)
-        return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
+        try:
+            rent_pr = write_payrequest_x(rent_id, pr_form_id)
+            return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
+        except Exception as ex:
+            message = f'Unable to write the pay request. Error: {str(ex)}'
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
 # TODO: remove email method or update pr creation via doReplace
@@ -95,10 +116,17 @@ def pr_history(rent_id):
 @pr_bp.route('/pr_print/pay_request_<int:pr_id>', methods=['GET', 'POST'])
 def pr_print(pr_id):
     # We generate the pdf from the html in the PrHistory table then display the pdf in a new tab
-    convert_html_to_pdf(get_pr_block(pr_id), 'pr.pdf')
-    workingdir = os.path.abspath(os.getcwd())
-    filepath = workingdir + '\\app\\temp_files\\'
-    return send_from_directory(filepath, 'pr.pdf')
+    try:
+        # TODO: Do we want the pr to be set to 'delivered' after the user selects 'print'?
+        # If the delivery method is post, we set the pr to 'delivered'
+        # update_pr_delivered(pr_id)
+        convert_html_to_pdf(get_pr_block(pr_id), 'pr.pdf')
+        workingdir = os.path.abspath(os.getcwd())
+        filepath = workingdir + '\\app\\temp_files\\'
+        return send_from_directory(filepath, 'pr.pdf')
+    except Exception as ex:
+        message = f'Unable to produce pay request. Error: {str(ex)}'
+        return redirect(url_for('pr_bp.file', pr_id=pr_id, message=message))
 
 
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
@@ -120,36 +148,45 @@ def pr_save_send_x():
     method = request.args.get('method', type=str)
     rent_id = request.args.get('rent_id', type=int)
     if request.method == 'POST':
-        pr_history_data = collect_pr_history_data()
-        pr_rent_data = collect_pr_rent_data()
-        pr_id = save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id)
-        if method == 'post':
-            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
-        else:
-            pr_email = request.form.get('pr_email')
-            pr_email_addr = request.form.get('pr_email_addr')
-            pr_file = get_pr_file(pr_id)
-            return render_template('pr_email_edit.html', email_block=pr_email, pr_email_addr=pr_email_addr,
-                                   method=method, pr_file=pr_file)
+        try:
+            pr_history_data = collect_pr_history_data()
+            pr_rent_data = collect_pr_rent_data()
+            pr_id = save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id)
+            if method == 'post':
+                return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
+            else:
+                pr_email = request.form.get('pr_email')
+                pr_email_addr = request.form.get('pr_email_addr')
+                pr_file = get_pr_file(pr_id)
+                return render_template('pr_email_edit.html', email_block=pr_email, pr_email_addr=pr_email_addr,
+                                       method=method, pr_file=pr_file)
+        except Exception as ex:
+            message = f'Cannot save pay request. Error:  {str(ex)}'
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
-@pr_bp.route('/pr_send_email', methods=['GET', 'POST'])
+@pr_bp.route('/pr_send_email/<int:pr_id>', methods=['GET', 'POST'])
 @login_required
-def pr_send_email():
+def pr_send_email(pr_id):
     if request.method == 'POST':
         appmail = current_app.extensions['mail']
         rent_id = request.form.get('rent_id')
         html_body = request.form.get('html_body')
         subject = request.form.get('subject')
         recipients = request.form.get('recipients')
-        # attach a pdf of the pr (aleady saved to the temp_files folder) to the email
-        if request.form.get('pr_attached'):
-            attachment = Attachment('payrequest for rent ' + rent_id,
-                                    'C:\\Users\\User\\PycharmProjects\\mjinn\\app\\temp_files\\pr.pdf',
-                                    'application/pdf')
-            response = app_send_email(appmail, recipients, subject, html_body, [attachment])
-        else:
-            response = app_send_email(appmail, recipients, subject, html_body)
+        try:
+            # attach a pdf of the pr (already saved to the temp_files folder) to the email
+            if request.form.get('pr_attached'):
+                attachment = Attachment('payrequest for rent ' + get_rentcode(rent_id),
+                                        'C:\\Users\\User\\PycharmProjects\\mjinn\\app\\temp_files\\pr.pdf',
+                                        'application/pdf')
+                response = app_send_email(appmail, recipients, subject, html_body, [attachment])
+            else:
+                response = app_send_email(appmail, recipients, subject, html_body)
+            # Update delivery status of the pay request
+            post_updated_payrequest_delivery(True, get_pr_history_row(pr_id))
+        except Exception as ex:
+            response = f"Email sending failed with error: {str(ex)}"
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=response))
 
 

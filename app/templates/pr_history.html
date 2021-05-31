@@ -27,38 +27,53 @@
                 <table class="table table-head" id="docfiles">
                     <thead>
                     <tr>
-                        <th style="width: 10.00%">date</th>
-                        <th style="width: 24.00%">summary</th>
-                        <th style="width: 9.00%">rent date</th>
-                        <th style="width: 7.00%">total due</th>
-                        <th style="width: 30.00%"></th>
+                        <th style="width: 12.00%">date</th>
+                        <th style="width: 28.00%">summary</th>
+                        <th style="width: 11.00%">rent date</th>
+                        <th style="width: 39.00%">total due</th>
+                        <th style="width: 10.00%">delivered</th>
                     </tr>
                     </thead>
                 </table>
                 <table class="table table-body table-body-alt">
                     <tbody>
                     <tr id="{{ pr_history[0].id }}">
-                        <td style="width: 10.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
+                        <td style="width: 12.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
                             pr_history[0].datetime else 'none' }}
                         </td>
-                        <td style="width: 24.00%"> {{ pr_history[0].summary }}</td>
-                        <td style="width: 9.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
+                        <td style="width: 28.00%"> {{ pr_history[0].summary }}</td>
+                        <td style="width: 11.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
                             pr_history[0].rent_date
                             else 'none' }}
                         </td>
-                        <td style="width: 7.00%"> {{ pr_history[0].total_due }}</td>
-                        <td style="width: 10.00%" class="vertical-align"><a
+                        <td style="width: 9.00%"> {{ pr_history[0].total_due }}</td>
+                        <td style="width: 11.00%" class="vertical-align"><a
                                 href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id, can_undo=True) }}"
                                 class="btn btn-teal-light btn-small button-icon circles" role="button">view</a>
-                        <td style="width: 10.00%" class="vertical-align">
+                        <td style="width: 11.00%" class="vertical-align">
                             <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=pr_history[0].id) }}"
                                class="btn btn-primary btn-small button-icon letter" role="button">print
                             </a>
                         </td>
-                        <td style="width: 10.00%" class="vertical-align">
+                        <td style="width: 11.00%" class="vertical-align">
                             <a data-toggle="modal" data-target="#modal_undo_pr"
                                class="btn btn-danger btn-small button-icon trash" role="button">undo
                             </a>
+                        </td>
+                        <td style="width: 7.00%" class="vertical-align">
+                            {% if pr_history[0].delivered %}
+                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=pr_history[0].id,
+                            rent_id=pr_history[0].rent_id, delivered=False) }}"
+                               class="btn btn-success btn-round button-icon round check"
+                               data-toggle="tooltip" title="Pay request has been delivered. Select to change to 'undelivered'"
+                               role="button"></a>
+                            {% else %}
+                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=pr_history[0].id, rent_id=pr_history[0].rent_id,
+                            delivered=True) }}"
+                               class="btn btn-danger btn-round button-icon round cross"
+                               data-toggle="tooltip" title="Pay request is not yet delivered. Select to change to 'delivered'"
+                               role="button"></a>
+                            {% endif %}
                         </td>
                     </tr>
                     </tbody>
@@ -68,23 +83,36 @@
                     {% for item in pr_history %}
                     {% if loop.index > 1 %}
                     <tr id="{{ item.id }}">
-                        <td style="width: 10.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else
+                        <td style="width: 12.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else
                             'none' }}
                         </td>
-                        <td style="width: 24.00%"> {{ item.summary }}</td>
-                        <td style="width: 9.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
+                        <td style="width: 28.00%"> {{ item.summary }}</td>
+                        <td style="width: 11.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
                             }}
                         </td>
-                        <td style="width: 7.00%"> {{ item.total_due }}</td>
-                        <td style="width: 10.00%" class="vertical-align"><a
+                        <td style="width: 9.00%"> {{ item.total_due }}</td>
+                        <td style="width: 11.00%" class="vertical-align"><a
                                 href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
                                 class="btn btn-teal-light btn-small button-icon circles"
                                 role="button">view</a>
                         </td>
-                        <td style="width: 20.00%" class="vertical-align">
+                        <td style="width: 22.00%" class="vertical-align">
                             <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=item.id) }}"
                                class="btn btn-primary btn-small button-icon letter" role="button">print
                             </a>
+                        </td>
+                        <td style="width: 7.00%" class="vertical-align">
+                            {% if item.delivered %}
+                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=item.id, rent_id=item.rent_id, delivered=False) }}"
+                               class="btn btn-success btn-round button-icon round check"
+                               data-toggle="tooltip" title="Pay request has been delivered. Select to change to 'undelivered'"
+                               role="button"></a>
+                            {% else %}
+                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=item.id, rent_id=item.rent_id, delivered=True) }}"
+                               class="btn btn-danger btn-round button-icon round cross"
+                               data-toggle="tooltip" title="Pay request is not yet delivered. Select to change to 'delivered'"
+                               role="button"></a>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endif %}

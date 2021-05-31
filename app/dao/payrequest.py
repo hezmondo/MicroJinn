@@ -45,6 +45,10 @@ def get_pr_history(rent_id):
     return PrHistory.query.filter_by(rent_id=rent_id).order_by(desc(PrHistory.datetime))
 
 
+def get_pr_history_row(pr_id):
+    return PrHistory.query.get(pr_id)
+
+
 def get_recovery_info(suffix):
     recovery_info = db.session.query(PrArrearsMatrix).filter_by(suffix=suffix).options(load_only('arrears_clause',
                                                                                                  'recovery_charge',
@@ -69,6 +73,13 @@ def post_updated_payrequest(block, pr_id):
     pr_history = PrHistory.query.get(pr_id)
     rent_id = pr_history.rent_id
     pr_history.block = block
+    commit_to_database()
+    return rent_id
+
+
+def post_updated_payrequest_delivery(delivered, pr_file):
+    rent_id = pr_file.rent_id
+    pr_file.delivered = delivered
     commit_to_database()
     return rent_id
 
@@ -98,7 +109,7 @@ def prepare_new_pr_history_entry_x(pr_history_data, rent_id, method='email'):
                            rent_date=datetime.strptime(pr_history_data.get('rent_date'), '%Y-%m-%d'),
                            total_due=pr_history_data.get('tot_due'),
                            arrears_level=pr_history_data.get('new_arrears_level'),
-                           delivery_method=PrDeliveryTypes.get_id(method), delivered=True)
+                           delivery_method=PrDeliveryTypes.get_id(method), delivered=False)
     # TODO: We are not using the typeprdelivery table yet in any meaningful way
     #  - should we remove it and make delivery_method in pr_history a string column?
     #  - We'd have to hard code the method strings in any combodict filters

@@ -207,6 +207,7 @@ wallet
 }
 .btn-small
 {
+    box-shadow: none;
 	border-radius: 15px;
 	margin: 0px;
 	padding: 3px 10px;

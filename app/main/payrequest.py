@@ -11,8 +11,9 @@ from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
 from app.dao.doc import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
-from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, \
-    get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, prepare_new_pr_history_entry_x, add_pr_charge
+from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
+    get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, prepare_new_pr_history_entry_x, \
+    post_updated_payrequest_delivery, add_pr_charge
 from app.dao.common import delete_record_basic
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
@@ -297,13 +298,19 @@ def undo_pr(pr_id):
         update_rollback_rent(rent_id, altered_arrears)
         # save action to actions table
         action_str = 'pay request for rent ' + str(rent_id) + ' totalling ' + str(
-        pr_file.total_due) + ' has been undone'
+            pr_file.total_due) + ' has been undone'
         add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         commit_to_database()
         message = "Pay request undone!"
     except Exception as err:
         return type(err), rent_id
     return message, rent_id
+
+
+def update_pr_delivered(pr_id):
+    pr_file = get_pr_history_row(pr_id)
+    if (not pr_file.delivered) and pr_file.delivery_method == 2:  # post delivery
+        post_updated_payrequest_delivery(True, pr_file)
 
 
 def write_payrequest(rent_id, pr_form_id):
