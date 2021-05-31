@@ -1,11 +1,13 @@
-from flask import Blueprint, current_app, redirect, render_template, request, url_for, json
+from flask import Blueprint, current_app, redirect, render_template, request, url_for, json, send_from_directory
 from flask_login import login_required
 from app.email import app_send_email
 from app.dao.common import get_filters
 from app.dao.form_letter import get_pr_forms
-from app.dao.payrequest import get_pr_file, get_pr_history, post_updated_payrequest
+from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, post_updated_payrequest
 from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, serialize_pr_save_data, save_new_payrequest, \
     save_new_payrequest_x, undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
+from app.dao.doc import convert_html_to_pdf
+import os
 
 pr_bp = Blueprint('pr_bp', __name__)
 
@@ -43,21 +45,28 @@ def pr_edit_xray(pr_form_id):
         return render_template('mergedocs/PRX.html', rent_pr=rent_pr)
 
 
-# TODO: improve pr_file editing functionality (beyond edit summary/block)
+# TODO: remove email method or update pr creation via doReplace
 @pr_bp.route('/pr_file/<int:pr_id>', methods=['GET', 'POST'])
 @login_required
 def pr_file(pr_id):
     method = request.args.get('method', type=str)
     if request.method == "POST":
-        block = request.form.get('xinput').replace("£", "&pound;")
-        rent_id = post_updated_payrequest(block, pr_id)
-        return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
+        try:
+            block = request.form.get('xinput').replace("£", "&pound;")
+            rent_id = post_updated_payrequest(block, pr_id)
+            message = 'Pay request #' + str(pr_id) + ' saved successfully'
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
+        except Exception as ex:
+            message = f'Unable to update pay request. Database write failed with error: {str(ex)}'
+            return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, message=message))
+    message = request.args.get('message', type=str)
+    can_undo = request.args.get('can_undo', False, type=bool)
     pr_file = get_pr_file(pr_id)
     if method == 'email':
         pr_save_data = json.loads(request.args.get('pr_save_data'))
         email_block = write_payrequest_email(pr_save_data)
         return render_template('pr_file.html', email_block=email_block, method=method, pr_file=pr_file)
-    return render_template('pr_file.html', pr_file=pr_file)
+    return render_template('pr_file.html', pr_file=pr_file, can_undo=can_undo, message=message)
 
 
 @pr_bp.route('/pr_history/<int:rent_id>', methods=['GET', 'POST'])
@@ -81,6 +90,15 @@ def pr_history(rent_id):
 #     return render_template('pr_main.html', actypes=actypes, floads=floads, options=options,
 #                            prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
 #                            statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
+
+
+@pr_bp.route('/pr_print/pay_request_<int:pr_id>', methods=['GET', 'POST'])
+def pr_print(pr_id):
+    # We generate the pdf from the html in the PrHistory table then display the pdf in a new tab
+    convert_html_to_pdf(get_pr_block(pr_id), 'pr.pdf')
+    workingdir = os.path.abspath(os.getcwd())
+    filepath = workingdir + '\\app\\temp_files\\'
+    return send_from_directory(filepath, 'pr.pdf')
 
 
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
@@ -124,7 +142,14 @@ def pr_send_email():
         html_body = request.form.get('html_body')
         subject = request.form.get('subject')
         recipients = request.form.get('recipients')
-        response = app_send_email(appmail, recipients, subject, html_body)
+        # attach a pdf of the pr (aleady saved to the temp_files folder) to the email
+        if request.form.get('pr_attached'):
+            attachment = Attachment('payrequest for rent ' + rent_id,
+                                    'C:\\Users\\User\\PycharmProjects\\mjinn\\app\\temp_files\\pr.pdf',
+                                    'application/pdf')
+            response = app_send_email(appmail, recipients, subject, html_body, [attachment])
+        else:
+            response = app_send_email(appmail, recipients, subject, html_body)
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=response))
 
 
@@ -141,3 +166,12 @@ def pr_undo(pr_id):
     if request.method == 'POST':
         message, rent_id = undo_pr(pr_id)
         return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
+
+
+# The attachment class makes it easy to add attachments to emails. We can move this if its scope will grow beyond
+# payrequests
+class Attachment:
+    def __init__(self, file_name, file_location, file_type):
+        self.file_name = file_name
+        self.file_type = file_type
+        self.file_location = file_location

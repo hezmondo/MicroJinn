@@ -1,6 +1,25 @@
 from app import app
 
 
+class ActionTypes:
+    # the "names" of the types
+    # ids are index into these, counting from 1
+    _names = ["agent", "pay request", "rent"]
+
+    @staticmethod
+    def names():
+        # note that we return a `.copy()`, if the caller changes the list it does not affect the list we have here
+        return ActionTypes._names.copy()
+
+    @staticmethod
+    def get_name(id):
+        return ActionTypes._names[id - 1]
+
+    @staticmethod
+    def get_id(name):
+        return ActionTypes._names.index(name) + 1
+
+
 class AcTypes:
     # the "names" of the types
     # ids are index into these, counting from 1
@@ -262,6 +281,7 @@ def inject_model_types():
     # this is called by Flask on every request
     # inject a dictionary of all the model types, so they are easily accessible in any template
     return {
+        'ActionTypes': ActionTypes,
         'AcTypes': AcTypes,
         'AdvArr': AdvArr,
         'BatchStatuses': BatchStatuses,

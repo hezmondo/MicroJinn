@@ -6,11 +6,20 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from app import app, db, login, cache
-from sqlalchemy.ext.hybrid import hybrid_property
 
 
-# As there are numerous model classes, shall we agree to keep them in alphabetic order,
-# apart from the last one, which seems to belong to User?
+class Action(db.Model):
+    __tablename__ = 'action'
+
+    id = db.Column(db.Integer, primary_key=True)
+    datetime = db.Column(db.DateTime)
+    actiontype_id = db.Column(db.Integer())
+    detail = db.Column(db.String(180))
+    link = db.Column(db.String(120))
+    link_vars = db.Column(db.String(120))
+    alert = db.Column(db.Boolean, nullable=True)
+
+
 class Agent(db.Model):
     __tablename__ = 'agent'
 

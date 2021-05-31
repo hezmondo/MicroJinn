@@ -9,14 +9,6 @@ from app.models import Agent, Headrent, RecentSearch
 from app.modeltypes import Freqs, Statuses
 
 
-def add_new_recent_search(fdict):
-    recent_search = RecentSearch()
-    recent_search.type = 'headrent'
-    recent_search.desc = ''
-    recent_search.dict = json.dumps(fdict)
-    db.session.add(recent_search)
-
-
 def create_new_headrent():
     # create new headrent function not yet built, so return any id:
     return 23
@@ -34,7 +26,6 @@ def get_headrent(headrent_id):  # returns all Headrent member variables as a mut
     if headrent_id == 0:
         # take the user to create new rent function:
         headrent_id = create_new_headrent()
-    pop_idlist_recent("recent_headrents", headrent_id)
     headrent = db.session.query(Headrent) \
         .filter_by(id=headrent_id).options(joinedload('agent').load_only('id', 'detail'),
                                        joinedload('landlord').load_only('name')) \
@@ -62,19 +53,6 @@ def get_headrents(filter):
         headrent.status = Statuses.get_name(headrent.status_id)
 
     return headrents
-
-
-def get_recent_searches():
-    return RecentSearch.query.filter(RecentSearch.type == 'headrent').all()
-
-
-def get_recent_searches_asc():
-    return RecentSearch.query.filter(RecentSearch.type == 'headrent').order_by(asc(RecentSearch.id)).all()
-
-
-# def get_most_recent_search():
-#     return RecentSearch.query.options(load_only('dict')).filter(RecentSearch.type == 'headrent') \
-#         .order_by(desc(RecentSearch.id)).first()
 
 
 def post_headrent(headrent):

@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal
 from flask import request
 from dateutil.relativedelta import relativedelta
+from app.dao.action import add_action
 from app.dao.case import check_case_exists, add_case
 from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
@@ -250,12 +251,15 @@ def save_new_payrequest(method):
 
 def save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id):
     pr_history = prepare_new_pr_history_entry_x(pr_history_data, rent_id, method)
-    if method != 'email':
-        convert_html_to_pdf(pr_history_data.get('block'), 'pr.pdf')
+    # make a pdf to post or send as an attachment
+    convert_html_to_pdf(pr_history_data.get('block'), 'pr.pdf')
     pr_id = add_pr_history(pr_history)
     case_created, charge_id = forward_rent_case_and_charges_x(pr_id, pr_rent_data, rent_id)
     if charge_id or case_created:
         add_pr_charge(pr_id, charge_id, case_created)
+    # save action to actions table
+    action_str = 'Pay request for rent ' + str(rent_id) + ' totalling ' + str(pr_history_data.get('tot_due')) + ' saved'
+    add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
     commit_to_database()
     return pr_id
 
@@ -271,7 +275,7 @@ def undo_pr(pr_id):
     try:
         rentobj = get_rentp(rent_id)  # get full enhanced rent pack
         if pr_file.rent_date != rentobj.lastrentdate:
-            message = "Cannot complete undo. The pr rent date is not the same as the rent's last rent date."
+            message = "Cannot complete undo. The pay request rent date is not the same as the rent's last rent date."
             return message, rent_id
         charges = get_total_charges(rent_id)
         tot_charges = 0
@@ -291,6 +295,10 @@ def undo_pr(pr_id):
         rent_gale = get_rent_gale(rentobj.lastrentdate, rentobj.freq_id, rentobj.rentpa)
         altered_arrears = rentobj.arrears - rent_gale
         update_rollback_rent(rent_id, altered_arrears)
+        # save action to actions table
+        action_str = 'pay request for rent ' + str(rent_id) + ' totalling ' + str(
+        pr_file.total_due) + ' has been undone'
+        add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         commit_to_database()
         message = "Pay request undone!"
     except Exception as err:

@@ -2,7 +2,7 @@ from threading import Thread
 from flask import current_app
 from flask_mail import Message
 import socket
-from app import mail
+from app import app, mail
 
 
 def send_async_email(app, msg):
@@ -26,7 +26,8 @@ def send_email(subject, sender, recipients, text_body, html_body,
     msg.html = html_body
     if attachments:
         for attachment in attachments:
-            msg.attach(*attachment)
+            with app.open_resource(attachment.file_location) as fp:
+                msg.attach(attachment.file_name, attachment.file_type, fp.read())
     if sync:
         mail.send(msg)
     else:

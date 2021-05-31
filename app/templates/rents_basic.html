@@ -4,107 +4,212 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<div class="row">
-    <div class="col-md-9">
-        {% if rents|length > 0 %}
-        <div class="table-fixed">
-            <table class="table" id="rents">
-                <thead>
-                <tr>
-                    <th style="width: 8.00%">rentcode</th>
-                    <th style="width: 9.00%">rent (pa)</th>
-                    <th style="width: 8.00%">owing</th>
-                    <th style="width: 13.00%">next rent date</th>
-                    <th style="width: 15.00%">tenant name</th>
-                    <th style="width: 22.00%">property address</th>
-                    <th style="width: 8.00%">source</th>
-                    <th style="width: 15.00%">agent details</th>
-                    <th style="width: 2.00%"></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for item in rents %}
-                <tr id="{{ item.id }}">
-                    <td style="width: 8.00%">{{ item.rentcode }}</td>
-                    <td style="width: 9.00%"> {{ item.rentpa }}</td>
-                    <td style="width: 8.00%"> {{ item.owing }}</td>
-                    <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
-                        item.datecode_id, 1).strftime('%d-%b-%Y') }}</td>
-                    <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                    <td style="width: 22.00%">{{ item.propaddr }}</td>
-                    <td style="width: 8.00%"> {{ item.source }}</td>
-                    <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}
-                    </td>
-                    <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
+<form method="POST" id="target">
+    <div class="row">
+        <div class="col-md-9">
+            {% if rents|length > 0 %}
+            <div class="table-fixed">
+                <table class="table" id="rents">
+                    <thead>
+                    <tr>
+                        <th style="width: 8.00%">rentcode</th>
+                        <th style="width: 9.00%">rent (pa)</th>
+                        <th style="width: 8.00%">owing</th>
+                        <th style="width: 13.00%">next rent date</th>
+                        <th style="width: 15.00%">tenant name</th>
+                        <th style="width: 22.00%">property address</th>
+                        <th style="width: 8.00%">source</th>
+                        <th style="width: 15.00%">agent details</th>
+                        <th style="width: 2.00%"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in rents %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 8.00%">{{ item.rentcode }}</td>
+                        <td style="width: 9.00%"> {{ item.rentpa }}</td>
+                        <td style="width: 8.00%"> {{ item.owing }}</td>
+                        <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
+                            item.datecode_id, 1).strftime('%d-%b-%Y') }}
+                        </td>
+                        <td style="width: 15.00%"> {{ item.tenantname }}</td>
+                        <td style="width: 22.00%">{{ item.propaddr }}</td>
+                        <td style="width: 8.00%"> {{ item.source }}</td>
+                        <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}
+                        </td>
+                        <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
             rent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles"
-                                                                       data-toggle="tooltip" title="view rent"
-                                                                       role="button"></a></td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                                                                           data-toggle="tooltip" title="view rent"
+                                                                           role="button"></a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            {{ widgets.message_box(
+            message="There are no rents that match your search.",
+            btn_text="reset search",
+            btn_class="btn btn-block btn-primary button-icon sync",
+            btn_url=url_for('rent_bp.rents_basic') ) }}
+            {% endif %}
         </div>
-        {% else %}
-        {{ widgets.message_box(
-        message="There are no rents that match your search.",
-        btn_text="reset search",
-        btn_class="btn btn-block btn-primary button-icon sync",
-        btn_url=url_for('rent_bp.rents_basic') ) }}
-        {% endif %}
-    </div>
-    <div class="col-md-3">
-        <form class="sticky-top" method="POST" id="target">
-            <div class="card card-white">
+        <div class="col-md-3">
+
+            {% if recent_searches|length > 0 %}
+            <div class="card card-white" style="margin-bottom:1rem;">
                 <div class="card-header">
                     <div class="row">
-                        <div class="col">search</div>
-                        <div class="col align-right"><b>{{ rents|length }}</b> results</div>
+                        <div class="col-md-9">most recent search</div>
+                        <div class="col-md-3 align-right">
+                            <a href="#expand_div" data-toggle="collapse" aria-expanded="false"
+                               id="expand_div_toggle" aria-controls="expand_div"
+                               class="button-icon btn-round round plus"
+                               role="button" style="box-shadow:none;"></a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body text-primary">
-                    <div class="form-group row">
-                        <div class="col">
-                            <input type="text" class="form-control" name="rentcode" data-toggle="tooltip"
-                                   title="Starts with" placeholder="rentcode starts with"
-                                   value="{{ fdict.rentcode }}">
-                            <input type="text" class="form-control" name="tenantname" data-toggle="tooltip"
-                                   title="includes" placeholder="tenant name" value="{{ fdict.tenantname }}">
-                            <input type="text" class="form-control" name="propaddr" data-toggle="tooltip"
-                                   title="includes" placeholder="property details" value="{{ fdict.propaddr }}">
-                            <input type="text" class="form-control" name="source" data-toggle="tooltip"
-                                   title="includes" placeholder="source" value="{{ fdict.source }}">
-                            <input type="text" class="form-control" name="agentdetail" data-toggle="tooltip"
-                                   title="includes" placeholder="agent details"
-                                   value="{{ fdict.agentdetail | truncate(20, True) }}">
-                            <!--                                <input type="text" class="form-control" name="count"-->
-                            <!--                                       placeholder="number of results" value="{{ rents|length }}">-->
+                    {% for item in recent_searches|reverse %}
+                    {% if loop.index == 1 %}
+                    <div class="form-group row" style="margin-bottom: 5px;">
+                        <div class="col-md-9" style="padding-right:2px;">
+                            <button
+                                    class="btn btn-block btn-light search-history" style="text-align: left;box-shadow:none;"
+                                    value="{{ item.dict }}" onclick="return false;">
+                                <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
+                                <span><b>{{ item.agent }} </b></span><span>{{ item.source }} </span>
+                                <span><b>{{ item.tenantname }}</b></span>
+                            </button>
+                        </div>
+                        <div class="col-md-3" style="padding-left:3px;">
+                            <button
+                                    style="height:100%; box-shadow:none;"
+                                    value="{{ item.dict }}"
+                                    data-toggle="tooltip" title="search database"
+                                    class="btn btn-success btn-block button-icon-center arrow-right search-history">
+                            </button>
                         </div>
                     </div>
-                    <div class="form-group row" style="margin-bottom: 0px;">
-                        <div class="col">
-                            <button type="submit" formaction="{{ url_for('rent_bp.rents_basic') }}"
-                                    class="btn btn-block btn-success  button-icon search" role="button">search
-                            </button>
-                            <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0) }}"
-                               class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                <div id="expand_div" class="collapse">
+                    <div class="card-body text-primary" style="padding-top:0;">
+                        <p>previous searches</p>
+                        {% for item in recent_searches|reverse %}
+                        {% if loop.index > 1 %}
+                        <div class="form-group row" style="margin-bottom: 5px;">
+                            <div class="col-md-9" style="padding-right:2px;">
+                                <button
+                                        class="btn btn-block btn-light search-history" style="text-align: left; box-shadow:none;"
+                                        value="{{ item.dict }}" onclick="return false;">
+                                    <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
+                                    <span><b>{{ item.agent }} </b></span><span>{{ item.source }} </span>
+                                    <span><b>{{ item.tenantname }}</b></span>
+                                </button>
+                            </div>
+                            <div class="col-md-3" style="padding-left:3px;">
+                                <button
+                                        style="height:100%; box-shadow:none;"
+                                        value="{{ item.dict }}"
+                                        data-toggle="tooltip" title="search database"
+                                        class="btn btn-success btn-block button-icon-center arrow-right search-history">
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="sticky-top">
+                <div class="card card-white">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">search</div>
+                            <div class="col align-right"><b>{{ rents|length }}</b> results</div>
+                        </div>
+                    </div>
+                    <div class="card-body text-primary">
+                        <div class="form-group row">
+                            <div class="col">
+                                <input id="form-rentcode" type="text" class="form-control" name="rentcode"
+                                       data-toggle="tooltip"
+                                       title="Starts with" placeholder="rentcode starts with"
+                                       value="{{ fdict.rentcode }}">
+                                <input id="form-tenantname" type="text" class="form-control" name="tenantname"
+                                       data-toggle="tooltip"
+                                       title="includes" placeholder="tenant name" value="{{ fdict.tenantname }}">
+                                <input id="form-propaddr" type="text" class="form-control" name="propaddr"
+                                       data-toggle="tooltip"
+                                       title="includes" placeholder="property details" value="{{ fdict.propaddr }}">
+                                <input id="form-source" type="text" class="form-control" name="source"
+                                       data-toggle="tooltip"
+                                       title="includes" placeholder="source" value="{{ fdict.source }}">
+                                <input id="form-agent" type="text" class="form-control" name="agent"
+                                       data-toggle="tooltip"
+                                       title="includes" placeholder="agent details"
+                                       value="{{ fdict.agent | truncate(20, True) }}">
+                            </div>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <div class="col">
+                                <div class="form-group row" style="margin-bottom: 1rem;">
+                                    <div class="col-md-5" style="padding-right:5px;">
+                                        <button class="btn btn-block btn-primary button-icon sync search-clear"
+                                                onclick="return false;">clear
+                                        </button>
+                                    </div>
+                                    <div class="col-md-7" style="padding-left:5px;">
+                                        <button type="submit" formaction="{{ url_for('rent_bp.rents_basic') }}"
+                                                class="btn btn-block btn-success  button-icon search" role="button">
+                                            search
+                                        </button>
+                                    </div>
+                                </div>
+                                <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0) }}"
+                                   class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-white" style="margin-top:1.5rem;">
+                    <div class="card-header">other actions</div>
+                    <div class="card-body text-primary">
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <div class="col">
+                                <button type="submit" formaction="{{ url_for('rent_bp.rents_external') }}"
+                                        class="btn btn-block btn-primary  button-icon search" role="button">search
+                                    external
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="card card-white" style="margin-top:1.5rem;">
-                <div class="card-header">other actions</div>
-                <div class="card-body text-primary">
-                    <div class="form-group row" style="margin-bottom: 0px;">
-                        <div class="col">
-                            <button type="submit" formaction="{{ url_for('rent_bp.rents_external') }}"
-                                    class="btn btn-block btn-primary  button-icon search" role="button">search
-                                external
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
+{% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+// Selecting an item from search history will populate the search fields and complete the search
+$('.search-history').mousedown(function(e) {
+    var dict = $.parseJSON($(this).val());
+    $('#form-rentcode').val(dict.rentcode);
+    $('#form-propaddr').val(dict.propaddr);
+    $('#form-agent').val(dict.agent);
+    $('#form-source').val(dict.source);
+    $('#form-tenantname').val(dict.tenantname);
+});
+$('.search-clear').click(function(e) {
+    $('#form-rentcode').val('');
+    $('#form-propaddr').val('');
+    $('#form-agent').val('');
+    $('#form-source').val('');
+    $('#form-tenantname').val('');
+});
+</script>
 {% endblock %}

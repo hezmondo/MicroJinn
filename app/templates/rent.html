@@ -522,17 +522,9 @@
 </div>
 
 {% endblock %}
-
-{% block message_on_load %}
-{% if messages %}
-{{ widgets.modal_message_on_load(messages=messages, title="Notice") }}
-{% endif %}
-{% endblock %}
-
 {% block javascript %}
 <script type="text/javascript">
     {% include "rent.js" %}
-
 </script>
 {% endblock %}
 

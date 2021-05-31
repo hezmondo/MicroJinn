@@ -1,6 +1,36 @@
+/*icon names:
+arrow-down
+arrow-left
+arrow-right
+arrow-up
+bell
+circles
+check
+cross
+download
+edit
+email-ic
+exclamation
+filter
+info
+invoice
+letter
+mail-ic
+meteor
+minus
+plus
+receipt
+save
+search
+sync
+trash
+wallet
+*/
+
+
 #doc_html, #email_html
 {
-	background-color: #EDEDED !important;
+	background-color: #f8f8f8;
 	box-shadow: 0 8px 16px rgba(0,0,0,.15);
 	min-height: 100px;
 	padding: 5% 10%;
@@ -56,6 +86,12 @@
 {
 	background-color: #6c757d !important;
 	color: white;
+}
+.bell::before
+{
+	content: "\f0f3";
+	font-family: "Font Awesome 5 Free";
+	font-weight: 900;
 }
 .block-text
 {
@@ -145,6 +181,7 @@
 {
 	background-color: #599181;
 	border-color: #599181;
+	color: white;
 }
 .btn-teal-light:not(:disabled):not(.disabled):active:focus
 {
@@ -154,6 +191,11 @@
 {
 	background-color: #518ADD;
 	border-color: #518ADD;
+}
+.btn-light
+{
+    color: #656565;
+	background-color: #f7f7f7;
 }
 .btn-round
 {
@@ -423,6 +465,12 @@
 .hr-invisible
 {
 	border-top: 0px;
+}
+.hr-thick
+{
+    width: 80%;
+    border: 2px solid rgba(0,0,0,.15);
+    border-radius: 3px;
 }
 .info::before
 {
@@ -791,49 +839,14 @@ thead
 	color: #ffffff;
 	font-weight: bold;
 }
-
+/*Extra padding to counter the padding added by the pdf code*/
+.pr_table tr, td, th
+{
+    padding-bottom: 5px;
+}
 .pr_table thead {
     background-color: #86A9DC;
     color: #ffffff;
     font-weight: bold;
 }
-
-.pr_table tbody tr:nth-child(odd) td   { background-color:transparent; }
-
-.pr_table tbody tr:nth-child(even) td   { background-color:transparent; }
-
-.pr_table {
-    font-size: 10.5pt;
-    table-layout: fixed;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    border: solid #86A9DC 1px;
-}
-.pr_table th {
-    text-align: center;
-    background-color: #6666ff;
-    color: white
-}
-.pr_table tr td {
-    padding: 5px;
-    background-color: transparent;
-}
-.total {
-    font-weight: bold;
-    border: solid #86A9DC 1px;
-    background-color: #fafafa;
-}
-.pr_table .amount-class {
-    text-align: right;
-    width: 20%;
-}
-.pr_table_heading {
-    background-color: #86A9DC;
-    color: #ffffff;
-    font-weight: bold;
-}
-.hr-thick {
-    border: 3px solid rgba(0,0,0,.15);
-    border-radius: 5px;
-}
+.pr_table tbody tr td {background-color:transparent;}

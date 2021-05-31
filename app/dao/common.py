@@ -2,11 +2,24 @@ import json
 from app import db, cache
 from flask import request
 from flask_login import current_user
+from sqlalchemy import asc
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
     Income, IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, \
-    Rent, MoneyAcc, TypeDeed, TypeDoc
+    Rent, RecentSearch, MoneyAcc, TypeDeed, TypeDoc
+
+
+def add_new_recent_search(fdict, type, desc=''):
+    recent_search = RecentSearch()
+    recent_search.type = type
+    recent_search.desc = desc
+    recent_search.dict = json.dumps(fdict)
+    db.session.add(recent_search)
+
+
+def delete(db_object):
+    db.session.delete(db_object)
 
 
 # Sam: We may end up moving these into their own separate dao files as the app increases in complexity - to deal with
@@ -142,8 +155,18 @@ def get_idlist_recent(type):
     return id_list
 
 
+def get_recent_searches(type):
+    return RecentSearch.query.filter(RecentSearch.type == type).all()
+
+
+def get_recent_searches_asc(type):
+    return RecentSearch.query.filter(RecentSearch.type == type).order_by(asc(RecentSearch.id)).all()
+
+
 def pop_idlist_recent(type, id):
     id_list = get_idlist_recent(type)
+    # make sure the id is an int
+    id = int(id)
     if id in id_list:
         id_list.remove(id)
     id_list.insert(0, id)

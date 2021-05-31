@@ -1,8 +1,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 from flask_login import login_required
-from app.main.headrent import mget_headrents_default, \
-    mget_headrents_from_search, mget_headrent, mget_recent_searches, update_landlord, \
-    update_headrent, update_propaddr, update_note
+from app.main.headrent import mget_recent_searches, mget_headrents_from_search, mget_headrents_default, mget_headrent, \
+    update_landlord, update_headrent, update_propaddr, update_note
 
 headrent_bp = Blueprint('headrent_bp', __name__)
 
@@ -14,7 +13,7 @@ def headrents():
     else:
         fdict, headrents = mget_headrents_default()
 
-    recent_searches = mget_recent_searches()
+    recent_searches = mget_recent_searches('headrent')
 
     return render_template('headrents.html', fdict=fdict, headrents=headrents, recent_searches=recent_searches)
 

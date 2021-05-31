@@ -6,7 +6,7 @@ from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenur
 
 
 def dict_basic():
-    return {'agentdetail': request.form.get('agentdetail') or "",
+    return {'agent': request.form.get('agent') or "",
             'propaddr': request.form.get('propaddr') or "",
             'rentcode': request.form.get('rentcode') or "",
             'source': request.form.get('source') or "",
@@ -19,7 +19,7 @@ def dict_advanced():
     dict['actype'] = request.form.getlist('actype') or ['all actypes']
     dict['agentmailto'] = request.form.get('agentmailto') or 'include'
     dict['emailable'] = request.form.get('emailable') or 'include'
-    dict['enddate'] = request.form.get('enddate') or date.today() + relativedelta(days=50)
+    dict['enddate'] = request.form.get('enddate') or ''
     dict['landlord'] = request.form.getlist('landlord') or ['all landlords']
     dict['prdelivery'] = request.form.getlist('prdelivery') or ['all prdeliveries']
     dict['salegrade'] = request.form.getlist('salegrade') or ['all salegrades']
@@ -56,7 +56,7 @@ def filter_advanced(dict):
     #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
     # elif key == "rentperiods" and value and value != "":
     #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
-    filtr.append(Rent.lastrentdate <= dict['enddate'])
+    filtr.append(Rent.lastrentdate <= (dict['enddate'] or (date.today() + relativedelta(days=30))))
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
         filtr.append(Landlord.name.in_(dict['landlord']))
     if dict['prdelivery'] and dict['prdelivery'] != ['all prdeliveries']:
@@ -119,7 +119,7 @@ def filter_basic_sql_2(dict, id_list):
     if id_list:
         sql2 = " r.id IN {}".format(tuple(id_list))
     else:
-        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agentdetail')) if dict.get('agentdetail') else ""
+        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agent')) if dict.get('agent') else ""
         # todo additional filter for amount owing:  owingSql = " {} <= Owing AND
         #  Owing <= {}".format(owing - money(0.03), owing + money(0.03)) if owing is not None else ""
         propaddr_sql = " propaddr LIKE '%{}%' ".format(dict.get('propaddr')) if dict.get('propaddr') else ""

@@ -379,10 +379,3 @@
     </div>
 </div>
 {% endblock %}
-
-<!--if a not empty message string is passed to the template we load the message when the page loads-->
-{% block message_on_load %}
-{% if message %}
-{{ widgets.modal_message_on_load(message=message, title="Notice") }}
-{% endif %}
-{% endblock %}

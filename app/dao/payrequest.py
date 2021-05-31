@@ -29,6 +29,10 @@ def get_pr_charge(pr_id):
     return PrCharge.query.filter_by(id=pr_id).one_or_none()
 
 
+def get_pr_block(pr_id):
+    return db.session.query(PrHistory).filter_by(id=pr_id).with_entities(PrHistory.block).scalar()
+
+
 def get_pr_file(pr_id):
     pr_file = PrHistory.query.join(Rent).with_entities(PrHistory.id, PrHistory.summary, PrHistory.block,
                                                        PrHistory.datetime, PrHistory.rent_date, PrHistory.total_due,

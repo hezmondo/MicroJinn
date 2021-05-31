@@ -63,6 +63,10 @@
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">logout</a>
                 </li>
                 {% endif %}
+                <hr>
+                <li class="nav-item">
+                    <a class="nav-link button-icon bell" href="{{ url_for('util_bp.actions') }}">actions</a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -100,9 +104,13 @@
 <script src="{{ url_for('static', filename='mjinn.js') }}"></script>
 <script src="{{ url_for('static', filename='sortable.js') }}"></script>
 {% block javascript %}{% endblock %}
-<!-- we can add a modal message when a page loads, for example after we post
-something to the db and want to give the user feedback -->
-{% block message_on_load %}{% endblock %}
+<!-- we can add a modal message when a page loads by passing message/messages to the template, for example after we post
+something to the db and want to give the user feedback. The message can be a string or list of stings -->
+{% if message %}
+{{ widgets.modal_message_on_load(message=message, title="Notice") }}
+{% elif messages %}
+{{ widgets.modal_message_on_load(messages=messages, title="Notice") }}
+{% endif %}
 </body>
 {% endblock %}
 </html>

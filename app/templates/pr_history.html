@@ -6,7 +6,7 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
@@ -28,10 +28,10 @@
                     <thead>
                     <tr>
                         <th style="width: 10.00%">date</th>
-                        <th style="width: 30.00%">summary</th>
-                        <th style="width: 10.00%">rent date</th>
-                        <th style="width: 10.00%">total due</th>
-                        <th style="width: 20.00%"></th>
+                        <th style="width: 24.00%">summary</th>
+                        <th style="width: 9.00%">rent date</th>
+                        <th style="width: 7.00%">total due</th>
+                        <th style="width: 30.00%"></th>
                     </tr>
                     </thead>
                 </table>
@@ -41,15 +41,20 @@
                         <td style="width: 10.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
                             pr_history[0].datetime else 'none' }}
                         </td>
-                        <td style="width: 30.00%"> {{ pr_history[0].summary }}</td>
-                        <td style="width: 10.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
+                        <td style="width: 24.00%"> {{ pr_history[0].summary }}</td>
+                        <td style="width: 9.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
                             pr_history[0].rent_date
                             else 'none' }}
                         </td>
-                        <td style="width: 10.00%"> {{ pr_history[0].total_due }}</td>
+                        <td style="width: 7.00%"> {{ pr_history[0].total_due }}</td>
                         <td style="width: 10.00%" class="vertical-align"><a
-                                href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id) }}"
+                                href="{{ url_for('pr_bp.pr_file', pr_id=pr_history[0].id, can_undo=True) }}"
                                 class="btn btn-teal-light btn-small button-icon circles" role="button">view</a>
+                        <td style="width: 10.00%" class="vertical-align">
+                            <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=pr_history[0].id) }}"
+                               class="btn btn-primary btn-small button-icon letter" role="button">print
+                            </a>
+                        </td>
                         <td style="width: 10.00%" class="vertical-align">
                             <a data-toggle="modal" data-target="#modal_undo_pr"
                                class="btn btn-danger btn-small button-icon trash" role="button">undo
@@ -66,15 +71,21 @@
                         <td style="width: 10.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else
                             'none' }}
                         </td>
-                        <td style="width: 30.00%"> {{ item.summary }}</td>
-                        <td style="width: 10.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
+                        <td style="width: 24.00%"> {{ item.summary }}</td>
+                        <td style="width: 9.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
                             }}
                         </td>
-                        <td style="width: 10.00%"> {{ item.total_due }}</td>
-                        <td style="width: 20.00%" class="vertical-align"><a
+                        <td style="width: 7.00%"> {{ item.total_due }}</td>
+                        <td style="width: 10.00%" class="vertical-align"><a
                                 href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
                                 class="btn btn-teal-light btn-small button-icon circles"
-                                role="button">view</a></td>
+                                role="button">view</a>
+                        </td>
+                        <td style="width: 20.00%" class="vertical-align">
+                            <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=item.id) }}"
+                               class="btn btn-primary btn-small button-icon letter" role="button">print
+                            </a>
+                        </td>
                     </tr>
                     {% endif %}
                     {% endfor %}
@@ -110,10 +121,5 @@
 </form>
 {% endblock %}
 
-{% block message_on_load %}
-{% if message %}
-{{ widgets.modal_message_on_load(message=message, title="message") }}
-{% endif %}
-{% endblock %}
 
 

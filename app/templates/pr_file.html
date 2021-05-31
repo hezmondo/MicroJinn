@@ -38,20 +38,19 @@
             <hr class="hr-thick">
             {{ pr_file.block|safe }}
         </div>
-        <input type="hidden" id="email_dict" name="email_dict" value="">
     </div>
     {% else %}
     <div class="form-group row flex-row-reverse">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('pr_bp.pr_history', rent_id=pr_file.rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr history</a>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-3">
             <a href="{{ url_for('rent_bp.rent', rent_id=pr_file.rent_id) }}"
                class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
         </div>
-        <div class="col-md-8">
-            <span>{{ pr_file.summary }}</span>
+        <div class="col-md-6">
+            <span><b>Summary | {{ pr_file.summary }} </b></span>
         </div>
     </div>
     <div class="row">
@@ -64,7 +63,7 @@
                     <input type="hidden" class="form-control" name="rent_id" value="{{ pr_file.rent_id }}">
                 </div>
             </div>
-            <div id="doc_html" contenteditable="true">
+            <div id="doc_html" contenteditable="false">
                 {{ pr_file.block|safe}}
             </div>
         </div>
@@ -79,9 +78,34 @@
                 <div class="card-body text-primary">
                     <div class="form-group row" style="margin-bottom:0px;">
                         <div class="col">
-                            <a data-toggle="modal" data-target="#modal_undo_pr"
-                               class="btn btn-danger btn-block button-icon trash" role="button">undo pay request
+                            <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=pr_file.id) }}"
+                               class="btn btn-primary btn-block button-icon letter" role="button">print
                             </a>
+                            <a data-toggle="collapse" href="#expand_edit"
+                               aria-expanded="false" aria-controls="expand_edit"
+                               class="btn btn-secondary btn-block button-icon edit edit_pr" role="button">edit
+                            </a>
+                            <div id="expand_edit" class="collapse" style="margin: 1rem 0rem">
+                                Edit the document, then select 'save' when you have finished
+                                <div class="row" style="margin-top: 1rem;">
+                                    <div class="col-md-6">
+                                        <button id="savehtml" class="btn btn-success btn-block button-icon save"
+                                                role="button">save
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a data-toggle="collapse" href="#expand_edit"
+                                           aria-expanded="false" aria-controls="expand_edit"
+                                           class="btn btn-secondary btn-block button-icon cross edit_pr" role="button">cancel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if can_undo %}
+                            <a style="margin-top: 0.5rem;" data-toggle="modal" data-target="#modal_undo_pr"
+                               class="btn btn-danger btn-block button-icon trash" role="button">undo
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -145,6 +169,18 @@
     {% endif %}
 </form>
 {% endblock %}
+{% block javascript %}
+<script type="text/javascript">
+$(document).ready(function(){
+    $('#expand_edit').on('shown.bs.collapse', function () {
+        $("#doc_html").css({"background-color": "white"});
+    });
+    $('#expand_edit').on('hidden.bs.collapse', function () {
+        $("#doc_html").css({"background-color": "#f8f8f8"});
+    });
+});
 
+</script>
+{% endblock %}
 
 

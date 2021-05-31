@@ -1,11 +1,14 @@
 # common.py - attempt to put all commonly used non db stuff here and in functions.py
 import typing
-from flask import current_app
+from flask import current_app, json
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from app import app
 from app.main.functions import money
 from app.models import Jstore, TypeDeed
 from app.modeltypes import Date_m
+from app.dao.common import add_new_recent_search, delete, get_recent_searches_asc, \
+    commit_to_database
 
 
 # convert a string so that the first letter is uppercase
@@ -38,11 +41,27 @@ def get_combodict_filter():
     return combo_dict
 
 
+def mpost_search(fdict, type):
+    recent_searches = get_recent_searches_asc(type)
+    # convert fdict into a string, as this is how it is saved in the db
+    str_dict = json.dumps(fdict)
+    # If the search dict already exists in the table we replace it so it becomes the most recent search
+    for recent_search in recent_searches:
+        if str_dict == recent_search.dict:
+            delete(recent_search)
+    # If there are already 6 records in the table we delete the oldest
+    if len(recent_searches) >= 6:
+        first_record = recent_searches[0]
+        delete(first_record)
+    add_new_recent_search(fdict, type)
+    commit_to_database()
+
+
 def get_rents_fdict(action='basic'):
     # get simple filter dictionary for rents and rents external pages
     dict_basic = {
         "rentcode": "",
-        "agentdetail": "",
+        "agent": "",
         "propaddr": "",
         "source": "",
         "tenantname": ""

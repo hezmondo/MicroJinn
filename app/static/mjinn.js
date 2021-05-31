@@ -33,6 +33,12 @@ $(document).ready(function(){
             $("#save_delete").hide();
         }
     });
+    $('#expand_div').on('hidden.bs.collapse', function () {
+        $('#expand_div_toggle').removeClass('minus').addClass('plus');
+    });
+    $('#expand_div').on('shown.bs.collapse', function () {
+        $('#expand_div_toggle').removeClass('plus').addClass('minus');
+    });
     //add tick icon on click to toggle button
     $(".btn-check").click(function(){
         if($(".btn-tog").hasClass('check')){
@@ -62,8 +68,11 @@ $(document).ready(function(){
         var pr_block = $('#doc_html').html();
         $('#pr_block').val(pr_block);
         var pr_addr = $('#addr_span').text().trim();
+        // remove unwanted characters
         var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
-        $('#pr_addr').val(pr_addr_strip);
+        // remove extra whitespace
+        var pr_addr_strip_clean = pr_addr.replace(/\s+/g, " ");
+        $('#pr_addr').val(pr_addr_strip_clean);
     });
     //allow display and navbar to change for smaller screens / phones
     resizeView();
