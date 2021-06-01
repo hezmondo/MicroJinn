@@ -15,6 +15,7 @@ from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_ch
     get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, prepare_new_pr_history_entry_x, \
     post_updated_payrequest_delivery, add_pr_charge
 from app.dao.common import delete_record_basic
+from app.dao.rent import get_rentcode
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
 from app.main.common import inc_date_m
@@ -259,7 +260,10 @@ def save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id):
     if charge_id or case_created:
         add_pr_charge(pr_id, charge_id, case_created)
     # save action to actions table
-    action_str = 'Pay request for rent ' + str(rent_id) + ' totalling ' + str(pr_history_data.get('tot_due')) + ' saved'
+    # TODO: Check with Hez - is it worth an extra db query to get the rentcode to display to the user rather than
+    #  rent_id - get_rentcode(rent_id)
+    action_str = 'Pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
+                 moneyToStr(pr_history_data.get('tot_due'), pound=True) + ' saved'
     add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
     commit_to_database()
     return pr_id
@@ -297,8 +301,8 @@ def undo_pr(pr_id):
         altered_arrears = rentobj.arrears - rent_gale
         update_rollback_rent(rent_id, altered_arrears)
         # save action to actions table
-        action_str = 'pay request for rent ' + str(rent_id) + ' totalling ' + str(
-            pr_file.total_due) + ' has been undone'
+        action_str = 'pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
+                     moneyToStr(pr_file.total_due, pound=True) + ' has been undone'
         add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         commit_to_database()
         message = "Pay request undone!"

@@ -1,5 +1,6 @@
 from flask import Blueprint, current_app, redirect, render_template, request, url_for, json, send_from_directory
 from flask_login import login_required
+from app import db
 from app.email import app_send_email
 from app.dao.common import get_filters
 from app.dao.rent import get_rentcode
@@ -32,7 +33,7 @@ def pr_delivery(pr_id):
         string = " set to 'delivered'" if delivered else " set to 'undelivered'"
         message = 'Pay request ' + str(pr_id) + string
     except Exception as ex:
-        message = f"Unable to update pay request. Error: {str(ex)}"
+        message = f"Unable to update pay request delivery. Database rolled back. Error: {str(ex)}"
     return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
@@ -78,7 +79,8 @@ def pr_file(pr_id):
             message = 'Pay request #' + str(pr_id) + ' saved successfully'
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
         except Exception as ex:
-            message = f'Unable to update pay request. Database write failed with error: {str(ex)}'
+            message = f'Unable to update pay request. Database rolled back. Error: {str(ex)}'
+            db.session.rollback()
             return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, message=message))
     message = request.args.get('message', type=str)
     can_undo = request.args.get('can_undo', False, type=bool)
@@ -148,21 +150,22 @@ def pr_save_send_x():
     method = request.args.get('method', type=str)
     rent_id = request.args.get('rent_id', type=int)
     if request.method == 'POST':
+        pr_history_data = collect_pr_history_data()
+        pr_rent_data = collect_pr_rent_data()
         try:
-            pr_history_data = collect_pr_history_data()
-            pr_rent_data = collect_pr_rent_data()
             pr_id = save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id)
-            if method == 'post':
-                return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
-            else:
-                pr_email = request.form.get('pr_email')
-                pr_email_addr = request.form.get('pr_email_addr')
-                pr_file = get_pr_file(pr_id)
-                return render_template('pr_email_edit.html', email_block=pr_email, pr_email_addr=pr_email_addr,
-                                       method=method, pr_file=pr_file)
         except Exception as ex:
-            message = f'Cannot save pay request. Error:  {str(ex)}'
+            message = f'Cannot save pay request. Database rolled back. Error:  {str(ex)}'
+            db.session.rollback()
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
+        if method == 'post':
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
+        else:
+            pr_email = request.form.get('pr_email')
+            pr_email_addr = request.form.get('pr_email_addr')
+            pr_file = get_pr_file(pr_id)
+            return render_template('pr_email_edit.html', email_block=pr_email, pr_email_addr=pr_email_addr,
+                                   method=method, pr_file=pr_file)
 
 
 @pr_bp.route('/pr_send_email/<int:pr_id>', methods=['GET', 'POST'])

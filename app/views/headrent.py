@@ -46,6 +46,6 @@ def headrent_update(headrent_id):
             note = request.form.get("note")
             update_note(headrent_id, note)
     except Exception as ex:
-        message = f"Update headrent failed. Error:  {str(ex)}"
+        message = f"Update headrent failed. Database rolled back. Error:  {str(ex)}"
 
     return redirect(url_for('headrent_bp.headrent', headrent_id=headrent_id, message=message))
