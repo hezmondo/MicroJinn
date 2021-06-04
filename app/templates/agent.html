@@ -414,7 +414,7 @@
 </div>
 {% endblock %}
 <!--we show the edit agent modal on page load if a user has come from agents and chosen to create a new agent-->
-{% block message_on_load %}
+{% block javascript %}
 {% if action == 'new_agent' and agent.id == 0 %}
 {{ widgets.modal_on_load_js(modal_id="agent_modal") }}
 {% endif %}

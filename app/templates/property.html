@@ -121,9 +121,8 @@ title="warning"
 {% endblock %}
 
 <!--we show the edit property modal on page load if a user has come from properties-->
-{% block message_on_load %}
+{% block javascript %}
 {% if action == 'edit' %}
 {{ widgets.modal_on_load_js(modal_id="property_modal") }}
 {% endif %}
 {% endblock %}
-
