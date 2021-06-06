@@ -1,26 +1,49 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
 from app.dao.money import get_money_acc, get_moneydets, get_moneydict, \
-    get_money_item, get_money_items, post_money_acc, post_money_item
+    get_money_item, get_money_items, post_money_acc, post_money_acc_new, post_money_item
+from app import db
 
 money_bp = Blueprint('money_bp', __name__)
 
+
 @money_bp.route('/money', methods=['GET', 'POST'])
 def money():
+    message = request.args.get('message')
     accsums, moneydets = get_moneydets()
 
-    return render_template('money.html', accsums=accsums, moneydets=moneydets)
+    return render_template('money.html', accsums=accsums, moneydets=moneydets, message=message)
 
 
 @money_bp.route('/money_acc/<int:acc_id>', methods=['GET', 'POST'])
 @login_required
 def money_acc(acc_id):
+    message = request.args.get('message')
     if request.method == "POST":
-        acc_id = post_money_acc(acc_id)
-        return redirect('/money_acc/{}'.format(acc_id))
+        try:
+            acc_id = post_money_acc(acc_id)
+        except Exception as ex:
+            message = f"Error posting new money account. Database rolled back. Error: {str(ex)}"
+            db.sesssion.rollback()
+        return redirect(url_for('money_bp.money_acc', acc_id=acc_id, message=message))
     moneyacc = get_money_acc(acc_id)
 
-    return render_template('money_acc.html', moneyacc=moneyacc)
+    return render_template('money_acc.html', moneyacc=moneyacc, message=message)
+
+
+@money_bp.route('/money_acc_new', methods=['GET', 'POST'])
+@login_required
+def money_acc_new():
+    if request.method == "POST":
+        try:
+            acc_id = post_money_acc_new()
+            message = 'New account created successfully.'
+            return redirect(url_for('money_bp.money', acc_id=acc_id, message=message))
+        except Exception as ex:
+            message = f"Error posting new money account. Database rolled back. Error: {str(ex)}"
+            db.sesssion.rollback()
+            return redirect(url_for('money_bp.money', message=message))
+    return render_template('money_acc.html')
 
 
 @money_bp.route('/money_deduce/<int:item_id>/<mode>', methods=['GET', 'POST'])

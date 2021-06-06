@@ -124,7 +124,7 @@
     btn_class="btn btn-block btn-success button-icon arrow-right",
     btn_on_click="on_sending_clicked()",
     btn_text="send email",
-    btn_url=url_for('pr_bp.pr_send_email'),
+    btn_url=url_for('pr_bp.pr_send_email', pr_id=pr_file.id),
     form="true",
     title="send email"
     ) }}

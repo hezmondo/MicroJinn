@@ -5,6 +5,7 @@ from app.main.income import get_income_dict, get_incomes
 
 income_bp = Blueprint('income_bp', __name__)
 
+
 @income_bp.route('/income/<int:acc_id>', methods=['GET', 'POST'])
 def income(acc_id):
     # display recent income postings for money account id or (if 0) for all accounts
@@ -13,6 +14,7 @@ def income(acc_id):
     income_dict = get_income_dict("basic")
 
     return render_template('income.html', income_dict=income_dict, incomes=incomes, incomevals=incomevals)
+
 
 @income_bp.route('/income_item/<int:income_id>', methods=['GET', 'POST'])
 @login_required

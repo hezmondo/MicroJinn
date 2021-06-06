@@ -148,18 +148,27 @@ def get_money_items(acc_id): # we assemble income items and money items into one
 
 
 def post_money_acc(acc_id):
-    # new moneyaccount:
-    if acc_id == 0:
-        moneyacc = MoneyAcc()
-    else:
-        # existing moneyaccount:
-        moneyacc = MoneyAcc.query.get(acc_id)
+    moneyacc = MoneyAcc.query.get(acc_id)
     moneyacc.bank_name = request.form.get("bank_name")
     moneyacc.acc_name = request.form.get("acc_name")
     moneyacc.sort_code = request.form.get("sort_code")
     moneyacc.acc_num = request.form.get("acc_num")
     acc_desc = request.form.get("acc_desc")
     moneyacc.acc_desc = acc_desc
+    db.session.add(moneyacc)
+    db.session.flush()
+    acc_id = moneyacc.id
+    commit_to_database()
+    return acc_id
+
+
+def post_money_acc_new():
+    moneyacc = MoneyAcc()
+    moneyacc.bank_name = request.form.get("bank_name")
+    moneyacc.acc_name = request.form.get("acc_name")
+    moneyacc.sort_code = request.form.get("sort_code")
+    moneyacc.acc_num = request.form.get("acc_num")
+    moneyacc.acc_desc = request.form.get("acc_desc")
     db.session.add(moneyacc)
     db.session.flush()
     acc_id = moneyacc.id

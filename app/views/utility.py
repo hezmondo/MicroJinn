@@ -1,12 +1,13 @@
 import json
+from app import app
 from flask import Blueprint, redirect, render_template, request, url_for, current_app
 from flask_login import login_required
-from app.dao.action import delete_action, get_actions, resolve_action
+from app.dao.action import delete_action, delete_actions, get_actions, resolve_action
 from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.dao.database import rollback_database
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
-from app.email import test_email_connect, test_send_email
+from app.email import app_send_email, test_email_connect, test_send_email
 from app.main.property import mget_properties_dict, mget_filter, mget_property, mget_properties_from_filter, mget_properties_all, \
     mget_properties_from_rent_id, mpost_new_property, mpost_property
 
@@ -24,8 +25,15 @@ def action_link(url):
 @util_bp.route('/action_delete/<int:action_id>', methods=["GET", "POST"])
 @login_required
 def action_delete(action_id):
-    delete_action(action_id)
-    return redirect(url_for('util_bp.actions'))
+    message = ''
+    try:
+        if action_id == 0:
+            delete_actions()
+        else:
+            delete_action(action_id)
+    except Exception as ex:
+        message = f'Unable to clear action(s). Error: {str(ex)}'
+    return redirect(url_for('util_bp.actions', message=message))
 
 
 @util_bp.route('/action_resolve/<int:action_id>', methods=["GET", "POST"])
@@ -90,6 +98,17 @@ def email_accs():
     emailaccs = get_email_accs()
 
     return render_template('email_accs.html', emailaccs=emailaccs)
+
+
+@util_bp.route('/email_submit_error', methods=["GET", "POST"])
+@login_required
+def email_submit_error():
+    appmail = current_app.extensions['mail']
+    html_body = request.args.get('body')
+    subject = 'Test error'
+    recipients = app.config['ADMINS']
+    response = app_send_email(appmail, recipients, subject, html_body)
+    return render_template('utilities.html', message=response)
 
 
 @util_bp.route('/landlord/<int:landlord_id>', methods=['GET', 'POST'])
@@ -200,5 +219,4 @@ def test_emailing_send():
 @util_bp.route('/utilities', methods=['GET', 'POST'])
 @login_required
 def utilities():
-
     return render_template('utilities.html')

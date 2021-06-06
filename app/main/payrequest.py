@@ -11,9 +11,11 @@ from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
 from app.dao.doc import convert_html_to_pdf
 from app.dao.form_letter import get_email_form_by_code, get_pr_form
-from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, \
-    get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, prepare_new_pr_history_entry_x, add_pr_charge
+from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
+    get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, prepare_new_pr_history_entry_x, \
+    post_updated_payrequest_delivery, add_pr_charge
 from app.dao.common import delete_record_basic
+from app.dao.rent import get_rentcode
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_rent_strings, update_roll_rent, update_rollback_rent
 from app.main.common import inc_date_m
@@ -258,7 +260,10 @@ def save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id):
     if charge_id or case_created:
         add_pr_charge(pr_id, charge_id, case_created)
     # save action to actions table
-    action_str = 'Pay request for rent ' + str(rent_id) + ' totalling ' + str(pr_history_data.get('tot_due')) + ' saved'
+    # TODO: Check with Hez - is it worth an extra db query to get the rentcode to display to the user rather than
+    #  rent_id - get_rentcode(rent_id)
+    action_str = 'Pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
+                 moneyToStr(pr_history_data.get('tot_due'), pound=True) + ' saved'
     add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
     commit_to_database()
     return pr_id
@@ -296,14 +301,20 @@ def undo_pr(pr_id):
         altered_arrears = rentobj.arrears - rent_gale
         update_rollback_rent(rent_id, altered_arrears)
         # save action to actions table
-        action_str = 'pay request for rent ' + str(rent_id) + ' totalling ' + str(
-        pr_file.total_due) + ' has been undone'
+        action_str = 'pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
+                     moneyToStr(pr_file.total_due, pound=True) + ' has been undone'
         add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         commit_to_database()
         message = "Pay request undone!"
     except Exception as err:
         return type(err), rent_id
     return message, rent_id
+
+
+def update_pr_delivered(pr_id):
+    pr_file = get_pr_history_row(pr_id)
+    if (not pr_file.delivered) and pr_file.delivery_method == 2:  # post delivery
+        post_updated_payrequest_delivery(True, pr_file)
 
 
 def write_payrequest(rent_id, pr_form_id):

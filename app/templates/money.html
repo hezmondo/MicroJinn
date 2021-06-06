@@ -1,11 +1,13 @@
 <!-- /templates/money.html  -->
 {% extends 'base.html' %}
 
+{% import 'widgets.html' as widgets %}
+
 {% block app_content %}
 <form method="POST" id="money_form">
     <div class="form-group row flex-row-reverse">
         <div class="col-md-3">
-            <a href="{{ url_for('money_bp.money_acc', acc_id=0) }}"
+            <a href="{{ url_for('money_bp.money_acc_new') }}"
                class="btn btn-block btn-danger button-icon plus" role="button">add new account</a>
         </div>
         <div class="col-md-3">

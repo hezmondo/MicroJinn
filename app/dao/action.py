@@ -23,6 +23,11 @@ def delete_action(action_id):
     db.session.commit()
 
 
+def delete_actions():
+    Action.query.delete()
+    db.session.commit()
+
+
 def resolve_action(action_id):
     action = get_action(action_id)
     action.alert = False

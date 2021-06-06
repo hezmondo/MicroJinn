@@ -36,6 +36,11 @@ def get_rent(rent_id):  # returns all Rent member variables plus associated item
     return rent
 
 
+def get_rentcode(rent_id):
+    rent = db.session.query(Rent).filter_by(id=rent_id).options(load_only('rentcode')).one_or_none()
+    return rent.rentcode
+
+
 def get_rent_md(rent_id):  # returns 5 Rent member variables as a mutable dict for mail_dialog
     return db.session.query(Rent) \
         .filter_by(id=rent_id).options(load_only('id', 'agent_id', 'datecode_id',

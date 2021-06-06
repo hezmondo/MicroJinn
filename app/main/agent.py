@@ -16,7 +16,8 @@ def mget_agents_dict():
 def mget_agents_from_search():
     fdict, filtr = mget_agents_filter()
     # if the user searches but leaves all search fields empty, the results will display the recent agents
-    agents = mget_agents_from_recent() if all(value == '' for value in fdict.values()) else get_agents_from_filter(filtr)
+    agents = mget_agents_from_recent() if all(value == '' for value in fdict.values()) else get_agents_from_filter(
+        filtr)
     return agents, fdict
 
 
@@ -40,33 +41,27 @@ def mget_agents_filter():
 
 def mget_agents_recent_filter():
     list = get_idlist_recent("recent_agents")
-    filtr =[Agent.id.in_(list)]
+    filtr = [Agent.id.in_(list)]
     return filtr, list
 
 
 def delete_agent(agent_id, rent_id=0):
-    message = ""
-    try:
-        if rent_id != 0:
-            set_rent_agent_unlink(rent_id)
-            message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
-        delete_record(agent_id, 'agent')
-        message += "The agent has been deleted. "
-    except Exception as ex:
-        message = f"Error deleting agent: {str(ex)}"
+    message = ''
+    if rent_id != 0:
+        set_rent_agent_unlink(rent_id)
+        message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
+    delete_record(agent_id, 'agent')
+    message += "The agent has been deleted. "
     return message
 
 
 def delete_agent_headrent(agent_id, headrent_id=0):
     message = ""
-    try:
-        if headrent_id != 0:
-            set_headrent_agent_unlink(headrent_id)
-            message = "This headrent no longer has a agent. "
-        delete_record(agent_id, 'agent')
-        message += "The agent has been deleted. "
-    except Exception as ex:
-        message = f"Error deleting agent: {str(ex)}"
+    if headrent_id != 0:
+        set_headrent_agent_unlink(headrent_id)
+        message = "This headrent no longer has a agent. "
+    delete_record(agent_id, 'agent')
+    message += "The agent has been deleted. "
     return message
 
 
@@ -93,13 +88,10 @@ def prepare_agent_template(agent_id):
 
 
 def select_new_agent(agent_id, rent_id):
-    try:
-        set_rent_agent(agent_id, rent_id)
-        commit_to_database()
-        message = "Success! This rent has been linked to a new agent. Mail is set to agent. " \
-                  "Please review the rent\'s mail address."
-    except Exception as ex:
-        message = f'Unable to update rent. Database write failed with error: {str(ex)}'
+    set_rent_agent(agent_id, rent_id)
+    commit_to_database()
+    message = "Success! This rent has been linked to a new agent. Mail is set to agent. " \
+              "Please review the rent\'s mail address."
     return message
 
 
@@ -124,27 +116,22 @@ def set_rent_agent(agent_id, rent_id):
 
 
 def update_agent(agent_id, rent_id=0):
-    try:
-        agent = Agent() if agent_id == 0 else get_agent(agent_id)
-        agent = populate_agent_from_form(agent)
-        agent_id = add_agent(agent)
-        message = "Agent details updated successfully! "
-        if rent_id != 0:
-            set_rent_agent(agent_id, rent_id)
-            message += "Mail has been set to agent. Please review this rent\'s mail-to details."
-        commit_to_database()
-        # update the user recent_agents to include a newly created agent (after we have done the main database work)
-        pop_idlist_recent("recent_agents", agent_id)
-    except Exception as ex:
-        message = f"Update agent failed. Error:  {str(ex)}"
+    agent = Agent() if agent_id == 0 else get_agent(agent_id)
+    agent = populate_agent_from_form(agent)
+    agent_id = add_agent(agent)
+    message = "Agent details updated successfully! "
+    if rent_id != 0:
+        set_rent_agent(agent_id, rent_id)
+        message += "Mail has been set to agent. Please review this rent\'s mail-to details."
+    commit_to_database()
+    # update the user recent_agents to include a newly created agent (after we have done the main database work)
+    pop_idlist_recent("recent_agents", agent_id)
+
     return agent_id, message
 
 
 def unlink_agent_from_rent(rent_id):
-    try:
-        set_rent_agent_unlink(rent_id)
-        commit_to_database()
-        message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
-    except Exception as ex:
-        message = f"Error deleting agent: {str(ex)}"
+    set_rent_agent_unlink(rent_id)
+    commit_to_database()
+    message = "This rent no longer has a agent. Mail has been set to tenant name at the property. "
     return message

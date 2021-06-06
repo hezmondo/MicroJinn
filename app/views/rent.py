@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required
+from app import db
 from app.dao.common import get_filters
 from app.dao.rent import get_rent_external
 from app.main.common import get_combodict_filter, get_combodict_rent
@@ -95,6 +96,6 @@ def rent_update(rent_id):
         elif action == 'rent':
             update_rent_rem(rent_id)
     except Exception as ex:
-        message = f"Update rent failed. Error:  {str(ex)}"
-
+        message = f"Update rent failed. Database rolled back. Error:  {str(ex)}"
+        db.session.rollback()
     return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))

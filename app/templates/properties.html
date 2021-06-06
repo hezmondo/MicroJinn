@@ -208,12 +208,12 @@
 
 <!--If there is no error message, we show the new property modal on page load if a user has come from
 rent without a property. We show the edit property modal if the user has come from rent with only 1 property.-->
-{% block message_on_load %}
+<!--{% block message_on_load %}
 {% if messages %}
 {{ widgets.modal_error_message_on_load(messages=messages) }}
 {% elif action == 'create_new' %}
 {{ widgets.modal_on_load_js(modal_id="new_property_modal") }}
 {% elif action == 'edit' %}
 {{ widgets.modal_on_load_js(modal_id='property_modal_' ~ properties[0].id) }}
-{% endif %}
+{% endif %}-->
 {% endblock %}
