@@ -15,13 +15,6 @@ import os
 pr_bp = Blueprint('pr_bp', __name__)
 
 
-@pr_bp.route('/pr_dialog/<int:rent_id>', methods=["GET", "POST"])
-@login_required
-def pr_dialog(rent_id):
-    pr_forms = get_pr_forms()
-    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
-
-
 @pr_bp.route('/pr_delivery/<int:pr_id>', methods=["GET", "POST"])
 @login_required
 def pr_delivery(pr_id):
@@ -34,7 +27,15 @@ def pr_delivery(pr_id):
         message = 'Pay request ' + str(pr_id) + string
     except Exception as ex:
         message = f"Unable to update pay request delivery. Database rolled back. Error: {str(ex)}"
+        db.session.rollback()
     return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
+
+
+@pr_bp.route('/pr_dialog/<int:rent_id>', methods=["GET", "POST"])
+@login_required
+def pr_dialog(rent_id):
+    pr_forms = get_pr_forms()
+    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
 
 
 @pr_bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])

@@ -228,7 +228,13 @@
                         <p>
                         Please find enclosed my/our cheque/PO for {{
                         money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }}
-                        to pay {{ rent_pr.landlord.manager.managername }} %ExtraRentStat% for property:
+                        to pay {{ rent_pr.rent_type }} from {% if rent_pr.arrears %}
+                            {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} {% else %} {{ rent_pr.next_gale_start.strftime('%d-%b-%Y') }}
+                            {% endif %} to {{ rent_pr.arrears_end_date_1.strftime('%d-%b-%Y') }}
+                            {% if rent_pr.charges or (rent_pr.recovery_charge_amount > 0) %} plus other
+                            charges as set out above {% endif %} (or {{ money_str(rent_pr.rent_gale +
+                            rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }} if you wish to pay
+                            an additional period of rent) for property:
                         {% for addr in rent_pr.propaddrs %}
                             {{ addr.propaddr }}
                         {% endfor %}
