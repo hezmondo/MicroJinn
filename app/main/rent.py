@@ -126,6 +126,40 @@ def get_rentp(rent_id):
     return rent
 
 
+def get_pr_strings(rent_pr):
+    return {'#advarr#': rent_pr.advarrdet,
+            '#arrears#': moneyToStr(rent_pr.arrears, pound=True),
+            '#arrears_start_date#': dateToStr(rent_pr.arrears_start_date),
+            '#arrears_end_date#': dateToStr(rent_pr.arrears_end_date),
+            '#landlord_name#': rent_pr.landlord.name,
+            '#lastrentdate#': dateToStr(rent_pr.lastrentdate),
+            '#manageraddr#': rent_pr.landlord.manager.manageraddr,
+            '#nextrentdate#': dateToStr(rent_pr.nextrentdate),
+            '#paidtodate#': dateToStr(rent_pr.paidtodate),
+            '#periodly#': rent_pr.freqdet,
+            '#price_quote#': moneyToStr(rent_pr.price_quote, pound=True),
+            '#propaddr#': '; '.join(each.propaddr.strip() for each in rent_pr.propaddrs),
+            '#rentcode#': rent_pr.rentcode,
+            '#rentgale#': moneyToStr(rent_pr.rent_gale, pound=True),
+            '#rentpa#': moneyToStr(rent_pr.rentpa, pound=True),
+            '#rent_type#': rent_pr.rent_type,
+            '#totcharges#': moneyToStr(rent_pr.totcharges, pound=True),
+            '#totdue#': moneyToStr(rent_pr.arrears + rent_pr.totcharges + rent_pr.rent_gale, pound=True),
+            '#acc_name#': rent_pr.landlord.money_account.acc_name,
+            '#acc_num#': rent_pr.landlord.money_account.acc_num,
+            '#arrearsenddate_plus1#': dateToStr(rent_pr.arrears_end_date_1),
+            '#bank_name#': rent_pr.landlord.money_account.bank_name,
+            '#manageraddr2#': rent_pr.landlord.manager.manageraddr2,
+            '#managername#': rent_pr.landlord.manager.managername,
+            '#next_gale_start#': dateToStr(rent_pr.next_gale_start),
+            # '#nextrentdate_plus1#': dateToStr(inc_date_m(rent_pr.lastrentdate,
+            #                                              rent_pr.freq_id, rent_pr.datecode_id, 2)),
+            '#pay_date#': dateToStr(rent_pr.pay_date),
+            '#sort_code#': rent_pr.landlord.money_account.sort_code,
+            '#tenantname#': rent_pr.tenantname,
+            '#today#': dateToStr(date.today())}
+
+
 def get_rent_strings(rent, type='mail'):
     # this function creates strings needed for mail, pay requests
     # first we test and manipulate certain items from rent
@@ -361,7 +395,7 @@ def rent_validation(rent, message=""):
         action_message = action_message + 'No valid mail address'
     if action_message:
         # save alert to actions table
-        action_str = 'Rent '+ rent.rentcode + ': ' + action_message
+        action_str = 'Rent ' + rent.rentcode + ': ' + action_message
         add_action(3, 1, action_str, 'rent_bp.rent', {'rent_id': rent.id})
         commit_to_database()
     return messages

@@ -7,8 +7,8 @@ from app.dao.rent import get_rentcode
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, \
     post_updated_payrequest_delivery
-from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, serialize_pr_save_data, save_new_payrequest, \
-    save_new_payrequest_x, undo_pr, write_payrequest, write_payrequest_x, write_payrequest_email
+from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, \
+    save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
 from app.dao.doc import convert_html_to_pdf
 import os
 
@@ -43,16 +43,12 @@ def pr_dialog(rent_id):
 def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
-        block, pr_save_data, rent_pr, subject, table_rows = write_payrequest(rent_id, pr_form_id)
-        # TODO: what property address do we use for rents with multiple properties if not the agent address?
-        # propaddr = '; '.join(each.propaddr.strip() for each in rent_pr.propaddrs)
-        if not rent_pr.mailaddr:
-            message = 'Cannot complete payrequest, Please update mail address.'
-            return redirect(url_for('rent_bp.rent', rent_id=rent_id, message=message))
-        pr_save_data = serialize_pr_save_data(pr_save_data)
-        return render_template('mergedocs/PR.html', pr_save_data=pr_save_data,
-                               block=block, rent_pr=rent_pr, subject=subject,
-                               table_rows=table_rows)
+        try:
+            block, block_email, rent_pr, subject = write_payrequest(rent_id, pr_form_id)
+            return render_template('mergedocs/PR.html', block=block, block_email=block_email, rent_pr=rent_pr, subject=subject)
+        except Exception as ex:
+            message = f'Unable to write the pay request. Error: {str(ex)}'
+            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
 @pr_bp.route('/pr_edit_xray/<int:pr_form_id>', methods=["GET", "POST"])
@@ -68,11 +64,9 @@ def pr_edit_xray(pr_form_id):
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
 
 
-# TODO: remove email method or update pr creation via doReplace
 @pr_bp.route('/pr_file/<int:pr_id>', methods=['GET', 'POST'])
 @login_required
 def pr_file(pr_id):
-    method = request.args.get('method', type=str)
     if request.method == "POST":
         try:
             block = request.form.get('xinput').replace("£", "&pound;")
@@ -86,10 +80,6 @@ def pr_file(pr_id):
     message = request.args.get('message', type=str)
     can_undo = request.args.get('can_undo', False, type=bool)
     pr_file = get_pr_file(pr_id)
-    if method == 'email':
-        pr_save_data = json.loads(request.args.get('pr_save_data'))
-        email_block = write_payrequest_email(pr_save_data)
-        return render_template('pr_file.html', email_block=email_block, method=method, pr_file=pr_file)
     return render_template('pr_file.html', pr_file=pr_file, can_undo=can_undo, message=message)
 
 
@@ -99,21 +89,6 @@ def pr_history(rent_id):
     message = request.args.get('message', type=str)
     pr_history = get_pr_history(rent_id)
     return render_template('pr_history.html', rent_id=rent_id, pr_history=pr_history, message=message)
-
-
-# @bp.route('/pr_main/<int:id>', methods=['GET', 'POST'])
-# @login_required
-# def pr_main(id):
-#     actypes, floads, options, prdeliveries, salegradedets = get_queryoptions_advanced()
-#     landlords, statusdets, tenuredets = get_queryoptions_common()
-#     if id == 0:
-#         rentprops = get_rentobjs_filter(1)
-#     else:
-#         rentprops = get_rentobjs_filter(id)
-#
-#     return render_template('pr_main.html', actypes=actypes, floads=floads, options=options,
-#                            prdeliveries=prdeliveries, salegradedets=salegradedets, landlords=landlords,
-#                            statusdets=statusdets, tenuredets=tenuredets, rentprops=rentprops)
 
 
 @pr_bp.route('/pr_print/pay_request_<int:pr_id>', methods=['GET', 'POST'])
@@ -136,25 +111,12 @@ def pr_print(pr_id):
 @login_required
 def pr_save_send():
     method = request.args.get('method', type=str)
-    if request.method == 'POST':
-        pr_id, pr_save_data, rent_id = save_new_payrequest(method)
-        if method == 'post':
-            return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
-        else:
-            pr_save_data = serialize_pr_save_data(pr_save_data)
-            return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, pr_save_data=pr_save_data, method='email'))
-
-
-@pr_bp.route('/pr_save_send_x', methods=['GET', 'POST'])
-@login_required
-def pr_save_send_x():
-    method = request.args.get('method', type=str)
     rent_id = request.args.get('rent_id', type=int)
     if request.method == 'POST':
         pr_history_data = collect_pr_history_data()
         pr_rent_data = collect_pr_rent_data()
         try:
-            pr_id = save_new_payrequest_x(method, pr_history_data, pr_rent_data, rent_id)
+            pr_id = save_new_payrequest(method, pr_history_data, pr_rent_data, rent_id)
         except Exception as ex:
             message = f'Cannot save pay request. Database rolled back. Error:  {str(ex)}'
             db.session.rollback()
