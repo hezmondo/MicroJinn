@@ -1,0 +1,132 @@
+<!-- pay request owings table -->
+{% macro owings_table(rent_pr) -%}
+<div id="owings_div">
+    <table class="pr_table" style="border-collapse: collapse;
+                        width: 100%; border-radius: 5px; margin-left: auto; margin-right: auto;">
+        <colgroup>
+            <col style="width:80%;">
+            <col style="width:20%">
+        </colgroup>
+        <tr style="background-color: #86A9DC; color: white; font-weight: bold;">
+            <td style="width:80%; font-size:10.5pt; padding-top:5px; padding-left:5px;">Details</td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;">Amount
+            </td>
+        </tr>
+        {% if rent_pr.rent_gale %}
+        <tr>
+            <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;"><span>
+                                    {{ rent_pr.freqdet.capitalize() }} {{ rent_pr.rent_type }} due and payable
+                                    {{ rent_pr.advarrdet }} on {{ rent_pr.nextrentdate.strftime('%d-%b-%Y') }}:</span>
+            </td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;" class="amount_class">
+                {{ money_str(rent_pr.rent_gale, pound=True) }}
+            </td>
+        </tr>
+        {% endif %}
+        {% if rent_pr.arrears %}
+        <tr>
+            <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">Unpaid
+                {{ rent_pr.rent_type }} is owing for the period
+                {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} to
+                {{ rent_pr.arrears_end_date.strftime('%d-%b-%Y') }}:
+            </td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;" class="amount_class">
+                {{ money_str(rent_pr.arrears, pound=True) }}
+            </td>
+        </tr>
+        {% endif %}
+        {% if rent_pr.charges %}
+        {% for charge in rent_pr.charges %}
+        <tr>
+            <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
+                {{ charge.chargetype.chargedesc.capitalize() }} added on
+                {{ charge.chargestartdate.strftime('%d-%b-%Y') }}:
+            </td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;" class="amount_class">
+                {{ money_str(charge.chargetotal, pound=True) }}
+            </td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+        {% if rent_pr.recovery_charge_amount > 0 %}
+        <tr>
+            <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
+                Recovery costs added on {{ today_date.strftime('%d-%b-%Y') }}:
+            </td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;" class="amount_class">
+                {{ money_str(rent_pr.recovery_charge_amount, pound=True) }}
+            </td>
+        </tr>
+        {% endif %}
+        <tr class="total" style="font-weight: bold; background-color:#e3e3e3;">
+            <td style="width:80%; padding-top:5px; padding-left:5px; font-size:10.5pt;">
+                The total amount payable is:
+            </td>
+            <td style="width:20%; font-size:10.5pt; padding-top:5px; padding-right: 10px;
+                                text-align: right;" class="amount_class">
+                {{ money_str(rent_pr.rent_gale + rent_pr.arrears +
+                rent_pr.totcharges, pound=True) }}
+            </td>
+        </tr>
+    </table>
+</div>
+{%- endmacro %}
+
+<!-- pay request bottom payment advice slip -->
+{% macro payment_advice(rent_pr) -%}
+<div align="center">
+    <p>
+        <b>PAYMENT ADVICE - {{ today_date.strftime('%d-%b-%Y') }} - Ref: {{ rent_pr.rentcode }}</b>
+        <br/>
+        Please return this section with your payment
+    </p>
+</div>
+<p>
+    Please find enclosed my/our cheque/PO for {{
+    money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }}
+    to pay {{ rent_pr.rent_type }} from {% if rent_pr.arrears %}
+    {{ rent_pr.arrears_start_date.strftime('%d-%b-%Y') }} {% else %} {{
+    rent_pr.next_gale_start.strftime('%d-%b-%Y') }}
+    {% endif %} to {{ rent_pr.arrears_end_date_1.strftime('%d-%b-%Y') }}
+    {% if rent_pr.charges or (rent_pr.recovery_charge_amount > 0) %} plus other
+    charges as set out above {% endif %} (or {{ money_str(rent_pr.rent_gale +
+    rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }} if you wish to pay
+    an additional period of rent) for property:
+    {% for addr in rent_pr.propaddrs %}
+    {{ addr.propaddr }}
+    {% endfor %}
+</p>
+{%- endmacro %}
+
+<!-- pay request xray arrears clause -->
+{% macro arrears_clause(rent_pr) -%}
+<p>
+    {% if rent_pr.suffix == 'ARC1' %}
+    Recovery charges have been added to your account because {{ rent_pr.rent_type }} was not paid when
+    due for at least two prior rent dates. If this account has not been paid in full within 35 days then
+    further charges of not less than £34.95 will be added to cover our costs in respect of immediate legal
+    proceedings to recover the unpaid amounts owing on this property.
+    {% elif rent_pr.suffix == 'ARC2' %}
+    Further recovery charges have been added to your account because {{ rent_pr.rent_type }} was not
+    paid when due for at least two prior rent dates. If this account has not been paid in full within 35
+    days then further charges of not less than £34.95 will be added to cover our costs in respect of immediate
+    legal proceedings to recover the unpaid amounts owing on this property.
+    {% elif rent_pr.suffix == 'ARW' %}
+    {{ rent_pr.rent_type.capitalize() }} is outstanding from prior periods. If this account has not been
+    paid in full within 35 days, an administration charge of not less than £20 will be made to pay for initial
+    investigation at the Land Registry to identify any parties to be informed prior to legal proceedings to
+    recover the unpaid amounts owing on this property.
+    {% elif rent_pr.suffix == 'ZERACH' %}
+    Charges as listed above have been owing for more than 90 days. If this account has not been paid in full within 35
+    days,
+    an administration fee of not less than £20 will be charged to pay for initial investigation at the
+    Land Registry to identify any parties to be informed prior to legal proceedings
+    to recover the unpaid amounts owing on this property.
+    {% endif %}
+</p>
+{%- endmacro %}
