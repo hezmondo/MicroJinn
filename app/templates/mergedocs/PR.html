@@ -23,6 +23,13 @@
                 ('The owner/occupier, ' + rent_pr.propaddrs[0].propaddr)], item_selected=rent_pr.mailaddr) }}
             </div>
             <div id="doc_html" contenteditable="false">
+                <!-- font-size recognised by the pdf creation code -->
+                <style>
+                    p
+                    {
+                        font-size: 10.5pt;
+                    }
+                </style>
                 <div id="manager_div" contenteditable="true">
                     <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
                         <b>{{ rent_pr.landlord.manager.managername }}</b>
@@ -56,19 +63,14 @@
                 </div>
                 <div class="font-size-medium" align="left" contenteditable="true">
                     {{ pr_widgets.owings_table(rent_pr) }}
-                    <style>
-                        p
-                        {
-                            font-size: 10.5pt;
-                        }
-                    </style>
-                    <p>{{ widgets.linebreaks_for_string(block) }}</p>
                     <p>
-                    <hr class="hr-thick"/>
-                    {{ pr_widgets.payment_advice(rent_pr) }}
-                    <br/>
-                    <br/>
+                        {{ widgets.linebreaks_for_string(block) }}
                     </p>
+                    {{ pr_widgets.payment_advice(rent_pr) }}
+                    <br />
+                    <br />
+                    <p style="page-break-before: always"></p>
+                    {{ pr_widgets.pr_s166(rent_pr) }}
                 </div>
             </div>
         </div>
