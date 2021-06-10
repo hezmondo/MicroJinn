@@ -167,6 +167,30 @@ def save_new_payrequest(method, pr_history_data, pr_rent_data, rent_id):
     return pr_id
 
 
+def save_new_payrequest_from_batch(html, rent_pr):
+    pr_history_data = {'block': html,
+                       'mailaddr': rent_pr.mailaddr,
+                       'pr_code': rent_pr.pr_code,
+                       'rent_date': rent_pr.nextrentdate.strftime("%Y-%m-%d"),
+                       'tot_due': rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges,
+                       'new_arrears_level': rent_pr.new_arrears_level,
+                       'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
+                       'charge_total': rent_pr.recovery_charge_amount}
+    pr_history = prepare_new_pr_history_entry(pr_history_data, rent_pr.id, 'post')
+    pr_id = add_pr_history(pr_history)
+    pr_rent_data = {'rent_date': rent_pr.nextrentdate.strftime("%Y-%m-%d"),
+                    'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
+                    'charge_total': rent_pr.recovery_charge_amount}
+    case_created, charge_id = forward_rent_case_and_charges(pr_id, pr_rent_data, rent_pr.id)
+    if charge_id or case_created:
+        add_pr_charge(pr_id, charge_id, case_created)
+    action_str = 'Pay request for rent ' + get_rentcode(rent_pr.id) + ' totalling ' + \
+                 moneyToStr(pr_history_data.get('tot_due'), pound=True) + ' saved'
+    add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_pr.id})
+    commit_to_database()
+    return pr_id
+
+
 def undo_pr(pr_id):
     pr_file = get_pr_file(pr_id)
     rent_id = pr_file.rent_id

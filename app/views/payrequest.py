@@ -7,7 +7,7 @@ from app.dao.rent import get_rentcode
 from app.dao.form_letter import get_pr_forms
 from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, \
     post_updated_payrequest_delivery
-from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, \
+from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, save_new_payrequest_from_batch, \
     save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
 from app.dao.doc import convert_html_to_pdf
 import os
@@ -105,6 +105,34 @@ def pr_print(pr_id):
     except Exception as ex:
         message = f'Unable to produce pay request. Error: {str(ex)}'
         return redirect(url_for('pr_bp.file', pr_id=pr_id, message=message))
+
+
+# Test - Produces pay requests for rents 1 - 100. Pdf saved in jinn\app\temp_files
+@pr_bp.route('/pr_test<int:rent_id>', methods=['GET', 'POST'])
+def pr_test(rent_id):
+    html_tot = ''
+    for rent_ids in range(1, 100):
+        block, block_email, rent_pr, subject = write_payrequest(rent_ids, 15)
+        if rent_pr.mailaddr:
+            html = render_template('mergedocs/PR_template.html', block=block, rent_pr=rent_pr, subject=subject)
+            html_tot = html_tot + html + "<p style='page-break-before: always'></p>"
+            save_new_payrequest_from_batch(html, rent_pr)
+    convert_html_to_pdf(html_tot, 'pr.pdf')
+    return redirect(url_for('util_bp.actions'))
+
+
+# Test - Produces pay requests for rents 1 - 100 using PRX. Pdf saved in jinn\app\temp_files
+@pr_bp.route('/prx_test<int:rent_id>', methods=['GET', 'POST'])
+def prx_test(rent_id):
+    html_tot = ''
+    for rent_ids in range(1, 100):
+        rent_pr = write_payrequest_x(rent_ids, 19)
+        if rent_pr.mailaddr:
+            html = render_template('mergedocs/PRX_template.html', rent_pr=rent_pr)
+            html_tot = html_tot + html + "<p style='page-break-before: always'></p>"
+            save_new_payrequest_from_batch(html, rent_pr)
+    convert_html_to_pdf(html_tot, 'pr.pdf')
+    return redirect(url_for('util_bp.actions'))
 
 
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
