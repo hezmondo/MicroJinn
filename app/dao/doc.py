@@ -4,6 +4,7 @@ from xhtml2pdf import pisa
 from app import db
 from flask import request
 from sqlalchemy import desc, literal
+from sqlalchemy.orm import load_only
 from werkzeug.utils import secure_filename
 from app.models import DigFile, DocFile, Rent, TypeDoc
 from app.dao.database import commit_to_database
@@ -122,16 +123,24 @@ def get_docfiles(rent_id):
             .join(Rent) \
             .join(TypeDoc) \
             .with_entities(DocFile.id, DocFile.doc_date, DocFile.summary, literal("doc").label('doc_dig'),
-                           DocFile.doc_text.label('doctext'), TypeDoc.desc, DocFile.out_in, Rent.rentcode) \
+                           DocFile.doc_text.label('doctext'), DocFile.rent_id, TypeDoc.desc, DocFile.out_in, Rent.rentcode) \
             .filter(*docfile_filter).union \
             (DigFile.query \
              .join(Rent) \
              .join(TypeDoc) \
              .with_entities(DigFile.id, DigFile.doc_date, DigFile.summary, literal("dig").label('doc_dig'),
-                            literal("Digitext").label('doctext'), TypeDoc.desc, DigFile.out_in, Rent.rentcode) \
+                            literal("Digitext").label('doctext'), DocFile.rent_id, TypeDoc.desc, DigFile.out_in, Rent.rentcode) \
              .filter(*digfile_filter)) \
             .order_by(desc(DocFile.doc_date), desc(DigFile.doc_date)).limit(100)
     return docfiles, dfoutin
+
+
+def get_docfile_text(doc_id):
+    return db.session.query(DocFile).filter_by(id=doc_id).options(load_only('doc_text')).one_or_none()
+
+
+def get_docfiles_text(rent_id):
+    return DocFile.query.filter_by(rent_id=rent_id)
 
 
 def upload_docfile(docfile):

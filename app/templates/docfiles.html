@@ -4,47 +4,161 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
+
+{% if rent_id != 0 %}
+<div class="form-group row flex-row-reverse">
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+    </div>
+</div>
+{% endif %}
+<div class="row">
+    <div class="col-md-9">
+        {% if docfiles %}
+        <div class="table-fixed" style="margin-bottom: 1.5rem;">
+            <table class="table" id="docfiles">
+                <thead>
+                <tr>
+                    <th style="width: 10.00%">date</th>
+                    <th style="width: 15.00%">rentcode</th>
+                    <th style="width: 39.00%">summary</th>
+                    <th style="width: 10.00%">doctype</th>
+                    <th style="width: 10.00%">doc or dig</th>
+                    <th style="width: 10.00%">out or in</th>
+                    <th style="width: 6.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in docfiles %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 10.00%" class="vertical-align"> {{ item.doc_date.strftime('%d-%b-%Y') if
+                        item.doc_date else 'none' }}
+                    </td>
+                    {% if rent_id == 0 %}
+                    <td style="width: 15.00%" class="vertical-align">
+                        <a href="{{ url_for('doc_bp.docfiles', rent_id=item.rent_id) }}"
+                           class="btn btn-block btn-teal-light btn-small button-icon letter"
+                           data-toggle="tooltip" title="view all {{ item.rentcode }}'s docfiles" role="button">
+                            {{ item.rentcode }}
+                        </a>
+                    </td>
+                    {% else %}
+                    <td style="width: 15.00%" class="vertical-align">{{ item.rentcode }}</td>
+                    {% endif %}
+                    <td style="width: 39.00%" class="vertical-align"> {{ item.summary }}</td>
+                    <td style="width: 10.00%" class="vertical-align"> {{ item.desc }}</td>
+                    <td style="width: 10.00%" class="vertical-align"> {{ item.doc_dig }}</td>
+                    <td style="width: 10.00%" class="vertical-align"> {{ item.out_in }}</td>
+                    <td style="width: 6.00%" class="vertical-align">
+                        <a href="{{ url_for('doc_bp.docfile', doc_id=item.id, doc_dig=item.doc_dig) }}"
+                           class="btn btn-teal-light btn-round button-icon round circles" data-toggle="tooltip"
+                           title="view docfile" role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="boxed boxed-center boxed-blue">
+            There are no documents for this rent.
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-3">
+        {% if rent_id == 0 %}
+        <div class="card card-white">
+            <div class="card-header">actions</div>
+            <div class="card-body text-primary">
+                <form method="POST" id="target">
+                    <div class="form-group row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
+                            <input type="text" class="form-control" name="summary" placeholder="summary">
+                            <input type="text" class="form-control" name="doc_text" placeholder="doc text">
+                            {{ widgets.combobox(name="doc_type", items=doc_types, item_selected=doc_types[0]) }}
+                            {{ widgets.combobox(name="out_in", items=outins, item_selected=dfoutin) }}
+                            <button style="margin-top:1rem;" type="submit"
+                                    class="btn btn-block btn-success button-icon search" role="button">search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="card card-white">
+            <div class="card-header">rent actions</div>
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
+                           class="btn btn-block btn-danger button-icon plus" role="button">new doc in</a>
+                        <a href="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=docfiles.rentcode) }}"
+                           class="btn btn-block btn-danger button-icon plus" role="button">new digfile</a>
+                        <a href="{{ url_for('doc_bp.docfiles_text', rent_id=rent_id) }}"
+                           class="btn btn-block btn-info button-icon circles" role="button">view all docfiles as text</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-white" style="margin-top:1rem;">
+            <div class="card-header">other actions</div>
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
+                           class="btn btn-block btn-primary button-icon circles" role="button">view all docfiles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!--
 <form method="POST" id="target">
     <div class="form-group row flex-row-reverse">
         {% if rent_id == 0 %}
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="rentcode" placeholder="rent code">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="summary" placeholder="summary">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" name="doc_text" placeholder="doc text">
-            </div>
-            <div class="col-md-2">
-                {{ widgets.combobox(name="doc_type", items=doc_types, item_selected=doc_types[0]) }}
-            </div>
-            <div class="col-md-2">
-                {{ widgets.combobox(name="out_in", items=outins, item_selected=dfoutin) }}
-            </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="rentcode" placeholder="rent code">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="summary" placeholder="summary">
+        </div>
+        <div class="col-md-2">
+            <input type="text" class="form-control" name="doc_text" placeholder="doc text">
+        </div>
+        <div class="col-md-2">
+            {{ widgets.combobox(name="doc_type", items=doc_types, item_selected=doc_types[0]) }}
+        </div>
+        <div class="col-md-2">
+            {{ widgets.combobox(name="out_in", items=outins, item_selected=dfoutin) }}
+        </div>
         {% else %}
-            <div class="col-md-3">
-                <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
-                   class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
-            </div>
-            <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
-                   class="btn btn-block btn-primary button-icon circles" role="button">view all docfiles</a>
-            </div>
-            <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
-                   class="btn btn-block btn-danger button-icon plus" role="button">new doc in</a>
-            </div>
-            <div class="col-md-2">
-                <a href="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=docfiles.rentcode) }}"
-                   class="btn btn-block btn-danger button-icon plus" role="button">new digfile</a>
-            </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=0) }}"
+               class="btn btn-block btn-primary button-icon circles" role="button">view all docfiles</a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
+               class="btn btn-block btn-danger button-icon plus" role="button">new doc in</a>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('doc_bp.upload_file', rent_id=rent_id, rentcode=docfiles.rentcode) }}"
+               class="btn btn-block btn-danger button-icon plus" role="button">new digfile</a>
+        </div>
         {% endif %}
     </div>
-  <div class="form-group row">
+    <div class="form-group row">
     </div>
     <div class="table-fixed">
         <table class="table" id="docfiles">
@@ -69,10 +183,11 @@
                 <td style="width: 10.00%"> {{ item.doc_dig }}</td>
                 <td style="width: 10.00%"> {{ item.out_in }}</td>
                 <td style="width: 10.00%" class="vertical-align"><a href="{{ url_for('doc_bp.docfile',
-                doc_id=item.id, doc_dig=item.doc_dig) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                doc_id=item.id, doc_dig=item.doc_dig) }}" class="btn btn-teal-light btn-round button-icon round circles"
+                                                                    role="button"></a>
             </tr>
             {% endfor %}
             </tbody>
         </table>
-    </div>
-{% endblock %}	
+    </div>-->
+{% endblock %}

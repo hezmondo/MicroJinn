@@ -1,10 +1,12 @@
-from flask import Blueprint, redirect, render_template, request, send_file, url_for, current_app
+from flask import Blueprint, redirect, render_template, request, send_file, url_for, current_app, send_from_directory
 from flask_login import login_required
 from io import BytesIO
 from app.dao.common import get_doc_types
-from app.dao.doc import get_digfile, get_docfile, get_docfiles, create_docfile_for_upload, upload_docfile, \
-    post_docfile, post_upload
+from app.dao.doc import convert_html_to_pdf, get_digfile, get_docfile, get_docfiles, get_docfiles_text, \
+    get_docfile_text, create_docfile_for_upload, upload_docfile, post_docfile, post_upload
 from app.email import app_send_email
+import os
+
 
 doc_bp = Blueprint('doc_bp', __name__)
 
@@ -27,6 +29,25 @@ def docfiles(rent_id):
     outins = ["all", "out", "in"]
     return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, doc_types=doc_types,
                            outins=outins)
+
+
+@doc_bp.route('/docfiles_text/<int:rent_id>', methods=['GET', 'POST'])
+def docfiles_text(rent_id):
+    docfiles = get_docfiles_text(rent_id)
+    return render_template('docfiles_text.html', docfiles=docfiles, rent_id=rent_id)
+
+
+@doc_bp.route('/doc_print/<int:doc_id>', methods=['GET', 'POST'])
+def doc_print(doc_id):
+    try:
+        docfile_text = get_docfile_text(doc_id)
+        convert_html_to_pdf(docfile_text.doc_text, 'document.pdf')
+        workingdir = os.path.abspath(os.getcwd())
+        filepath = workingdir + '\\app\\temp_files\\'
+        return send_from_directory(filepath, 'document.pdf')
+    except Exception as ex:
+        message = f'Unable to produce document. Error: {str(ex)}'
+        return redirect(url_for('doc_bp.docfiles', rent_id=0, message=message))
 
 
 @doc_bp.route('/download/<int:doc_id>')

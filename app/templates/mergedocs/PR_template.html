@@ -2,11 +2,10 @@
 {% import 'widgets.html' as widgets %}
 <!-- font-size recognised by the pdf creation code -->
 <style>
-                    p
-                    {
-                        font-size: 10.5pt;
-                    }
-
+p
+{
+    font-size: 10.5pt;
+}
 </style>
 <div id="manager_div" contenteditable="true">
     <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
@@ -25,18 +24,18 @@
     Date: {{ today_date.strftime('%d-%b-%Y') }}
 </div>
 <div class="font-size-medium" align="left" style="font-size:10.5pt;">
-					<span id="addr_span" class="block-text" contenteditable="true">
-						{% set addr_list = rent_pr.mailaddr.split(',') %}
-                        {% for item in addr_list %}
-                            {{ item }}
-                            <br/>
-                        {% endfor %}
-					</span>
+    <span id="addr_span" class="block-text" contenteditable="true">
+        {% set addr_list = rent_pr.mailaddr.split(',') %}
+        {% for item in addr_list %}
+            {{ item }}
+            <br/>
+        {% endfor %}
+    </span>
     <br/>
     <br/>
     <b><span id="subject_span" class="block-text" contenteditable="true" style="font-size:10.5pt;">
-						{{ subject }}
-					</span></b>
+        {{ subject }}
+    </span></b>
     <br/>
 </div>
 <div class="font-size-medium" align="left" contenteditable="true">
