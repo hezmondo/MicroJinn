@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 {% import 'bootstrap/wtf.html' as wtf %}
 {% import 'widgets.html' as widgets %}
+{% import 'mergedocs/PR_widgets.html' as pr_widgets with context%}
 
 {% block app_content %}
 <form method="POST" action="{{ url_for('pr_bp.pr_save_send', method=method, rent_id=rent_pr.id) }}">
@@ -17,27 +18,35 @@
     <div class="row">
         <div class="col-md-9">
             <div id="address_fields" style="margin-bottom:1rem;">
-                {{ widgets.combobox(name="address_fields", id="address_fields", items=[rent_pr.mailaddr, (rent_pr.tenantname + ', ' + rent_pr.propaddrs[0].propaddr),
-                                    ('The owner/occupier, ' + rent_pr.propaddrs[0].propaddr)], item_selected=rent_pr.mailaddr) }}
+                {{ widgets.combobox(name="address_fields", id="address_fields", items=[rent_pr.mailaddr,
+                (rent_pr.tenantname + ', ' + rent_pr.propaddrs[0].propaddr),
+                ('The owner/occupier, ' + rent_pr.propaddrs[0].propaddr)], item_selected=rent_pr.mailaddr) }}
             </div>
             <div id="doc_html" contenteditable="false">
+                <!-- font-size recognised by the pdf creation code -->
+                <style>
+                    p
+                    {
+                        font-size: 10.5pt;
+                    }
+                </style>
                 <div id="manager_div" contenteditable="true">
-                    <div class="font-size-large manager-name" align="center">
+                    <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
                         <b>{{ rent_pr.landlord.manager.managername }}</b>
                     </div>
-                    <div class="font-size-small manager-addr" align="center">
+                    <div class="font-size-small manager-addr" align="center" style="font-size:9.5pt;">
                         {{ rent_pr.landlord.manager.manageraddr }}
                         <br/>
                         {{ rent_pr.landlord.manager.manageraddr2 }}
                         <br/>
                     </div>
                 </div>
-                <div class="font-size-medium" align="right" contenteditable="true">
+                <div class="font-size-medium" align="right" contenteditable="true" style="font-size:10.5pt;">
                     <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
                     <br/>
-                    Date: {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }}
+                    Date: {{ today_date.strftime('%d-%b-%Y') }}
                 </div>
-                <div class="font-size-medium" align="left">
+                <div class="font-size-medium" align="left" style="font-size:10.5pt;">
 					<span id="addr_span" class="block-text" contenteditable="true">
 						{% set addr_list = rent_pr.mailaddr.split(',') %}
                         {% for item in addr_list %}
@@ -47,40 +56,21 @@
 					</span>
                     <br/>
                     <br/>
-                    <b><span id="subject_span" class="block-text" contenteditable="true">
+                    <b><span id="subject_span" class="block-text" contenteditable="true" style="font-size:10.5pt;">
 						{{ subject }}
 					</span></b>
                     <br/>
                 </div>
                 <div class="font-size-medium" align="left" contenteditable="true">
-                    <div id="owings_div">
-                        <table class="pr_table">
-                            <colgroup>
-                                <col style="width:80%">
-                                <col style="width:20%">
-                            </colgroup>
-                            <tr class="pr_table_heading">
-                                <td>Details</td>
-                                <td>Amount</td>
-                            </tr>
-                            {% for statement, value in table_rows.items() %}
-                            <tr>
-                                <td>{{ statement }}</td>
-                                <td class="amount_class">{{ value }}</td>
-                            </tr>
-                            {% endfor %}
-                            <tr class="total">
-                                <td>The total amount payable is:</td>
-                                <td class="amount_class">{{ money_str(rent_pr.totdue, pound=True) }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    {{ widgets.linebreaks_for_string(block) }}
-                </div>
-                <div id="hidden_email_dets" style="display: none;">
-                    <div>Email sent on {{ today_date.strftime('%d-%b-%Y') if today_date else 'none' }} to &nbsp;<span
-                            class="span-input" id="email_span" contenteditable="true"> {{ rent_pr.email if rent_pr.email else 'example@gmail.com; example2@gmail.com'}} </span>
-                    </div>
+                    {{ pr_widgets.owings_table(rent_pr) }}
+                    <p>
+                        {{ widgets.linebreaks_for_string(block) }}
+                    </p>
+                    {{ pr_widgets.payment_advice(rent_pr) }}
+                    <br />
+                    <br />
+                    <p style="page-break-before: always"></p>
+                    {{ pr_widgets.pr_s166(rent_pr) }}
                 </div>
             </div>
         </div>
@@ -101,28 +91,34 @@
                             </button>
                             <button type="submit"
                                     formaction="{{ url_for('pr_bp.pr_save_send', method='email and post', rent_id=rent_pr.id) }}"
-                                    class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and email
+                                    class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and
+                                email
                             </button>
                             <button type="submit"
                                     formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon email-ic" role="button">email
                             </button>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-3">
+        <div class="col">
             <input type="hidden" id="pr_block" name="xinput" value="xyz">
-        </div>
-        <div class="col-md-3">
             <input type="hidden" id="pr_addr" name="pr_addr" value="">
-        </div>
-        <div class="col-md-2">
-            <input type="hidden" id="pr_save_data" name="pr_save_data" value="{{ pr_save_data }}">
+            <input type="hidden" id="pr_email_addr" name="pr_email_addr" value="{{ rent_pr.email if rent_pr.email
+                        else 'example@gmail.com; example2@gmail.com'}}">
+            <input type="hidden" id="pr_code" name="pr_code" value="{{ rent_pr.pr_code }}">
+            <input type="hidden" id="rent_date" name="rent_date" value="{{ rent_pr.nextrentdate }}">
+            <input type="hidden" id="tot_due" name="tot_due"
+                   value="{{ rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges }}">
+            <input type="hidden" id="new_arrears_level" name="new_arrears_level"
+                   value="{{ rent_pr.new_arrears_level }}">
+            <input type="hidden" id="new_arrears" name="new_arrears" value="{{ rent_pr.arrears + rent_pr.rent_gale }}">
+            <input type="hidden" id="charge_total" name="charge_total" value="{{ rent_pr.recovery_charge_amount }}">
+            <input type="hidden" id="pr_email" name="pr_email" value="{{ block_email }}">
         </div>
     </div>
 </form>

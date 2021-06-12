@@ -1,0 +1,64 @@
+<!-- /templates/docfiles_text.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="docfile_text">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+            <a href="{{ url_for('doc_bp.docfiles', rent_id=docfiles[0].rent_id) }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to docfiles</a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ url_for('rent_bp.rent', rent_id=docfiles[0].rent_id) }}"
+               class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div id="doc_html" contenteditable="false">
+                {% for docfile in docfiles %}
+                <p id="{{ docfile.id }}date" contenteditable="true"><b>{{ docfile.doc_date|safe }} | {{
+                    docfile.summary|safe }}</b></p>
+                <p id="{{ docfile.id }}doc_text">{{ docfile.doc_text|safe }}</p>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ url_for('doc_bp.docfile', doc_id=docfile.id) }}"
+                           class="btn btn-secondary btn-block button-icon edit" role="button">edit this docfile
+                        </a>
+                    </div>
+                    <div class="col">
+                        <a href="{{ url_for('doc_bp.doc_print', doc_id=docfile.id) }}" target="_blank"
+                           class="btn btn-primary btn-block button-icon letter" role="button">print this docfile
+                        </a>
+                    </div>
+                </div>
+                <br/>
+                <hr class="hr-thick"/>
+                <br/>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>options</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <a href="{{ url_for('doc_bp.docfile', doc_id=0, doc_dig='doc', rent_id=rent_id) }}"
+                               class="btn btn-block btn-danger button-icon plus" role="button">new doc in</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

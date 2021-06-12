@@ -84,25 +84,7 @@ def post_updated_payrequest_delivery(delivered, pr_file):
     return rent_id
 
 
-def prepare_new_pr_history_entry(block, pr_save_data, rent_id, mailaddr, method='email'):
-    pr_history = PrHistory()
-    pr_history.block = block
-    pr_history.rent_id = rent_id
-    pr_history.summary = pr_save_data.get('pr_code') + "-" + method + "-" + mailaddr[0:25]
-    pr_history.datetime = datetime.now()
-    pr_history.rent_date = datetime.strptime(pr_save_data.get('rent_date_string'), '%d-%b-%Y')
-    pr_history.total_due = pr_save_data.get('tot_due')
-    pr_history.arrears_level = pr_save_data.get('new_arrears_level')
-    # TODO: We are not using the typeprdelivery table yet in any meaningful way
-    #  - should we remove it and make delivery_method in pr_history a string column?
-    #  - We'd have to hard code the method strings in any combodict filters
-    pr_history.delivery_method = PrDeliveryTypes.get_id(method)
-    # TODO: Add pending / delivered functionality
-    pr_history.delivered = True
-    return pr_history
-
-
-def prepare_new_pr_history_entry_x(pr_history_data, rent_id, method='email'):
+def prepare_new_pr_history_entry(pr_history_data, rent_id, method='email'):
     summary = pr_history_data.get('pr_code') + "-" + method + "-" + pr_history_data.get('mailaddr')[0:25]
     pr_history = PrHistory(block=pr_history_data.get('block').replace("£", "&pound;"), rent_id=rent_id,
                            summary=summary, datetime=datetime.now(),

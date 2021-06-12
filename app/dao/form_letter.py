@@ -1,5 +1,6 @@
 from app import db
 from flask import request
+from sqlalchemy.orm import load_only
 from app.models import FormLetter, TypeDoc
 from app.dao.common import get_doctype
 from app.dao.database import commit_to_database
@@ -32,18 +33,20 @@ def get_form_letters(action='all'):
     return form_letters
 
 
-def get_email_form_by_code(code):
-    email_form = FormLetter.query.filter(FormLetter.code == code).one_or_none()
-    return email_form
+def get_pr_form_code(pr_form_id):
+    return db.session.query(FormLetter).filter_by(id=pr_form_id).options(load_only('code')).one_or_none()
 
 
-def get_pr_form(pr_form_id):
-    pr_form = FormLetter.query.filter(FormLetter.id == pr_form_id).one_or_none()
-    return pr_form
+def get_pr_form_essential(pr_form_id):
+    return db.session.query(FormLetter).filter_by(id=pr_form_id).options(load_only('code', 'block', 'subject'))\
+        .one_or_none()
+
+
+def get_pr_email_form():
+    return db.session.query(FormLetter).filter_by(code='EPR').options(load_only('block')).one_or_none()
 
 
 def get_pr_forms():
-
     return FormLetter.query.filter(FormLetter.doctype_id == 2).all()
 
 

@@ -1,0 +1,67 @@
+{% import 'mergedocs/PR_widgets.html' as pr_widgets with context%}
+
+<!-- font-size recognised by the pdf creation code -->
+<style>
+                    p
+                    {
+                        font-size: 10.5pt;
+                    }
+
+
+</style>
+<div id="manager_div" contenteditable="true">
+    <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
+        <b>{{ rent_pr.landlord.manager.managername }}</b>
+    </div>
+    <div class="font-size-small manager-addr" align="center" style="font-size:9.5pt;">
+        {{ rent_pr.landlord.manager.manageraddr }}
+        <br/>
+        {{ rent_pr.landlord.manager.manageraddr2 }}
+        <br/>
+    </div>
+</div>
+<div class="font-size-medium" align="right" contenteditable="true" style="font-size:10.5pt;">
+    <span id="ref_span">Our Ref: {{ rent_pr.rentcode }}</span>
+    <br/>
+    Date: {{ today_date.strftime('%d-%b-%Y') }}
+</div>
+<div class="font-size-medium" align="left" style="font-size:10.5pt;">
+					<span id="addr_span" class="block-text" contenteditable="true">
+						{% set addr_list = rent_pr.mailaddr.split(',') %}
+                        {% for item in addr_list %}
+                            {{ item }}
+                            <br/>
+                        {% endfor %}
+					</span>
+    <br/>
+    <br/>
+    <b><span id="subject_span" class="block-text" contenteditable="true" style="font-size:10.5pt;">
+						{{ rent_pr.rent_type.capitalize() }} account for property:
+                        {% for addr in rent_pr.propaddrs %}
+                            {{ addr.propaddr }}
+                        {% endfor %}
+					</span></b>
+    <br/>
+</div>
+<div align="left" contenteditable="true">
+    {{ pr_widgets.owings_table(rent_pr) }}
+    <br>
+    {% if rent_pr.suffix %}
+    {{ pr_widgets.arrears_clause(rent_pr) }}
+    {% endif %}
+    <p>
+        Please make your cheque/PO payable to {{ rent_pr.landlord.manager.managername }} with your reference
+        {{ rent_pr.rentcode }} written on the back. If you prefer to pay us the {{
+        money_str(rent_pr.rent_gale + rent_pr.arrears + rent_pr.totcharges, pound=True) }} by BACS or faster
+        payments, our bank is {{ rent_pr.landlord.money_account.bank_name }}, our account is {{
+        rent_pr.landlord.money_account.acc_name }}, the sort code is {{
+        rent_pr.landlord.money_account.sort_code }} and our account number is {{
+        rent_pr.landlord.money_account.acc_num }}. Please make sure that you give the property reference
+        {{ rent_pr.rentcode }} with any BACS payment and please email us to confirm any BACS payment.
+    </p>
+    {{ pr_widgets.payment_advice(rent_pr) }}
+    <br/>
+    <br/>
+    <p style="page-break-before: always"></p>
+    {{ pr_widgets.pr_s166(rent_pr) }}
+</div>

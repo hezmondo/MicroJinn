@@ -26,8 +26,7 @@
 		</div>
 		<div class="col-md-2">
 			<label for="template">template:</label>
-			<input type="text" class="form-control" name="template" value="{{ form_letter.description }}">
-			{{ widgets.combobox(name="template", items=templates, item_selected=form_letter.template) }}
+			{{ widgets.combobox(name="template", items=['LTS'], item_selected=form_letter.template) }}
 		</div>
 	</div>
 	<div class="form-group row">

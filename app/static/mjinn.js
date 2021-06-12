@@ -84,13 +84,13 @@ $(document).ready(function(){
         $(this).toggleClass('active', $(this).attr('href') == loc);
     });
     $('#doc_html').html(function(i, html) {
-      return html.replace(/\*\*(.*?)\*\*/g, '<span class="emboldened">$1</span>');
+      return html.replace(/\*\*(.*?)\*\*/g, '<span style="font-weight:bold;">$1</span>');
     });
     $('#doc_html').html(function(i, html2) {
-      return html2.replace(/\^\^(.*?)\^\^/g, '<span class="italic">$1</span>');
+      return html2.replace(/\^\^(.*?)\^\^/g, '<span style="font-style:italic;">$1</span>');
     });
     $('#doc_html').html(function(i, html3) {
-      return html3.replace(/\|\|(.*?)\|\|/g, '<span class="highlighted">$1</span>');
+      return html3.replace(/\|\|(.*?)\|\|/g, '<span style="background-color:yellow;">$1</span>');
     });
     //the expandable table buttons (show more) are found with id show_more_1 or show_more_2 (we can have a maximum
     //of two expandable tables per page). We want to change the text of the buttons after they are expanded.
