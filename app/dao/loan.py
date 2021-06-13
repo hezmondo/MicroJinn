@@ -1,10 +1,8 @@
 import sqlalchemy
-from sqlalchemy import asc, select, text
-from sqlalchemy.orm import joinedload, load_only
 from app import db
 from app.dao.database import commit_to_database
 from app.dao.money import get_money_items_loan
-from app.models import Loan, LoanIntRate, LoanStat, LoanTran, MoneyItem
+from app.models import Loan, LoanStat, LoanTran
 
 
 def dbget_loan_row(loan_id):

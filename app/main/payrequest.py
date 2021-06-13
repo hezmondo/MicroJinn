@@ -9,7 +9,7 @@ from app.dao.action import add_action
 from app.dao.case import check_case_exists, add_case
 from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
-from app.dao.doc import convert_html_to_pdf
+from app.main.doc import convert_html_to_pdf
 from app.dao.form_letter import get_pr_form_essential, get_pr_form_code, get_pr_email_form
 from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
     get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \

@@ -2,14 +2,13 @@ from flask import Blueprint, redirect, render_template, request, send_file, url_
 from flask_login import login_required
 from io import BytesIO
 from app.dao.common import get_doc_types
-from app.dao.doc import convert_html_to_pdf, get_digfile, get_docfile, get_docfiles, get_docfiles_text, \
-    get_docfile_text, create_docfile_for_upload, upload_docfile, post_docfile, post_upload
+from app.dao.doc import get_docfiles_text, get_docfile_text, dbget_digfile_row
+from app.main.doc import convert_html_to_pdf, get_docfile, get_docfiles, \
+    docfile_create, upload_docfile, post_docfile, post_upload
 from app.email import app_send_email
 import os
 
-
 doc_bp = Blueprint('doc_bp', __name__)
-
 
 @doc_bp.route('/docfile/<int:doc_id>', methods=['GET', 'POST'])
 @login_required
@@ -53,7 +52,7 @@ def doc_print(doc_id):
 @doc_bp.route('/download/<int:doc_id>')
 @login_required
 def download(doc_id):
-    digfile = get_digfile(doc_id)
+    digfile = dbget_digfile_row(doc_id)
     return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True,
                      mimetype='application/pdf')
 
@@ -63,7 +62,7 @@ def email_and_save():
     if request.method == "POST":
         # create the record to be uploaded to `docfile` table
         # this contains the email
-        docfile = create_docfile_for_upload(0)
+        docfile = docfile_create(0)
         # send the email now, from the docfile record
         appmail = current_app.extensions['mail']
         recipients = request.form.get('email_to')
