@@ -9,7 +9,7 @@ from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, get_pr
     post_updated_payrequest_delivery
 from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, save_new_payrequest_from_batch, \
     save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
-from app.dao.doc import convert_html_to_pdf
+from app.main.doc import convert_html_to_pdf
 import os
 
 pr_bp = Blueprint('pr_bp', __name__)

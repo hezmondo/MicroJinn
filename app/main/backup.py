@@ -24,7 +24,7 @@ def mget_backup_path():
 
 def mget_SQLAlchemy_engine() -> engine.Engine:
     # return the SQLAlchemy `Engine` bound into the current session
-    return app.db.session.get_bind()
+    return app.db.session.bind
 
 
 def mget_SQLAlchemy_engine_url() -> url.URL:

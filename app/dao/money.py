@@ -128,14 +128,12 @@ def get_money_items(acc_id): # we assemble income items and money items into one
                 income_filter.append(Income.id == 0)
         moneyvals['category'] = catval
     transitems = \
-        MoneyItem.query.join(MoneyAcc) \
-            .join(MoneyCat) \
+        MoneyItem.query.join(MoneyAcc).join(MoneyCat) \
             .with_entities(MoneyItem.id, MoneyItem.num, MoneyItem.date, MoneyItem.payer, MoneyItem.amount,
                            MoneyItem.memo, MoneyAcc.acc_desc, MoneyCat.cat_name, MoneyItem.cleared) \
             .filter(*money_filter) \
             .union_all(
-            (Income.query.join(MoneyAcc)
-             .join(IncomeAlloc)
+            (Income.query.join(MoneyAcc).join(IncomeAlloc)
              .with_entities(Income.id, literal("X").label('num'), Income.date, Income.payer, Income.amount,
                             IncomeAlloc.rentcode.label('memo'), MoneyAcc.acc_desc,
                             literal("BACS income").label('cat_name'), literal("1").label('cleared'))

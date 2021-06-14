@@ -51,7 +51,7 @@
                     <td style="width: 10.00%" class="vertical-align"> {{ item.doc_dig }}</td>
                     <td style="width: 10.00%" class="vertical-align"> {{ item.out_in }}</td>
                     <td style="width: 6.00%" class="vertical-align">
-                        <a href="{{ url_for('doc_bp.docfile', doc_id=item.id, doc_dig=item.doc_dig) }}"
+                        <a href="{{ url_for('doc_bp.docfile', doc_id=item.id, doc_dig=item.doc_dig, rentcode=item.rentcode) }}"
                            class="btn btn-teal-light btn-round button-icon round circles" data-toggle="tooltip"
                            title="view docfile" role="button"></a>
                 </tr>
