@@ -4,276 +4,63 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
+{% if action == 'initialize' and method == 'pr' %}
+<div class="form-group row flex-row-reverse">
+    <div class="col-md-3">
+        <a href="{{ url_for('pr_bp.pr_start') }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to filter select</a>
+    </div>
+</div>
+{% endif %}
 <form action="/filter" method="post">
+    {% if action == 'initialize' and method == 'pr' %}
+    <div class="boxed boxed-center boxed-blue" style="margin-bottom: 1rem;">
+        <div class="row">
+            <div class="col">
+                Add a new filter by loading and modifying a previous filter or selecting new filter options. When you
+                finish selecting your filter options, use 'run filter' to test the filter and 'save filter' to save it.
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <div class="row" style="margin-bottom: 1rem;">
-        <div class="col-md-4">
-            <div class="card card-white" style="margin-bottom: 1rem;">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col-md-2">rent</div>
-                        <div class="col align-right">
-                            <a href="#" class="button-icon sync clear-filters"
-                               role="button">clear all filters</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body text-primary">
-                    <div class="form-group row">
-                        <div class="col">
-                            <input id="filter-rentcode" type="text" class="form-control" name="rentcode"
-                                   data-toggle="tooltip"
-                                   placeholder="rentcode starts with" title="starts with" value="{{ fdict.rentcode }}">
-                        </div>
-                        <div class="col">
-                            <input id="filter-tenantname" type="text" class="form-control" name="tenantname"
-                                   data-toggle="tooltip"
-                                   placeholder="tenant name" title="includes" value="{{ fdict.tenantname }}">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col">
-                            <input id="filter-propaddr" type="text" class="form-control" name="propaddr"
-                                   data-toggle="tooltip"
-                                   placeholder="property details" title="includes" value="{{ fdict.propaddr }}">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <div class="col">
-                            <input id="filter-agentdetail" type="text" class="form-control" name="agentdetail"
-                                   data-toggle="tooltip"
-                                   placeholder="agent details" title="includes" value="{{ fdict.agentdetail }}">
-
-                        </div>
-                    </div>
-                    <div class="form-group row" style="margin-bottom: 0px;">
-                        <div class="col">
-                            {{ widgets.multiselect_as_select(name="landlord", items=Landlords.names(),
-                            items0="all landlords", id="filter-landlord",
-                            items_selected=fdict.landlord) }}
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-            <div class="card card-white">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">status | select multiple</div>
-                        <div class="col align-right">
-                            <a href="#expand_status" data-toggle="collapse" aria-expanded="false"
-                               aria-controls="expand_status"
-                               class="button-icon btn-round round minus"
-                               role="button"></a>
-                        </div>
-                    </div>
-                </div>
-                <div id="expand_status" class="collapse collapse-filter show">
-                    <div class="card-body text-primary">
-                        <div class="form-group row">
-                            <div class="col">
-                                {{ widgets.multiselect_as_select(name="tenure", items=Tenures.names(),
-                                items0="all tenures",
-                                items_selected=fdict.tenure, id="filter-tenure") }}
-                            </div>
-                            <div class="col">
-                                {{ widgets.multiselect_as_select(name="status", items=Statuses.names(),
-                                items0="all statuses", id="filter-status",
-                                items_selected=fdict.status) }}
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                {{ widgets.multiselect_as_select(name="salegrade", items=SaleGrades.names(),
-                                items0="all salegrades", id="filter-salegrade",
-                                items_selected=fdict.salegrade) }}
-                            </div>
-                            <div class="col">
-                                {{ widgets.multiselect_as_select(name="actype", items=AcTypes.names(),
-                                items0="all actypes",
-                                items_selected=fdict.actype, id="filter-actype") }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-white" style="margin-bottom:1rem;">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">source</div>
-                        <div class="col align-right">
-                            <a href="#expand_source" data-toggle="collapse" aria-expanded="false"
-                               aria-controls="expand_source"
-                               class="button-icon btn-round round minus"
-                               role="button"></a>
-                        </div>
-                    </div>
-                </div>
-                <div id="expand_source" class="collapse collapse-filter show">
-                    <div class="card-body text-primary">
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <input id="filter-source" type="text" class="form-control" name="source"
-                                       data-toggle="tooltip"
-                                       placeholder="source"
-                                       title="includes" value="{{ fdict.source }}">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card card-white" style="margin-bottom:1rem;">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">owing</div>
-                        <div class="col align-right">
-                            <a href="#expand_owing" data-toggle="collapse" aria-expanded="false"
-                               aria-controls="expand_owing"
-                               class="button-icon btn-round round minus"
-                               role="button"></a>
-                        </div>
-                    </div>
-                </div>
-                <div id="expand_owing" class="collapse collapse-filter show">
-                    <div class="card-body text-primary">
-                        <div class="form-group row">
-                            <div class="col">
-                                <input id="filter-rentpa" type="text" class="form-control" name="rentpa"
-                                       data-toggle="tooltip"
-                                       placeholder="rent pa"
-                                       title="example = 100" value="{{ fdict.rentpa }}">
-                            </div>
-                            <div class="col">
-                                <input id="filter-arrears" type="text" class="form-control" name="arrears"
-                                       data-toggle="tooltip"
-                                       placeholder="arrears"
-                                       title="example < 100" value="{{ fdict.arrears }}">
-                            </div>
-                            <div class="col">
-                                <input id="filter-rentperiods" type="text" class="form-control" name="rentperiods"
-                                       data-toggle="tooltip"
-                                       placeholder="periods owing"
-                                       title="example > 5" value="{{ fdict.rentperiods }}">
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <label for="enddate">end date:</label>
-                                <input id="filter-enddate" type="date" class="form-control" placeholder="end date"
-                                       name="enddate"
-                                       value="{{ fdict.enddate }}">
-                            </div>
-                            <div class="col">
-                                <label for="charges">charges:</label>
-                                {{ widgets.combobox(name="charges", items=combodict.options,
-                                item_selected=fdict.charges,
-                                id="filter-charges") }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card card-white">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">mail</div>
-                        <div class="col align-right">
-                            <a href="#expand_mail" data-toggle="collapse" aria-expanded="false"
-                               aria-controls="expand_mail"
-                               class="button-icon btn-round round minus"
-                               role="button"></a>
-                        </div>
-                    </div>
-                </div>
-                <div id="expand_mail" class="collapse collapse-filter show">
-                    <div class="card-body text-primary">
-                        <div class="form-group row">
-                            <div class="col">
-                                <label for="enddate">mail to agent:</label>
-                                {{ widgets.combobox(name="agentmailto", items=combodict.options,
-                                item_selected=fdict.agentmailto, id="filter-agentmailto") }}
-                            </div>
-                            <div class="col">
-                                <label for="charges">emailable:</label>
-                                {{ widgets.combobox(name="emailable", items=combodict.options, id="filter-emailable",
-                                item_selected=fdict.emailable) }}
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <label for="enddate">pr delivery:</label>
-                                {{ widgets.multiselect_as_select(name="prdelivery", items=PrDeliveryTypes.names(),
-                                items0="all prdeliveries", id="filter-prdelivery",
-                                items_selected=fdict.prdelivery) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-blue" style="margin-bottom:1rem;">
-                <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
-                   aria-controls="save_filter_card"
-                   class="btn btn-block btn-primary button-icon save" role="button">save filter</a>
-                <div id="save_filter_card" class="collapse">
-                    <div class="card-body text-primary">
-                        <div class="form-group row">
-                            <div class="col">
-                                <label for="filtertype">filter type:</label>
-                                {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
-                                item_selected=fdict.filtertype, id="filter-filtertype") }}
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col">
-                                <input id="filter_desc" type="text" class="form-control" name="filterdesc"
-                                       placeholder="enter description">
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <input id="filter_name" type="text" class="form-control" name="filtername"
-                                       placeholder="enter name">
-                            </div>
-                            <div class="col">
-                                <button type="submit"
-                                        formaction="{{ url_for('rent_bp.rents_advanced', action='save', filtr_id=filtr_id) }}"
-                                        class="btn btn-block btn-primary  button-icon save" role="button">save filter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-9">
             <div class="card card-red" style="margin-bottom:1rem;">
                 <a href="#expand_load" data-toggle="collapse" aria-expanded="false"
                    aria-controls="expand_load"
                    class="btn btn-block btn-danger button-icon filter"
-                   role="button">load filter</a>
+                   role="button">
+                    <span>
+                        {% if method == 'pr' %}
+                        load pay request filter
+                        {% elif method == 'rent' %}
+                        load rent filter
+                        {% else %}
+                        load filter
+                        {% endif %}
+                    </span>
+                </a>
                 <div id="expand_load" class="collapse collapse-filter">
                     <table class="table table-condensed">
                         <tbody>
                         {% for item in jfilters %}
                         <tr>
                             <td style="width: 10.00%">{{ item.code }}</td>
-                            <td style="width: 70.00%">{{ item.description}}</td>
+                            <td style="width: 60.00%">{{ item.description}}</td>
                             <td>
-                                <button
-                                        class="btn btn-block btn-danger button-icon round filter load-filters"
-                                        style="text-align: left;"
-                                        data-toggle="tooltip" title="load filter" value="{{ item.content }}"
-                                        onclick="return false;">
+                                <button type="submit"
+                                        formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
+                                        action='load', method=method) }}"
+                                        class="btn btn-danger btn-small button-icon filter">load
                                 </button>
                             </td>
                             <td>
                                 <a
-                                        class="btn btn-block btn-warning button-icon round trash"
+                                        class="btn btn-small btn-warning button-icon trash"
                                         style="text-align: left;"
                                         href="{{ url_for('util_bp.delete_item', item_id=item.id, item='jstore') }}"
-                                        data-toggle="tooltip" title="delete filter"
                                         onclick="return confirm('are you sure you want to delete this filter?');">
+                                    delete
                                 </a>
                             </td>
                         </tr>
@@ -282,79 +69,440 @@
                     </table>
                 </div>
             </div>
-            <div class="card card-green">
-                <div class="card-header">search</div>
-                <div class="card-body text-primary">
-                    <div class="form-group row" style="margin-bottom: 0px;">
-                        <div class="col">
-                            <input type="text" class="form-control" placeholder="run size" name="runsize"
-                                   value="{{ fdict.runsize }}">
-                        </div>
-                        <div class="col">
-                            <button type="submit"
-                                    formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=filtr_id) + '#search' }}"
-                                    class="btn btn-block btn-success button-icon search" role="button">search
-                            </button>
+            <div class="card card-clear" style="margin-bottom:1rem;">
+                <a href="#expand_filters" data-toggle="collapse" aria-expanded="false"
+                   aria-controls="expand_filters"
+                   class="btn btn-block btn-secondary button-icon filter"
+                   role="button">change filter options</a>
+                {% if action == 'initialize' %}
+                <div id="expand_filters" class="collapse collapse-filter show">
+                    {% else %}
+                    <div id="expand_filters" class="collapse collapse-filter">
+                        {% endif %}
+                        <div class="card-body text-primary">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card card-clear" style="margin-bottom: 1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row" style="height: 35px;">
+                                                <div class="col">rent</div>
+                                                <div class="col align-right">
+                                                    <a class="button-icon sync clear-filters"
+                                                       style="color:inherit;" role="button">clear all filter options</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    <input id="filter_rentcode" type="text" class="form-control"
+                                                           name="rentcode"
+                                                           data-toggle="tooltip"
+                                                           placeholder="rentcode starts with" title="starts with"
+                                                           value="{{ fdict.rentcode }}">
+                                                </div>
+                                                <div class="col">
+                                                    <input id="filter_tenantname" type="text" class="form-control"
+                                                           name="tenantname"
+                                                           data-toggle="tooltip"
+                                                           placeholder="tenant name" title="includes"
+                                                           value="{{ fdict.tenantname }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    <input id="filter_propaddr" type="text" class="form-control"
+                                                           name="propaddr"
+                                                           data-toggle="tooltip"
+                                                           placeholder="property details" title="includes"
+                                                           value="{{ fdict.propaddr }}">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    <input id="filter_agentdetail" type="text" class="form-control"
+                                                           name="agentdetail"
+                                                           data-toggle="tooltip"
+                                                           placeholder="agent details" title="includes"
+                                                           value="{{ fdict.agentdetail }}">
+
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    {{ widgets.multiselect_as_select(name="landlord",
+                                                    items=Landlords.names(),
+                                                    items0="all landlords", id="filter_landlord",
+                                                    items_selected=fdict.landlord) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-clear">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col">status | select multiple</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    {{ widgets.multiselect_as_select(name="tenure",
+                                                    items=Tenures.names(),
+                                                    items0="all tenures",
+                                                    items_selected=fdict.tenure, id="filter_tenure") }}
+                                                </div>
+                                                <div class="col">
+                                                    {{ widgets.multiselect_as_select(name="status",
+                                                    items=Statuses.names(),
+                                                    items0="all statuses", id="filter_status",
+                                                    items_selected=fdict.status) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    {{ widgets.multiselect_as_select(name="salegrade",
+                                                    items=SaleGrades.names(),
+                                                    items0="all salegrades", id="filter_salegrade",
+                                                    items_selected=fdict.salegrade) }}
+                                                </div>
+                                                <div class="col">
+                                                    {{ widgets.multiselect_as_select(name="actype",
+                                                    items=AcTypes.names(),
+                                                    items0="all actypes",
+                                                    items_selected=fdict.actype, id="filter_actype") }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col">source</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <input id="filter_source" type="text" class="form-control"
+                                                           name="source"
+                                                           data-toggle="tooltip"
+                                                           placeholder="source"
+                                                           title="includes" value="{{ fdict.source }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col">owing</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row" style="margin-left:0px;">
+                                                <div class="col">
+                                                    {{ widgets.combobox_number(name = "rentpa", value=fdict.rentpa,
+                                                    placeholder="rent pa", tooltip="rent per annum | example = 100",
+                                                    id="filter_rentpa", item_selected=fdict.modifier_rentpa)
+                                                    }}
+                                                </div>
+                                                <div class="col">
+                                                    {{ widgets.combobox_number(name = "arrears", value=fdict.arrears,
+                                                    placeholder="arrears", tooltip="arrears | example < 100",
+                                                    id="filter_arrears", item_selected=fdict.modifier_arrears)
+                                                    }}
+                                                </div>
+                                                <div class="col">
+                                                    {{ widgets.combobox_number(name = "rentperiods",
+                                                    value=fdict.rentperiods, placeholder="periods owing",
+                                                    tooltip="periods owing | example < 3", id="filter_rentperiods",
+                                                    item_selected=fdict.modifier_rentperiods) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <label for="enddate">end date:</label>
+                                                    <input id="filter_enddate" type="date" class="form-control"
+                                                           placeholder="end date"
+                                                           name="enddate"
+                                                           value="{{ fdict.enddate }}">
+                                                </div>
+                                                <div class="col">
+                                                    <label for="charges">charges:</label>
+                                                    {{ widgets.combobox(name="charges", items=combodict.options,
+                                                    item_selected=fdict.charges,
+                                                    id="filter_charges") }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col">mail</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    <label for="enddate">mail to agent:</label>
+                                                    {{ widgets.combobox(name="agentmailto", items=combodict.options,
+                                                    item_selected=fdict.agentmailto, id="filter_agentmailto") }}
+                                                </div>
+                                                <div class="col">
+                                                    <label for="charges">emailable:</label>
+                                                    {{ widgets.combobox(name="emailable", items=combodict.options,
+                                                    id="filter_emailable",
+                                                    item_selected=fdict.emailable) }}
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <label for="enddate">pr delivery:</label>
+                                                    {{ widgets.multiselect_as_select(name="prdelivery",
+                                                    items=PrDeliveryTypes.names(),
+                                                    items0="all prdeliveries", id="filter_prdelivery",
+                                                    items_selected=fdict.prdelivery) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card card-clear">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col">run this filter</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <input type="text" class="form-control" placeholder="run size"
+                                                           name="runsize"
+                                                           id="filter_runsize" value="{{ fdict.runsize }}">
+                                                </div>
+                                                <div class="col">
+                                                    <button type="submit"
+                                                            formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=filtr_id, action='search', method=method) }}"
+                                                            class="btn btn-block btn-success button-icon search"
+                                                            role="button">
+                                                        run filter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div>
+                    {% if not action == 'initialize' %}
+                    {% if rents|length == 0 %}
+                    <div class="boxed boxed-center boxed-blue">
+                        <div class="row">
+                            <div class="col">
+                                No results. Refine your search using the filter options above.
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div id="search" class="table-fixed">
+                        <table class="table" id="rents">
+                            <thead>
+                            <tr>
+                                <th style="width: 8.00%">rentcode</th>
+                                <th style="width: 9.00%">rent (pa)</th>
+                                <th style="width: 8.00%">arrears</th>
+                                <th style="width: 13.00%">next rent date</th>
+                                <th style="width: 15.00%">tenant name</th>
+                                <th style="width: 22.00%">property address</th>
+                                <th style="width: 8.00%">source</th>
+                                <th style="width: 15.00%">agent details</th>
+                                <th style="width: 2.00%"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in rents %}
+                            <tr id="{{ item.id }}">
+                                <td style="width: 8.00%">{{ item.rentcode }}</td>
+                                <td style="width: 9.00%"> {{ item.rentpa }}</td>
+                                <td style="width: 8.00%"> {{ item.arrears }}</td>
+                                <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
+                                    item.datecode_id, 1).strftime('%d-%b-%Y') }}
+                                </td>
+                                <td style="width: 15.00%"> {{ item.tenantname }}</td>
+                                <td style="width: 22.00%">{{ item.propaddr }}</td>
+                                <td style="width: 8.00%"> {{ item.source }}</td>
+                                <td style="width: 15.00%"> {{ item.detail | default('no agent', true) | truncate(40) }}
+                                </td>
+                                <td style="width: 2.00%" class="vertical-align">
+                                    <a href="{{ url_for('rent_bp.rent', rent_id=item.id) }}"
+                                       class="btn btn-teal-light btn-round button-icon round circles"
+                                       data-toggle="tooltip" title="view rent" role="button"></a></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="sticky-top">
+                    <div class="card card-blue" style="margin-bottom:1rem;">
+                        <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
+                           aria-controls="save_filter_card"
+                           class="btn btn-block btn-primary button-icon save" role="button">save as new filter</a>
+                        <div id="save_filter_card" class="collapse">
+                            <div class="card-body text-primary">
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <label for="filtertype">filter type:</label>
+                                        {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
+                                        item_selected=fdict.filtertype, id="filter_filtertype") }}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <input id="filter_desc" type="text" class="form-control" name="filterdesc"
+                                               placeholder="enter description">
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="margin-bottom: 0px;">
+                                    <div class="col">
+                                        <input id="filter_name" type="text" class="form-control" name="filtername"
+                                               placeholder="enter name">
+                                    </div>
+                                    <div class="col">
+                                        <button type="submit"
+                                                formaction="{{ url_for('rent_bp.rents_advanced', action='save', filtr_id=filtr_id, method=method) }}"
+                                                class="btn btn-block btn-primary  button-icon save" role="button">save
+                                            filter
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if method == 'pr' and rents|length > 1 %}
+                    <div class="card card-green" style="margin-bottom:1rem;">
+                        <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
+                           aria-controls="produce_pr_card"
+                           class="btn btn-block btn-success button-icon letter" role="button">
+                            produce {{ rents|length }} pay requests</a>
+                        <div id="produce_pr_card" class="collapse">
+                            <div class="card-body text-primary">
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <span>Produce a pay request batch for these {{ rents|length }} rents?
+                                    </div>
+                                </div>
+                                <div class="form-group row" style="margin-bottom: 0px;">
+                                    <div class="col">
+                                        <button type="submit"
+                                                formaction="{{ url_for('pr_bp.pr_run_batch') }}"
+                                                class="btn btn-block btn-success button-icon arrow-right" role="button">
+                                            (coming soon)
+                                        </button>
+                                    </div>
+                                    <div class="col">
+                                        <a class="btn btn-block btn-secondary button-icon cross"
+                                           role="button" href="#produce_pr_card" data-toggle="collapse"
+                                           aria-expanded="false"
+                                           aria-controls="produce_pr_card">cancel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    {% if rents[0] == 'initialize' %}
-    <div class="boxed boxed-center boxed-blue">
-        <div class="row">
-            <div class="col">
-                Begin by choosing or loading filters and selecting 'search'.
-            </div>
-        </div>
-    </div>
-    {% elif rents|length == 0 %}
-    <div class="boxed boxed-center boxed-blue">
-        <div class="row">
-            <div class="col">
-                No results. Refine your search using the filters above.
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div id="search" class="table-fixed">
-        <div class="align-right"><b>{% if rents|length > 50 %}over{% endif %} {{ rents|length }} results</b></div>
-        <table class="table" id="rents">
-            <thead>
-            <tr>
-                <th style="width: 8.00%">rentcode</th>
-                <th style="width: 8.00%">rentpa</th>
-                <th style="width: 8.00%">arrears</th>
-                <th style="width: 8.00%">nextrentdate</th>
-                <th style="width: 15.00%">tenantname</th>
-                <th style="width: 20.00%">propaddr</th>
-                <th style="width: 8.00%">source</th>
-                <th style="width: 20.00%">agent details</th>
-                <th style="width: 5.00%"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in rents %}
-            <tr id="{{ item.id }}">
-                <td style="width: 8.00%">{{ item.rentcode }}</td>
-                <td style="width: 8.00%"> {{ item.rentpa }}</td>
-                <td style="width: 8.00%"> {{ item.arrears }}</td>
-                <td style="width: 8.00%"> {{ item.nextrentdate }}</td>
-                <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                <td style="width: 20.00%">{{ item.propaddr }}</td>
-                <td style="width: 8.00%"> {{ item.source }}</td>
-                <td style="width: 20.00%"> {{ item.agent.detail }}</td>
-                <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-            rent_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles"
-                                                                   data-toggle="tooltip" title="view rent"
-                                                                   role="button"></a></td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
-</form>
 
+</form>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    // Selecting an filter from advanced filters will populate the search fields
+    $('.load-filters').mousedown(function(e) {
+        var dict = $.parseJSON($(this).val());
+        $('#filter_rentcode').val(dict.rentcode);
+        $('#filter_tenantname').val(dict.tenantname);
+        $('#filter_propaddr').val(dict.propaddr);
+        $('#filter_agentdetail').val(dict.agentdetail);
+        $('#filter_landlord').val(dict.landlord);
+        $('#filter_tenure').val(dict.tenure);
+        $('#filter_status').val(dict.status);
+        $('#filter_salegrade').val(dict.salegrade);
+        $('#filter_actype').val(dict.actype);
+        $('#filter_source').val(dict.source);
+        $('#filter_rentpa').val(dict.rentpa);
+        $('#modifier_rentpa').val(dict.modifier_rentpa);
+        $('#filter_arrears').val(dict.arrears);
+        $('#modifier_arrears').val(dict.modifier_arrears);
+        $('#filter_rentperiods').val(dict.rentperiods);
+        $('#modifier_rentperiods').val(dict.modifier_rentperiods);
+        $('#filter_enddate').val(dict.enddate);
+        $('#filter_charges').val(dict.charges);
+        $('#filter_agentmailto').val(dict.agentmailto);
+        $('#filter_emailable').val(dict.emailable);
+        $('#filter_prdelivery').val(dict.prdelivery);
+        $('#filter_filtertype').val(dict.filtertype);
+        $('#filter_runsize').val(dict.runsize);
+        // expand filters
+        $('.collapse-filter').collapse('show');
+    });
+    $('.hide-filters').mousedown(function(e) {
+        $('.collapse').collapse('hide');
+    });
+    $('.clear-filters').mousedown(function(e) {
+        $('#filter_rentcode').val('');
+        $('#filter_tenantname').val('');
+        $('#filter_propaddr').val('');
+        $('#filter_agentdetail').val('');
+        $('#filter_landlord').val('all landlords');
+        $('#filter_tenure').val('all tenures');
+        $('#filter_status').val('all statuses');
+        $('#filter_salegrade').val('all salegrades');
+        $('#filter_actype').val('all actypes');
+        $('#filter_source').val('');
+        $('#filter_rentpa').val('');
+        $('#modifier_rentpa').val('=');
+        $('#filter_arrears').val('');
+        $('#modifier_arrears').val('=');
+        $('#filter_rentperiods').val('');
+        $('#modifier_rentperiods').val('=');
+        $('#filter_enddate').val('');
+        $('#filter_charges').val('include');
+        $('#filter_agentmailto').val('include');
+        $('#filter_emailable').val('include');
+        $('#filter_prdelivery').val('all prdeliveries');
+        $('#filter_filtertype').val('');
+        $('#filter_runsize').val('');
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 {% endblock %}

@@ -3,25 +3,33 @@ from dateutil.relativedelta import relativedelta
 from flask import request
 from app.models import Agent, Landlord, Property, Rent
 from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenures
+from app.main.functions import strToDec
 
 
 def dict_basic():
-    return {'agent': request.form.get('agent') or "",
+    return {'agentdetail': request.form.get('agentdetail') or "",
             'propaddr': request.form.get('propaddr') or "",
             'rentcode': request.form.get('rentcode') or "",
             'source': request.form.get('source') or "",
-            'tenantname': request.form.get('tenantname') or ""
-            }
+            'tenantname': request.form.get('tenantname') or ""}
 
 
 def dict_advanced():
     dict = dict_basic()
     dict['actype'] = request.form.getlist('actype') or ['all actypes']
     dict['agentmailto'] = request.form.get('agentmailto') or 'include'
+    dict['modifier_arrears'] = request.form.get('modifier_arrears') or ''
+    dict['arrears'] = request.form.get('arrears') or ''
+    dict['charges'] = request.form.get('charges') or 'include'
     dict['emailable'] = request.form.get('emailable') or 'include'
     dict['enddate'] = request.form.get('enddate') or ''
     dict['landlord'] = request.form.getlist('landlord') or ['all landlords']
     dict['prdelivery'] = request.form.getlist('prdelivery') or ['all prdeliveries']
+    dict['modifier_rentpa'] = request.form.get('modifier_rentpa') or ''
+    dict['rentpa'] = request.form.get('rentpa') or ''
+    dict['modifier_rentperiods'] = request.form.get('modifier_rentperiods') or ''
+    dict['rentperiods'] = request.form.get('rentperiods') or ''
+    dict['runsize'] = request.form.get('runsize') or ''
     dict['salegrade'] = request.form.getlist('salegrade') or ['all salegrades']
     dict['status'] = request.form.getlist('status') or ['all statuses']
     dict['tenure'] = request.form.getlist('tenure') or ['all tenures']
@@ -38,12 +46,44 @@ def filter_advanced(dict):
             ids.append(AcTypes.get_id(dict['actype'][i]))
         filtr.append(Rent.actype_id.in_(ids))
     if dict['agentmailto'] and dict['agentmailto'] == "exclude":
-        filtr.append(Rent.mailto_id.notin_(1, 2))
+        filtr.append(Rent.mailto_id.notin_((1, 2)))
     elif dict['agentmailto'] and dict['agentmailto'] == "only":
-        filtr.append(Rent.mailto_id.in_(1, 2))
+        filtr.append(Rent.mailto_id.in_((1, 2)))
     #     todo
-    # elif key == "arrears" and value and value != "":
-    #     filtr.append(Rent.arrears == strToDec('{}'.format(value)))
+    if dict['arrears'] and dict['arrears'] != "":
+        if dict['modifier_arrears'] == '=':
+            filtr.append(Rent.arrears == strToDec(dict['arrears']))
+        if dict['modifier_arrears'] == '<':
+            filtr.append(Rent.arrears < strToDec(dict['arrears']))
+        if dict['modifier_arrears'] == '<=':
+            filtr.append(Rent.arrears <= strToDec(dict['arrears']))
+        if dict['modifier_arrears'] == '>':
+            filtr.append(Rent.arrears > strToDec(dict['arrears']))
+        if dict['modifier_arrears'] == '>=':
+            filtr.append(Rent.arrears >= strToDec(dict['arrears']))
+    if dict['rentpa'] and dict['rentpa'] != "":
+        if dict['modifier_rentpa'] == '=':
+            filtr.append(Rent.rentpa == strToDec(dict['rentpa']))
+        if dict['modifier_rentpa'] == '<':
+            filtr.append(Rent.rentpa < strToDec(dict['rentpa']))
+        if dict['modifier_rentpa'] == '<=':
+            filtr.append(Rent.rentpa <= strToDec(dict['rentpa']))
+        if dict['modifier_rentpa'] == '>':
+            filtr.append(Rent.rentpa > strToDec(dict['rentpa']))
+        if dict['modifier_rentpa'] == '>=':
+            filtr.append(Rent.rentpa >= strToDec(dict['rentpa']))
+        # TODO: filters, or switch to raw SQL
+    # if dict['rentperiods'] and dict['rentperiods'] != "":
+    #     if dict['modifier_rentperiods'] == '=':
+    #         filtr.append(Rent.arrears == strToDec(dict['rentperiods']))
+    #     if dict['modifier_rentperiods'] == '<':
+    #         filtr.append(Rent.arrears < strToDec(dict['rentperiods']))
+    #     if dict['modifier_rentperiods'] == '<=':
+    #         filtr.append(Rent.arrears <= strToDec(dict['rentperiods']))
+    #     if dict['modifier_rentperiods'] == '>':
+    #         filtr.append(Rent.arrears > strToDec(dict['rentperiods']))
+    #     if dict['modifier_rentperiods'] == '>=':
+    #         filtr.append(Rent.arrears >= strToDec(dict['rentperiods']))
     # elif key == "charges" and value == "exclude":
     #     filtr.append(Rent.mailto_id.notin_(1, 2))
     # elif key == "charges" and value == "only":
@@ -52,10 +92,6 @@ def filter_advanced(dict):
     #     filtr.append(Rent.mailto_id.notin_(1, 2))
     # elif dict['emailable'] and dict['emailable'] == "only":
     #     filtr.append(Rent.mailto_id.in_(1, 2))
-    # elif key == "rentpa" and value and value != "":
-    #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
-    # elif key == "rentperiods" and value and value != "":
-    #     filtr.append(Rent.rentpa == strToDec('{}'.format(value)))
     filtr.append(Rent.lastrentdate <= (dict['enddate'] or (date.today() + relativedelta(days=30))))
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
         filtr.append(Landlord.name.in_(dict['landlord']))
@@ -119,7 +155,7 @@ def filter_basic_sql_2(dict, id_list):
     if id_list:
         sql2 = " r.id IN {}".format(tuple(id_list))
     else:
-        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agent')) if dict.get('agent') else ""
+        agentdetail_sql = " a.detail LIKE '%{}%' ".format(dict.get('agentdetail')) if dict.get('agentdetail') else ""
         # todo additional filter for amount owing:  owingSql = " {} <= Owing AND
         #  Owing <= {}".format(owing - money(0.03), owing + money(0.03)) if owing is not None else ""
         propaddr_sql = " propaddr LIKE '%{}%' ".format(dict.get('propaddr')) if dict.get('propaddr') else ""

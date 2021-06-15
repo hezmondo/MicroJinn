@@ -211,6 +211,7 @@ class Jstore(db.Model):
     code = db.Column(db.String(30))
     description = db.Column(db.String(90), nullable=True)
     content = db.Column(db.Text)
+    last_used = db.Column(db.DateTime)
 
 
 class Landlord(db.Model):
@@ -425,15 +426,6 @@ class PrCharge(db.Model):
     id = db.Column(db.Integer, db.ForeignKey('pr_history.id'), primary_key=True)
     charge_id = db.Column(db.Integer, db.ForeignKey('charge.id'))
     case_created = db.Column(db.Boolean)
-
-
-class PrFilter(db.Model):
-    __tablename__ = 'pr_filter'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    description = db.Column(db.String(90), nullable=True)
-    content = db.Column(db.Text)
 
 
 class PrHistory(db.Model):

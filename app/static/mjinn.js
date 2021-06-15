@@ -56,24 +56,6 @@ $(document).ready(function(){
         var mysave = $('#doc_html').html();
         $('#xinput').val(mysave);
     });
-    //copy address field and separate each line
-    $('#address_fields').click(function() {
-        var addr = $('#address_fields option:selected').text();
-        var addr_split = addr.replace(/,/g, "<br />");
-        $('#addr_span').html(addr_split);
-        $('#addr_span').append("<br />");
-    });
-    //save pr - collect address to put in summary
-    $('.save_pr').click(function() {
-        var pr_block = $('#doc_html').html();
-        $('#pr_block').val(pr_block);
-        var pr_addr = $('#addr_span').text().trim();
-        // remove unwanted characters
-        var pr_addr_strip = pr_addr.replace(/[^\x20-\x7E]/gmi, "");
-        // remove extra whitespace
-        var pr_addr_strip_clean = pr_addr.replace(/\s+/g, " ");
-        $('#pr_addr').val(pr_addr_strip_clean);
-    });
     //allow display and navbar to change for smaller screens / phones
     resizeView();
     $(window).resize(function(){
@@ -116,55 +98,6 @@ $(document).ready(function(){
     });
     $(document).on('shown.bs.modal', function(e) {
         $('input:visible:enabled:first', e.target).focus();
-    });
-    // Selecting an filter from advanced filters will populate the search fields
-    $('.load-filters').mousedown(function(e) {
-        var dict = $.parseJSON($(this).val());
-        $('#filter-rentcode').val(dict.rentcode);
-        $('#filter-tenantname').val(dict.tenantname);
-        $('#filter-propaddr').val(dict.propaddr);
-        $('#filter-agentdetail').val(dict.agentdetail);
-        $('#filter-landlord').val(dict.landlord);
-        $('#filter-tenure').val(dict.tenure);
-        $('#filter-status').val(dict.status);
-        $('#filter-salegrade').val(dict.salegrade);
-        $('#filter-actype').val(dict.actype);
-        $('#filter-source').val(dict.source);
-        $('#filter-rentpa').val(dict.rentpa);
-        $('#filer-arrears').val(dict.arrears);
-        $('#filter-rentperiods').val(dict.rentperiods);
-        $('#filter-enddate').val(dict.enddate);
-        $('#filter-charges').val(dict.charges);
-        $('#filter-agentmailto').val(dict.agentmailto);
-        $('#filter-emailable').val(dict.emailable);
-        $('#filter-prdelivery').val(dict.prdelivery);
-        $('#filter-filtertype').val(dict.filtertype);
-        // expand filters
-        $('.collapse-filter').collapse('show');
-    });
-    $('.hide-filters').mousedown(function(e) {
-        $('.collapse').collapse('hide');
-    });
-    $('.clear-filters').mousedown(function(e) {
-        $('#filter-rentcode').val('');
-        $('#filter-tenantname').val('');
-        $('#filter-propaddr').val('');
-        $('#filter-agentdetail').val('');
-        $('#filter-landlord').val('');
-        $('#filter-tenure').val('');
-        $('#filter-status').val('');
-        $('#filter-salegrade').val('');
-        $('#filter-actype').val('');
-        $('#filter-source').val('');
-        $('#filter-rentpa').val('');
-        $('#filer-arrears').val('');
-        $('#filter-rentperiods').val('');
-        $('#filter-enddate').val((new Date()).toISOString().split('T')[0]);
-        $('#filter-charges').val('');
-        $('#filter-agentmailto').val('');
-        $('#filter-emailable').val('');
-        $('#filter-prdelivery').val('');
-        $('#filter-filtertype').val('');
     });
 });
 $(function() {

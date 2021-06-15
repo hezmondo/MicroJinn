@@ -138,8 +138,8 @@ def get_doc_types():
     return doc_types
 
 
-def get_filters(type):
-    return Jstore.query.filter(Jstore.type == type).all()
+def get_filters(type=''):
+    return Jstore.query.filter(Jstore.type == type).all() if type else Jstore.query.all()
 
 
 def get_filter_stored(filtr_id):

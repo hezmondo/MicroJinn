@@ -135,6 +135,13 @@ def prx_test(rent_id):
     return redirect(url_for('util_bp.actions'))
 
 
+# Test - Produces pay requests for rents 1 - 100 using PRX. Pdf saved in jinn\app\temp_files
+@pr_bp.route('/pr_run_batch', methods=['GET', 'POST'])
+def pr_run_batch():
+
+    return redirect(url_for('util_bp.actions'))
+
+
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
 @login_required
 def pr_save_send():
