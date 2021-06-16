@@ -731,6 +731,12 @@ wallet
 {
 	color: inherit !important;
 }
+.title-text
+{
+    font-size: 1.3rem;
+    font-weight: 200;
+    color:white;
+}
 .trash::before
 {
 	content: "\f2ed";

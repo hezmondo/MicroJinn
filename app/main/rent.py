@@ -300,16 +300,22 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
 def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
     rents = []
     if action == "load":  # load predefined filter dictionary from jstore
-        fdict = get_filter_stored(filtr_id)
-        fdict = json.loads(fdict.content)
+        filter_data = get_filter_stored(filtr_id)
+        fdict = json.loads(filter_data.content)
         for key, value in fdict.items():
             fdict[key] = value
+        # add metadata of filter to display on rents_advanced.html
+        fdict['code'] = filter_data.code
+        fdict['description'] = filter_data.description
     else:
         fdict = dict_advanced()  # get request form values or default dictionary
     # now we construct advanced sqlalchemy filter using either dictionary
     filtr = filter_advanced(fdict)
     if action == "save":
         post_rent_filter(fdict)
+        # add metadata of filter to display on rents_advanced.html
+        fdict['code'] = request.form.get("filtername")
+        fdict['description'] = request.form.get("filterdesc")
     # now get filtered rent objects for this filter
     if request.method == 'POST':
         runsize = (request.form.get('runsize') or 50) if action != 'load' else (fdict.get('runsize') or 50)

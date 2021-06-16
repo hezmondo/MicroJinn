@@ -34,7 +34,7 @@
                         </td>
                         <td><a
                                 class="btn btn-round btn-warning button-icon round trash"
-                                href="{{ url_for('util_bp.delete_item', item_id=item.id, item='jstore') }}"
+                                href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method='pr') }}"
                                 data-toggle="tooltip" title="delete filter"
                                 onclick="return confirm('are you sure you want to delete this filter?');">
                         </a></td>

@@ -1,10 +1,19 @@
 from datetime import datetime
 from app import db
-from app.models import PrArrearsMatrix, PrCharge, PrHistory, Rent
+from app.models import PrArrearsMatrix, PrBatch, PrCharge, PrHistory, Rent
 from app.modeltypes import PrDeliveryTypes
 from app.dao.database import commit_to_database
 from sqlalchemy import desc
 from sqlalchemy.orm import load_only
+
+
+def post_pr_batch(runcode, size, status, is_account):
+    pr_batch = PrBatch(datetime=datetime.now(), code=runcode, size=size, status=status, is_account=is_account)
+    db.session.add(pr_batch)
+    # db.session.flush()
+    # batch_id = pr_batch.id
+    commit_to_database()
+    return pr_batch
 
 
 def add_pr_charge(pr_id, charge_id, case_created):

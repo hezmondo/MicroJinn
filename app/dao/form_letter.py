@@ -6,6 +6,11 @@ from app.dao.common import get_doctype
 from app.dao.database import commit_to_database
 
 
+def get_form_id(form_letter_code):
+    form = db.session.query(FormLetter).filter_by(code=form_letter_code).options(load_only('id')).one_or_none()
+    return form.id
+
+
 def get_form_letter(form_letter_id):  #returns all Rent member variables as a mutable dict
     form_letter = FormLetter.query.filter_by(id=form_letter_id).first()
     form_letter.doctype = get_doctype(form_letter.doctype_id)
@@ -48,6 +53,10 @@ def get_pr_email_form():
 
 def get_pr_forms():
     return FormLetter.query.filter(FormLetter.doctype_id == 2).all()
+
+
+def get_pr_form_codes():
+    return db.session.query(FormLetter).filter_by(doctype_id=2).options(load_only('code')).all()
 
 
 def post_form_letter(form_letter_id):

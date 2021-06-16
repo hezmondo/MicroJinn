@@ -411,10 +411,10 @@ class PrBatch(db.Model):
     __tablename__ = 'pr_batch'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
+    datetime = db.Column(db.DateTime)
     code = db.Column(db.String(30))
     size = db.Column(db.Integer)
-    status_id = db.Column(db.Integer)
+    status = db.Column(db.String(30))
     is_account = db.Column(db.Boolean)
 
     payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
