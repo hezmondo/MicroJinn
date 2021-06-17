@@ -11,9 +11,9 @@ from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
 from app.main.doc import convert_html_to_pdf
 from app.dao.form_letter import get_pr_form_essential, get_pr_form_code, get_pr_email_form
-from app.dao.payrequest import post_pr_batch, add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
-    get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \
-    post_updated_payrequest_delivery, add_pr_charge
+from app.dao.payrequest import post_pr_batch_empty,  add_pr_history, get_last_arrears_level, get_pr_ids_from_batch, \
+    get_pr_charge, get_pr_file, get_pr_history_row, get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \
+    post_updated_payrequest_delivery, add_pr_charge, update_pr_batch
 from app.dao.common import delete_record_basic
 from app.dao.rent import get_rentcode
 from app.main.functions import dateToStr, doReplace, moneyToStr
@@ -144,15 +144,21 @@ def mget_recent_charge_date(rent_pr):
 def run_batch(pr_template_id, rent_id_list, runcode):
     pr_complete = {}
     pr_error = {}
+    # Get pr_batch id by posting an empty batch that we will update later
+    batch_id = post_pr_batch_empty()
     for rent_id in rent_id_list:
         try:
             block, block_email, rent_pr, subject = write_payrequest(rent_id, pr_template_id)
             html = render_template('mergedocs/PR_template.html', block=block, rent_pr=rent_pr, subject=subject)
-            pr_id = save_new_payrequest_from_batch(html, rent_pr)
+            pr_id = save_new_payrequest_from_batch(batch_id, html, rent_pr)
             pr_complete[rent_id] = pr_id
         except Exception as ex:
             pr_error[rent_id] = str(ex)
-    pr_batch = post_pr_batch(runcode, len(pr_complete), 'pending', False)
+    pr_batch = update_pr_batch(batch_id, runcode, len(pr_complete), 'pending', False)
+    action_str = 'Pay request Batch ' + str(pr_batch.id) + ' of ' + str(pr_batch.size) + ' pay requests saved | ' + \
+                 pr_batch.code
+    # TODO: Modify link from action to pr_batch
+    # add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_pr.id})
     return pr_batch, pr_complete, pr_error
 
 
@@ -182,7 +188,7 @@ def save_new_payrequest(method, pr_history_data, pr_rent_data, rent_id):
     return pr_id
 
 
-def save_new_payrequest_from_batch(html, rent_pr):
+def save_new_payrequest_from_batch(batch_id, html, rent_pr):
     pr_history_data = {'block': html,
                        'mailaddr': rent_pr.mailaddr,
                        'pr_code': rent_pr.pr_code,
@@ -191,7 +197,7 @@ def save_new_payrequest_from_batch(html, rent_pr):
                        'new_arrears_level': rent_pr.new_arrears_level,
                        'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
                        'charge_total': rent_pr.recovery_charge_amount}
-    pr_history = prepare_new_pr_history_entry(pr_history_data, rent_pr.id, 'post')
+    pr_history = prepare_new_pr_history_entry(pr_history_data, rent_pr.id, 'post', batch_id)
     pr_id = add_pr_history(pr_history)
     pr_rent_data = {'rent_date': rent_pr.nextrentdate.strftime("%Y-%m-%d"),
                     'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
@@ -199,9 +205,6 @@ def save_new_payrequest_from_batch(html, rent_pr):
     case_created, charge_id = forward_rent_case_and_charges(pr_id, pr_rent_data, rent_pr.id)
     if charge_id or case_created:
         add_pr_charge(pr_id, charge_id, case_created)
-    action_str = 'Pay request for rent ' + get_rentcode(rent_pr.id) + ' totalling ' + \
-                 moneyToStr(pr_history_data.get('tot_due'), pound=True) + ' saved'
-    add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_pr.id})
     commit_to_database()
     return pr_id
 
@@ -241,6 +244,14 @@ def undo_pr(pr_id):
     except Exception as ex:
         return type(ex), rent_id
     return message, rent_id
+
+
+def undo_pr_batch(batch_id):
+    pr_ids = get_pr_ids_from_batch(batch_id)
+    for pr_id in pr_ids:
+        undo_pr(pr_id.id)
+    delete_record_basic(batch_id, 'pr_batch')
+    commit_to_database()
 
 
 def update_pr_delivered(pr_id):

@@ -16,6 +16,15 @@ def post_pr_batch(runcode, size, status, is_account):
     return pr_batch
 
 
+def post_pr_batch_empty():
+    pr_batch = PrBatch()
+    db.session.add(pr_batch)
+    db.session.flush()
+    batch_id = pr_batch.id
+    commit_to_database()
+    return batch_id
+
+
 def add_pr_charge(pr_id, charge_id, case_created):
     pr_charge = PrCharge()
     pr_charge.id = pr_id
@@ -30,16 +39,28 @@ def add_pr_history(pr_history):
     return pr_history.id
 
 
+def get_batch_pay_requests(batch_id):
+    return db.session.query(PrHistory).filter_by(batch_id=batch_id).all()
+
+
 def get_last_arrears_level(rent_id):
     return db.session.query(PrHistory.arrears_level).filter_by(rent_id=rent_id).order_by(-PrHistory.id).first()
 
 
-def get_pr_charge(pr_id):
-    return PrCharge.query.filter_by(id=pr_id).one_or_none()
+def get_pr_batch(batch_id):
+    return PrBatch.query.get(batch_id)
+
+
+def get_pr_batches():
+    return PrBatch.query.all()
 
 
 def get_pr_block(pr_id):
     return db.session.query(PrHistory).filter_by(id=pr_id).with_entities(PrHistory.block).scalar()
+
+
+def get_pr_charge(pr_id):
+    return PrCharge.query.filter_by(id=pr_id).one_or_none()
 
 
 def get_pr_file(pr_id):
@@ -56,6 +77,10 @@ def get_pr_history(rent_id):
 
 def get_pr_history_row(pr_id):
     return PrHistory.query.get(pr_id)
+
+
+def get_pr_ids_from_batch(batch_id):
+    return  db.session.query(PrHistory).filter_by(batch_id=batch_id).options(load_only('id')).all()
 
 
 def get_recovery_info(suffix):
@@ -93,16 +118,27 @@ def post_updated_payrequest_delivery(delivered, pr_file):
     return rent_id
 
 
-def prepare_new_pr_history_entry(pr_history_data, rent_id, method='email'):
+def prepare_new_pr_history_entry(pr_history_data, rent_id, method='email', batch_id=None):
     summary = pr_history_data.get('pr_code') + "-" + method + "-" + pr_history_data.get('mailaddr')[0:25]
     pr_history = PrHistory(block=pr_history_data.get('block').replace("£", "&pound;"), rent_id=rent_id,
                            summary=summary, datetime=datetime.now(),
                            rent_date=datetime.strptime(pr_history_data.get('rent_date'), '%Y-%m-%d'),
                            total_due=pr_history_data.get('tot_due'),
                            arrears_level=pr_history_data.get('new_arrears_level'),
-                           delivery_method=PrDeliveryTypes.get_id(method), delivered=False)
+                           delivery_method=PrDeliveryTypes.get_id(method), delivered=False, batch_id=batch_id)
     # TODO: We are not using the typeprdelivery table yet in any meaningful way
     #  - should we remove it and make delivery_method in pr_history a string column?
     #  - We'd have to hard code the method strings in any combodict filters
     # TODO: Add pending / delivered functionality
     return pr_history
+
+
+def update_pr_batch(batch_id, runcode, size, status, is_account):
+    pr_batch = PrBatch.query.get(batch_id)
+    pr_batch.datetime = datetime.now()
+    pr_batch.code = runcode
+    pr_batch.size = size
+    pr_batch.status = status
+    pr_batch.is_account = is_account
+    commit_to_database()
+    return pr_batch
