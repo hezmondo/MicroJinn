@@ -26,4 +26,4 @@ def sqldumps(filename):
     backup_path = mget_backup_path()
     # page has: <a href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}">{{ backup_file.name }}</a>
     # this function sends the file from the directory as a download "attachment" (i.e. needs to be saved)
-    return send_from_directory(directory=backup_path, filename=filename, as_attachment=True)
+    return send_from_directory(directory=backup_path, path=filename, as_attachment=True)

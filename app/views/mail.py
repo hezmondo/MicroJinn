@@ -21,10 +21,7 @@ def mail_edit(form_letter_id):
     template = request.args.get('template', "LTS", type=str)
     method = request.args.get('method', "email", type=str)
     if request.method == "POST":
-        form_letter_id = form_letter_id
-        income_id = request.form.get('income_id') or 0
-        rent_id = request.form.get('rent_id')
-        block, doctype_id, leasedata, rent, subject, variables = writeMail(rent_id, template, form_letter_id, income_id)
+        block, doctype_id, leasedata, rent, subject, variables = writeMail(form_letter_id, template)
         mailaddr = request.form.get('mailaddr')
         sent_to = rent.email if method == "email" else mailaddr[0:25]
         summary = f"{method}-{template}-to-{sent_to}"[0:25]

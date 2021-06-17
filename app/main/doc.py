@@ -25,6 +25,7 @@ def convert_html_to_pdf(source_html, output_filename):
     # close output file
     result_file.close()  # close output file
     # return False on success and True on errors
+
     return pisa_status.err
 
 
@@ -47,6 +48,7 @@ def docfile_create(doc_id):
     docfile.doctype_id = int(request.form.get('doctype_id'))
     docfile.summary = request.form.get('summary')
     docfile.out_in = 0 if request.form.get('out_in') == "out" else 1
+
     return docfile
 
 
@@ -100,7 +102,6 @@ def get_docfiles(rent_id):
     if rent_id > 0:
         digfile_filter.append(DigFile.rent_id == rent_id)
         docfile_filter.append(DocFile.rent_id == rent_id)
-
     docfiles = dbget_docfiles(docfile_filter, digfile_filter)
 
     return docfiles, dfoutin

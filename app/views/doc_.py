@@ -15,9 +15,10 @@ doc_bp = Blueprint('doc_bp', __name__)
 def docfile(doc_id):
     if request.method == "POST":
         rent_id = post_docfile(doc_id)
-        return redirect("/views/rent/{}".format(rent_id))
+        (url_for('rent_bp.rent', rent_id=rent_id))
     docfile, doc_dig = get_docfile(doc_id)
     doc_types = [typedoc.desc for typedoc in get_doc_types()]
+
     return render_template('docfile.html', docfile=docfile, doc_types=doc_types, doc_dig=doc_dig)
 
 
@@ -26,6 +27,7 @@ def docfiles(rent_id):
     docfiles, dfoutin = get_docfiles(rent_id)
     doc_types = [typedoc.desc for typedoc in get_doc_types()]
     outins = ["all", "out", "in"]
+
     return render_template('docfiles.html', rent_id=rent_id, dfoutin=dfoutin, docfiles=docfiles, doc_types=doc_types,
                            outins=outins)
 
@@ -33,6 +35,7 @@ def docfiles(rent_id):
 @doc_bp.route('/docfiles_text/<int:rent_id>', methods=['GET', 'POST'])
 def docfiles_text(rent_id):
     docfiles = get_docfiles_text(rent_id)
+
     return render_template('docfiles_text.html', docfiles=docfiles, rent_id=rent_id)
 
 
@@ -46,6 +49,7 @@ def doc_print(doc_id):
         return send_from_directory(filepath, 'document.pdf')
     except Exception as ex:
         message = f'Unable to produce document. Error: {str(ex)}'
+
         return redirect(url_for('doc_bp.docfiles', rent_id=0, message=message))
 
 
@@ -53,6 +57,7 @@ def doc_print(doc_id):
 @login_required
 def download(doc_id):
     digfile = dbget_digfile_row(doc_id)
+
     return send_file(BytesIO(digfile.dig_data), attachment_filename=digfile.summary, as_attachment=True,
                      mimetype='application/pdf')
 
@@ -73,6 +78,7 @@ def email_and_save():
         # now upload to the database
         upload_docfile(docfile)
         rent_id = docfile.rent_id
+
         return redirect(url_for('doc_bp.docfiles', rent_id=rent_id))
 
 
