@@ -138,12 +138,13 @@ def get_doc_types():
     return doc_types
 
 
-def get_filters(type):
-    return Jstore.query.filter(Jstore.type == type).all()
+def get_filters(type=''):
+    return Jstore.query.filter(Jstore.type == type).all() if type else Jstore.query.all()
 
 
 def get_filter_stored(filtr_id):
-    return db.session.query(Jstore).filter_by(id=filtr_id).options(load_only('content')).one_or_none()
+    return db.session.query(Jstore).filter_by(id=filtr_id).options(load_only('code', 'description', 'content'))\
+        .one_or_none()
 
 
 def get_idlist_recent(type):

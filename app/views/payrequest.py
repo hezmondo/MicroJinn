@@ -4,10 +4,10 @@ from app import db
 from app.email import app_send_email
 from app.dao.common import get_filters
 from app.dao.rent import get_rentcode
-from app.dao.form_letter import get_pr_forms
+from app.dao.form_letter import get_form_id, get_pr_forms
 from app.dao.payrequest import get_pr_block, get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, \
     post_updated_payrequest_delivery
-from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, save_new_payrequest_from_batch, \
+from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, run_batch, save_new_payrequest_from_batch, \
     save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
 from app.main.doc import convert_html_to_pdf
 import os
@@ -133,6 +133,18 @@ def prx_test(rent_id):
             save_new_payrequest_from_batch(html, rent_pr)
     convert_html_to_pdf(html_tot, 'pr.pdf')
     return redirect(url_for('util_bp.actions'))
+
+
+@pr_bp.route('/pr_run_batch', methods=['GET', 'POST'])
+def pr_run_batch():
+    if request.method == 'POST':
+        rent_id_list = json.loads(request.form.get('rent_id_list'))
+        runcode = request.form.get('runcode') or 'none'
+        pr_template_id = get_form_id(request.form.get('pr_template'))
+        pr_batch, pr_complete, pr_error = run_batch(pr_template_id, rent_id_list, runcode)
+
+        return render_template('pr_batch.html', pr_batch=pr_batch, pr_complete=pr_complete,
+                                   pr_error=pr_error)
 
 
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])

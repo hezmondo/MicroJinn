@@ -319,6 +319,14 @@ wallet
 {
 	border-radius: 0px;
 }
+.card-clear
+{
+	border-radius: 5px;
+}
+.card-clear .card-header
+{
+	border-radius: 5px 5px 0px 0px;
+}
 .card-green
 {
 	border-radius: 5px;
@@ -331,6 +339,11 @@ wallet
 .card-header
 {
 	padding: .60rem 1.25rem;
+}
+.card-header-narrow
+{
+	padding: .30rem 1.25rem;
+	height: 2.15rem;
 }
 .card-orange
 {
@@ -359,6 +372,16 @@ wallet
 .card-red .card-header
 {
 	background-color: #e85765;
+	color: white;
+}
+.card-secondary
+{
+	border-radius: 5px;
+}
+.card-secondary .card-header
+{
+	background-color: #6c757d;
+	border-radius: 5px 5px 0px 0px;
 	color: white;
 }
 .card-white
@@ -707,6 +730,12 @@ wallet
 .text-primary
 {
 	color: inherit !important;
+}
+.title-text
+{
+    font-size: 1.3rem;
+    font-weight: 200;
+    color:white;
 }
 .trash::before
 {

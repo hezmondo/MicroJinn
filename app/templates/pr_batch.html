@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<form method="POST" id="target">
+    <div class="form-group row flex-row-reverse">
+        <div class="col-md-3">
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <div class="table-fixed">
+                <table class="table table-head" id="docfiles">
+                    <thead>
+                    <tr>
+                        <th>batch details</th>
+                    </tr>
+                    </thead>
+                </table>
+                <table class="table table-base">
+                    <tbody>
+                    <tr>
+                        <td class="td-title vertical-align">date and time</td>
+                        <td class="vertical-align">{{ pr_batch.datetime }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title vertical-align">runcode</td>
+                        <td class="vertical-align">{{ pr_batch.code }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title vertical-align">size</td>
+                        <td class="vertical-align">{{ pr_batch.size }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title vertical-align">status</td>
+                        <td class="vertical-align">{{ pr_batch.status }}</td>
+                    </tr>
+                    <tr>
+                        <td class="td-title vertical-align">other details</td>
+                        <td class="vertical-align">
+                            <span>
+                            {% if pr_complete and pr_complete|length > 0 %}
+                                <b>{{ pr_complete|length }}</b> pay request(s) were created successfully.
+                            {% endif %}
+                            {% if pr_error and pr_error|length > 0 %}
+                                <b>{{ pr_error|length }}</b> pay request(s) failed.
+                            {% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-white sticky-top">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col"><span>options</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0px;">
+                        <div class="col">
+                            <a href="#"
+                               class="btn btn-block btn-success button-icon plus" role="button">button</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+
+

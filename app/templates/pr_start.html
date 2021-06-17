@@ -2,32 +2,62 @@
 {% extends 'base.html' %}
 
 {% block app_content %}
-<form method="POST" id="pr_filter">
-    <div class="table-fixed">
-        <table class="table" id="filters">
-            <thead>
-            <tr>
-                <th style="width: 10.00%">id</th>
-                <th style="width: 10.00%">code</th>
-                <th style="width: 70.00%">description</th>
-                <th style="width: 10.00%"></th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in filters %}
-            <tr id="{{ item.id }}">
-                <td style="width: 10.00%">{{ item.id }}</td>
-                <td style="width: 10.00%"> {{ item.code }}</td>
-                <td style="width: 60.00%"> {{ item.description }}</td>
-                <td>
-                    <button type="submit" formaction="{{ url_for('rent_bp.load_filter',
-                    filtr_id=item.id, action='pr_query') }}"
-                            class="btn btn-success btn-small button-icon arrow-right">go</button>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+<div class="row" style="margin-top: 1rem;">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <form method="POST">
+                <table class="table" id="filters">
+                    <thead>
+                    <tr>
+                        <th style="width: 10.00%">last used</th>
+                        <th style="width: 10.00%">code</th>
+                        <th style="width: 60.00%">description</th>
+                        <th style="width: 15.00%"></th>
+                        <th style="width: 5.00%"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in filters %}
+                    <tr id="{{ item.id }}">
+                        <td style="width: 10.00%">{{ item.last_used.strftime('%d-%b-%Y %H:%M') if item.last_used else
+                            '' }}
+                        </td>
+                        <td style="width: 10.00%"> {{ item.code }}</td>
+                        <td style="width: 60.00%"> {{ item.description }}</td>
+                        <td>
+                            <button type="submit"
+                                    formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
+                                    action='load', method='pr') }}"
+                                    class="btn btn-success btn-small button-icon arrow-right">go
+                            </button>
+                        </td>
+                        <td><a
+                                class="btn btn-round btn-warning button-icon round trash"
+                                href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method='pr') }}"
+                                data-toggle="tooltip" title="delete filter"
+                                onclick="return confirm('are you sure you want to delete this filter?');">
+                        </a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
     </div>
-</form>
+    <div class="col-md-3">
+        <div class="card card-white">
+            <div class="card-header">actions</div>
+            <div class="card-body text-primary">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0, action='initialize', method='pr')}}"
+                           class="btn btn-danger btn-block button-icon plus" role="button">add new filter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

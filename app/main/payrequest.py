@@ -3,7 +3,7 @@ import json
 from app import decimal_default
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from flask import request
+from flask import request, render_template
 from dateutil.relativedelta import relativedelta
 from app.dao.action import add_action
 from app.dao.case import check_case_exists, add_case
@@ -11,7 +11,7 @@ from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
 from app.main.doc import convert_html_to_pdf
 from app.dao.form_letter import get_pr_form_essential, get_pr_form_code, get_pr_email_form
-from app.dao.payrequest import add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
+from app.dao.payrequest import post_pr_batch, add_pr_history, get_last_arrears_level, get_pr_charge, get_pr_file, get_pr_history_row, \
     get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \
     post_updated_payrequest_delivery, add_pr_charge
 from app.dao.common import delete_record_basic
@@ -139,6 +139,21 @@ def mget_recent_charge_date(rent_pr):
     for charge in rent_pr.charges:
         charge_start_dates.append(charge.chargestartdate)
     return max(charge_start_dates)
+
+
+def run_batch(pr_template_id, rent_id_list, runcode):
+    pr_complete = {}
+    pr_error = {}
+    for rent_id in rent_id_list:
+        try:
+            block, block_email, rent_pr, subject = write_payrequest(rent_id, pr_template_id)
+            html = render_template('mergedocs/PR_template.html', block=block, rent_pr=rent_pr, subject=subject)
+            pr_id = save_new_payrequest_from_batch(html, rent_pr)
+            pr_complete[rent_id] = pr_id
+        except Exception as ex:
+            pr_error[rent_id] = str(ex)
+    pr_batch = post_pr_batch(runcode, len(pr_complete), 'pending', False)
+    return pr_batch, pr_complete, pr_error
 
 
 def save_charge(rent_id, recovery_charge_amount, chargetype_id):

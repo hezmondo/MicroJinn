@@ -12,6 +12,11 @@ def create_new_rent():
     return 23
 
 
+def delete_rent_filter(item_id):
+    Jstore.query.filter_by(id=item_id).delete()
+    commit_to_database()
+
+
 def get_agent_rents(agent_id):
     return db.session.query(Rent).filter_by(agent_id=agent_id).options(load_only('id', 'rentcode', 'tenantname')).all()
 

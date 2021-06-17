@@ -211,6 +211,7 @@ class Jstore(db.Model):
     code = db.Column(db.String(30))
     description = db.Column(db.String(90), nullable=True)
     content = db.Column(db.Text)
+    last_used = db.Column(db.DateTime)
 
 
 class Landlord(db.Model):
@@ -410,10 +411,10 @@ class PrBatch(db.Model):
     __tablename__ = 'pr_batch'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date)
+    datetime = db.Column(db.DateTime)
     code = db.Column(db.String(30))
     size = db.Column(db.Integer)
-    status_id = db.Column(db.Integer)
+    status = db.Column(db.String(30))
     is_account = db.Column(db.Boolean)
 
     payrequests = db.relationship('PrHistory', backref='batch', lazy='dynamic')
@@ -425,15 +426,6 @@ class PrCharge(db.Model):
     id = db.Column(db.Integer, db.ForeignKey('pr_history.id'), primary_key=True)
     charge_id = db.Column(db.Integer, db.ForeignKey('charge.id'))
     case_created = db.Column(db.Boolean)
-
-
-class PrFilter(db.Model):
-    __tablename__ = 'pr_filter'
-
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(30))
-    description = db.Column(db.String(90), nullable=True)
-    content = db.Column(db.Text)
 
 
 class PrHistory(db.Model):

@@ -2,13 +2,24 @@ from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required
 from app import db
 from app.dao.common import get_filters
-from app.dao.rent import get_rent_external
+from app.dao.rent import delete_rent_filter, get_rent_external
+from app.dao.form_letter import get_pr_form_codes
 from app.main.common import get_combodict_filter, get_combodict_rent
 from app.main.rent import get_rentp, mget_recent_searches, get_rents_advanced, mpost_search, get_rents_basic_sql, \
     get_rents_external, rent_validation, update_landlord, update_rent_rem, \
     update_tenant
 
 rent_bp = Blueprint('rent_bp', __name__)
+
+
+@rent_bp.route('/delete_filter<int:item_id>', methods=['GET', 'POST'])
+def delete_filter(item_id):
+    method = request.args.get('method')
+    delete_rent_filter(item_id)
+    if method == 'pr':
+        return redirect(url_for('pr_bp.pr_start'))
+    else:
+        return redirect(url_for('rent_bp.rents_advanced', filtr_id=0, method=method))
 
 
 @rent_bp.route('/load_filter', methods=['GET', 'POST'])
@@ -43,14 +54,21 @@ def rent_external(rent_external_id):  # view external rent from home rents page
 @rent_bp.route('/rents_advanced/<int:filtr_id>', methods=['GET', 'POST'])
 @login_required
 def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
-    action = request.args.get('action', "query", type=str)
+    action = request.args.get('action', 'query', type=str)
+    method = request.args.get('method', 'rent', type=str)
     combodict = get_combodict_filter()    # get combobox values with "all" added as an option
-
     fdict, rents = get_rents_advanced(action, filtr_id)   # get filter values and rent objects
-    jfilters = get_filters(2)
+    jfilters = get_filters(1) if method == 'pr' else get_filters(2)
+    if method == 'pr':
+        pr_templates = get_pr_form_codes()
+        pr_template_codes = []
+        for item in pr_templates:
+            pr_template_codes.append(item.code)
+        return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
+                               fdict=fdict, jfilters=jfilters, method=method, pr_template_codes=pr_template_codes, rents=rents)
 
     return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
-                           fdict=fdict, jfilters=jfilters, rents=rents)
+                           fdict=fdict, jfilters=jfilters, method=method, rents=rents)
 
 
 @rent_bp.route('/', methods=['GET', 'POST'])

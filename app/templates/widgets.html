@@ -46,6 +46,25 @@
 {%- endmacro %}
 
 
+<!-- combobox_number(): a dropdown with less than/greater than/equal to modifiers for filtering numbers/prices-->
+{% macro combobox_number(name, value="", placeholder="", tooltip="", id="", item_selected=None) -%}
+<div class="row">
+    <select style="width:50px; padding:0px;" class="form-control" name="modifier_{{ name }}" id="modifier_{{ name }}">
+        {% set items = ['=','<','<=','>','>='] %}
+        {% for item in items %}
+        {% set selected = 'selected' if item == item_selected else '' %}
+        <option value="{{item}}" {{selected}}>{{item}}</option>
+        {% endfor %}
+    </select>
+    <input style="width:90px;" id="{{ id }}" type="text" class="form-control"
+           name="{{ name }}"
+           data-toggle="tooltip"
+           placeholder="{{ placeholder }}"
+           title="{{ tooltip }}" value="{{ value }}">
+</div>
+{%- endmacro %}
+
+
 <!-- macro action modal - produces a modal with a message, optional title and optional
 two buttons ('cancel' and an action button - which submits a form if form='true')
 if we do not define a button, the default close button appears-->
@@ -88,7 +107,7 @@ form="", title="") -%}
                             </button>
                             {% else %}
                             <a id="{{ btn_id }}" class="{{ btn_class }}"
-                                    href="{{ btn_url }}" onclick="{{ btn_on_click }}">{{ btn_text }}
+                               href="{{ btn_url }}" onclick="{{ btn_on_click }}">{{ btn_text }}
                             </a>
                             {% endif %}
                         </div>
@@ -148,6 +167,8 @@ completed and a page has loaded-->
     $(document).ready(function(){
     $("#{{ modal_id }}").modal('show');
 });
+
+
 </script>
 {%- endmacro %}
 

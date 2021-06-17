@@ -84,7 +84,7 @@ def mget_recent_searches(type):
         recent_search.tenantname = fdict.get('tenantname')
         recent_search.propaddr = fdict.get('propaddr')
         recent_search.source = fdict.get('source')
-        recent_search.agent = fdict.get('agent')
+        recent_search.agent = fdict.get('agentdetail')
     return recent_searches
 
 
@@ -298,25 +298,30 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
 
 
 def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
+    rents = []
     if action == "load":  # load predefined filter dictionary from jstore
-        fdict = get_filter_stored(filtr_id)
-        fdict = json.loads(fdict.content)
+        filter_data = get_filter_stored(filtr_id)
+        fdict = json.loads(filter_data.content)
         for key, value in fdict.items():
             fdict[key] = value
+        # add metadata of filter to display on rents_advanced.html
+        fdict['code'] = filter_data.code
+        fdict['description'] = filter_data.description
     else:
         fdict = dict_advanced()  # get request form values or default dictionary
     # now we construct advanced sqlalchemy filter using either dictionary
     filtr = filter_advanced(fdict)
     if action == "save":
         post_rent_filter(fdict)
+        # add metadata of filter to display on rents_advanced.html
+        fdict['code'] = request.form.get("filtername")
+        fdict['description'] = request.form.get("filterdesc")
     # now get filtered rent objects for this filter
     if request.method == 'POST':
-        rents = getrents_advanced(filtr, 50)
+        runsize = (request.form.get('runsize') or 50) if action != 'load' else (fdict.get('runsize') or 50)
+        rents = getrents_advanced(filtr, runsize)
         for rent in rents:
             rent.propaddr = get_propaddr(rent.id)
-    else:
-        # string to tell jinja to provide initial message to user on rents_advanced load up.
-        rents = ['initialize']
 
     return fdict, rents
 
@@ -342,8 +347,8 @@ def get_rents_external():
     filtr = []
     if dict.get('rentcode') and dict.get('rentcode') != "":
         filtr.append(RentExternal.rentcode.startswith([dict.get('rentcode')]))
-    if dict.get('agent') and dict.get('agent') != "":
-        filtr.append(RentExternal.agentdetail.ilike('%{}%'.format(dict.get('agent'))))
+    if dict.get('agentdetail') and dict.get('agentdetail') != "":
+        filtr.append(RentExternal.agentdetail.ilike('%{}%'.format(dict.get('agentdetail'))))
     if dict.get('propaddr') and dict.get('propaddr') != "":
         filtr.append(RentExternal.propaddr.ilike('%{}%'.format(dict.get('propaddr'))))
     if dict.get('source') and dict.get('source') != "":

@@ -148,10 +148,10 @@
                                 <input id="form-source" type="text" class="form-control" name="source"
                                        data-toggle="tooltip"
                                        title="includes" placeholder="source" value="{{ fdict.source }}">
-                                <input id="form-agent" type="text" class="form-control" name="agent"
+                                <input id="form-agent" type="text" class="form-control" name="agentdetail"
                                        data-toggle="tooltip"
                                        title="includes" placeholder="agent details"
-                                       value="{{ fdict.agent | truncate(20, True) }}">
+                                       value="{{ fdict.agentdetail | truncate(20, True) }}">
                             </div>
                         </div>
                         <div class="form-group row" style="margin-bottom: 0px;">
@@ -169,7 +169,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0) }}"
+                                <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=0, method='rent', action='initialize') }}"
                                    class="btn btn-block btn-danger button-icon filter" role="button">advanced filter</a>
                             </div>
                         </div>
@@ -200,7 +200,7 @@ $('.search-history').mousedown(function(e) {
     var dict = $.parseJSON($(this).val());
     $('#form-rentcode').val(dict.rentcode);
     $('#form-propaddr').val(dict.propaddr);
-    $('#form-agent').val(dict.agent);
+    $('#form-agent').val(dict.agentdetail);
     $('#form-source').val(dict.source);
     $('#form-tenantname').val(dict.tenantname);
 });
