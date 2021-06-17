@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.dao.lease import get_lease, get_leases, post_lease
+from app.main.lease import get_lease_info, get_leases, post_lease
 
 lease_bp = Blueprint('lease_bp', __name__)
 
@@ -10,7 +10,7 @@ def lease(lease_id):
     if request.method == "POST":
         rent_id = post_lease(lease_id)
         return redirect(url_for('rent_bp.rent', rent_id=rent_id))
-    lease, uplift_types = get_lease(lease_id)
+    lease, uplift_types = get_lease_info(lease_id)
 
     return render_template('lease.html', lease=lease, uplift_types=uplift_types)
 
