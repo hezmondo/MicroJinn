@@ -37,6 +37,7 @@
                         <td class="td-title vertical-align" style="width: 12.00%">status</td>
                         <td class="vertical-align">{{ pr_batch.status }}</td>
                     </tr>
+                    {% if pr_complete or pr_error %}
                     <tr>
                         <td class="td-title vertical-align" style="width: 12.00%">other details</td>
                         <td class="vertical-align">
@@ -50,6 +51,7 @@
                             </span>
                         </td>
                     </tr>
+                    {% endif %}
                     </tbody>
                 </table>
             </div>
@@ -58,11 +60,14 @@
                 <table class="table table-head">
                     <thead>
                     <tr>
-                        <th style="width: 12.00%">rentcode</th>
-                        <th style="width: 28.00%">summary</th>
+                        <th style="width: 10.00%">rentcode</th>
+                        <th style="width: 25.00%">summary</th>
                         <th style="width: 11.00%">rent date</th>
-                        <th style="width: 39.00%">total due</th>
-                        <th style="width: 10.00%">delivered</th>
+                        <th style="width: 10.00%">total due</th>
+                        <th style="width: 10.00%">deliver by</th>
+                        <th style="width: 22.00%">email address</th>
+                        <th style="width: 5.00%"></th>
+                        <th style="width: 7.00%">delivery</th>
                     </tr>
                     </thead>
                 </table>
@@ -70,36 +75,31 @@
                     <tbody>
                     {% for item in pay_requests %}
                     <tr id="{{ item.id }}">
-                        <td style="width: 12.00%"> {{ item.rentcode }}
+                        <td style="width: 10.00%" class="vertical-align"> {{ item.rent.rentcode }}</td>
+                        <td style="width: 25.00%" class="vertical-align"> {{ item.summary }}</td>
+                        <td style="width: 11.00%" class="vertical-align"> {{ item.rent_date.strftime('%d-%b-%Y')
+                            if item.rent_date else 'none' }}
                         </td>
-                        <td style="width: 28.00%"> {{ item.summary }}</td>
-                        <td style="width: 11.00%"> {{ item.rent_date.strftime('%d-%b-%Y') if item.rent_date else 'none'
-                            }}
-                        </td>
-                        <td style="width: 9.00%"> {{ item.total_due }}</td>
-                        <td style="width: 11.00%" class="vertical-align"><a
-                                href="{{ url_for('pr_bp.pr_file', pr_id=item.id) }}"
-                                class="btn btn-teal-light btn-small button-icon circles"
-                                role="button">view</a>
+                        <td style="width: 10.00%" class="vertical-align"> {{ item.total_due }}</td>
+                        <td style="width: 10.00%" class="vertical-align">
+                            {{ PrDeliveryTypes.get_name(item.delivery_method) }}
                         </td>
                         <td style="width: 22.00%" class="vertical-align">
+                            {% if item.delivery_method == 1 or 3 %}
+                            {{ item.rent.email }}
+                            {% endif %}
+                        </td>
+                        <td style="width: 5.00%" class="vertical-align">
                             <a target="_blank" href="{{ url_for('pr_bp.pr_print', pr_id=item.id) }}"
-                               class="btn btn-primary btn-small button-icon letter" role="button">print
+                               data-toggle="tooltip" title="print this pay request"
+                               class="btn btn-primary btn-round button-icon round letter" role="button">
                             </a>
                         </td>
                         <td style="width: 7.00%" class="vertical-align">
                             {% if item.delivered %}
-                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=item.id, rent_id=item.rent_id, delivered=False) }}"
-                               class="btn btn-success btn-round button-icon round check"
-                               data-toggle="tooltip"
-                               title="Pay request has been delivered. Select to change to 'undelivered'"
-                               role="button"></a>
+                            delivered
                             {% else %}
-                            <a href="{{ url_for('pr_bp.pr_delivery', pr_id=item.id, rent_id=item.rent_id, delivered=True) }}"
-                               class="btn btn-danger btn-round button-icon round cross"
-                               data-toggle="tooltip"
-                               title="Pay request is not yet delivered. Select to change to 'delivered'"
-                               role="button"></a>
+                            pending
                             {% endif %}
                         </td>
                     </tr>
@@ -114,24 +114,98 @@
             {% endif %}
         </div>
         <div class="col-md-3">
-            <div class="card card-white sticky-top">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col"><span>options</span>
+            <div class="sticky-top">
+                <div class="card card-blue" style="margin-bottom:1rem;">
+                    <a href="#print_batch_card" data-toggle="collapse" aria-expanded="false"
+                       aria-controls="print_batch_card"
+                       class="btn btn-block btn-primary button-icon letter" role="button">
+                        print post pay requests</a>
+                    <div id="print_batch_card" class="collapse">
+                        <div class="card-body text-primary">
+                            <div class="form-group row">
+                                <div class="col-md-4" style="margin:auto;">
+                                    sort by
+                                </div>
+                                <div class="col-md-8">
+                                    {{ widgets.combobox(name="pr_template", items=['rentid']) }}
+                                </div>
+                            </div>
+                            <span><hr></span>
+                            <div class="form-group row" style="margin-bottom: 0px;">
+                                <div class="col">
+                                    <a href="{{ url_for('pr_bp.pr_batch_post', batch_id=pr_batch.id) }}" target="_blank"
+                                       class="btn btn-block btn-primary button-icon letter" role="button">print
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-block btn-secondary button-icon cross"
+                                       role="button" href="#print_batch_card" data-toggle="collapse"
+                                       aria-expanded="false"
+                                       aria-controls="print_batch_card">cancel
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="card-body text-primary">
-                    <div class="form-group row" style="margin-bottom:0px;">
-                        <div class="col">
-                        <a href="{{ url_for('pr_bp.pr_undo_batch', batch_id=pr_batch.id) }}"
-                           class="btn btn-block btn-danger button-icon trash" role="button">undo batch</a>
+                <div class="card card-green" style="margin-bottom:1rem;">
+                    <a href="#email_batch_card" data-toggle="collapse" aria-expanded="false"
+                       aria-controls="email_batch_card"
+                       class="btn btn-block btn-success button-icon arrow-right" role="button">
+                        send email pay requests</a>
+                    <div id="email_batch_card" class="collapse">
+                        <div class="card-body text-primary">
+                            <div class="form-group row">
+                                <div class="col">
+                                    Send emails?
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom: 0px;">
+                                <div class="col">
+                                    <a href="{{ url_for('pr_bp.pr_batch_email', batch_id=pr_batch.id) }}"
+                                       target="_blank"
+                                       class="btn btn-block btn-success button-icon arrow-right" role="button">email
+                                    </a>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-block btn-secondary button-icon cross"
+                                       role="button" href="#email_batch_card" data-toggle="collapse"
+                                       aria-expanded="false"
+                                       aria-controls="email_batch_card">cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-white" style="margin-top:1rem;">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col"><span>other options</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body text-primary">
+                        <div class="form-group row" style="margin-bottom:0px;">
+                            <div class="col">
+                                <a data-toggle="modal" data-target="#modal_undo_batch"
+                                   class="btn btn-block btn-danger button-icon trash" role="button">undo batch</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    {{ widgets.modal_action(
+    body="Are you sure you want to undo this batch?",
+    id="modal_undo_batch",
+    btn_class="btn btn-block btn-danger button-icon trash",
+    btn_text="undo batch",
+    btn_url=url_for('pr_bp.pr_undo_batch', batch_id=pr_batch.id),
+    form="true",
+    title="warning"
+    ) }}
 </form>
 {% endblock %}
 

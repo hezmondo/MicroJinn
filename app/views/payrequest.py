@@ -5,8 +5,8 @@ from app.email import app_send_email
 from app.dao.common import get_filters
 from app.dao.rent import get_rentcode
 from app.dao.form_letter import get_form_id, get_pr_forms
-from app.dao.payrequest import get_batch_pay_requests, get_pr_batch, get_pr_batches, get_pr_block, get_pr_file, \
-    get_pr_history, get_pr_history_row, post_updated_payrequest, post_updated_payrequest_delivery
+from app.dao.payrequest import get_batch_pay_requests, get_batch_pr_post_html, get_pr_batch, get_pr_batches, get_pr_block, \
+    get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, post_updated_payrequest_delivery
 from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, undo_pr_batch, run_batch, \
     save_new_payrequest_from_batch, \
     save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
@@ -20,9 +20,28 @@ pr_bp = Blueprint('pr_bp', __name__)
 def pr_batch(batch_id):
     pr_batch = get_pr_batch(batch_id)
     pay_requests = get_batch_pay_requests(batch_id)
-    for pay_request in pay_requests:
-        pay_request.rentcode = get_rentcode(pay_request.rent_id)
+
     return render_template('pr_batch.html', pr_batch=pr_batch, pay_requests=pay_requests)
+
+
+@pr_bp.route('/pr_batch_email/<int:batch_id>', methods=['GET', 'POST'])
+def pr_batch_email(batch_id):
+    pr_batch = get_pr_batch(batch_id)
+    pay_requests = get_batch_pay_requests(batch_id)
+
+    return render_template('pr_batch.html', pr_batch=pr_batch, pay_requests=pay_requests)
+
+
+@pr_bp.route('/pr_batch_post/<int:batch_id>', methods=['GET', 'POST'])
+def pr_batch_post(batch_id):
+    pay_requests = get_batch_pr_post_html(batch_id)
+    html_complete = ''
+    for pay_request in pay_requests:
+        html_complete = html_complete + pay_request.block + "<p style='page-break-before: always'></p>"
+    convert_html_to_pdf(html_complete, 'pr.pdf')
+    workingdir = os.path.abspath(os.getcwd())
+    filepath = workingdir + '\\app\\temp_files\\'
+    return send_from_directory(filepath, 'pr.pdf')
 
 
 @pr_bp.route('/pr_batches', methods=['GET', 'POST'])
@@ -162,8 +181,6 @@ def pr_run_batch():
             pr_template_id = get_form_id(request.form.get('pr_template'))
             pr_batch, pr_complete, pr_error = run_batch(pr_template_id, rent_id_list, runcode)
             pay_requests = get_batch_pay_requests(pr_batch.id)
-            for pay_request in pay_requests:
-                pay_request.rentcode = get_rentcode(pay_request.rent_id)
         except Exception as ex:
             message = f'Unable to produce batch. Error: {str(ex)}'
             return redirect(url_for('pr_bp.pr_batches', message=message))
@@ -174,7 +191,7 @@ def pr_run_batch():
 @pr_bp.route('/pr_save_send', methods=['GET', 'POST'])
 @login_required
 def pr_save_send():
-    method = request.args.get('method', type=str)
+    method = request.args.get('method', type=int)
     rent_id = request.args.get('rent_id', type=int)
     if request.method == 'POST':
         pr_history_data = collect_pr_history_data()
@@ -185,7 +202,7 @@ def pr_save_send():
             message = f'Cannot save pay request. Database rolled back. Error:  {str(ex)}'
             db.session.rollback()
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id, message=message))
-        if method == 'post':
+        if method == 2:  # delivery: post
             return redirect(url_for('pr_bp.pr_history', rent_id=rent_id))
         else:
             pr_email = request.form.get('pr_email')

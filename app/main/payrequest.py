@@ -197,7 +197,7 @@ def save_new_payrequest_from_batch(batch_id, html, rent_pr):
                        'new_arrears_level': rent_pr.new_arrears_level,
                        'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
                        'charge_total': rent_pr.recovery_charge_amount}
-    pr_history = prepare_new_pr_history_entry(pr_history_data, rent_pr.id, 'post', batch_id)
+    pr_history = prepare_new_pr_history_entry(pr_history_data, rent_pr.id, rent_pr.prdelivery_id, batch_id)
     pr_id = add_pr_history(pr_history)
     pr_rent_data = {'rent_date': rent_pr.nextrentdate.strftime("%Y-%m-%d"),
                     'new_arrears': rent_pr.arrears + rent_pr.rent_gale,

@@ -3,8 +3,8 @@ from app import db
 from app.models import PrArrearsMatrix, PrBatch, PrCharge, PrHistory, Rent
 from app.modeltypes import PrDeliveryTypes
 from app.dao.database import commit_to_database
-from sqlalchemy import desc
-from sqlalchemy.orm import load_only
+from sqlalchemy import desc, not_
+from sqlalchemy.orm import load_only, joinedload
 
 
 def post_pr_batch(runcode, size, status, is_account):
@@ -40,7 +40,14 @@ def add_pr_history(pr_history):
 
 
 def get_batch_pay_requests(batch_id):
-    return db.session.query(PrHistory).filter_by(batch_id=batch_id).all()
+    return db.session.query(PrHistory).filter_by(batch_id=batch_id) \
+        .options(load_only('datetime', 'summary', 'rent_date', 'total_due', 'delivery_method', 'delivered'),
+                 joinedload('rent').load_only('rentcode', 'email')).all()
+
+
+def get_batch_pr_post_html(batch_id):
+    return db.session.query(PrHistory).filter_by(batch_id=batch_id).filter(PrHistory.delivery_method != 1) \
+        .options(load_only('rent_id', 'block', 'delivery_method')).all()
 
 
 def get_last_arrears_level(rent_id):
@@ -80,13 +87,13 @@ def get_pr_history_row(pr_id):
 
 
 def get_pr_ids_from_batch(batch_id):
-    return  db.session.query(PrHistory).filter_by(batch_id=batch_id).options(load_only('id')).all()
+    return db.session.query(PrHistory).filter_by(batch_id=batch_id).options(load_only('id')).all()
 
 
 def get_recovery_info(suffix):
     recovery_info = db.session.query(PrArrearsMatrix).filter_by(suffix=suffix).options(load_only('arrears_clause',
                                                                                                  'recovery_charge',
-                                                                                                 'create_case')).\
+                                                                                                 'create_case')). \
         one_or_none()
     arrears_clause = recovery_info.arrears_clause
     create_case = recovery_info.create_case
@@ -96,7 +103,7 @@ def get_recovery_info(suffix):
 
 def get_recovery_info_x(suffix):
     recovery_info = db.session.query(PrArrearsMatrix).filter_by(suffix=suffix).options(load_only('recovery_charge',
-                                                                                                 'create_case')).\
+                                                                                                 'create_case')). \
         one_or_none()
     create_case = recovery_info.create_case
     recovery_charge = recovery_info.recovery_charge
@@ -118,18 +125,15 @@ def post_updated_payrequest_delivery(delivered, pr_file):
     return rent_id
 
 
-def prepare_new_pr_history_entry(pr_history_data, rent_id, method='email', batch_id=None):
-    summary = pr_history_data.get('pr_code') + "-" + method + "-" + pr_history_data.get('mailaddr')[0:25]
+def prepare_new_pr_history_entry(pr_history_data, rent_id, method=1, batch_id=None):
+    summary = pr_history_data.get('pr_code') + "-" + PrDeliveryTypes.get_name(method) + "-" + pr_history_data.get(
+        'mailaddr')[0:25]
     pr_history = PrHistory(block=pr_history_data.get('block').replace("£", "&pound;"), rent_id=rent_id,
                            summary=summary, datetime=datetime.now(),
                            rent_date=datetime.strptime(pr_history_data.get('rent_date'), '%Y-%m-%d'),
                            total_due=pr_history_data.get('tot_due'),
                            arrears_level=pr_history_data.get('new_arrears_level'),
-                           delivery_method=PrDeliveryTypes.get_id(method), delivered=False, batch_id=batch_id)
-    # TODO: We are not using the typeprdelivery table yet in any meaningful way
-    #  - should we remove it and make delivery_method in pr_history a string column?
-    #  - We'd have to hard code the method strings in any combodict filters
-    # TODO: Add pending / delivered functionality
+                           delivery_method=method, delivered=False, batch_id=batch_id)
     return pr_history
 
 
