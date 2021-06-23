@@ -1,13 +1,9 @@
 import sqlalchemy
 from app import db
 from datetime import date
-from sqlalchemy import func
+from sqlalchemy import func, select
 from app.dao.database import commit_to_database
 from app.models import Lease, LeaseUpType, Rent
-
-
-def dbget_lease_row(lease_id):
-    return Lease.query.get(lease_id)
 
 
 def dbget_lease(lease_id, rent_id):
@@ -30,6 +26,14 @@ def dbget_lease(lease_id, rent_id):
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
 
     return lease, uplift_types
+
+
+def dbget_lease_row(lease_id):
+    return Lease.query.get(lease_id)
+
+
+def dbget_lease_row_rent(rent_id):
+    return db.session.execute(select(Lease).filter_by(rent_id=rent_id)).scalar_one()
 
 
 def dbget_leasedata(rent_id, grfactor, calc_date):

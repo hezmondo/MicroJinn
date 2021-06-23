@@ -8,7 +8,7 @@ lease_bp = Blueprint('lease_bp', __name__)
 @login_required
 def lease(lease_id):
     if request.method == "POST":
-        rent_id = post_lease(lease_id)
+        rent_id = post_lease()
         return redirect(url_for('rent_bp.rent', rent_id=rent_id))
     lease, uplift_types = get_lease_info(lease_id)
 
