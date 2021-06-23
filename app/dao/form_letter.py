@@ -56,7 +56,11 @@ def get_pr_forms():
 
 
 def get_pr_form_codes():
-    return db.session.query(FormLetter).filter_by(doctype_id=2).options(load_only('code')).all()
+    pr_forms = db.session.query(FormLetter).filter_by(doctype_id=2).options(load_only('code')).all()
+    pr_template_codes = []
+    for pr_form in pr_forms:
+        pr_template_codes.append(pr_form.code)
+    return pr_template_codes
 
 
 def post_form_letter(form_letter_id):

@@ -96,6 +96,7 @@ def get_rent_gale(next_rent_date, frequency, rentpa):
         return money(rentpa / frequency)
     rent_gale = money(round_decimals_down(rentpa / frequency))
     if (frequency == 2 and next_rent_date.month > 6) or (frequency == 4 and next_rent_date.month > 9):
+        # TODO: Check that we can divide by 100 without any errors or extra 00000s ever
         return rent_gale + (missing_pennies / 100)
     else:
         return money(rent_gale)

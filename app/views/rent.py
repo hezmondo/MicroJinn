@@ -60,10 +60,7 @@ def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
     fdict, rents = get_rents_advanced(action, filtr_id)   # get filter values and rent objects
     jfilters = get_filters(1) if method == 'pr' else get_filters(2)
     if method == 'pr':
-        pr_templates = get_pr_form_codes()
-        pr_template_codes = []
-        for item in pr_templates:
-            pr_template_codes.append(item.code)
+        pr_template_codes = get_pr_form_codes()
         return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
                                fdict=fdict, jfilters=jfilters, method=method, pr_template_codes=pr_template_codes, rents=rents)
 

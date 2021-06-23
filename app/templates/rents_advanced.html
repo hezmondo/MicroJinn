@@ -349,7 +349,8 @@
                                 <td style="width: 15.00%"> {{ item.tenantname }}</td>
                                 <td style="width: 22.00%">{{ item.propaddr }}</td>
                                 <td style="width: 8.00%"> {{ item.source }}</td>
-                                <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) | truncate(40) }}
+                                <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) |
+                                    truncate(40) }}
                                 </td>
                                 <td style="width: 2.00%" class="vertical-align">
                                     <a href="{{ url_for('rent_bp.rent', rent_id=item.id) }}"
@@ -411,16 +412,31 @@
                             <div class="card-body text-primary">
                                 <div class="form-group row">
                                     <div class="col-md-6" style="margin:auto;">
-                                        select template
+                                        select pr template
                                     </div>
                                     <div class="col-md-6">
                                         {{ widgets.combobox(name="pr_template", items=pr_template_codes) }}
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <div class="col-md-6" style="margin:auto;">
+                                        select email template
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ widgets.combobox(name="pr_template", items=['EPR']) }}
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col">
+                                        <a class="btn btn-block btn-teal button-icon circles" role="button">
+                                            view pay request templates
+                                        </a>
+                                    </div>
+                                </div>
                                 <span><hr></span>
                                 <div class="form-group row">
                                     <div class="col">
-                                        <span>Produce a pay request batch for these {{ rents|length }} rents?
+                                        <span>Produce a pay request batch for these {{ rents|length }} rents?</span>
                                     </div>
                                 </div>
                                 <div class="form-group row" style="margin-bottom: 0px;">
@@ -513,5 +529,6 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
 </script>
 {% endblock %}
