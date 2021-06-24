@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template,  request
 from flask_login import login_required
-from app.dao.form_letter import get_form_letters
+from app.main.form_letter import mget_form_letters
 from app.main.mail import get_mail_pack, writeMail
 
 mail_bp = Blueprint('mail_bp', __name__)
@@ -10,7 +10,7 @@ mail_bp = Blueprint('mail_bp', __name__)
 @login_required
 def mail_dialog(rent_id):
     action = request.args.get('action', "all", type=str)
-    form_letters = get_form_letters(action)
+    form_letters = mget_form_letters(action)
     mail_pack = get_mail_pack(rent_id)
     return render_template('mail_dialog.html', action=action, form_letters=form_letters, mail_pack=mail_pack)
 

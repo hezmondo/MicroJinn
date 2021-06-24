@@ -49,7 +49,7 @@ def delete_record(item_id, item):
         redir = "util_bp.email_accs"
     elif item == "formletter":
         FormLetter.query.filter_by(id=item_id).delete()
-        redir = "formletter_bp.forms"
+        redir = "form_letter_bp.form_letters"
     elif item == "income":
         Income.query.filter_by(id=item_id).delete()
         redir = "income_bp.income"

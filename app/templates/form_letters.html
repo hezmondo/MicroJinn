@@ -1,50 +1,86 @@
 <!-- /templates/form_letters.html  -->
 {% extends 'base.html' %}
-
+{% import 'widgets.html' as widgets %}
 {% block app_content %}
-<form method="POST" id="target">
-    <div class="form-group row">
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="code" placeholder="code">
-        </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="description" placeholder="description">
-        </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="subject" placeholder="subject">
-        </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control" name="block" placeholder="block">
+
+<div class="row">
+    <div class="col-md-9">
+        <div class="table-fixed">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th style="width: 15.00%">code</th>
+                    <th style="width: 60.00%">description</th>
+                    <th style="width: 15.00%"></th>
+                    <th style="width: 10.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in form_letters %}
+                <tr>
+                    <td style="width: 15.00%">{{ item.code }}</td>
+                    <td style="width: 60.00%">{{ item.description }}</td>
+                    <td style="width: 15.00%"><a
+                            href="#"
+                            class="btn btn-warning btn-small button-icon invoice" role="button">duplicate</a></td>
+                    <td style="width: 10.00%"><a
+                            href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id) }}"
+                            class="btn btn-teal-light btn-small button-icon circles" role="button">view</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="form-group row flex-row-reverse">
-        <div class="col-md-3">
-            <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
-        </div>
-        <div class="col-md-3">
-            <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=0) }}"
-               class="btn btn-block btn-danger button-icon plus" role="button">add new form_letter</a>
-        </div>
+    <div class="col-md-3">
+        <form method="POST" id="target">
+            <div class="sticky-top">
+                <div class="card card-white" style="margin-bottom: 1rem;">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">search</div>
+                        </div>
+                    </div>
+                    <div class="card-body text-primary">
+                        <div class="form-group row">
+                            <div class="col">
+                                <input type="text" class="form-control" name="code" placeholder="code"
+                                       value="{{ fdict.code }}">
+                                <input type="text" class="form-control" name="description"
+                                       placeholder="description" value="{{ fdict.description }}">
+                                <input type="text" class="form-control" name="subject" placeholder="subject"
+                                       value="{{ fdict.subject }}">
+                                <input type="text" class="form-control" name="block" placeholder="content"
+                                       value="{{ fdict.block }}">
+                            </div>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <div class="col">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-white">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col">actions</div>
+                        </div>
+                    </div>
+                    <div class="card-body text-primary">
+                        <div class="row">
+                            <div class="col">
+                                <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=0) }}"
+                                   class="btn btn-block btn-danger button-icon plus" role="button">add new
+                                    form_letter</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="form-group row">
-    </div>
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th style="width: 20.00%">code</th>
-            <th style="width: 60.00%">description</th>
-            <th style="width: 10.00%">action</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in form_letters %}
-        <tr>
-            <td style="width: 20.00%">{{ item.code }}</td>
-            <td style="width: 60.00%">{{ item.description }}</td>
-            <td style="width: 10.00%" ><a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id) }}" class="btn btn-teal-light btn-small button-icon circles" role="button">view</a></td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</form>
+</div>
 {% endblock %}
