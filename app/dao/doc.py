@@ -78,6 +78,10 @@ def get_docfiles_text(rent_id):
     return DocFile.query.filter_by(rent_id=rent_id)
 
 
+def get_typedoc_id(doctype):
+    return TypeDoc.query.with_entities(TypeDoc.id).filter(TypeDoc.desc == doctype).one()[0]
+
+
 def upload_docfile(docfile):
     db.session.add(docfile)
     commit_to_database()

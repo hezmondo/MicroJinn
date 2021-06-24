@@ -23,6 +23,14 @@ $(document).ready(function(){
         $('#more_vars').hide();
         $('#lease_vars').show();
     });
+    $('#expand_edit').on('shown.bs.collapse', function () {
+        $("#doc_html").css({"background-color": "white"});
+        $(':input').prop('readonly', false);
+    });
+    $('#expand_edit').on('hidden.bs.collapse', function () {
+        $("#doc_html").css({"background-color": "#f8f8f8"});
+        $(':input').prop('readonly', true);
+    });
 });
 
 function add_markup(markup) {

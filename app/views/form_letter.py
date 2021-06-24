@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, request, url_for
 from flask_login import login_required
 from app.dao.common import get_doc_types
-from app.dao.form_letter import get_form_letter, get_form_letters, post_form_letter
+from app.main.form_letter import mget_form_letter, mget_form_letters_from_search, mpost_form_letter, mpost_form_letter_new
+from app.dao.form_letter import get_form_letters_all
 
 form_letter_bp = Blueprint('form_letter_bp', __name__)
 
@@ -10,18 +11,27 @@ form_letter_bp = Blueprint('form_letter_bp', __name__)
 @login_required
 def form_letter(form_letter_id):
     if request.method == "POST":
-        form_letter_id = post_form_letter(form_letter_id)
-        return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id))
+        try:
+            form_letter_id = mpost_form_letter_new() if form_letter_id == 0 else mpost_form_letter(form_letter_id)
+            return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id))
+        except Exception as ex:
+            message = f'Unable to save the letter. Error: {str(ex)}'
+            return redirect(url_for('form_letter_bp.form_letters', message=message))
     doc_types = [typedoc.desc for typedoc in get_doc_types()]
-    form_letter = get_form_letter(form_letter_id)
+    form_letter = mget_form_letter(form_letter_id) if form_letter_id != 0 else ''
     variables = list_variables()
     return render_template('form_letter.html', doc_types=doc_types, form_letter=form_letter, variables=variables)
 
 
-@form_letter_bp.route('/form_letters', methods=['GET'])
+@form_letter_bp.route('/form_letters', methods=['GET', 'POST'])
 def form_letters():
-    form_letters = get_form_letters("all")
-    return render_template('form_letters.html', form_letters=form_letters)
+    message = request.args.get('message')
+    fdict = {}
+    if request.method == 'POST':
+        form_letters, fdict = mget_form_letters_from_search()
+    else:
+        form_letters = get_form_letters_all()
+    return render_template('form_letters.html', form_letters=form_letters, fdict=fdict, message=message)
 
 
 # TODO: These variables are hardcoded, rather than obtained from the get_variables code. With this method they'll
