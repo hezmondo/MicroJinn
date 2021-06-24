@@ -42,10 +42,10 @@ def get_leases():
 
 def get_lease_variables(rent_id):
     fhfactor = 1 + (Decimal(request.form.get('fh_rate')) / 100)
-    grfactor = 1 + (Decimal(request.form.get('gr_rate')) / 100)
+    gr_rate = Decimal(request.form.get('gr_rate'))
     gr_new = Decimal(request.form.get('gr_new'))
     yp_val = Decimal(request.form.get('yp_val'))
-    leasedata = dbget_leasedata(rent_id, grfactor, date.today())
+    leasedata = dbget_leasedata(rent_id, gr_rate, date.today())
     grval = leasedata["grval"]
     realty = leasedata["realty"]
     rent_code = leasedata["rent_code"]
