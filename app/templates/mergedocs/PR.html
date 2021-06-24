@@ -87,16 +87,16 @@
                     <div class="form-group row" style="margin-bottom:0px;">
                         <div class="col">
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='post', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method=2, rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon letter" role="button">post
                             </button>
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email and post', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method=3, rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon mail-ic" role="button">post and
                                 email
                             </button>
                             <button type="submit"
-                                    formaction="{{ url_for('pr_bp.pr_save_send', method='email', rent_id=rent_pr.id) }}"
+                                    formaction="{{ url_for('pr_bp.pr_save_send', method=1, rent_id=rent_pr.id) }}"
                                     class="btn btn-block btn-success save_pr button-icon email-ic" role="button">email
                             </button>
                         </div>

@@ -1,0 +1,71 @@
+<!-- /templates/pr_batches.html  -->
+{% extends 'base.html' %}
+
+{% import 'widgets.html' as widgets %}
+
+{% block app_content %}
+<div class="row">
+    <div class="col-md-9">
+        {% if pr_batches %}
+        <div class="table-fixed">
+            <table class="table" id="pr_batches">
+                <thead>
+                <tr>
+                    <th style="width: 10.00%">id</th>
+                    <th style="width: 20.00%">date time</th>
+                    <th style="width: 10.00%">code</th>
+                    <th style="width: 10.00%">size</th>
+                    <th style="width: 10.00%">status</th>
+                    <th style="width: 38.00%">type</th>
+                    <th style="width: 2.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in pr_batches %}
+                <tr id="{{ item.id }}">
+                    <td style="width: 10.00%">{{ item.id }}</td>
+                    <td style="width: 20.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') }}</td>
+                    <td style="width: 10.00%"> {{ item.code }}</td>
+                    <td style="width: 10.00%"> {{ item.size }}</td>
+                    <td style="width: 10.00%"> {{ item.status }}</td>
+                    <td style="width: 38.00%">
+                        {% if item.is_account %} account {% else %} pay request {% endif %}
+                    </td>
+                    <td style="width: 2.00%" class="vertical-align"><a href="{{ url_for('pr_bp.pr_batch',
+            batch_id=item.id) }}" class="btn btn-teal-light btn-round button-icon round circles" role="button"></a>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="boxed boxed-center boxed-blue">
+            There are no pay request batches. Go to 'pr start' to create a batch.
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-3">
+        <div class="sticky-top">
+            <div class="card card-white" style="margin-bottom: 1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <form method="POST" id="target">
+                        <div class="form-group row" style="margin-bottom: 0px;">
+                            <div class="col">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">
+                                    search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

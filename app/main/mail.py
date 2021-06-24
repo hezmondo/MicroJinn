@@ -1,5 +1,5 @@
 from flask import request
-from app.dao.form_letter import get_form_letter
+from app.main.form_letter import mget_form_letter
 from app.dao.income import get_income_item
 from app.dao.rent import get_rent_md
 from app.main.functions import dateToStr, doReplace, moneyToStr
@@ -27,7 +27,7 @@ def writeMail(form_letter_id, template):
     variables['#paydate#'] = dateToStr(income_item.paydate) if income_item else "no paydate"
     variables['#payer#'] = income_item.payer if income_item else "no payer"
     variables['#paytypedet#'] = PayTypes.get_name(income_item.paytype_id) if income_item else "no paytype"
-    form_letter = get_form_letter(form_letter_id)
+    form_letter = mget_form_letter(form_letter_id)
     leasedata = None
     if "LEQ" in form_letter.code:
         leasedata, lease_variables = get_lease_variables(rent_id)

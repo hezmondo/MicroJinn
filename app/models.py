@@ -94,6 +94,8 @@ class DocFile(db.Model):
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
     out_in = db.Column(db.SmallInteger, nullable=False)
 
+    pr_history_docfile = db.relationship('PrHistory', backref='pr_history', lazy='dynamic')
+
 
 class EmailAcc(db.Model):
     __tablename__ = 'email_acc'
@@ -442,6 +444,7 @@ class PrHistory(db.Model):
     arrears_level = db.Column(db.String(1))
     delivery_method = db.Column(db.Integer)
     delivered = db.Column(db.Boolean)
+    docfile_id = db.Column(db.Integer, db.ForeignKey('docfile.id'))
 
     pr_charge_pr_history = db.relationship('PrCharge', backref='pr_history', lazy='dynamic')
 

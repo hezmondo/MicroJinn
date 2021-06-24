@@ -6,7 +6,7 @@ from sqlalchemy import asc
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
-    Income, IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrCharge, PrHistory, \
+    Income, IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrBatch, PrCharge, PrHistory, \
     Rent, RecentSearch, MoneyAcc, TypeDeed, TypeDoc
 
 
@@ -49,7 +49,7 @@ def delete_record(item_id, item):
         redir = "util_bp.email_accs"
     elif item == "formletter":
         FormLetter.query.filter_by(id=item_id).delete()
-        redir = "formletter_bp.forms"
+        redir = "form_letter_bp.form_letters"
     elif item == "income":
         Income.query.filter_by(id=item_id).delete()
         redir = "income_bp.income"
@@ -102,6 +102,8 @@ def delete_record_basic(item_id, item):
         PrCharge.query.filter_by(id=item_id).delete()
     elif item == "pr_file":
         PrHistory.query.filter_by(id=item_id).delete()
+    elif item == "pr_batch":
+        PrBatch.query.filter_by(id=item_id).delete()
 
 
 @cache.cached(key_prefix='db_charge_types_all')
