@@ -59,7 +59,7 @@ def get_pr_batch(batch_id):
 
 
 def get_pr_batches():
-    return PrBatch.query.all()
+    return PrBatch.query.order_by(-PrBatch.datetime).all()
 
 
 def get_pr_block(pr_id):

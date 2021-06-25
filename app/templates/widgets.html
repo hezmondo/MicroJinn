@@ -6,7 +6,7 @@
     {% if items0 %}
     <!-- Optionally an extra item can be passed in as `items0` -->
     <!-- This convenince allows callers to insert some "all ..." at the start of the list for a filter choice -->
-    {% set selected = 'selected' if items0 in items_selected else '' %}
+    {% set selected = 'selected' if items0 in item_selected else '' %}
     <option value="{{items0}}" {{selected}}>{{items0}}</option>
     {% endif %}
     {% for item in items %}

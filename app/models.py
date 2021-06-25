@@ -594,6 +594,7 @@ class User(UserMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     recent_rents = db.Column(db.String(300))
     recent_agents = db.Column(db.String(300))
+    settings = db.Column(db.String(300))
 
     def __repr__(self):
 

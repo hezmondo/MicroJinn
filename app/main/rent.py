@@ -319,7 +319,7 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
         fdict['description'] = request.form.get("filterdesc")
     # now get filtered rent objects for this filter
     if request.method == 'POST':
-        runsize = (request.form.get('runsize') or 50) if action != 'load' else (fdict.get('runsize') or 50)
+        runsize = (request.form.get('runsize') or 300) if action != 'load' else (fdict.get('runsize') or 300)
         rents = getrents_advanced(filtr, runsize)
         for rent in rents:
             rent.propaddr = get_propaddr(rent.id)

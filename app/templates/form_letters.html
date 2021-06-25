@@ -9,23 +9,38 @@
             <table class="table table-condensed">
                 <thead>
                 <tr>
-                    <th style="width: 15.00%">code</th>
-                    <th style="width: 60.00%">description</th>
-                    <th style="width: 15.00%"></th>
+                    <th style="width: 18.00%">code</th>
+                    <th style="width: 55.00%">description</th>
                     <th style="width: 10.00%"></th>
+                    <th style="width: 12.00%"></th>
+                    <th style="width: 5.00%"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for item in form_letters %}
                 <tr>
-                    <td style="width: 15.00%">{{ item.code }}</td>
-                    <td style="width: 60.00%">{{ item.description }}</td>
-                    <td style="width: 15.00%"><a
-                            href="#"
-                            class="btn btn-warning btn-small button-icon invoice" role="button">duplicate</a></td>
+                    <td style="width: 18.00%">{{ item.code }}</td>
+                    <td style="width: 55.00%">{{ item.description }}</td>
                     <td style="width: 10.00%"><a
-                            href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id) }}"
+                            data-toggle="tooltip" title="view and edit this form letter"
+                            href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id, method=method) }}"
                             class="btn btn-teal-light btn-small button-icon circles" role="button">view</a></td>
+                    <td style="width: 12.00%">
+                        {% if method == 'payrequest' %}
+                        <a data-toggle="tooltip" title="make a copy of this form letter"
+                           href="{{ url_for('form_letter_bp.form_letter_clone', method=method, form_letter_id=item.id) }}"
+                           class="btn btn-info btn-small button-icon invoice" role="button">clone</a>
+                        {% else %}
+                        <a data-toggle="tooltip" title="make a copy of this form letter"
+                           href="{{ url_for('form_letter_bp.form_letter_clone', form_letter_id=item.id) }}"
+                           class="btn btn-info btn-small button-icon invoice" role="button">clone</a>
+                        {% endif %}
+                    </td>
+                    <td style="width: 5.00%"><a
+                            data-toggle="tooltip" title="delete this form letter"
+                            onclick="return confirm('Are you sure you want to delete this form letter?');"
+                            href="{{ url_for('util_bp.delete_item', item_id=item.id, item='formletter') }}"
+                            class="btn btn-danger btn-round button-icon round trash" role="button"></a></td>
                 </tr>
                 {% endfor %}
                 </tbody>
@@ -33,19 +48,30 @@
         </div>
     </div>
     <div class="col-md-3">
-        <form method="POST" id="target">
-            <div class="sticky-top">
-                <div class="card card-white" style="margin-bottom: 1rem;">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col">search</div>
-                        </div>
+
+        <div class="sticky-top">
+            <div class="card card-white" style="margin-bottom: 1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
                     </div>
-                    <div class="card-body text-primary">
+                </div>
+                <div class="card-body text-primary">
+                    <form method="POST" id="target">
                         <div class="form-group row">
                             <div class="col">
+                                {% if method %}
+                                {{ widgets.combobox(name="doc_type", items=doc_types, items0="all doc types",
+                                item_selected=method) }}
+                                {% elif fdict.doc_type %}
+                                {{ widgets.combobox(name="doc_type", items=doc_types, items0="all doc types",
+                                item_selected=fdict.doc_type) }}
+                                {% else %}
+                                {{ widgets.combobox(name="doc_type", items=doc_types, items0="all doc types",
+                                item_selected="all doc types") }}
+                                {% endif %}
                                 <input type="text" class="form-control" name="code" placeholder="code"
-                                       value="{{ fdict.code }}">
+                                       value="{{ fdict.code }}" style="margin-top:1rem;">
                                 <input type="text" class="form-control" name="description"
                                        placeholder="description" value="{{ fdict.description }}">
                                 <input type="text" class="form-control" name="subject" placeholder="subject"
@@ -61,26 +87,68 @@
                                 </button>
                             </div>
                         </div>
+                    </form>
+                </div>
+            </div>
+            {% if fdict.doc_type == 'payrequest' or method == 'payrequest' %}
+            <div class="card card-white" style="margin-top:1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">pay request options</div>
                     </div>
                 </div>
-                <div class="card card-white">
-                    <div class="card-header">
-                        <div class="row">
-                            <div class="col">actions</div>
-                        </div>
-                    </div>
-                    <div class="card-body text-primary">
+                <div class="card-body text-primary">
+                    <form method="POST" id="pr_defaults" target="{{ url_for('form_letter_bp.save_pr_defaults') }}">
                         <div class="row">
                             <div class="col">
-                                <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=0) }}"
-                                   class="btn btn-block btn-danger button-icon plus" role="button">add new
-                                    form_letter</a>
+                                select default pr template
                             </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {{ widgets.combobox(name="pr_default", items=pr_template_codes,
+                                item_selected=pr_defaults.pr_default) }}
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:1rem;">
+                            <div class="col">
+                                select default pr email template
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                {{ widgets.combobox(name="pr_email_default", items=pr_template_codes,
+                                item_selected=pr_defaults.pr_email_default) }}
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:1rem;">
+                            <div class="col">
+                                <button formaction="{{ url_for('form_letter_bp.save_pr_defaults') }}"
+                                        class="btn btn-block btn-primary button-icon save" role="button">save defaults
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+            <div class="card card-white" style="margin-top:1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">actions</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col">
+                            <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=0) }}"
+                               class="btn btn-block btn-danger button-icon plus" role="button">add new
+                                form_letter</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}

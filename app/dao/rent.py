@@ -1,6 +1,7 @@
 import json
 from app import db
 from flask import flash, redirect, url_for, request
+from sqlalchemy import select
 from sqlalchemy.orm import joinedload, load_only
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
@@ -129,3 +130,8 @@ def post_rent(rent):
 
     return rent_id
 
+
+def update_filter_last_used(code, datetime):
+    jstore = db.session.execute(select(Jstore).filter_by(code=code)).scalar_one()
+    jstore.last_used=datetime
+    commit_to_database()

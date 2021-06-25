@@ -7,14 +7,15 @@
 <div class="form-group row">
     <div class="col-md-9">
         <span class="title-text">
-            {% if action == 'load' or action == 'save' %}
+            {% if fdict.code %}
             <b>{{ fdict.code }}</b> - {{ fdict.description }}
-            {% elif action == 'search' %}
+            {% endif %}
+            {% if action == 'search' %}
             New Search
             {% endif %}
         </span>
     </div>
-    {% if method == 'pr' %}
+    {% if method == 'payrequest' %}
     <div class="col-md-3">
         <a href="{{ url_for('pr_bp.pr_start') }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to filter select</a>
@@ -22,7 +23,7 @@
     {% endif %}
 </div>
 <form action="/filter" method="post">
-    {% if action == 'initialize' and method == 'pr' %}
+    {% if action == 'initialize' and method == 'payrequest' %}
     <div class="boxed boxed-center boxed-blue" style="margin-bottom: 1rem;">
         <div class="row">
             <div class="col">
@@ -40,7 +41,7 @@
                    class="btn btn-block btn-danger button-icon filter"
                    role="button">
                     <span>
-                        {% if method == 'pr' %}
+                        {% if method == 'payrequest' %}
                         load pay request filter
                         {% elif method == 'rent' %}
                         load rent filter
@@ -54,23 +55,21 @@
                         <tbody>
                         {% for item in jfilters %}
                         <tr>
+                            <td style="width: 20.00%">{{ item.last_used }}</td>
                             <td style="width: 10.00%">{{ item.code }}</td>
-                            <td style="width: 60.00%">{{ item.description}}</td>
-                            <td>
+                            <td style="width: 50.00%">{{ item.description}}</td>
+                            <td style="width: 15.00%">
                                 <button type="submit"
                                         formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
                                         action='load', method=method) }}"
                                         class="btn btn-danger btn-small button-icon filter">load
                                 </button>
                             </td>
-                            <td>
-                                <a
-                                        class="btn btn-small btn-warning button-icon trash"
-                                        style="text-align: left;"
-                                        href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
-                                        onclick="return confirm('are you sure you want to delete this filter?');">
-                                    delete
-                                </a>
+                            <td style="width: 5.00%">
+                                <a class="btn btn-round btn-warning button-icon round trash"
+                                   title="delete this filter" data-toggle="tooltip"
+                                   href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
+                                   onclick="return confirm('are you sure you want to delete this filter?');"></a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -294,7 +293,8 @@
                                                 </div>
                                                 <div class="col">
                                                     <button type="submit"
-                                                            formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=filtr_id, action='search', method=method) }}"
+                                                            formaction="{{ url_for('rent_bp.rents_advanced',
+                                                            filtr_id=filtr_id, action='search', method=method, code=fdict.code) }}"
                                                             class="btn btn-block btn-success button-icon search"
                                                             role="button">
                                                         run filter
@@ -402,7 +402,7 @@
                             </div>
                         </div>
                     </div>
-                    {% if method == 'pr' and rents|length > 1 %}
+                    {% if method == 'payrequest' and rents|length > 1 %}
                     <div class="card card-green" style="margin-bottom:1rem;">
                         <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
                            aria-controls="produce_pr_card"
@@ -415,7 +415,8 @@
                                         select pr template
                                     </div>
                                     <div class="col-md-6">
-                                        {{ widgets.combobox(name="pr_template", items=pr_template_codes) }}
+                                        {{ widgets.combobox(name="pr_template", items=pr_template_codes,
+                                        item_selected=pr_defaults.pr_default) }}
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -423,12 +424,15 @@
                                         select email template
                                     </div>
                                     <div class="col-md-6">
-                                        {{ widgets.combobox(name="pr_template", items=['EPR']) }}
+                                        {{ widgets.combobox(name="pr_template", items=pr_template_codes,
+                                        item_selected=pr_defaults.pr_email_default) }}
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <div class="col">
-                                        <a class="btn btn-block btn-teal button-icon circles" role="button">
+                                        <a class="btn btn-block btn-teal button-icon circles"
+                                           href="{{ url_for('form_letter_bp.form_letters', method='payrequest') }}"
+                                           role="button">
                                             view pay request templates
                                         </a>
                                     </div>
@@ -464,46 +468,16 @@
         </div>
         <!--hidden input to save rent ids to send to pr_batch-->
         <input type="hidden" id="rent_id_list" name="rent_id_list" value="{{ rent_ids }}">
-        {% if action != 'search' %}
+        {% if fdict.code %}
         <input type="hidden" id="runcode" name="runcode" value="{{ fdict.code }}">
+        {% else %}
+        <input type="hidden" id="runcode" name="runcode" value="Unsaved Filter">
         {% endif %}
 </form>
 {% endblock %}
 
 {% block javascript %}
 <script type="text/javascript">
-    // Selecting an filter from advanced filters will populate the search fields
-    $('.load-filters').mousedown(function(e) {
-        var dict = $.parseJSON($(this).val());
-        $('#filter_rentcode').val(dict.rentcode);
-        $('#filter_tenantname').val(dict.tenantname);
-        $('#filter_propaddr').val(dict.propaddr);
-        $('#filter_agentdetail').val(dict.agentdetail);
-        $('#filter_landlord').val(dict.landlord);
-        $('#filter_tenure').val(dict.tenure);
-        $('#filter_status').val(dict.status);
-        $('#filter_salegrade').val(dict.salegrade);
-        $('#filter_actype').val(dict.actype);
-        $('#filter_source').val(dict.source);
-        $('#filter_rentpa').val(dict.rentpa);
-        $('#modifier_rentpa').val(dict.modifier_rentpa);
-        $('#filter_arrears').val(dict.arrears);
-        $('#modifier_arrears').val(dict.modifier_arrears);
-        $('#filter_rentperiods').val(dict.rentperiods);
-        $('#modifier_rentperiods').val(dict.modifier_rentperiods);
-        $('#filter_enddate').val(dict.enddate);
-        $('#filter_charges').val(dict.charges);
-        $('#filter_agentmailto').val(dict.agentmailto);
-        $('#filter_emailable').val(dict.emailable);
-        $('#filter_prdelivery').val(dict.prdelivery);
-        $('#filter_filtertype').val(dict.filtertype);
-        $('#filter_runsize').val(dict.runsize);
-        // expand filters
-        $('.collapse-filter').collapse('show');
-    });
-    $('.hide-filters').mousedown(function(e) {
-        $('.collapse').collapse('hide');
-    });
     $('.clear-filters').mousedown(function(e) {
         $('#filter_rentcode').val('');
         $('#filter_tenantname').val('');
@@ -529,6 +503,5 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
-
 </script>
 {% endblock %}

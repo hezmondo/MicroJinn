@@ -15,7 +15,7 @@ from app.dao.payrequest import post_pr_batch_empty,  add_pr_history, get_last_ar
     get_pr_charge, get_pr_file, get_pr_history_row, get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \
     post_updated_payrequest_delivery, add_pr_charge, update_pr_batch
 from app.dao.common import delete_record_basic
-from app.dao.rent import get_rentcode
+from app.dao.rent import get_rentcode, update_filter_last_used
 from app.main.functions import dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_pr_strings, update_roll_rent, update_rollback_rent
 from app.main.common import inc_date_m
@@ -155,10 +155,10 @@ def run_batch(pr_template_id, rent_id_list, runcode):
         except Exception as ex:
             pr_error[rent_id] = str(ex)
     pr_batch = update_pr_batch(batch_id, runcode, len(pr_complete), 'pending', False)
-    action_str = 'Pay request Batch ' + str(pr_batch.id) + ' of ' + str(pr_batch.size) + ' pay requests saved | ' + \
+    update_filter_last_used(pr_batch.code, pr_batch.datetime)
+    action_str = 'Pay request Batch ' + str(pr_batch.id) + ' containing ' + str(pr_batch.size) + ' pay requests saved | ' + \
                  pr_batch.code
-    # TODO: Modify link from action to pr_batch
-    # add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_pr.id})
+    add_action(2, 0, action_str, 'pr_bp.pr_batches')
     return pr_batch, pr_complete, pr_error
 
 
@@ -209,7 +209,7 @@ def save_new_payrequest_from_batch(batch_id, html, rent_pr):
     return pr_id
 
 
-def undo_pr(pr_id):
+def undo_pr(pr_id, batch=False):
     pr_file = get_pr_file(pr_id)
     rent_id = pr_file.rent_id
     try:
@@ -235,11 +235,12 @@ def undo_pr(pr_id):
         rent_gale = get_rent_gale(rentobj.lastrentdate, rentobj.freq_id, rentobj.rentpa)
         altered_arrears = rentobj.arrears - rent_gale
         update_rollback_rent(rent_id, altered_arrears)
-        # save action to actions table
-        action_str = 'pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
-                     moneyToStr(pr_file.total_due, pound=True) + ' has been undone'
-        add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         commit_to_database()
+        # save action to actions table if not from a batch
+        if not batch:
+            action_str = 'pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
+                         moneyToStr(pr_file.total_due, pound=True) + ' has been undone'
+            add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         message = "Pay request undone!"
     except Exception as ex:
         return type(ex), rent_id
@@ -249,9 +250,11 @@ def undo_pr(pr_id):
 def undo_pr_batch(batch_id):
     pr_ids = get_pr_ids_from_batch(batch_id)
     for pr_id in pr_ids:
-        undo_pr(pr_id.id)
+        undo_pr(pr_id.id, True)
     delete_record_basic(batch_id, 'pr_batch')
     commit_to_database()
+    action_str = 'Pay request Batch ' + str(batch_id) + ' undone'
+    add_action(2, 0, action_str, 'pr_bp.pr_batches')
 
 
 def update_pr_delivered(pr_id):
