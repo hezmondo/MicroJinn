@@ -1,13 +1,9 @@
 import sqlalchemy
 from app import db
 from datetime import date
-from sqlalchemy import func
+from sqlalchemy import func, select
 from app.dao.database import commit_to_database
 from app.models import Lease, LeaseUpType, Rent
-
-
-def dbget_lease_row(lease_id):
-    return Lease.query.get(lease_id)
 
 
 def dbget_lease(lease_id, rent_id):
@@ -32,9 +28,17 @@ def dbget_lease(lease_id, rent_id):
     return lease, uplift_types
 
 
-def dbget_leasedata(rent_id, grfactor, calc_date):
+def dbget_lease_row(lease_id):
+    return Lease.query.get(lease_id)
+
+
+def dbget_lease_row_rent(rent_id):
+    return db.session.execute(select(Lease).filter_by(rent_id=rent_id)).scalar_one()
+
+
+def dbget_leasedata(rent_id, gr_rate, calc_date):
     resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c)"),
-                     params={"a": rent_id, "b": grfactor, "c": calc_date})
+                     params={"a": rent_id, "b": gr_rate, "c": calc_date})
     leasedata = [dict(row) for row in resultproxy][0]
     commit_to_database()
 

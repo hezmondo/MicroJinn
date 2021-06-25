@@ -4,7 +4,7 @@ from decimal import Decimal
 from flask import request
 from app.main.functions import money, moneyToStr
 from app.dao.lease import dbget_lease, dbget_leasedata, dbget_leases, dbget_lease_row, \
-    dbget_uplift_type_id, dbpost_lease
+    dbget_lease_row_rent, dbget_uplift_type_id, dbpost_lease
 from app.models import Lease, LeaseUpType, Rent
 
 
@@ -42,10 +42,10 @@ def get_leases():
 
 def get_lease_variables(rent_id):
     fhfactor = 1 + (Decimal(request.form.get('fh_rate')) / 100)
-    grfactor = 1 + (Decimal(request.form.get('gr_rate')) / 100)
+    gr_rate = Decimal(request.form.get('gr_rate'))
     gr_new = Decimal(request.form.get('gr_new'))
     yp_val = Decimal(request.form.get('yp_val'))
-    leasedata = dbget_leasedata(rent_id, grfactor, date.today())
+    leasedata = dbget_leasedata(rent_id, gr_rate, date.today())
     grval = leasedata["grval"]
     realty = leasedata["realty"]
     rent_code = leasedata["rent_code"]
@@ -55,7 +55,7 @@ def get_lease_variables(rent_id):
     unimpval = money(salevalue * realty / 100)
     margeval = money((salevalue - unimpval - fhval - grval) / 2) if unexpired < 80 else Decimal(0)
     tribval = money(fhval + grval + margeval)
-    leq5 = money(tribval - (margeval/5))
+    leq5 = money(tribval + 400 - (margeval/5))
     leq4 = money(leq5 - yp_val*100)
     leq3 = money(leq4 - yp_val*100)
     leq2 = money(leq3 + 500)
@@ -80,18 +80,12 @@ def get_lease_variables(rent_id):
     return leasedata, lease_variables
 
 
-def post_lease(lease_id):
+def post_lease():
     rent_id = int(request.form.get("rent_id"))
-    # new lease for id 0, otherwise existing lease:
-    if lease_id == 0:
+    lease = dbget_lease_row_rent(rent_id)
+    if lease is None:
+    # new lease for empty result, otherwise existing lease:
         lease = Lease()
-        lease.id = 0
-        lease.rent_id = rent_id
-        lease.start_date = "1991-01-01"
-        lease.uplift_date = "1991-01-01"
-        lease.value_date = "1991-01-01"
-    else:
-        lease = dbget_lease_row(lease_id)
     lease.term = request.form.get("term")
     lease.start_date = request.form.get("start_date")
     lease.start_rent = request.form.get("start_rent")
