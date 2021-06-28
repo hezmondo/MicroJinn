@@ -6,7 +6,7 @@ import json
 
 # agent - id = 1, pay request - id = 2, rent - id = 3
 # alert = 1, info = 0
-def add_action(actiontype_id, alert, detail, link, link_vars):
+def add_action(actiontype_id, alert, detail, link, link_vars=''):
     # first check to see if the action detail is in the db. If it is, we will replace the old action
     # with the updated one
     action = db.session.query(Action).filter_by(detail=detail).one_or_none()
@@ -16,7 +16,7 @@ def add_action(actiontype_id, alert, detail, link, link_vars):
                     link_vars=json.dumps(link_vars), alert=alert)
     db.session.add(action)
     db.session.flush()
-
+    db.session.commit()
 
 def delete_action(action_id):
     Action.query.filter_by(id=action_id).delete()

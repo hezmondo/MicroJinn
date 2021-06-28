@@ -19,7 +19,7 @@ util_bp = Blueprint('util_bp', __name__)
 @login_required
 def action_link(url):
     url_vars = json.loads(request.args.get('url_vars'))
-    return redirect(url_for(url, **url_vars))
+    return redirect(url_for(url, **url_vars)) if url_vars else redirect(url_for(url))
 
 
 @util_bp.route('/action_delete/<int:action_id>', methods=["GET", "POST"])

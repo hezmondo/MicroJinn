@@ -6,7 +6,7 @@
 {% block app_content %}
 <div class="form-group row flex-row-reverse">
     <div class="col-md-3">
-        <a href="{{ url_for('form_letter_bp.form_letters') }}"
+        <a href="{{ url_for('form_letter_bp.form_letters', method=method) }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to form letters</a>
     </div>
 </div>

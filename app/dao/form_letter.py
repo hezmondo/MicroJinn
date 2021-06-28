@@ -1,9 +1,11 @@
 from app import db
-from flask import request
+import json
 from sqlalchemy import select
 from sqlalchemy.orm import load_only
-from app.models import FormLetter, TypeDoc
+from app.models import FormLetter, User
 from app.dao.database import commit_to_database
+from flask_login import current_user
+from app.dao.doc import get_typedoc_id
 
 
 def get_form_id(form_letter_code):
@@ -16,29 +18,28 @@ def get_form_letter(form_letter_id):
 
 
 def get_form_letters_all():
-    return db.session.execute(select(FormLetter)).scalars().all()
+    return db.session.execute(select(FormLetter).order_by(FormLetter.code)).scalars().all()
 
 
-def get_form_letters_from_search(fdict):
-    return db.session.execute(select(FormLetter).where(FormLetter.code.ilike(f"%{fdict.get('code')}%"),
-                                                       FormLetter.description.ilike(f"%{fdict.get('description')}%"),
-                                                       FormLetter.subject.ilike(f"%{fdict.get('subject')}%"),
-                                                       FormLetter.block.ilike(
-                                                           f"%{fdict.get('block')}%"))).scalars().all()
+def get_form_letters_from_search(filtr):
+    return db.session.execute(select(FormLetter).where(*filtr)).scalars().all()
 
 
 def get_form_letters_lease():
-    return db.session.execute(select(FormLetter).where(FormLetter.code.ilike('LEQ-%'))).scalars().all()
+    return db.session.execute(
+        select(FormLetter).where(FormLetter.code.ilike('LEQ-%')).order_by(FormLetter.code)).scalars().all()
 
 
 def get_form_letters_other():
     return db.session.execute(select(FormLetter).where(FormLetter.code.notilike('PR-%'),
                                                        FormLetter.code.notilike('AC-%'),
-                                                       FormLetter.code.notilike('LEQ-%'))).scalars().all()
+                                                       FormLetter.code.notilike('LEQ-%')).order_by(
+        FormLetter.code)).scalars().all()
 
 
 def get_form_letters_pr():
-    return db.session.execute(select(FormLetter).where(FormLetter.doctype_id == 2)).scalars().all()
+    return db.session.execute(
+        select(FormLetter).where(FormLetter.doctype_id == 2).order_by(FormLetter.code)).scalars().all()
 
 
 def get_pr_form_code(pr_form_id):

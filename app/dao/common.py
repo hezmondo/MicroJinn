@@ -2,7 +2,7 @@ import json
 from app import db, cache
 from flask import request
 from flask_login import current_user
-from sqlalchemy import asc
+from sqlalchemy import asc, select
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
@@ -141,7 +141,8 @@ def get_doc_types():
 
 
 def get_filters(type=''):
-    return Jstore.query.filter(Jstore.type == type).all() if type else Jstore.query.all()
+    return db.session.execute(select(Jstore).where(Jstore.type == type)
+                              .order_by(Jstore.last_used.desc())).scalars().all() if type else Jstore.query.all()
 
 
 def get_filter_stored(filtr_id):
@@ -204,4 +205,13 @@ def post_deed(deed_id, rent_id):
 
     return deed_id
 
+
+def get_user_settings():
+    settings = getattr(current_user, 'settings')
+    return json.loads(settings) if settings else ''
+
+
+def post_user_settings(settings):
+    setattr(current_user, 'settings', json.dumps(settings))
+    commit_to_database()
 
