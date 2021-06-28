@@ -3,7 +3,7 @@ from app import db
 from datetime import date
 from sqlalchemy import func, select
 from app.dao.database import commit_to_database
-from app.models import Lease, LeaseUpType, Rent
+from app.models import Lease, LeaseRel, LeaseUpType, Rent
 
 
 def dbget_lease(lease_id, rent_id):
@@ -26,6 +26,19 @@ def dbget_lease(lease_id, rent_id):
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
 
     return lease, uplift_types
+
+
+def dbget_leaseval_data(filtr):     # get lease and rent data for lease extension valuation and quotations
+    return db.session.query(Lease).join(Rent).join(LeaseUpType) \
+            .with_entities(Lease.id, Lease.info,Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
+                           Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date,
+                           LeaseUpType.method, LeaseUpType.uplift_value, LeaseUpType.years,
+                           Rent.freq_id, Rent.rentcode, Rent.rentpa) \
+                .filter(*filtr).one_or_none()
+
+
+def dbget_lease_relvals(ids):
+    return db.session.execute(select(LeaseRel.relativity).where(LeaseRel.unexpired.in_(ids))).all()
 
 
 def dbget_lease_row(lease_id):
