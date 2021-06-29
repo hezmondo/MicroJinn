@@ -30,7 +30,7 @@ def dbget_lease(lease_id, rent_id):
 
 def dbget_leaseval_data(filtr):     # get lease and rent data for lease extension valuation and quotations
     return db.session.query(Lease).join(Rent).join(LeaseUpType) \
-            .with_entities(Lease.id, Lease.info,Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
+            .with_entities(Lease.id, Lease.info, Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
                            Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date,
                            LeaseUpType.method, LeaseUpType.uplift_value, LeaseUpType.years,
                            Rent.freq_id, Rent.rentcode, Rent.rentpa) \
