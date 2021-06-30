@@ -10,28 +10,35 @@ from app.models import Lease, LeaseUpType, Rent
 
 
 def get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years):
-    # we obtain the present value of future periodic rent payments over a period of years:
-    # first the simplest case of the rent fixed at zero throughout the remaining unexpired term:
+    # we calculate the present value of future rent payments.  The principle is that a payment 1 year from now
+    # is worth 1 / 1.065 (the yearly pushaway factor) of the actual payment, if the discount rate is 6.5 per cent
+    # first the simplest case - the rent is fixed at zero throughout the remaining unexpired term:
     if method == 'ZERO':
         return 0
-    # next the next simplest case of the rent fixed throughout the remaining unexpired term:
+    # next simplest case - the rent is a fixed amount throughout the remaining unexpired term:
     elif method == 'FIXED':
         return get_rent_period_value(freq_id, gr_rate, rentpa, unexpired)
-    # next the cases where the annual rent increases every x years by some set formula:
+    # next are the cases where the annual rent increases: eg increasing every 25 years by 50 per cent:
     gr_value = 0
     factor = 1 / (1 + gr_rate / 100)
     period_to_uplift = up_date - date.today()
     years_to_uplift = period_to_uplift.days / 365.25
+    # first we obtain the present value of the current rent payments up to the first rent uplift date
     gr_value = gr_value + get_rent_period_value(freq_id, gr_rate, rentpa, years_to_uplift)
+    # next we calculate the increased rent after the first uplift
     rentpa = inc_rentpa(rentcap, rentpa, method, up_value, up_years)
+    # next we calculate the remaining unexpired term after the first rent uplift
     expiring = unexpired - years_to_uplift
+    # next we set the pushaway value as the period from now to that first rent uplift date
     pushaway = years_to_uplift
+    # next we calculate the value of each set of rent payments for each period between uplifts after the first uplift
     while expiring > up_years:
         grv_add = get_rent_period_value(freq_id, gr_rate, rentpa, up_years)
         gr_value = gr_value + grv_add * pow(factor, pushaway)
         expiring = expiring - up_years
         pushaway = pushaway + up_years
         rentpa = inc_rentpa(rentcap, rentpa, method, up_value, up_years)
+    # lastly we calculate the value of the remaining rent payments after the last rent uplift
     grv_add = get_rent_period_value(freq_id, gr_rate, rentpa, expiring)
 
     return gr_value + grv_add * pow(factor, pushaway)
@@ -87,16 +94,25 @@ def get_lease_variables(rent_id):
     up_value = float(leasedata.uplift_value)
     up_years = leasedata.years
     rentcap = float(leasedata.rent_cap)
+    # the improved value is the notional value of the leasehold interest with a new long lease at a low ground rent
     salevalue = float(leasedata.sale_value_k * 1000)
     startdate = leasedata.start_date
     difference = date.today() - startdate
     unexpired = float(leasedata.term - (difference.days / 365.25))
+    # relativity is the percentage used to calculate the marriage value - see below
     relativity = get_relativity(unexpired)
+    # now we calculate the present value of all future ground rent payments using the gr discount rate
     gr_value = get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years)
+    # now we calculate the present value of the future freehold reversion using the fh discount rate
     fhval = salevalue / pow(fhfactor, unexpired)
+    # the unimproved value is the notional value of the leasehold interest with the present lease
     unimpval = salevalue * relativity / 100
+    # marriage value is the notional difference between the unimproved and improved values of the
+    # leasehold interest and is calculated as the improved value x relativity
     marriagevalue = (salevalue - unimpval - fhval - gr_value) / 2 if math.floor(unexpired) < 80 else 0
+    # the sum we calculate would be awarded for our interest if arbitrated in a lease extension tribunal
     tribval = fhval + gr_value + marriagevalue
+    # now we calculate quotations for a series of 5 alternative new terms and new ground rents
     leq5 = tribval + 400 - (marriagevalue/5)
     leq4 = leq5 - yp_val * 100
     leq3 = leq4 - yp_val * 100
@@ -124,7 +140,7 @@ def get_lease_variables(rent_id):
 
 
 def get_rent_period_value(freq_id, gr_rate, rentpa, period):
-    # we obtain the present value of future periodic rent payments over a period of years:
+    # we obtain the present value of future rent payments over a set period:
     factor = float(1 / (1 + (gr_rate / freq_id) / 100))
     periods = period * freq_id
     inc = (periods % 1) or 0.001
@@ -138,7 +154,7 @@ def get_rent_period_value(freq_id, gr_rate, rentpa, period):
 
 
 def get_relativity(unexpired):
-    # we obtain the relativity as a value apportioned between two values in the lease_relativity table:
+    # we obtain the relativity by interpolating between two consecutive values in the lease_relativity table:
     if math.floor(unexpired) < 96.5:
         ids = [math.floor(unexpired), math.floor(unexpired) + 1]
         # ids.append(math.floor(unexpired))
@@ -153,12 +169,17 @@ def get_relativity(unexpired):
 
 
 def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
+    # the uplifted rent is calculated by different methods, the first being a simple percentage uplift:
     if method == 'ADDPC':
         new_rent = rentpa * (1 + (up_value/100))
+    # Edwards Close has a random first uplift which cannot be calculated. Thereafter a simple percentage uplift:
     if method == 'ADDPCZEDW':
         new_rent = 560.00 if rentpa < 260 else rentpa * (1 + (up_value/100))
+    # this method simply adds the same value at each rent uplift:
     if method == 'ADDVAL':
         new_rent = rentpa + up_value
+    # this method uplifts the rent according to the increase in the RPI index over the relevant period. As not
+    # yet known, we store a value eg 1.80 as the estimated annual percentage increase in the index:
     if method == 'RPI':
         new_rent = rentpa * pow(1 + (up_value / 100), uplift_years)
 
