@@ -56,7 +56,7 @@ def backup_file_list():
             self.name = ""
             self.size = 0
             self.mtime = 0
-            self.datetime = ""
+            self.time_date = ""
 
     # find the existing backup files, and put them into `restore_files` table
     if not os.path.isdir(backup_path):
@@ -72,7 +72,7 @@ def backup_file_list():
                     file_info.name = entry.name
                     file_info.size = stat_result.st_size
                     file_info.mtime = datetime.datetime.fromtimestamp(stat_result.st_mtime)
-                    file_info.datetime = file_info.mtime.strftime("%d-%b-%Y %H:%M")
+                    file_info.time_date = file_info.mtime.strftime("%d-%b-%Y %H:%M")
                     backup_files.append(file_info)
     # sort by modification time, reversed, so that most recent at top
     backup_files.sort(key=lambda fi: fi.mtime, reverse=True)

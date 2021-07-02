@@ -9,10 +9,8 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_bootstrap import Bootstrap
 from logging.handlers import SMTPHandler, RotatingFileHandler
-# from sqlalchemy import event
-# from sqlalchemy.engine import Engine
-# import time
 import logging
+
 
 # We declare and create the global `app` instance here in this file
 # This allows us to access it, and use function decorations like `@app.context_processor`, from other modules
@@ -29,24 +27,29 @@ mail = Mail()
 bootstrap = Bootstrap()
 
 # logging to determine sqlalchemy query times
-# logging.basicConfig()
-# logger = logging.getLogger('sqlalchemy.engine')
-# logger.setLevel(logging.INFO)
+
+from sqlalchemy import event
+from sqlalchemy.engine import Engine
+import time
+
+logging.basicConfig()
+logger = logging.getLogger('sqlalchemy.engine')
+logger.setLevel(logging.INFO)
 
 
-# @event.listens_for(Engine, "before_cursor_execute")
-# def before_cursor_execute(conn, cursor, statement,
-#                         parameters, context, executemany):
-#     conn.info.setdefault('query_start_time', []).append(time.time())
-#     logger.debug("Start Query: %s", statement)
-#
-#
-# @event.listens_for(Engine, "after_cursor_execute")
-# def after_cursor_execute(conn, cursor, statement,
-#                         parameters, context, executemany):
-#     total = time.time() - conn.info['query_start_time'].pop(-1)
-#     logger.debug("Query Complete!")
-#     logger.debug("Total Time: %f", total)
+@event.listens_for(Engine, "before_cursor_execute")
+def before_cursor_execute(conn, cursor, statement,
+                        parameters, context, executemany):
+    conn.info.setdefault('query_start_time', []).append(time.time())
+    logger.debug("Start Query: %s", statement)
+
+
+@event.listens_for(Engine, "after_cursor_execute")
+def after_cursor_execute(conn, cursor, statement,
+                        parameters, context, executemany):
+    total = time.time() - conn.info['query_start_time'].pop(-1)
+    logger.debug("Query Complete!")
+    logger.debug("Total Time: %f", total)
 
 
 def decimal_default(obj):

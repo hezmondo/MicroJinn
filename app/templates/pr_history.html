@@ -38,8 +38,8 @@
                 <table class="table table-body table-body-alt">
                     <tbody>
                     <tr id="{{ pr_history[0].id }}">
-                        <td style="width: 12.00%"> {{ pr_history[0].datetime.strftime('%d-%b-%Y %H:%M') if
-                            pr_history[0].datetime else 'none' }}
+                        <td style="width: 12.00%"> {{ pr_history[0].time_date.strftime('%d-%b-%Y %H:%M') if
+                            pr_history[0].time_date else 'none' }}
                         </td>
                         <td style="width: 28.00%"> {{ pr_history[0].summary }}</td>
                         <td style="width: 11.00%"> {{ pr_history[0].rent_date.strftime('%d-%b-%Y') if
@@ -83,7 +83,7 @@
                     {% for item in pr_history %}
                     {% if loop.index > 1 %}
                     <tr id="{{ item.id }}">
-                        <td style="width: 12.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') if item.datetime else
+                        <td style="width: 12.00%"> {{ item.time_date.strftime('%d-%b-%Y %H:%M') if item.time_date else
                             'none' }}
                         </td>
                         <td style="width: 28.00%"> {{ item.summary }}</td>

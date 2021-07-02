@@ -5,9 +5,10 @@
 
 <div class="row" style="margin-top: 1rem;">
     <div class="col-md-9">
+        {% if filters %}
         <div class="table-fixed">
             <form method="POST">
-                <table class="table" id="filters">
+                <table class="table table-red-light" id="filters">
                     <thead>
                     <tr>
                         <th style="width: 15.00%">last used</th>
@@ -44,6 +45,11 @@
                 </table>
             </form>
         </div>
+        {% else %}
+        <div class="boxed boxed-center boxed-blue">
+            Add a new filter to create a batch of pay requests.
+        </div>
+        {% endif %}
     </div>
     <div class="col-md-3">
         <div class="card card-white">

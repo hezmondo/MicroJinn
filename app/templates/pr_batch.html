@@ -12,7 +12,7 @@
     <div class="row">
         <div class="col-md-9">
             <div class="table-fixed">
-                <table class="table table-head table-narrow">
+                <table class="table table-head table-narrow table-red-light">
                     <thead>
                     <tr>
                         <td>batch details</td>
@@ -23,7 +23,7 @@
                     <tbody>
                     <tr>
                         <td class="td-title vertical-align" style="width: 12.00%">date and time</td>
-                        <td class="vertical-align">{{ pr_batch.datetime.strftime('%d-%b-%Y %H:%M') }}</td>
+                        <td class="vertical-align">{{ pr_batch.time_date.strftime('%d-%b-%Y %H:%M') }}</td>
                     </tr>
                     <tr>
                         <td class="td-title vertical-align" style="width: 12.00%">runcode</td>

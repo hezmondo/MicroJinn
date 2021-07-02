@@ -17,7 +17,7 @@ rent_bp = Blueprint('rent_bp', __name__)
 def delete_filter(item_id):
     method = request.args.get('method')
     delete_rent_filter(item_id)
-    if method == 'pr':
+    if method == 'payrequest':
         return redirect(url_for('pr_bp.pr_start'))
     else:
         return redirect(url_for('rent_bp.rents_advanced', filtr_id=0, method=method))

@@ -8,7 +8,7 @@ from sqlalchemy.orm import load_only, joinedload
 
 
 def post_pr_batch(runcode, size, status, is_account):
-    pr_batch = PrBatch(datetime=datetime.now(), code=runcode, size=size, status=status, is_account=is_account)
+    pr_batch = PrBatch(time_date=datetime.now(), code=runcode, size=size, status=status, is_account=is_account)
     db.session.add(pr_batch)
     # db.session.flush()
     # batch_id = pr_batch.id
@@ -41,7 +41,7 @@ def add_pr_history(pr_history):
 
 def get_batch_pay_requests(batch_id):
     return db.session.query(PrHistory).filter_by(batch_id=batch_id) \
-        .options(load_only('datetime', 'summary', 'rent_date', 'total_due', 'delivery_method', 'delivered'),
+        .options(load_only('time_date', 'summary', 'rent_date', 'total_due', 'delivery_method', 'delivered'),
                  joinedload('rent').load_only('rentcode', 'email')).all()
 
 
@@ -59,7 +59,7 @@ def get_pr_batch(batch_id):
 
 
 def get_pr_batches():
-    return PrBatch.query.order_by(-PrBatch.datetime).all()
+    return PrBatch.query.order_by(-PrBatch.time_date).all()
 
 
 def get_pr_block(pr_id):
@@ -72,14 +72,14 @@ def get_pr_charge(pr_id):
 
 def get_pr_file(pr_id):
     pr_file = PrHistory.query.join(Rent).with_entities(PrHistory.id, PrHistory.summary, PrHistory.block,
-                                                       PrHistory.datetime, PrHistory.rent_date, PrHistory.total_due,
+                                                       PrHistory.time_date, PrHistory.rent_date, PrHistory.total_due,
                                                        Rent.rentcode, Rent.id.label("rent_id")) \
         .filter(PrHistory.id == pr_id).one_or_none()
     return pr_file
 
 
 def get_pr_history(rent_id):
-    return PrHistory.query.filter_by(rent_id=rent_id).order_by(desc(PrHistory.datetime))
+    return PrHistory.query.filter_by(rent_id=rent_id).order_by(desc(PrHistory.time_date))
 
 
 def get_pr_history_row(pr_id):
@@ -129,7 +129,7 @@ def prepare_new_pr_history_entry(pr_history_data, rent_id, method=1, batch_id=No
     summary = pr_history_data.get('pr_code') + "-" + PrDeliveryTypes.get_name(method) + "-" + pr_history_data.get(
         'mailaddr')[0:25]
     pr_history = PrHistory(block=pr_history_data.get('block').replace("£", "&pound;"), rent_id=rent_id,
-                           summary=summary, datetime=datetime.now(),
+                           summary=summary, time_date=datetime.now(),
                            rent_date=datetime.strptime(pr_history_data.get('rent_date'), '%Y-%m-%d'),
                            total_due=pr_history_data.get('tot_due'),
                            arrears_level=pr_history_data.get('new_arrears_level'),
@@ -139,7 +139,7 @@ def prepare_new_pr_history_entry(pr_history_data, rent_id, method=1, batch_id=No
 
 def update_pr_batch(batch_id, runcode, size, status, is_account):
     pr_batch = PrBatch.query.get(batch_id)
-    pr_batch.datetime = datetime.now()
+    pr_batch.time_date = datetime.now()
     pr_batch.code = runcode
     pr_batch.size = size
     pr_batch.status = status

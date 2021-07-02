@@ -155,7 +155,8 @@ def run_batch(pr_template_id, rent_id_list, runcode):
         except Exception as ex:
             pr_error[rent_id] = str(ex)
     pr_batch = update_pr_batch(batch_id, runcode, len(pr_complete), 'pending', False)
-    update_filter_last_used(pr_batch.code, pr_batch.datetime)
+    if runcode != "Unsaved Filter":
+        update_filter_last_used(pr_batch.code, pr_batch.time_date)
     action_str = 'Pay request Batch ' + str(pr_batch.id) + ' containing ' + str(pr_batch.size) + ' pay requests saved | ' + \
                  pr_batch.code
     add_action(2, 0, action_str, 'pr_bp.pr_batches')

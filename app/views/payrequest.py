@@ -177,7 +177,7 @@ def pr_run_batch():
     if request.method == 'POST':
         try:
             rent_id_list = json.loads(request.form.get('rent_id_list'))
-            runcode = request.form.get('runcode') or 'none'
+            runcode = request.form.get('runcode') or 'Unknown Filter'
             pr_template_id = get_form_id(request.form.get('pr_template'))
             pr_batch, pr_complete, pr_error = run_batch(pr_template_id, rent_id_list, runcode)
             pay_requests = get_batch_pay_requests(pr_batch.id)

@@ -8,7 +8,7 @@
     <div class="col-md-9">
         {% if pr_batches %}
         <div class="table-fixed">
-            <table class="table" id="pr_batches">
+            <table class="table table-red-light" id="pr_batches">
                 <thead>
                 <tr>
                     <th style="width: 10.00%">id</th>
@@ -24,7 +24,7 @@
                 {% for item in pr_batches %}
                 <tr id="{{ item.id }}">
                     <td style="width: 10.00%">{{ item.id }}</td>
-                    <td style="width: 20.00%"> {{ item.datetime.strftime('%d-%b-%Y %H:%M') }}</td>
+                    <td style="width: 20.00%"> {{ item.time_date.strftime('%d-%b-%Y %H:%M') }}</td>
                     <td style="width: 10.00%"> {{ item.code }}</td>
                     <td style="width: 10.00%"> {{ item.size }}</td>
                     <td style="width: 10.00%"> {{ item.status }}</td>
