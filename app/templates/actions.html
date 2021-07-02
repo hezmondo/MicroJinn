@@ -26,7 +26,7 @@
                     {% else %}
                 <tr id="{{ action.id }}">
                     {% endif %}
-                    <td style="width: 15.00%">{{ action.datetime.strftime('%d-%b-%Y %H:%M') }}</td>
+                    <td style="width: 15.00%">{{ action.time_date.strftime('%d-%b-%Y %H:%M') }}</td>
                     <td style="width: 10.00%">{{ ActionTypes.get_name(action.actiontype_id) }}</td>
                     <td style="width: 50.00%">{{ action.detail }}</td>
                     <td style="width: 10.00%">

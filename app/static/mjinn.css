@@ -723,6 +723,10 @@ wallet
 {
 	background: #e85765;
 }
+.table-red-light thead
+{
+	background: #f0848e;
+}
 .table-rent td
 {
 	padding: 0.6rem;

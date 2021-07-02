@@ -12,7 +12,7 @@ class Action(db.Model):
     __tablename__ = 'action'
 
     id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.DateTime)
+    time_date = db.Column(db.DateTime)
     actiontype_id = db.Column(db.Integer())
     detail = db.Column(db.String(180))
     link = db.Column(db.String(120))
@@ -413,7 +413,7 @@ class PrBatch(db.Model):
     __tablename__ = 'pr_batch'
 
     id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.DateTime)
+    time_date = db.Column(db.DateTime)
     code = db.Column(db.String(30))
     size = db.Column(db.Integer)
     status = db.Column(db.String(30))
@@ -434,7 +434,7 @@ class PrHistory(db.Model):
     __tablename__ = 'pr_history'
 
     id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.DateTime)
+    time_date = db.Column(db.DateTime)
     summary = db.Column(db.String(90))
     block = db.Column(db.Text)
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))

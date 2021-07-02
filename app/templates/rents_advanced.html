@@ -55,7 +55,13 @@
                         <tbody>
                         {% for item in jfilters %}
                         <tr>
-                            <td style="width: 20.00%">{{ item.last_used }}</td>
+                            <td style="width: 20.00%">
+                                {% if item.last_used %}
+                                {{ item.last_used }}
+                                {% else %}
+                                <span>Unused</span>
+                                {% endif %}
+                            </td>
                             <td style="width: 10.00%">{{ item.code }}</td>
                             <td style="width: 50.00%">{{ item.description}}</td>
                             <td style="width: 15.00%">

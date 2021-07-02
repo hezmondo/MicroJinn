@@ -21,7 +21,7 @@
                     <tr>
                         <th style="width: 25.00%">name</th>
                         <th style="width: 20.00%">size</th>
-                        <th style="width: 25.00%">datetime</th>
+                        <th style="width: 25.00%">date time</th>
                         <th style="width: 15.00%">download to pc</th>
                         <th style="width: 15.00%">restore database</th>
                     </tr>
@@ -34,7 +34,7 @@
                         <tr style="width: 100%;">
                             <td style="width: 25.00%">{{ backup_file.name }}</td>
                             <td style="width: 20.00%">{{ "{:,}".format(backup_file.size) }}</td>
-                            <td style="width: 25.00%">{{ backup_file.datetime }}</td>
+                            <td style="width: 25.00%">{{ backup_file.time_date }}</td>
                             <td style="width: 15.00%"><a
                                     href="{{ url_for('backup_bp.sqldumps', filename=backup_file.name) }}"
                                     class="btn btn-small btn-info button-icon download" role="button">download</a></td>

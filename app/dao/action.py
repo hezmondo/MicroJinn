@@ -12,7 +12,7 @@ def add_action(actiontype_id, alert, detail, link, link_vars=''):
     action = db.session.query(Action).filter_by(detail=detail).one_or_none()
     if action:
         db.session.delete(action)
-    action = Action(datetime=datetime.now(), actiontype_id=actiontype_id, detail=detail, link=link,
+    action = Action(time_date=datetime.now(), actiontype_id=actiontype_id, detail=detail, link=link,
                     link_vars=json.dumps(link_vars), alert=alert)
     db.session.add(action)
     db.session.flush()
