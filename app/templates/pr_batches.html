@@ -24,7 +24,8 @@
                 {% for item in pr_batches %}
                 <tr id="{{ item.id }}">
                     <td style="width: 10.00%">{{ item.id }}</td>
-                    <td style="width: 20.00%"> {{ item.time_date.strftime('%d-%b-%Y %H:%M') }}</td>
+                    <td style="width: 20.00%"> {{ item.time_date.strftime('%d-%b-%Y %H:%M')
+                        if item.time_date else "none"  }}</td>
                     <td style="width: 10.00%"> {{ item.code }}</td>
                     <td style="width: 10.00%"> {{ item.size }}</td>
                     <td style="width: 10.00%"> {{ item.status }}</td>

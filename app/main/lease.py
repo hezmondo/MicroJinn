@@ -1,10 +1,9 @@
 import math
 from datetime import date
 from dateutil.relativedelta import relativedelta
-from decimal import Decimal
 from flask import request
 from app.main.functions import money, moneyToStr
-from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leases, dbget_lease_row, dbget_lease_relvals, \
+from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leases, dbget_lease_relvals, \
     dbget_lease_row_rent, dbget_uplift_type_id, dbpost_lease
 from app.models import Lease, LeaseUpType, Rent
 
@@ -157,8 +156,6 @@ def get_relativity(unexpired):
     # we obtain the relativity by interpolating between two consecutive values in the lease_relativity table:
     if math.floor(unexpired) < 96.5:
         ids = [math.floor(unexpired), math.floor(unexpired) + 1]
-        # ids.append(math.floor(unexpired))
-        # ids.append(math.floor(unexpired) + 1)
         relativity_values = dbget_lease_relvals(ids)
         low = float(relativity_values[0][0])
         high = float(relativity_values[1][0])
@@ -170,6 +167,7 @@ def get_relativity(unexpired):
 
 def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
     # the uplifted rent is calculated by different methods, the first being a simple percentage uplift:
+    new_rent = money(0)
     if method == 'ADDPC':
         new_rent = rentpa * (1 + (up_value/100))
     # Edwards Close has a random first uplift which cannot be calculated. Thereafter a simple percentage uplift:
@@ -186,7 +184,7 @@ def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
     return new_rent if rentcap < 0.01 else min(rentcap, new_rent)
 
 
-def post_lease():
+def update_lease():
     rent_id = int(request.form.get("rent_id"))
     lease = dbget_lease_row_rent(rent_id)
     if lease is None:

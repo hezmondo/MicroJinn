@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.main.lease import get_lease_info, get_leases, post_lease
+from app.main.lease import get_lease_info, get_leases, update_lease
 
 lease_bp = Blueprint('lease_bp', __name__)
 
@@ -8,7 +8,7 @@ lease_bp = Blueprint('lease_bp', __name__)
 @login_required
 def lease(lease_id):
     if request.method == "POST":
-        rent_id = post_lease()
+        rent_id = update_lease()
         return redirect(url_for('rent_bp.rent', rent_id=rent_id))
     lease, uplift_types = get_lease_info(lease_id)
 
