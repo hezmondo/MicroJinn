@@ -16,7 +16,7 @@ from app.main.common import get_rents_fdict, inc_date_m, mpost_search
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic, filter_basic_sql_1, \
     filter_basic_sql_2
-from app.models import Rent, RentExternal
+from app.models import Rent, RentExternal, Agent
 from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 
 
@@ -321,8 +321,6 @@ def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page
     if request.method == 'POST':
         runsize = (request.form.get('runsize') or 300) if action != 'load' else (fdict.get('runsize') or 300)
         rents = getrents_advanced(filtr, runsize)
-        for rent in rents:
-            rent.propaddr = get_propaddr(rent.id)
 
     return fdict, rents
 
