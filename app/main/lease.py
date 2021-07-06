@@ -3,8 +3,8 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
 from app.main.functions import money, moneyToStr
-from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leaseval_data_alt, dbget_leases, dbget_lease_relvals, \
-    dbget_lease_row_rent, dbget_uplift_type_id, dbpost_lease
+from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leases, dbget_lease_relvals, \
+    dbget_lease_row_rent, dbget_methods, dbpost_lease
 from app.models import Lease, LeaseUpType, Rent
 
 
@@ -46,15 +46,16 @@ def get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, 
 def get_lease_info(lease_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
-    lease, uplift_types = dbget_lease(lease_id, rent_id)
+    lease = dbget_lease(lease_id, rent_id)
     if not lease:
         lease = {
                     'id': 0,
                     'rent_id': rent_id,
                     'rentcode': rentcode
                 }
+    methods = dbget_methods()
 
-    return lease, uplift_types
+    return lease, methods
 
 
 def get_leases():
@@ -70,9 +71,10 @@ def get_leases():
         lfilter.append(Lease.uplift_date <= enddate)
     if ult and ult != "" and ult != "all uplift types":
         lfilter.append(LeaseUpType.uplift_type.ilike('%{}%'.format(ult)))
-    leases, uplift_types = dbget_leases(lfilter)
+    leases = dbget_leases(lfilter)
+    leases.unexpired = get_unexpired(leases.term, leases.startdate)
 
-    return leases, uplift_types, rcd, uld, ult
+    return leases, rcd, uld, ult
 
 
 def get_lease_variables(rent_id):
@@ -85,19 +87,17 @@ def get_lease_variables(rent_id):
     filtr = []
     filtr.append(Lease.rent_id == rent_id)
     leasedata = dbget_leaseval_data(filtr)
-    freq_id = leasedata.freq_id
-    method = leasedata.method
-    rent_code = leasedata.rentcode
-    rentpa = float(leasedata.rentpa)
+    freq_id = leasedata.rent.freq_id
+    method = leasedata.LeaseUpType.method
+    rent_code = leasedata.rent.rentcode
+    rentpa = float(leasedata.rent.rentpa)
     up_date = leasedata.uplift_date
-    up_value = float(leasedata.uplift_value)
-    up_years = leasedata.years
+    up_value = float(leasedata.LeaseUpType.value)
+    up_years = leasedata.LeaseUpType.years
     rentcap = float(leasedata.rent_cap)
     # the improved value is the notional value of the leasehold interest with a new long lease at a low ground rent
     salevalue = float(leasedata.sale_value_k * 1000)
-    startdate = leasedata.start_date
-    difference = date.today() - startdate
-    unexpired = float(leasedata.term - (difference.days / 365.25))
+    unexpired = get_unexpired(leasedata.term, leasedata.start_date)
     # relativity is the percentage used to calculate the marriage value - see below
     relativity = get_relativity(unexpired)
     # now we calculate the present value of all future ground rent payments using the gr discount rate
@@ -120,7 +120,7 @@ def get_lease_variables(rent_id):
     leq1 = leq2 - val100
     lease_variables = {'#unexpired#': str(money(unexpired)),
                        '#lease_rentcode#': rent_code,
-                       '#relativity#': str(relativity),
+                       '#relativity#': str(money(relativity)),
                        '#fh_value#': moneyToStr(fhval if fhval else 0, pound=True),
                        '#gr_value#': moneyToStr(gr_value if gr_value else 0, pound=True),
                        '#marriage_value#': moneyToStr(marriagevalue if marriagevalue else 0, pound=True),
@@ -165,6 +165,10 @@ def get_relativity(unexpired):
         return 100
 
 
+def get_unexpired(term, startdate):
+    difference = date.today() - startdate
+    return float(term - (difference.days / 365.25))
+
 def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
     # the uplifted rent is calculated by different methods, the first being a simple percentage uplift:
     new_rent = money(0)
@@ -200,8 +204,6 @@ def update_lease():
     lease.value = request.form.get("value")
     lease.value_date = request.form.get("value_date")
     lease.rent_id = rent_id
-    uplift_type = request.form.get("uplift_type")
-    lease.uplift_type_id = dbget_uplift_type_id(uplift_type)
     dbpost_lease(lease)
 
     return rent_id
