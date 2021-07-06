@@ -2,6 +2,7 @@ import sqlalchemy
 from app import db
 from datetime import date
 from sqlalchemy import func, select
+from sqlalchemy.orm import load_only, joinedload
 from app.dao.database import commit_to_database
 from app.models import Lease, LeaseRel, LeaseUpType, Rent
 
@@ -28,13 +29,23 @@ def dbget_lease(lease_id, rent_id):
     return lease, uplift_types
 
 
-def dbget_leaseval_data(filtr):     # get lease and rent data for lease extension valuation and quotations
+def dbget_leaseval_data(filtr):  # get lease and rent data for lease extension valuation and quotations
     return db.session.query(Lease).join(Rent).join(LeaseUpType) \
-            .with_entities(Lease.id, Lease.info, Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
-                           Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date,
-                           LeaseUpType.method, LeaseUpType.uplift_value, LeaseUpType.years,
-                           Rent.freq_id, Rent.rentcode, Rent.rentpa) \
-                .filter(*filtr).one_or_none()
+        .with_entities(Lease.id, Lease.info, Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
+                       Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date,
+                       LeaseUpType.method, LeaseUpType.uplift_value, LeaseUpType.years,
+                       Rent.freq_id, Rent.rentcode, Rent.rentpa) \
+        .filter(*filtr).one_or_none()
+
+
+def dbget_leaseval_data_alt(filtr):
+    stmt = select(Lease) \
+        .options(load_only(Lease.info, Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
+                           Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date),
+                 joinedload('LeaseUpType').load_only(LeaseUpType.method, LeaseUpType.uplift_value,
+                                                   LeaseUpType.years),
+                 joinedload('rent').load_only(Rent.freq_id, Rent.rentcode, Rent.rentpa))
+    return db.session.execute(stmt.filter(*filtr)).scalar_one_or_none()
 
 
 def dbget_lease_relvals(ids):
@@ -51,7 +62,7 @@ def dbget_lease_row_rent(rent_id):
 
 def dbget_leasedata(rent_id, gr_rate, calc_date):
     resultproxy = db.session.execute(sqlalchemy.text("CALL lex_valuation(:a, :b, :c)"),
-                     params={"a": rent_id, "b": gr_rate, "c": calc_date})
+                                     params={"a": rent_id, "b": gr_rate, "c": calc_date})
     leasedata = [dict(row) for row in resultproxy][0]
     commit_to_database()
 
@@ -63,8 +74,8 @@ def dbget_leases(lfilter):
         .join(Rent) \
         .join(LeaseUpType) \
         .with_entities(Rent.rentcode, Lease.id, Lease.info,
-                        func.mjinn.lex_unexpired(Lease.id, date.today()).label('unexpired'),
-                        Lease.term, Lease.uplift_date, LeaseUpType.uplift_type) \
+                       func.mjinn.lex_unexpired(Lease.id, date.today()).label('unexpired'),
+                       Lease.term, Lease.uplift_date, LeaseUpType.uplift_type) \
         .filter(*lfilter).limit(60).all()
     uplift_types = [value for (value,) in LeaseUpType.query.with_entities(LeaseUpType.uplift_type).all()]
     uplift_types.insert(0, "all uplift types")
@@ -83,5 +94,3 @@ def dbget_uplift_type_id(uplift_type):
 def dbpost_lease(lease):
     db.session.add(lease)
     commit_to_database()
-
-

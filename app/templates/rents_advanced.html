@@ -353,7 +353,7 @@
                                     item.datecode_id, 1).strftime('%d-%b-%Y') }}
                                 </td>
                                 <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                                <td style="width: 22.00%">{{ item.propaddr }}</td>
+                                <td style="width: 22.00%">{{ item.prop_rent[0].propaddr }}</td>
                                 <td style="width: 8.00%"> {{ item.source }}</td>
                                 <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) |
                                     truncate(40) }}

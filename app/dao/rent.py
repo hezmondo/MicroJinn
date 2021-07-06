@@ -2,10 +2,10 @@ import json
 from app import db
 from flask import flash, redirect, url_for, request
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload, load_only
+from sqlalchemy.orm import joinedload, load_only, contains_eager
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Charge, Landlord, Jstore, Property, Rent, RentExternal
+from app.models import Agent, Landlord, Jstore, Rent, RentExternal
 
 
 def create_new_rent():
@@ -23,17 +23,19 @@ def get_agent_rents(agent_id):
 
 
 def get_rent(rent_id):  # returns all Rent member variables plus associated items as a mutable dict
-    if rent_id == 0:        # take the user to create new rent function (not yet built)
+    if rent_id == 0:  # take the user to create new rent function (not yet built)
         rent_id = create_new_rent()
     pop_idlist_recent("recent_rents", rent_id)
     # rent = Rent.query.filter_by(id=rent_id).first()
     rent = db.session.query(Rent) \
-        .filter_by(id=rent_id)\
+        .filter_by(id=rent_id) \
         .options(joinedload('agent').load_only('id', 'detail'),
-            joinedload('landlord').options(load_only('name'),
-            joinedload('manager').load_only('managername', 'manageraddr', 'manageraddr2'),
-            joinedload('money_account').load_only('acc_name', 'acc_num', 'bank_name', 'sort_code')),
-            joinedload('typedeed').load_only('deedcode', 'info')) \
+                 joinedload('landlord').options(load_only('name'),
+                                                joinedload('manager').load_only('managername', 'manageraddr',
+                                                                                'manageraddr2'),
+                                                joinedload('money_account').load_only('acc_name', 'acc_num',
+                                                                                      'bank_name', 'sort_code')),
+                 joinedload('typedeed').load_only('deedcode', 'info')) \
         .one_or_none()
     if rent is None:
         flash('Invalid rent code')
@@ -68,27 +70,24 @@ def getrents_basic_sql(sql):  # simple filtered rents for main rents page using 
     return db.session.execute(sql).fetchall()
 
 
-# TODO: In order to filter results we have to explicitly join filterable tables (.join(Landlord) etc) but this slows
-#  the query down. We still need to determine the most efficient way to retrieve data from complex queries with
-#  complex filters
-def getrents_advanced(filtr, runsize):    # filtered rents for advanced queries and payrequest pages
-    return db.session.query(Rent).join(Property).join(Landlord) \
-        .options(load_only('id', 'advarr_id', 'arrears', 'freq_id', 'lastrentdate',
-                                                        'prdelivery_id', 'rentcode', 'rentpa', 'tenantname'),
-           joinedload('landlord').load_only('name'),
-           joinedload('agent').load_only('detail')) \
-        .filter(*filtr).limit(runsize).all()
+def getrents_advanced(filtr, runsize):
+    stmt = select(Rent).join(Rent.prop_rent).join(Landlord).join(Agent) \
+        .options(contains_eager(Rent.prop_rent).load_only('propaddr'),
+                 load_only('advarr_id', 'arrears', 'freq_id', 'lastrentdate', 'prdelivery_id', 'rentcode',
+                           'rentpa', 'source', 'tenantname', 'datecode_id'),
+                 joinedload('agent').load_only('detail'))
+    return db.session.execute(stmt.filter(*filtr).limit(runsize)).unique().scalars().all()
 
 
-def get_rentsexternal(filtr):     # simple filtered external rents for main rents page or external rents page
+def get_rentsexternal(filtr):  # simple filtered external rents for main rents page or external rents page
     return db.session.query(RentExternal) \
-            .options(load_only('id', 'agentdetail', 'arrears', 'datecode_id', 'lastrentdate', 'rentcode', 'owner',
-                               'propaddr', 'rentpa', 'source', 'status', 'tenantname'),
-                     joinedload('manager_external').load_only('codename')) \
-            .filter(*filtr).order_by(RentExternal.rentcode).limit(30).all()
+        .options(load_only('id', 'agentdetail', 'arrears', 'datecode_id', 'lastrentdate', 'rentcode', 'owner',
+                           'propaddr', 'rentpa', 'source', 'status', 'tenantname'),
+                 joinedload('manager_external').load_only('codename')) \
+        .filter(*filtr).order_by(RentExternal.rentcode).limit(30).all()
 
 
-def get_rents_filters(typ):        # get stored advanced filter for advanced queries and payrequest pages
+def get_rents_filters(typ):  # get stored advanced filter for advanced queries and payrequest pages
     filters = Jstore.query.filter(Jstore.type == typ).all()
 
     return filters
@@ -133,5 +132,5 @@ def post_rent(rent):
 
 def update_filter_last_used(code, datetime):
     jstore = db.session.execute(select(Jstore).filter_by(code=code)).scalar_one()
-    jstore.last_used=datetime
+    jstore.last_used = datetime
     commit_to_database()

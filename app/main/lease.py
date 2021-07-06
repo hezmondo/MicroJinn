@@ -3,7 +3,7 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
 from app.main.functions import money, moneyToStr
-from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leases, dbget_lease_relvals, \
+from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leaseval_data_alt, dbget_leases, dbget_lease_relvals, \
     dbget_lease_row_rent, dbget_uplift_type_id, dbpost_lease
 from app.models import Lease, LeaseUpType, Rent
 
