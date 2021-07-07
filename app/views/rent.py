@@ -34,6 +34,8 @@ def load_filter():
 @rent_bp.route('/rent/<int:rent_id>', methods=['GET', 'POST'])
 # @login_required
 def rent(rent_id):
+    nav = request.args.get('nav', '', type=str)
+    nav_id = request.args.get('nav_id', type=int)
     message = request.args.get('message', '', type=str)
     combodict = get_combodict_rent()
     # gather rent combobox values
@@ -41,7 +43,7 @@ def rent(rent_id):
     # basic validation check for mail and email variables
     messages = rent_validation(rent, message)
 
-    return render_template('rent.html', rent=rent, combodict=combodict, messages=messages)
+    return render_template('rent.html', rent=rent, combodict=combodict, messages=messages, nav=nav, nav_id=nav_id)
 
 
 @rent_bp.route('/rent_external/<int:rent_external_id>', methods=["GET"])

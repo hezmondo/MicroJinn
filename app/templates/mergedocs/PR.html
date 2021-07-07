@@ -70,6 +70,7 @@
                    value="{{ rent_pr.new_arrears_level }}">
             <input type="hidden" id="new_arrears" name="new_arrears" value="{{ rent_pr.arrears + rent_pr.rent_gale }}">
             <input type="hidden" id="charge_total" name="charge_total" value="{{ rent_pr.recovery_charge_amount }}">
+            <input type="hidden" id="create_case" name="create_case" value="{{ rent_pr.create_case }}">
             <input type="hidden" id="pr_email" name="pr_email" value="{{ block_email }}">
         </div>
     </div>

@@ -176,3 +176,11 @@ def money_processor():
         return sVal
 
     return dict(money_str=money_str)
+
+
+@app.context_processor
+def string_processor():
+    def capitalize_first_only(string):
+        return string[:1].upper() + string[1:]
+
+    return dict(capitalize_first_only=capitalize_first_only)

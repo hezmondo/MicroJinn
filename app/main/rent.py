@@ -171,7 +171,6 @@ def get_rent_strings(rent, type='mail'):
     next_gale_start = dateToStr(rent.nextrentdate) \
         if rent.advarrdet == "in advance" else dateToStr(lastrentdate + relativedelta(days=1))
     charges = rent.charges if hasattr(rent, 'charges') else Decimal(0)
-    # TODO: charges_string needs cleaning adds ', ' onto final charge
     charges_string = "no charges"
     charges_list = []
     if charges and charges != 0:
