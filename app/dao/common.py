@@ -6,7 +6,7 @@ from sqlalchemy import asc, select
 from sqlalchemy.orm import load_only
 from app.dao.database import commit_to_database
 from app.models import Agent, Case, Charge, ChargeType, DocFile, DigFile, EmailAcc, FormLetter, Jstore, \
-    Income, IncomeAlloc, Landlord, LeaseUpType, Loan, MoneyItem, Property, PrBatch, PrCharge, PrHistory, \
+    Income, IncomeAlloc, Landlord, Loan, MoneyItem, Property, PrBatch, PrCharge, PrHistory, \
     Rent, RecentSearch, MoneyAcc, TypeDeed, TypeDoc
 
 
@@ -180,12 +180,6 @@ def pop_idlist_recent(type, id):
     commit_to_database()
 
 
-def get_uplift_types():
-    uplift_types = LeaseUpType.query.all()
-
-    return uplift_types
-
-
 def post_deed(deed_id, rent_id):
     if deed_id == 0:
         deed = TypeDeed()
@@ -214,4 +208,3 @@ def get_user_settings():
 def post_user_settings(settings):
     setattr(current_user, 'settings', json.dumps(settings))
     commit_to_database()
-

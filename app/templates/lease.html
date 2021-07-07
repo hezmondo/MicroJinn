@@ -16,51 +16,55 @@
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="rentcode">rentcode:</label>
             <input type="text" class="form-control" name="rentcode" value="{{ lease.rentcode }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="term">term in years:</label>
             <input type="text" class="form-control" name="term" value="{{ lease.term }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="start_date">start date:</label>
             <input type="date" class="form-control" name="start_date" value="{{ lease.start_date }}">
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label for="start_rent">start rent:</label>
             <input type="text" class="form-control" name="start_rent" value="{{ lease.start_rent }}">
         </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-md-3">
-            <label for="uplift_type">uplift type:</label>
-            {{ widgets.combobox(name="uplift_type", items=uplift_types, item_selected=lease.uplift_type) }}
-        </div>
-        <div class="col-md-3">
-            <label for="uplift_date">uplift date:</label>
-            <input type="date" class="form-control" name="uplift_date" value="{{ lease.uplift_date }}">
-        </div>
-        <div class="col-md-3">
-            <label for="value_date">last valuation date:</label>
-            <input type="date" class="form-control" name="value_date" value="{{ lease.value_date }}">
-        </div>
-        <div class="col-md-3">
-            <label for="value">last valuation £:</label>
-            <input type="text" class="form-control" name="value" value="{{ lease.value }}">
-        </div>
-    </div>
-    <div class="form-group row">
         <div class="col-md-2">
             <label for="sale_value_k">improved value £K:</label>
             <input type="text" class="form-control" name="sale_value_k" value="{{ lease.sale_value_k }}">
         </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-md-2">
+            <label for="uplift_id">uplift id:</label>
+            <input type="text" class="form-control" name="uplift_id" value="{{ lease.uplift_id }}">
+        </div>
+        <div class="col-md-2">
+            <label for="uplift_date">uplift date:</label>
+            <input type="date" class="form-control" name="uplift_date" value="{{ lease.uplift_date }}">
+        </div>
+        <div class="col-md-2">
+            <label for="uplift_years">uplift years:</label>
+            <input type="text" class="form-control" name="uplift_years" value="{{ lease.LeaseUpType.years }}">
+        </div>
+        <div class="col-md-2">
+            <label for="uplift_method">uplift method:</label>
+            {{ widgets.combobox(name="uplift_method", items=methods, item_selected=lease.LeaseUpType.method) }}
+        </div>
+        <div class="col-md-2">
+            <label for="uplift_value">uplift value:</label>
+            <input type="text" class="form-control" name="uplift_value" value="{{ lease.LeaseUpType.value }}">
+        </div>
+    </div>
+    <div class="form-group row">
         <div class="col-md-2">
             <label for="rent_cap">rent capped at:</label>
             <input type="text" class="form-control" name="rent_cap" value="{{ lease.rent_cap }}">
         </div>
-        <div class="col-md-8">
+        <div class="col-md-10">
             <label for="info">info:</label>
             <input type="text" class="form-control" name="info" value="{{ lease.info }}">
         </div>

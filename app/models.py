@@ -250,10 +250,8 @@ class Lease(db.Model):
     info = db.Column(db.String(180))
     uplift_date = db.Column(db.Date)
     sale_value_k = db.Column(db.Numeric(10, 2))
-    uplift_type_id = db.Column(db.Integer, db.ForeignKey('lease_uplift_type.id'))
+    uplift_id = db.Column(db.Integer, db.ForeignKey('lease_up_type.id'))
     rent_cap = db.Column(db.Numeric(8, 2))
-    value = db.Column(db.Numeric(8, 2))
-    value_date = db.Column(db.Date)
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
 
@@ -275,15 +273,14 @@ class LeaseRel(db.Model):
 
 
 class LeaseUpType(db.Model):
-    __tablename__ = 'lease_uplift_type'
+    __tablename__ = 'lease_up_type'
 
     id = db.Column(db.Integer, primary_key=True)
-    uplift_type = db.Column(db.String(15))
     years = db.Column(db.Integer)
     method = db.Column(db.String(15))
-    uplift_value = db.Column(db.Numeric(8, 2))
+    value = db.Column(db.Numeric(8, 2))
 
-    lease_uplift_type = db.relationship('Lease', backref='LeaseUpType', lazy='dynamic')
+    lease_up_type = db.relationship('Lease', backref='LeaseUpType', lazy='dynamic')
 
 
 class Loan(db.Model):
