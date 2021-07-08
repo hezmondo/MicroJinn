@@ -1,7 +1,10 @@
 from datetime import date
 from dateutil.relativedelta import relativedelta
 from flask import request
-from app.models import Agent, Landlord, Property, Rent
+from math import ceil
+from sqlalchemy import select
+from sqlalchemy.orm import aliased
+from app.models import Agent, Charge, Landlord, Property, Rent
 from app.modeltypes import AcTypes, PrDeliveryTypes, SaleGrades, Statuses, Tenures
 from app.main.functions import strToDec
 
@@ -49,7 +52,15 @@ def filter_advanced(dict):
         filtr.append(Rent.mailto_id.notin_((1, 2)))
     elif dict['agentmailto'] and dict['agentmailto'] == "only":
         filtr.append(Rent.mailto_id.in_((1, 2)))
-    #     todo
+    if dict['emailable'] and dict['emailable'] == "exclude":
+        filtr.append(Rent.email.notilike('%@%') | Rent.email.is_(None))
+    elif dict['emailable'] and dict['emailable'] == "only":
+        filtr.append(Rent.email.ilike('%@%'))
+    if dict['charges'] and dict['charges'] == "exclude":
+        alias_charge = aliased(Charge)
+        filtr.append(~select(alias_charge).where(Rent.id == alias_charge.rent_id).exists())
+    elif dict['charges'] and dict['charges'] == "only":
+        filtr.append(Charge.rent_id == Rent.id)
     if dict['arrears'] and dict['arrears'] != "":
         if dict['modifier_arrears'] == '=':
             filtr.append(Rent.arrears == strToDec(dict['arrears']))
@@ -72,26 +83,17 @@ def filter_advanced(dict):
             filtr.append(Rent.rentpa > strToDec(dict['rentpa']))
         if dict['modifier_rentpa'] == '>=':
             filtr.append(Rent.rentpa >= strToDec(dict['rentpa']))
-        # TODO: filters, or switch to raw SQL
-    # if dict['rentperiods'] and dict['rentperiods'] != "":
-    #     if dict['modifier_rentperiods'] == '=':
-    #         filtr.append(Rent.arrears == strToDec(dict['rentperiods']))
-    #     if dict['modifier_rentperiods'] == '<':
-    #         filtr.append(Rent.arrears < strToDec(dict['rentperiods']))
-    #     if dict['modifier_rentperiods'] == '<=':
-    #         filtr.append(Rent.arrears <= strToDec(dict['rentperiods']))
-    #     if dict['modifier_rentperiods'] == '>':
-    #         filtr.append(Rent.arrears > strToDec(dict['rentperiods']))
-    #     if dict['modifier_rentperiods'] == '>=':
-    #         filtr.append(Rent.arrears >= strToDec(dict['rentperiods']))
-    # elif key == "charges" and value == "exclude":
-    #     filtr.append(Rent.mailto_id.notin_(1, 2))
-    # elif key == "charges" and value == "only":
-    #     filtr.append(Rent.mailto_id.in_(1, 2))
-    # elif dict['emailable'] and dict['emailable'] == "exclude":
-    #     filtr.append(Rent.mailto_id.notin_(1, 2))
-    # elif dict['emailable'] and dict['emailable'] == "only":
-    #     filtr.append(Rent.mailto_id.in_(1, 2))
+    if dict['rentperiods'] and dict['rentperiods'] != "":
+        if dict['modifier_rentperiods'] == '=':
+            filtr.append(Rent.arrears == dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
+        if dict['modifier_rentperiods'] == '<':
+            filtr.append(Rent.arrears < dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
+        if dict['modifier_rentperiods'] == '<=':
+            filtr.append(Rent.arrears <= dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
+        if dict['modifier_rentperiods'] == '>':
+            filtr.append(Rent.arrears > dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
+        if dict['modifier_rentperiods'] == '>=':
+            filtr.append(Rent.arrears >= dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
     filtr.append(Rent.lastrentdate <= (dict['enddate'] or (date.today() + relativedelta(days=30))))
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
         filtr.append(Landlord.name.in_(dict['landlord']))

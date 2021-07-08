@@ -39,10 +39,6 @@ def mget_charges(rent_id):
     return charges
 
 
-def mget_charges_rent(rent_id):
-    return charges
-
-
 def get_total_charges(rent_id):
     return Charge.query.with_entities(Charge.chargetotal).filter_by(rent_id=rent_id).all()
 
