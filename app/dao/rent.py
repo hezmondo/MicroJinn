@@ -13,6 +13,10 @@ def create_new_rent():
     return 23
 
 
+def dbget_rent_id(rentcode):
+    return db.session.execute(select(Rent.id).where(Rent.rentcode==rentcode)).scalar().one
+
+
 def delete_rent_filter(item_id):
     Jstore.query.filter_by(id=item_id).delete()
     commit_to_database()

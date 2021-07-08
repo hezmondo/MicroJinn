@@ -3,7 +3,7 @@ from app.main.form_letter import mget_form_letter
 from app.dao.income import get_income_item
 from app.dao.rent import get_rent_md
 from app.main.functions import dateToStr, doReplace, moneyToStr
-from app.main.lease import get_lease_variables
+from app.main.lease import mget_lease_variables
 from app.main.rent import get_mailaddr, get_propaddr, get_rentp, get_rent_strings
 from app.modeltypes import PayTypes
 
@@ -30,7 +30,7 @@ def writeMail(form_letter_id, template):
     form_letter = mget_form_letter(form_letter_id)
     leasedata = None
     if "LEQ" in form_letter.code:
-        leasedata, lease_variables = get_lease_variables(rent_id)
+        leasedata, lease_variables = mget_lease_variables(rent_id)
         variables.update(lease_variables)
     block = form_letter.block if form_letter.block else ""
     doctype_id = form_letter.doctype_id

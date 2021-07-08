@@ -8,13 +8,16 @@
                 <button type="submit" class="btn btn-block btn-success button-icon search" role="button">search</button>
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" name="rentcode" value="{{ rcd }}">
+                <input type="text" class="form-control" name="rentcode" placeholder="rentcode"
+                       value="{{ rentcode }}">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" name="uplift_type" value="{{ ult }}">
+                <input type="text" class="form-control" name="method" placeholder="uplift method"
+                       value="{{ method }}">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" name="upliftdays" value="{{ uld }}">
+                <input type="text" class="form-control" name="days" placeholder="days to uplift date"
+                       value="{{ days }}">
             </div>
             <div class="col-md-4">
                 enter number of days ahead to filter for uplift date:
@@ -25,20 +28,26 @@
     <table class="table" id="leases">
         <thead>
             <tr>
-                <th style="width: 10.00%">rentcode</th>
-                <th style="width: 12.00%">uplift date</th>
-                <th style="width: 10.00%">unexpired</th>
-                <th style="width: 60.00%">info</th>
+                <th style="width: 8.00%">rentcode</th>
+                <th style="width: 10.00%">uplift date</th>
+                <th style="width: 8.00%">unexpired</th>
+                <th style="width: 8.00%">years</th>
+                <th style="width: 8.00%">method</th>
+                <th style="width: 8.00%">value</th>
+                <th style="width: 42.00%">info</th>
                 <th style="width: 8.00%">action</th>
             </tr>
         </thead>
         <tbody>
             {% for item in leases %}
                 <tr id="{{ item.id }}">
-                    <td style="width: 10.00%">{{ item.rentcode }}</td>
-                    <td style="width: 12.00%">{{ item.uplift_date.strftime('%d-%b-%Y') }}</td>
-                    <td style="width: 10.00%"> {{ item.unexpired }}</td>
-                    <td style="width: 60.00%"> {{ item.info }}</td>
+                    <td style="width: 8.00%">{{ item.rent.rentcode }}</td>
+                    <td style="width: 10.00%">{{ item.uplift_date.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 8.00%"> {{ item.unexpired }}</td>
+                    <td style="width: 8.00%"> {{ item.LeaseUpType.years }}</td>
+                    <td style="width: 8.00%"> {{ item.LeaseUpType.method }}</td>
+                    <td style="width: 8.00%"> {{ item.LeaseUpType.value }}</td>
+                    <td style="width: 42.00%"> {{ item.info }}</td>
                     <td style="width: 8.00%"><a href="{{ url_for('lease_bp.lease', lease_id=item.id) }}">view</a></td>
                 </tr>
             {% endfor %}
