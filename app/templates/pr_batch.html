@@ -75,7 +75,12 @@
                     <tbody>
                     {% for item in pay_requests %}
                     <tr id="{{ item.id }}">
-                        <td style="width: 10.00%" class="vertical-align"> {{ item.rent.rentcode }}</td>
+                        <td style="width: 10.00%" class="vertical-align">
+                            <a href="{{ url_for('rent_bp.rent', rent_id=item.rent.id, nav='batch', nav_id=pr_batch.id) }}"
+                               class="btn btn-teal-light btn-small"
+                               data-toggle="tooltip" title="view rent" role="button">{{ item.rent.rentcode }}</a>
+
+                        </td>
                         <td style="width: 25.00%" class="vertical-align"> {{ item.summary }}</td>
                         <td style="width: 11.00%" class="vertical-align"> {{ item.rent_date.strftime('%d-%b-%Y')
                             if item.rent_date else 'none' }}

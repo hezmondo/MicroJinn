@@ -2,12 +2,10 @@
 
 <!-- font-size recognised by the pdf creation code -->
 <style>
-                    p
-                    {
-                        font-size: 10.5pt;
-                    }
-
-
+p
+{
+    font-size: 10.5pt;
+}
 </style>
 <div id="manager_div" contenteditable="true">
     <div class="font-size-large manager-name" align="center" style="font-size:12.5pt;">
@@ -36,7 +34,7 @@
     <br/>
     <br/>
     <b><span id="subject_span" class="block-text" contenteditable="true" style="font-size:10.5pt;">
-						{{ rent_pr.rent_type.capitalize() }} account for property:
+						{{ capitalize_first_only(rent_pr.rent_type) }} account for property:
                         {% for addr in rent_pr.propaddrs %}
                             {{ addr.propaddr }}
                         {% endfor %}

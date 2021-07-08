@@ -16,7 +16,7 @@ from app.dao.payrequest import post_pr_batch_empty,  add_pr_history, get_last_ar
     post_updated_payrequest_delivery, add_pr_charge, update_pr_batch
 from app.dao.common import delete_record_basic
 from app.dao.rent import get_rentcode, update_filter_last_used
-from app.main.functions import dateToStr, doReplace, moneyToStr
+from app.main.functions import capitalize_first_only, dateToStr, doReplace, moneyToStr
 from app.main.rent import get_rent_gale, get_rentp, get_pr_strings, update_roll_rent, update_rollback_rent
 from app.main.common import inc_date_m
 
@@ -112,7 +112,8 @@ def collect_pr_history_data():
 def collect_pr_rent_data():
     return {'rent_date': request.form.get('rent_date'),
             'new_arrears': request.form.get('new_arrears'),
-            'charge_total': request.form.get('charge_total')}
+            'charge_total': request.form.get('charge_total'),
+            'create_case': request.form.get('create_case')}
 
 
 def create_case(rent_id, pr_id):
@@ -128,7 +129,7 @@ def forward_rent_case_and_charges(pr_id, pr_rent_data, rent_id):
     case_created = False
     if Decimal(pr_rent_data.get('charge_total')) > 0:
         charge_id = save_charge(rent_id, Decimal(pr_rent_data.get('charge_total')), 10)
-    if not check_case_exists(rent_id):
+    if pr_rent_data.get('create_case') == 'True' and not check_case_exists(rent_id):
         create_case(rent_id, pr_id)
         case_created = True
     return case_created, charge_id
@@ -202,7 +203,8 @@ def save_new_payrequest_from_batch(batch_id, html, rent_pr):
     pr_id = add_pr_history(pr_history)
     pr_rent_data = {'rent_date': rent_pr.nextrentdate.strftime("%Y-%m-%d"),
                     'new_arrears': rent_pr.arrears + rent_pr.rent_gale,
-                    'charge_total': rent_pr.recovery_charge_amount}
+                    'charge_total': rent_pr.recovery_charge_amount,
+                    'create_case': rent_pr.create_case}
     case_created, charge_id = forward_rent_case_and_charges(pr_id, pr_rent_data, rent_pr.id)
     if charge_id or case_created:
         add_pr_charge(pr_id, charge_id, case_created)
@@ -279,7 +281,7 @@ def write_payrequest(rent_id, pr_form_id):
         rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
     rent_pr = append_pr_date_variables(rent_pr)
     pr_variables = get_pr_strings(rent_pr)
-    subject = doReplace(pr_variables, pr_form.subject).title()
+    subject = capitalize_first_only(doReplace(pr_variables, pr_form.subject))
     arrears_clause = doReplace(pr_variables, arrears_clause) + '\n\n' if arrears_clause else ""
     block = arrears_clause.capitalize() + doReplace(pr_variables, pr_form.block) if pr_form.block else ""
     block_email = get_pr_email_form()

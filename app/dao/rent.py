@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, load_only, contains_eager
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Landlord, Jstore, Rent, RentExternal
+from app.models import Agent, Charge, Landlord, Jstore, Rent, RentExternal
 
 
 def create_new_rent():
@@ -49,8 +49,8 @@ def get_rent(rent_id):  # returns all Rent member variables plus associated item
 
 
 def get_rentcode(rent_id):
-    rent = db.session.query(Rent).filter_by(id=rent_id).options(load_only('rentcode')).one_or_none()
-    return rent.rentcode
+    stmt = select(Rent.rentcode).filter_by(id=rent_id)
+    return db.session.execute(stmt).scalar_one_or_none()
 
 
 def get_rent_md(rent_id):  # returns 5 Rent member variables as a mutable dict for mail_dialog
@@ -75,7 +75,7 @@ def getrents_basic_sql(sql):  # simple filtered rents for main rents page using 
 
 
 def getrents_advanced(filtr, runsize):
-    stmt = select(Rent).join(Rent.prop_rent).join(Landlord).join(Agent) \
+    stmt = select(Rent).join(Rent.prop_rent).join(Landlord).outerjoin(Agent).outerjoin(Rent.charge_rent) \
         .options(contains_eager(Rent.prop_rent).load_only('propaddr'),
                  load_only('advarr_id', 'arrears', 'freq_id', 'lastrentdate', 'prdelivery_id', 'rentcode',
                            'rentpa', 'source', 'tenantname', 'datecode_id'),

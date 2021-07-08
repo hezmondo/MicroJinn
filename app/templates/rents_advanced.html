@@ -22,7 +22,7 @@
     </div>
     {% endif %}
 </div>
-<form action="/filter" method="post">
+<form method="POST">
     {% if action == 'initialize' and method == 'payrequest' %}
     <div class="boxed boxed-center boxed-blue" style="margin-bottom: 1rem;">
         <div class="row">
@@ -293,7 +293,7 @@
                                         <div class="card-body text-primary">
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
-                                                    <input type="text" class="form-control" placeholder="run size"
+                                                    <input type="text" class="form-control" placeholder="run size | default 300"
                                                            name="runsize"
                                                            id="filter_runsize" value="{{ fdict.runsize }}">
                                                 </div>
@@ -353,7 +353,12 @@
                                     item.datecode_id, 1).strftime('%d-%b-%Y') }}
                                 </td>
                                 <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                                <td style="width: 22.00%">{{ item.prop_rent[0].propaddr }}</td>
+                                <td style="width: 22.00%">
+                                    {% for addr in item.prop_rent %}
+                                        {{ addr.propaddr }}
+                                        {% if not loop.last %}; {% endif %}
+                                    {% endfor %}
+                                </td>
                                 <td style="width: 8.00%"> {{ item.source }}</td>
                                 <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) |
                                     truncate(40) }}

@@ -9,6 +9,10 @@ import math
 from decimal import Decimal
 
 
+def capitalize_first_only(string):
+    return string[:1].upper() + string[1:]
+
+
 def doReplace(dict, clause):
     for key, value in dict.items():
         clause = clause.replace(key, value)
