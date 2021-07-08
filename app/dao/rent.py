@@ -45,7 +45,8 @@ def get_rent(rent_id):  # returns all Rent member variables plus associated item
 
 
 def get_rentcode(rent_id):
-    rent = db.session.query(Rent).filter_by(id=rent_id).options(load_only('rentcode')).one_or_none()
+    stmt = select(Rent).filter_by(id=rent_id).options(load_only('rentcode'))
+    rent = db.session.execute(stmt).scalar_one_or_none()
     return rent.rentcode
 
 
