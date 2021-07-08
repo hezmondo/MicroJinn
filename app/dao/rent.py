@@ -45,9 +45,8 @@ def get_rent(rent_id):  # returns all Rent member variables plus associated item
 
 
 def get_rentcode(rent_id):
-    stmt = select(Rent).filter_by(id=rent_id).options(load_only('rentcode'))
-    rent = db.session.execute(stmt).scalar_one_or_none()
-    return rent.rentcode
+    stmt = select(Rent.rentcode).filter_by(id=rent_id)
+    return db.session.execute(stmt).scalar_one_or_none()
 
 
 def get_rent_md(rent_id):  # returns 5 Rent member variables as a mutable dict for mail_dialog
