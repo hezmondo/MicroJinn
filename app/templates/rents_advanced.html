@@ -35,11 +35,74 @@
     {% endif %}
     <div class="row" style="margin-bottom: 1rem;">
         <div class="col-md-9">
-            <div class="card card-red" style="margin-bottom:1rem;">
-                <a href="#expand_load" data-toggle="collapse" aria-expanded="false"
-                   aria-controls="expand_load"
-                   class="btn btn-block btn-danger button-icon filter"
-                   role="button">
+            <div>
+                {% if not action == 'initialize' %}
+                {% if rents|length == 0 %}
+                <div class="boxed boxed-center boxed-blue">
+                    <div class="row">
+                        <div class="col">
+                            No results. Refine your search using the filter options above.
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                {%- set rent_ids = [] %}
+                <div id="search" class="table-fixed">
+                    <table class="table" id="rents">
+                        <thead>
+                        <tr>
+                            <th style="width: 8.00%">rentcode</th>
+                            <th style="width: 9.00%">rent (pa)</th>
+                            <th style="width: 8.00%">arrears</th>
+                            <th style="width: 13.00%">next rent date</th>
+                            <th style="width: 15.00%">tenant name</th>
+                            <th style="width: 22.00%">property address</th>
+                            <th style="width: 8.00%">source</th>
+                            <th style="width: 15.00%">agent details</th>
+                            <th style="width: 2.00%"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in rents %}
+                        <!-- collect rent_ids to send to pr_batch -->
+                        <span style="display:none;">{{ rent_ids.append(item.id) }}</span>
+                        <tr id="{{ item.id }}">
+                            <td style="width: 8.00%">{{ item.rentcode }}</td>
+                            <td style="width: 9.00%"> {{ item.rentpa }}</td>
+                            <td style="width: 8.00%"> {{ item.arrears }}</td>
+                            <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
+                                item.datecode_id, 1).strftime('%d-%b-%Y') }}
+                            </td>
+                            <td style="width: 15.00%"> {{ item.tenantname }}</td>
+                            <td style="width: 22.00%">
+                                {% for addr in item.prop_rent %}
+                                {{ addr.propaddr }}
+                                {% if not loop.last %}; {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td style="width: 8.00%"> {{ item.source }}</td>
+                            <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) |
+                                truncate(40) }}
+                            </td>
+                            <td style="width: 2.00%" class="vertical-align">
+                                <a href="{{ url_for('rent_bp.rent', rent_id=item.id) }}"
+                                   class="btn btn-teal-light btn-round button-icon round circles"
+                                   data-toggle="tooltip" title="view rent" role="button"></a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="sticky-top">
+                <div class="card card-red" style="margin-bottom:1rem;">
+                    <a data-toggle="modal" data-target="#load_filter_modal"
+                       class="btn btn-block btn-danger button-icon filter"
+                       role="button">
                     <span>
                         {% if method == 'payrequest' %}
                         load pay request filter
@@ -49,50 +112,178 @@
                         load filter
                         {% endif %}
                     </span>
-                </a>
-                <div id="expand_load" class="collapse collapse-filter">
-                    <table class="table table-condensed">
-                        <tbody>
-                        {% for item in jfilters %}
-                        <tr>
-                            <td style="width: 20.00%">
-                                {% if item.last_used %}
-                                {{ item.last_used }}
-                                {% else %}
-                                <span>Unused</span>
-                                {% endif %}
-                            </td>
-                            <td style="width: 10.00%">{{ item.code }}</td>
-                            <td style="width: 50.00%">{{ item.description}}</td>
-                            <td style="width: 15.00%">
-                                <button type="submit"
-                                        formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
-                                        action='load', method=method) }}"
-                                        class="btn btn-danger btn-small button-icon filter">load
-                                </button>
-                            </td>
-                            <td style="width: 5.00%">
-                                <a class="btn btn-round btn-warning button-icon round trash"
-                                   title="delete this filter" data-toggle="tooltip"
-                                   href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
-                                   onclick="return confirm('are you sure you want to delete this filter?');"></a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
+                    </a>
                 </div>
+                <div class="card card-clear" style="margin-bottom:1rem;">
+                    <a data-toggle="modal" data-target="#filters_modal"
+                       class="btn btn-block btn-secondary button-icon filter"
+                       role="button">change filter options</a>
+                </div>
+                <div class="card card-blue" style="margin-bottom:1rem;">
+                    <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
+                       aria-controls="save_filter_card"
+                       class="btn btn-block btn-primary button-icon save" role="button">save as new filter</a>
+                    <div id="save_filter_card" class="collapse">
+                        <div class="card-body text-primary">
+                            <div class="form-group row">
+                                <div class="col">
+                                    <label for="filtertype">filter type:</label>
+                                    {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
+                                    item_selected=fdict.filtertype, id="filter_filtertype") }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
+                                           placeholder="enter description">
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom: 0px;">
+                                <div class="col">
+                                    <input id="filter_name" type="text" class="form-control" name="filtername"
+                                           placeholder="enter name">
+                                </div>
+                                <div class="col">
+                                    <button type="submit"
+                                            formaction="{{ url_for('rent_bp.rents_advanced', action='save', filtr_id=filtr_id, method=method) }}"
+                                            class="btn btn-block btn-primary  button-icon save" role="button">save
+                                        filter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if method == 'payrequest' and rents|length > 1 %}
+                <div class="card card-green" style="margin-bottom:1rem;">
+                    <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
+                       aria-controls="produce_pr_card"
+                       class="btn btn-block btn-success button-icon letter" role="button">
+                        produce {{ rents|length }} pay requests</a>
+                    <div id="produce_pr_card" class="collapse">
+                        <div class="card-body text-primary">
+                            <div class="form-group row">
+                                <div class="col-md-6" style="margin:auto;">
+                                    select pr template
+                                </div>
+                                <div class="col-md-6">
+                                    {{ widgets.combobox(name="pr_template", items=pr_template_codes,
+                                    item_selected=pr_defaults.pr_default) }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6" style="margin:auto;">
+                                    select email template
+                                </div>
+                                <div class="col-md-6">
+                                    {{ widgets.combobox(name="pr_template", items=pr_template_codes,
+                                    item_selected=pr_defaults.pr_email_default) }}
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <a class="btn btn-block btn-teal button-icon circles"
+                                       href="{{ url_for('form_letter_bp.form_letters', method='payrequest') }}"
+                                       role="button">
+                                        view pay request templates
+                                    </a>
+                                </div>
+                            </div>
+                            <span><hr></span>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <span>Produce a pay request batch for these {{ rents|length }} rents?</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom: 0px;">
+                                <div class="col">
+                                    <button type="submit" id="pr_run_batch"
+                                            formaction="{{ url_for('pr_bp.pr_run_batch') }}"
+                                            class="btn btn-block btn-success button-icon arrow-right" role="button">
+                                        go
+                                    </button>
+                                </div>
+                                <div class="col">
+                                    <a class="btn btn-block btn-secondary button-icon cross"
+                                       role="button" href="#produce_pr_card" data-toggle="collapse"
+                                       aria-expanded="false"
+                                       aria-controls="produce_pr_card">cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
-            <div class="card card-clear" style="margin-bottom:1rem;">
-                <a href="#expand_filters" data-toggle="collapse" aria-expanded="false"
-                   aria-controls="expand_filters"
-                   class="btn btn-block btn-secondary button-icon filter"
-                   role="button">change filter options</a>
-                {% if action == 'initialize' %}
-                <div id="expand_filters" class="collapse collapse-filter show">
-                    {% else %}
-                    <div id="expand_filters" class="collapse collapse-filter">
-                        {% endif %}
+        </div>
+    </div>
+    <!--hidden input to save rent ids to send to pr_batch-->
+    <input type="hidden" id="rent_id_list" name="rent_id_list" value="{{ rent_ids }}">
+    {% if fdict.code %}
+    <input type="hidden" id="runcode" name="runcode" value="{{ fdict.code }}">
+    {% else %}
+    <input type="hidden" id="runcode" name="runcode" value="Unsaved Filter">
+    {% endif %}
+</form>
+
+<!-- Modal - load filter -->
+<div class="modal fade" id="load_filter_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <form method="POST">
+                    <div class="card card-clear">
+                        <div class="card-header" style="background-color:#e85765; color:white;">select a filter to load
+                        </div>
+                        <table class="table table-condensed">
+                            <tbody>
+                            {% for item in jfilters %}
+                            <tr>
+                                <td style="width: 20.00%">
+                                    {% if item.last_used %}
+                                    {{ item.last_used }}
+                                    {% else %}
+                                    <span>Unused</span>
+                                    {% endif %}
+                                </td>
+                                <td style="width: 10.00%">{{ item.code }}</td>
+                                <td style="width: 50.00%">{{ item.description}}</td>
+                                <td style="width: 15.00%">
+                                    <button type="submit"
+                                            formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
+                                        action='load', method=method) }}"
+                                            class="btn btn-danger btn-small button-icon filter">load
+                                    </button>
+                                </td>
+                                <td style="width: 5.00%">
+                                    <a class="btn btn-round btn-warning button-icon round trash"
+                                       title="delete this filter" data-toggle="tooltip"
+                                       href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
+                                       onclick="return confirm('are you sure you want to delete this filter?');"></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - filter options -->
+<div class="modal fade" id="filters_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <form method="POST" id="rent">
+                    <div class="card card-clear">
+                        <div class="card-header" style="background-color:#4e4e4e; color:white;">select filter options
+                        </div>
                         <div class="card-body text-primary">
                             <div class="row">
                                 <div class="col-md-6">
@@ -102,7 +293,8 @@
                                                 <div class="col">rent</div>
                                                 <div class="col align-right">
                                                     <a class="button-icon sync clear-filters"
-                                                       style="color:inherit;" role="button">clear all filter options</a>
+                                                       style="color:inherit;" role="button">clear all filter
+                                                        options</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -112,11 +304,13 @@
                                                     <input id="filter_rentcode" type="text" class="form-control"
                                                            name="rentcode"
                                                            data-toggle="tooltip"
-                                                           placeholder="rentcode starts with" title="starts with"
+                                                           placeholder="rentcode starts with"
+                                                           title="starts with"
                                                            value="{{ fdict.rentcode }}">
                                                 </div>
                                                 <div class="col">
-                                                    <input id="filter_tenantname" type="text" class="form-control"
+                                                    <input id="filter_tenantname" type="text"
+                                                           class="form-control"
                                                            name="tenantname"
                                                            data-toggle="tooltip"
                                                            placeholder="tenant name" title="includes"
@@ -134,7 +328,8 @@
                                             </div>
                                             <div class="form-group row">
                                                 <div class="col">
-                                                    <input id="filter_agentdetail" type="text" class="form-control"
+                                                    <input id="filter_agentdetail" type="text"
+                                                           class="form-control"
                                                            name="agentdetail"
                                                            data-toggle="tooltip"
                                                            placeholder="agent details" title="includes"
@@ -218,13 +413,16 @@
                                         <div class="card-body text-primary">
                                             <div class="form-group row" style="margin-left:0px;">
                                                 <div class="col">
-                                                    {{ widgets.combobox_number(name = "rentpa", value=fdict.rentpa,
-                                                    placeholder="rent pa", tooltip="rent per annum | example = 100",
+                                                    {{ widgets.combobox_number(name = "rentpa",
+                                                    value=fdict.rentpa,
+                                                    placeholder="rent pa", tooltip="rent per annum | example =
+                                                    100",
                                                     id="filter_rentpa", item_selected=fdict.modifier_rentpa)
                                                     }}
                                                 </div>
                                                 <div class="col">
-                                                    {{ widgets.combobox_number(name = "arrears", value=fdict.arrears,
+                                                    {{ widgets.combobox_number(name = "arrears",
+                                                    value=fdict.arrears,
                                                     placeholder="arrears", tooltip="arrears | example < 100",
                                                     id="filter_arrears", item_selected=fdict.modifier_arrears)
                                                     }}
@@ -232,7 +430,8 @@
                                                 <div class="col">
                                                     {{ widgets.combobox_number(name = "rentperiods",
                                                     value=fdict.rentperiods, placeholder="periods owing",
-                                                    tooltip="periods owing | example < 3", id="filter_rentperiods",
+                                                    tooltip="periods owing | example < 3",
+                                                    id="filter_rentperiods",
                                                     item_selected=fdict.modifier_rentperiods) }}
                                                 </div>
                                             </div>
@@ -263,12 +462,14 @@
                                             <div class="form-group row">
                                                 <div class="col">
                                                     <label for="enddate">mail to agent:</label>
-                                                    {{ widgets.combobox(name="agentmailto", items=combodict.options,
+                                                    {{ widgets.combobox(name="agentmailto",
+                                                    items=combodict.options,
                                                     item_selected=fdict.agentmailto, id="filter_agentmailto") }}
                                                 </div>
                                                 <div class="col">
                                                     <label for="charges">emailable:</label>
-                                                    {{ widgets.combobox(name="emailable", items=combodict.options,
+                                                    {{ widgets.combobox(name="emailable",
+                                                    items=combodict.options,
                                                     id="filter_emailable",
                                                     item_selected=fdict.emailable) }}
                                                 </div>
@@ -293,7 +494,8 @@
                                         <div class="card-body text-primary">
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
-                                                    <input type="text" class="form-control" placeholder="run size | default 300"
+                                                    <input type="text" class="form-control"
+                                                           placeholder="run size | default 300"
                                                            name="runsize"
                                                            id="filter_runsize" value="{{ fdict.runsize }}">
                                                 </div>
@@ -313,178 +515,13 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div>
-                    {% if not action == 'initialize' %}
-                    {% if rents|length == 0 %}
-                    <div class="boxed boxed-center boxed-blue">
-                        <div class="row">
-                            <div class="col">
-                                No results. Refine your search using the filter options above.
-                            </div>
-                        </div>
-                    </div>
-                    {% else %}
-                    {%- set rent_ids = [] %}
-                    <div id="search" class="table-fixed">
-                        <table class="table" id="rents">
-                            <thead>
-                            <tr>
-                                <th style="width: 8.00%">rentcode</th>
-                                <th style="width: 9.00%">rent (pa)</th>
-                                <th style="width: 8.00%">arrears</th>
-                                <th style="width: 13.00%">next rent date</th>
-                                <th style="width: 15.00%">tenant name</th>
-                                <th style="width: 22.00%">property address</th>
-                                <th style="width: 8.00%">source</th>
-                                <th style="width: 15.00%">agent details</th>
-                                <th style="width: 2.00%"></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item in rents %}
-                            <!-- collect rent_ids to send to pr_batch -->
-                            <span style="display:none;">{{ rent_ids.append(item.id) }}</span>
-                            <tr id="{{ item.id }}">
-                                <td style="width: 8.00%">{{ item.rentcode }}</td>
-                                <td style="width: 9.00%"> {{ item.rentpa }}</td>
-                                <td style="width: 8.00%"> {{ item.arrears }}</td>
-                                <td style="width: 13.00%"> {{ next_rent_date(item.lastrentdate, item.freq_id,
-                                    item.datecode_id, 1).strftime('%d-%b-%Y') }}
-                                </td>
-                                <td style="width: 15.00%"> {{ item.tenantname }}</td>
-                                <td style="width: 22.00%">
-                                    {% for addr in item.prop_rent %}
-                                        {{ addr.propaddr }}
-                                        {% if not loop.last %}; {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td style="width: 8.00%"> {{ item.source }}</td>
-                                <td style="width: 15.00%"> {{ item.agent.detail | default('no agent', true) |
-                                    truncate(40) }}
-                                </td>
-                                <td style="width: 2.00%" class="vertical-align">
-                                    <a href="{{ url_for('rent_bp.rent', rent_id=item.id) }}"
-                                       class="btn btn-teal-light btn-round button-icon round circles"
-                                       data-toggle="tooltip" title="view rent" role="button"></a></td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="sticky-top">
-                    <div class="card card-blue" style="margin-bottom:1rem;">
-                        <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
-                           aria-controls="save_filter_card"
-                           class="btn btn-block btn-primary button-icon save" role="button">save as new filter</a>
-                        <div id="save_filter_card" class="collapse">
-                            <div class="card-body text-primary">
-                                <div class="form-group row">
-                                    <div class="col">
-                                        <label for="filtertype">filter type:</label>
-                                        {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
-                                        item_selected=fdict.filtertype, id="filter_filtertype") }}
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col">
-                                        <input id="filter_desc" type="text" class="form-control" name="filterdesc"
-                                               placeholder="enter description">
-                                    </div>
-                                </div>
-                                <div class="form-group row" style="margin-bottom: 0px;">
-                                    <div class="col">
-                                        <input id="filter_name" type="text" class="form-control" name="filtername"
-                                               placeholder="enter name">
-                                    </div>
-                                    <div class="col">
-                                        <button type="submit"
-                                                formaction="{{ url_for('rent_bp.rents_advanced', action='save', filtr_id=filtr_id, method=method) }}"
-                                                class="btn btn-block btn-primary  button-icon save" role="button">save
-                                            filter
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% if method == 'payrequest' and rents|length > 1 %}
-                    <div class="card card-green" style="margin-bottom:1rem;">
-                        <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
-                           aria-controls="produce_pr_card"
-                           class="btn btn-block btn-success button-icon letter" role="button">
-                            produce {{ rents|length }} pay requests</a>
-                        <div id="produce_pr_card" class="collapse">
-                            <div class="card-body text-primary">
-                                <div class="form-group row">
-                                    <div class="col-md-6" style="margin:auto;">
-                                        select pr template
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ widgets.combobox(name="pr_template", items=pr_template_codes,
-                                        item_selected=pr_defaults.pr_default) }}
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-md-6" style="margin:auto;">
-                                        select email template
-                                    </div>
-                                    <div class="col-md-6">
-                                        {{ widgets.combobox(name="pr_template", items=pr_template_codes,
-                                        item_selected=pr_defaults.pr_email_default) }}
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col">
-                                        <a class="btn btn-block btn-teal button-icon circles"
-                                           href="{{ url_for('form_letter_bp.form_letters', method='payrequest') }}"
-                                           role="button">
-                                            view pay request templates
-                                        </a>
-                                    </div>
-                                </div>
-                                <span><hr></span>
-                                <div class="form-group row">
-                                    <div class="col">
-                                        <span>Produce a pay request batch for these {{ rents|length }} rents?</span>
-                                    </div>
-                                </div>
-                                <div class="form-group row" style="margin-bottom: 0px;">
-                                    <div class="col">
-                                        <button type="submit" id="pr_run_batch"
-                                                formaction="{{ url_for('pr_bp.pr_run_batch') }}"
-                                                class="btn btn-block btn-success button-icon arrow-right" role="button">
-                                            go
-                                        </button>
-                                    </div>
-                                    <div class="col">
-                                        <a class="btn btn-block btn-secondary button-icon cross"
-                                           role="button" href="#produce_pr_card" data-toggle="collapse"
-                                           aria-expanded="false"
-                                           aria-controls="produce_pr_card">cancel
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
+                </form>
             </div>
         </div>
-        <!--hidden input to save rent ids to send to pr_batch-->
-        <input type="hidden" id="rent_id_list" name="rent_id_list" value="{{ rent_ids }}">
-        {% if fdict.code %}
-        <input type="hidden" id="runcode" name="runcode" value="{{ fdict.code }}">
-        {% else %}
-        <input type="hidden" id="runcode" name="runcode" value="Unsaved Filter">
-        {% endif %}
-</form>
+    </div>
+</div>
+
+
 {% endblock %}
 
 {% block javascript %}
@@ -514,5 +551,20 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 {% endblock %}
