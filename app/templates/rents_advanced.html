@@ -4,17 +4,7 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-<div class="form-group row">
-    <div class="col-md-9">
-        <span class="title-text">
-            {% if fdict.code %}
-            <b>{{ fdict.code }}</b> - {{ fdict.description }}
-            {% endif %}
-            {% if action == 'search' %}
-            New Search
-            {% endif %}
-        </span>
-    </div>
+<div class="form-group row flex-row-reverse">
     {% if method == 'payrequest' %}
     <div class="col-md-3">
         <a href="{{ url_for('pr_bp.pr_start') }}"
@@ -23,16 +13,6 @@
     {% endif %}
 </div>
 <form method="POST">
-    {% if action == 'initialize' and method == 'payrequest' %}
-    <div class="boxed boxed-center boxed-blue" style="margin-bottom: 1rem;">
-        <div class="row">
-            <div class="col">
-                Add a new filter by loading and modifying a previous filter or selecting new filter options. When you
-                finish selecting your filter options, use 'run filter' to test the filter and 'save filter' to save it.
-            </div>
-        </div>
-    </div>
-    {% endif %}
     <div class="row" style="margin-bottom: 1rem;">
         <div class="col-md-9">
             <div>
@@ -41,7 +21,7 @@
                 <div class="boxed boxed-center boxed-blue">
                     <div class="row">
                         <div class="col">
-                            No results. Refine your search using the filter options above.
+                            No results. Refine your search using the filter options.
                         </div>
                     </div>
                 </div>
@@ -94,15 +74,55 @@
                     </table>
                 </div>
                 {% endif %}
+                {% elif method == 'payrequest'%}
+                <div class="boxed boxed-blue">
+                    <div class="row">
+                        <div class="col">
+                            Add a new filter by loading and modifying a previous filter or selecting new filter options.
+                            When you
+                            finish selecting your filter options, use 'run filter' to test the filter and 'save filter'
+                            to save it.
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="boxed boxed-blue" style="margin-bottom: 1rem;">
+                    <div class="row">
+                        <div class="col">
+                            Search using the filter options.
+                        </div>
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </div>
         <div class="col-md-3">
-            <div class="sticky-top">
-                <div class="card card-red" style="margin-bottom:1rem;">
-                    <a data-toggle="modal" data-target="#load_filter_modal"
-                       class="btn btn-block btn-danger button-icon filter"
-                       role="button">
+
+            <div class="card card-white" style="margin-bottom:1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">Search details</div>
+                        <div class="col align-right"><b>{{ rents|length }}</b> results</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="form-group row" style="margin-bottom:0rem;">
+                        <div class="col">
+                            {% if fdict.code %}
+                            <b>{{ fdict.code }} - </b>
+                            {{ fdict.description }}
+                            {% endif %}
+                            {% if action == 'search' %}
+                            New search
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card card-red" style="margin-bottom:1rem;">
+                <a data-toggle="modal" data-target="#load_filter_modal"
+                   class="btn btn-block btn-danger button-icon filter"
+                   role="button">
                     <span>
                         {% if method == 'payrequest' %}
                         load pay request filter
@@ -112,8 +132,9 @@
                         load filter
                         {% endif %}
                     </span>
-                    </a>
-                </div>
+                </a>
+            </div>
+            <div class="sticky-top">
                 <div class="card card-clear" style="margin-bottom:1rem;">
                     <a data-toggle="modal" data-target="#filters_modal"
                        class="btn btn-block btn-secondary button-icon filter"
@@ -134,14 +155,24 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col">
+                                    {% if fdict.description %}
+                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
+                                           placeholder="enter description" value="{{ fdict.description }}">
+                                    {% else %}
                                     <input id="filter_desc" type="text" class="form-control" name="filterdesc"
                                            placeholder="enter description">
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="form-group row" style="margin-bottom: 0px;">
                                 <div class="col">
+                                    {% if fdict.code %}
+                                    <input id="filter_name" type="text" class="form-control" name="filtername"
+                                           placeholder="enter name" value="{{ fdict.code }}">
+                                    {% else %}
                                     <input id="filter_name" type="text" class="form-control" name="filtername"
                                            placeholder="enter name">
+                                    {% endif %}
                                 </div>
                                 <div class="col">
                                     <button type="submit"
@@ -235,7 +266,14 @@
             <div class="modal-body no-padding">
                 <form method="POST">
                     <div class="card card-clear">
-                        <div class="card-header" style="background-color:#e85765; color:white;">select a filter to load
+                        <div class="card-header" style="background-color:#e85765; color:white;">
+                            <div class="row">
+                                <div class="col vertical-align">select a filter to load</div>
+                                <div class="col align-right">
+                                    <a class="button-icon cross" role="button" style="color:inherit;"
+                                       data-dismiss="modal">cancel</a>
+                                </div>
+                            </div>
                         </div>
                         <table class="table table-condensed">
                             <tbody>
@@ -282,7 +320,14 @@
             <div class="modal-body no-padding">
                 <form method="POST" id="rent">
                     <div class="card card-clear">
-                        <div class="card-header" style="background-color:#4e4e4e; color:white;">select filter options
+                        <div class="card-header" style="background-color:#4e4e4e; color:white;">
+                            <div class="row">
+                                <div class="col vertical-align">choose filter options</div>
+                                <div class="col align-right">
+                                    <a class="button-icon cross" role="button" style="color:inherit;"
+                                       data-dismiss="modal">cancel</a>
+                                </div>
+                            </div>
                         </div>
                         <div class="card-body text-primary">
                             <div class="row">
@@ -290,7 +335,7 @@
                                     <div class="card card-clear" style="margin-bottom: 1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row" style="height: 35px;">
-                                                <div class="col">rent</div>
+                                                <div class="col"><b>rent</b></div>
                                                 <div class="col align-right">
                                                     <a class="button-icon sync clear-filters"
                                                        style="color:inherit;" role="button">clear all filter
@@ -350,7 +395,7 @@
                                     <div class="card card-clear">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
-                                                <div class="col">status | select multiple</div>
+                                                <div class="col"><b>status</b> | select multiple</div>
                                             </div>
                                         </div>
                                         <div class="card-body text-primary">
@@ -389,7 +434,7 @@
                                     <div class="card card-clear" style="margin-bottom:1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
-                                                <div class="col">source</div>
+                                                <div class="col"><b>source</b></div>
                                             </div>
                                         </div>
                                         <div class="card-body text-primary">
@@ -407,7 +452,7 @@
                                     <div class="card card-clear" style="margin-bottom:1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
-                                                <div class="col">owing</div>
+                                                <div class="col"><b>owing</b> | rent, arrears, periods</div>
                                             </div>
                                         </div>
                                         <div class="card-body text-primary">
@@ -455,7 +500,7 @@
                                     <div class="card card-clear" style="margin-bottom:1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
-                                                <div class="col">mail</div>
+                                                <div class="col"><b>mail</b></div>
                                             </div>
                                         </div>
                                         <div class="card-body text-primary">
@@ -488,7 +533,7 @@
                                     <div class="card card-clear">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
-                                                <div class="col">run this filter</div>
+                                                <div class="col"><b>run this filter</b></div>
                                             </div>
                                         </div>
                                         <div class="card-body text-primary">
@@ -551,6 +596,16 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
+
+
+
+
+
+
+
+
+
 
 
 
