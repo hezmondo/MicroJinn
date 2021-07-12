@@ -1,6 +1,6 @@
 from flask import Blueprint, redirect, render_template,  request, url_for
 from flask_login import login_required
-from app.main.lease import mget_lease_info, mget_leases, update_lease
+from app.main.lease import mget_lease_exts, mget_lease_info, mget_leases, update_lease
 
 lease_bp = Blueprint('lease_bp', __name__)
 
@@ -13,6 +13,13 @@ def lease(lease_id):
     lease, methods = mget_lease_info(lease_id)
 
     return render_template('lease.html', lease=lease, methods=methods)
+
+
+@lease_bp.route('/lease_extensions', methods=['GET', 'POST'])
+def lease_extensions():
+    lease_exts, rentcode = mget_lease_exts()
+
+    return render_template('lease_extensions.html', lease_exts=lease_exts, rentcode=rentcode)
 
 
 @lease_bp.route('/leases', methods=['GET', 'POST'])

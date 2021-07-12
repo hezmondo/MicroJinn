@@ -1,4 +1,4 @@
-<!-- /templates/leases.html  -->
+<!-- /templates/lease_extensions.html  -->
 {% extends 'base.html' %}
 
 {% import 'widgets.html' as widgets %}
@@ -6,32 +6,31 @@
 {% block app_content %}
 <form method="POST" id="target">
     <div class="row">
-        <div class="col-md-9">
-            {% if leases|length > 0 %}
+        <div class="col-md-8">
+            {% if lease_exts|length > 0 %}
             <div class="table-fixed">
-                <table class="table" id="rents">
+                <table class="table" id="lease_exts">
                     <thead>
                     <tr>
-                        <th style="width: 8.00%">rentcode</th>
-                        <th style="width: 10.00%">uplift date</th>
-                        <th style="width: 8.00%">unexpired</th>
-                        <th style="width: 18.00%">type</th>
-                        <th style="width: 45.00%">info</th>
-                        <th style="width: 11.00%">goto lease</th>
+                        <th style="width: 20.00%">rentcode</th>
+                        <th style="width: 26.00%">date</th>
+                        <th style="width: 20.00%">value</th>
+                        <th style="width: 17.00%">goto rent</th>
+                        <th style="width: 17.00%">goto lease</th>
                     </tr>
                     </thead>
                     <tbody>
-                        {% for item in leases %}
+                        {% for item in lease_exts %}
                             <tr id="{{ item.id }}">
-                                <td style="width: 8.00%">{{ item.rent.rentcode }}</td>
-                                <td style="width: 10.00%">{{ item.uplift_date.strftime('%d-%b-%Y') }}</td>
-                                <td style="width: 8.00%"> {{ item.unexpired }}</td>
-                                <td style="width: 18.00%">F{{ item.LeaseUpType.years|round }}
-                                    {{ item.LeaseUpType.method }}{{ item.LeaseUpType.value }}</td>
-                                <td style="width: 45.00%"> {{ item.info }}</td>
-                                <td style="width: 11.00%" class="vertical-align"><a href="{{ url_for('lease_bp.lease',
-                                    lease_id=item.id) }}" class="btn btn-teal-light btn-round button-icon
-                                    round circles" data-toggle="tooltip" title="goto lease" role="button"></a></td>
+                                <td style="width: 20.00%">{{ item.rentcode }}</td>
+                                <td style="width: 26.00%">{{ item.date.strftime('%d-%b-%Y') if item.date else 'none' }}</td>
+                                <td style="width: 20.00%">{{ item.value }}</td>
+                                <td style="width: 17.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
+                                    rent_id=item.rent_id) }}" class="btn btn-teal-light btn-round button-icon round circles"
+                                    data-toggle="tooltip" title="goto rent" role="button"></a></td>
+                                <td style="width: 17.00%" class="vertical-align"><a href="{{ url_for('lease_bp.lease',
+                                    lease_id=item.lease_id) }}" class="btn btn-teal-light btn-round button-icon round circles"
+                                    data-toggle="tooltip" title="goto lease" role="button"></a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -39,19 +38,19 @@
             </div>
             {% else %}
             {{ widgets.message_box(
-            message="There are no leases that match your search.",
+            message="There are no lease extensions that match your search.",
             btn_text="reset search",
             btn_class="btn btn-block btn-primary button-icon sync",
-            btn_url=url_for('lease_bp.leases') ) }}
+            btn_url=url_for('lease_bp.lease_extensions', rentcode=rentcode) ) }}
             {% endif %}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="sticky-top">
                 <div class="card card-white">
                     <div class="card-header">
                         <div class="row">
                             <div class="col">search</div>
-                            <div class="col align-right"><b>{{ leases|length }}</b> results</div>
+                            <div class="col align-right"><b>{{ lease_exts|length }}</b> results</div>
                         </div>
                     </div>
                     <div class="card-body text-primary">
@@ -61,12 +60,6 @@
                                        data-toggle="tooltip"
                                        title="Starts with" placeholder="rentcode starts with"
                                        value="{{ rentcode }}">
-                                <input id="form-method" type="text" class="form-control" name="method"
-                                       data-toggle="tooltip"
-                                       title="includes" placeholder="uplift method" value="{{ method }}">
-                                <input id="form-days" type="text" class="form-control" name="days"
-                                       data-toggle="tooltip"
-                                       title="less than" placeholder="days to next uplift" value="{{ days }}">
                             </div>
                         </div>
                         <div class="form-group row" style="margin-bottom: 0px;">
@@ -92,9 +85,9 @@
                     <div class="card-body text-primary">
                         <div class="form-group row" style="margin-bottom: 0px;">
                             <div class="col">
-                                <button type="submit" formaction="{{ url_for('lease_bp.lease_extensions') }}"
-                                        class="btn btn-block btn-primary  button-icon search" role="button">lease
-                                    extensions
+                                <button type="submit" formaction="{{ url_for('lease_bp.leases') }}"
+                                        class="btn btn-block btn-primary  button-icon search" role="button">return to
+                                    leases
                                 </button>
                             </div>
                         </div>
@@ -109,8 +102,6 @@
 <script type="text/javascript">
 $('.search-clear').click(function(e) {
     $('#form-rentcode').val('');
-    $('#form-method').val('');
-    $('#form-days').val('');
 });
 </script>
 {% endblock %}

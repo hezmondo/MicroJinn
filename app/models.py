@@ -254,14 +254,16 @@ class Lease(db.Model):
     rent_cap = db.Column(db.Numeric(8, 2))
     rent_id = db.Column(db.Integer, db.ForeignKey('rent.id'))
 
+    lext_lease = db.relationship('LeaseExt', backref='lease')
+
 
 class LeaseExt(db.Model):
     __tablename__ = 'lease_extension'
 
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String(15))
     date = db.Column(db.Date)
-    value = db.Column(db.Integer)
+    value = db.Column(db.Numeric(10, 2))
+    lease_id = db.Column(db.Integer, db.ForeignKey('lease.id'))
 
 
 class LeaseRel(db.Model):

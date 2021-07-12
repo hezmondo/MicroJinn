@@ -3,9 +3,9 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from flask import request
 from app.main.functions import money, moneyToStr
-from app.dao.lease import dget_leasep, dget_leaseval_data, dget_leases, dget_lease_relvals, \
+from app.dao.lease import dget_lease_exts, dget_leasep, dget_leaseval_data, dget_leases, dget_lease_relvals, \
     dget_lease_rent, dget_methods, dget_uplift_id, dpost_lease
-from app.dao.rent import dbget_rent_id
+from app.dao.rent import dbget_rent_id, get_rentcode
 from app.models import Lease, LeaseUpType, Rent
 
 
@@ -61,6 +61,20 @@ def mget_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date,
     grv_add = mget_rent_period_value(freq_id, gr_rate, rentpa, expiring)
 
     return gr_value + grv_add * pow(factor, pushaway)
+
+
+def mget_lease_exts():
+    rentcode = request.form.get("rentcode") or ""
+    sql = mget_sql()
+    if rentcode and rentcode != '':
+        sql = sql + " WHERE r.rentcode LIKE '{}%' ".format(rentcode)
+
+    return dget_lease_exts(sql), rentcode
+
+    # filtr = []
+    # if rentcode and rentcode != 'all rentcodes':
+    #     filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
+    # lease_exts = dget_lease_exts(filtr)
 
 
 def mget_lease_info(lease_id):
@@ -180,6 +194,14 @@ def mget_rent_period_value(freq_id, gr_rate, rentpa, period):
         periods = periods - 1
 
     return rpval
+
+
+def mget_sql():
+    return """ SELECT r.rentcode, x.id, x.date, x.value, x.lease_id, y.rent_id  
+                FROM lease_extension x LEFT JOIN lease y
+                ON x.lease_id = y.id
+                LEFT JOIN rent r
+                ON y.rent_id = r.id"""
 
 
 def mget_unexpired(term, startdate):
