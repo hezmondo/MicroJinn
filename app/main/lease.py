@@ -1,14 +1,34 @@
 import math
-from datetime import date
+from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from flask import request
 from app.main.functions import money, moneyToStr
-from app.dao.lease import dbget_lease, dbget_leaseval_data, dbget_leases, dbget_lease_relvals, \
-    dbget_lease_row_rent, dbget_methods, dbpost_lease
+from app.dao.lease import dget_lease_exts, dget_leasep, dget_leaseval_data, dget_leases, dget_lease_relvals, \
+    dget_lease_rent, dget_methods, dget_uplift_id, dpost_lease
+from app.dao.rent import dbget_rent_id, get_rentcode
 from app.models import Lease, LeaseUpType, Rent
 
 
-def get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years):
+def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
+    # the uplifted rent is calculated by different methods, the first being a simple percentage uplift:
+    new_rent = money(0)
+    if method == 'ADDPC':
+        new_rent = rentpa * (1 + (up_value/100))
+    # Edwards Close has a random first uplift which cannot be calculated. Thereafter a simple percentage uplift:
+    if method == 'ADDPCZEDW':
+        new_rent = 560.00 if rentpa < 260 else rentpa * (1 + (up_value/100))
+    # this method simply adds the same value at each rent uplift:
+    if method == 'ADDVAL':
+        new_rent = rentpa + up_value
+    # this method uplifts the rent according to the increase in the RPI index over the relevant period. As not
+    # yet known, we store a value eg 1.80 as the estimated annual percentage increase in the index:
+    if method == 'RPI':
+        new_rent = rentpa * pow(1 + (up_value / 100), uplift_years)
+
+    return new_rent if rentcap < 0.01 else min(rentcap, new_rent)
+
+
+def mget_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years):
     # we calculate the present value of future rent payments.  The principle is that a payment 1 year from now
     # is worth 1 / 1.065 (the yearly pushaway factor) of the actual payment, if the discount rate is 6.5 per cent
     # first the simplest case - the rent is fixed at zero throughout the remaining unexpired term:
@@ -16,14 +36,14 @@ def get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, 
         return 0
     # next simplest case - the rent is a fixed amount throughout the remaining unexpired term:
     elif method == 'FIXED':
-        return get_rent_period_value(freq_id, gr_rate, rentpa, unexpired)
+        return mget_rent_period_value(freq_id, gr_rate, rentpa, unexpired)
     # next are the cases where the annual rent increases: eg increasing every 25 years by 50 per cent:
     gr_value = 0
     factor = 1 / (1 + gr_rate / 100)
     period_to_uplift = up_date - date.today()
     years_to_uplift = period_to_uplift.days / 365.25
     # first we obtain the present value of the current rent payments up to the first rent uplift date
-    gr_value = gr_value + get_rent_period_value(freq_id, gr_rate, rentpa, years_to_uplift)
+    gr_value = gr_value + mget_rent_period_value(freq_id, gr_rate, rentpa, years_to_uplift)
     # next we calculate the increased rent after the first uplift
     rentpa = inc_rentpa(rentcap, rentpa, method, up_value, up_years)
     # next we calculate the remaining unexpired term after the first rent uplift
@@ -32,52 +52,63 @@ def get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, 
     pushaway = years_to_uplift
     # next we calculate the value of each set of rent payments for each period between uplifts after the first uplift
     while expiring > up_years:
-        grv_add = get_rent_period_value(freq_id, gr_rate, rentpa, up_years)
+        grv_add = mget_rent_period_value(freq_id, gr_rate, rentpa, up_years)
         gr_value = gr_value + grv_add * pow(factor, pushaway)
         expiring = expiring - up_years
         pushaway = pushaway + up_years
         rentpa = inc_rentpa(rentcap, rentpa, method, up_value, up_years)
     # lastly we calculate the value of the remaining rent payments after the last rent uplift
-    grv_add = get_rent_period_value(freq_id, gr_rate, rentpa, expiring)
+    grv_add = mget_rent_period_value(freq_id, gr_rate, rentpa, expiring)
 
     return gr_value + grv_add * pow(factor, pushaway)
 
 
-def get_lease_info(lease_id):
+def mget_lease_exts():
+    rentcode = request.form.get("rentcode") or ""
+    sql = mget_sql()
+    if rentcode and rentcode != '':
+        sql = sql + " WHERE r.rentcode LIKE '{}%' ".format(rentcode)
+
+    return dget_lease_exts(sql), rentcode
+
+    # filtr = []
+    # if rentcode and rentcode != 'all rentcodes':
+    #     filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
+    # lease_exts = dget_lease_exts(filtr)
+
+
+def mget_lease_info(lease_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))
     rentcode = request.args.get('rentcode', "ABC1", type=str)
-    lease = dbget_lease(lease_id, rent_id)
+    lease = dget_leasep(lease_id, rent_id)
     if not lease:
-        lease = {
-                    'id': 0,
-                    'rent_id': rent_id,
-                    'rentcode': rentcode
-                }
-    methods = dbget_methods()
+        lease = Lease(rent_id=rent_id, rentcode=rentcode)
+    methods = dget_methods()
 
     return lease, methods
 
 
-def get_leases():
+def mget_leases():
     lfilter = []
-    rcd = request.form.get("rentcode") or "all rentcodes"
-    uld = request.form.get("upliftdays") or ""
-    ult = request.form.get("uplift_type") or "all uplift types"
-    if rcd and rcd != "all rentcodes":
-        lfilter.append(Rent.rentcode.ilike('%{}%'.format(rcd)))
-    if uld and uld != "":
-        uld = int(uld)
-        enddate = date.today() + relativedelta(days=uld)
+    rentcode = request.form.get("rentcode") or ""
+    days = request.form.get("days") or ""
+    method = request.form.get("method") or ""
+    if rentcode and rentcode != "":
+        lfilter.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
+    if days and days != "":
+        days = int(days)
+        enddate = date.today() + relativedelta(days=days)
         lfilter.append(Lease.uplift_date <= enddate)
-    if ult and ult != "" and ult != "all uplift types":
-        lfilter.append(LeaseUpType.uplift_type.ilike('%{}%'.format(ult)))
-    leases = dbget_leases(lfilter)
-    leases.unexpired = get_unexpired(leases.term, leases.startdate)
+    if method and method != "" and method != "":
+        lfilter.append(LeaseUpType.method.ilike('%{}%'.format(method)))
+    leases = dget_leases(lfilter)
+    for lease in leases:
+        lease.unexpired = money(mget_unexpired(lease.term, lease.start_date))
 
-    return leases, rcd, uld, ult
+    return leases, rentcode, days, method
 
 
-def get_lease_variables(rent_id):
+def mget_lease_variables(rent_id):
     # we obtain all the rent and lease data to calculate for a lease extension quotation:
     fh_rate = float(request.form.get('fh_rate'))
     fhfactor = float(1 + fh_rate / 100)
@@ -86,7 +117,7 @@ def get_lease_variables(rent_id):
     yp_val = float(request.form.get('yp_val'))
     filtr = []
     filtr.append(Lease.rent_id == rent_id)
-    leasedata = dbget_leaseval_data(filtr)
+    leasedata = dget_leaseval_data(filtr)
     freq_id = leasedata.rent.freq_id
     method = leasedata.LeaseUpType.method
     rent_code = leasedata.rent.rentcode
@@ -97,11 +128,11 @@ def get_lease_variables(rent_id):
     rentcap = float(leasedata.rent_cap)
     # the improved value is the notional value of the leasehold interest with a new long lease at a low ground rent
     salevalue = float(leasedata.sale_value_k * 1000)
-    unexpired = get_unexpired(leasedata.term, leasedata.start_date)
+    unexpired = mget_unexpired(leasedata.term, leasedata.start_date)
     # relativity is the percentage used to calculate the marriage value - see below
-    relativity = get_relativity(unexpired)
+    relativity = mget_relativity(unexpired)
     # now we calculate the present value of all future ground rent payments using the gr discount rate
-    gr_value = get_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years)
+    gr_value = mget_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date, up_value, up_years)
     # now we calculate the present value of the future freehold reversion using the fh discount rate
     fhval = salevalue / pow(fhfactor, unexpired)
     # the unimproved value is the notional value of the leasehold interest with the present lease
@@ -138,7 +169,20 @@ def get_lease_variables(rent_id):
     return leasedata, lease_variables
 
 
-def get_rent_period_value(freq_id, gr_rate, rentpa, period):
+def mget_relativity(unexpired):
+    # we obtain the relativity by interpolating between two consecutive values in the lease_relativity table:
+    if math.floor(unexpired) < 96.5:
+        ids = [math.floor(unexpired), math.floor(unexpired) + 1]
+        relativity_values = dget_lease_relvals(ids)
+        low = float(relativity_values[0][0])
+        high = float(relativity_values[1][0])
+
+        return low + ((high - low) * (unexpired % 1))
+    else:
+        return 100
+
+
+def mget_rent_period_value(freq_id, gr_rate, rentpa, period):
     # we obtain the present value of future rent payments over a set period:
     factor = float(1 / (1 + (gr_rate / freq_id) / 100))
     periods = period * freq_id
@@ -152,60 +196,41 @@ def get_rent_period_value(freq_id, gr_rate, rentpa, period):
     return rpval
 
 
-def get_relativity(unexpired):
-    # we obtain the relativity by interpolating between two consecutive values in the lease_relativity table:
-    if math.floor(unexpired) < 96.5:
-        ids = [math.floor(unexpired), math.floor(unexpired) + 1]
-        relativity_values = dbget_lease_relvals(ids)
-        low = float(relativity_values[0][0])
-        high = float(relativity_values[1][0])
-
-        return low + ((high - low) * (unexpired % 1))
-    else:
-        return 100
+def mget_sql():
+    return """ SELECT r.rentcode, x.id, x.date, x.value, x.lease_id, y.rent_id  
+                FROM lease_extension x LEFT JOIN lease y
+                ON x.lease_id = y.id
+                LEFT JOIN rent r
+                ON y.rent_id = r.id"""
 
 
-def get_unexpired(term, startdate):
+def mget_unexpired(term, startdate):
     difference = date.today() - startdate
     return float(term - (difference.days / 365.25))
 
-def inc_rentpa(rentcap, rentpa, method, up_value, uplift_years):
-    # the uplifted rent is calculated by different methods, the first being a simple percentage uplift:
-    new_rent = money(0)
-    if method == 'ADDPC':
-        new_rent = rentpa * (1 + (up_value/100))
-    # Edwards Close has a random first uplift which cannot be calculated. Thereafter a simple percentage uplift:
-    if method == 'ADDPCZEDW':
-        new_rent = 560.00 if rentpa < 260 else rentpa * (1 + (up_value/100))
-    # this method simply adds the same value at each rent uplift:
-    if method == 'ADDVAL':
-        new_rent = rentpa + up_value
-    # this method uplifts the rent according to the increase in the RPI index over the relevant period. As not
-    # yet known, we store a value eg 1.80 as the estimated annual percentage increase in the index:
-    if method == 'RPI':
-        new_rent = rentpa * pow(1 + (up_value / 100), uplift_years)
-
-    return new_rent if rentcap < 0.01 else min(rentcap, new_rent)
-
 
 def update_lease():
-    rent_id = int(request.form.get("rent_id"))
-    lease = dbget_lease_row_rent(rent_id)
-    if lease is None:
-    # new lease for empty result, otherwise existing lease:
-        lease = Lease()
+    rent_id = int(request.form.get("rent_id")) or int(0)
+    rentcode = request.form.get("rentcode")
+    # new lease if no lease for rent_id, otherwise get existing lease for rent_id:
+    lease = dget_lease_rent(rent_id) or Lease(rentcode=rentcode)
     lease.term = request.form.get("term")
-    lease.start_date = request.form.get("start_date")
+    lease.start_datetime = datetime.strptime(request.form.get("start_date"), '%Y-%m-%d')
     lease.start_rent = request.form.get("start_rent")
     lease.info = request.form.get("info")
-    lease.uplift_date = request.form.get("uplift_date")
+    lease.uplift_date = datetime.strptime(request.form.get("uplift_date"), '%Y-%m-%d')
     lease.sale_value_k = request.form.get("sale_value_k")
     lease.rent_cap = request.form.get("rent_cap")
-    lease.value = request.form.get("value")
-    lease.value_date = request.form.get("value_date")
-    lease.rent_id = rent_id
-    dbpost_lease(lease)
+    lease.rent_id = rent_id if rent_id > 0 else dbget_rent_id(rentcode)
+    method = request.form.get("uplift_method")
+    value = request.form.get("uplift_value")
+    years = request.form.get("uplift_years")
+    uplift_id = dget_uplift_id(method, value, years)
+    uplift_type = None
+    if uplift_id:
+        lease.uplift_id = uplift_id
+    else:
+        uplift_type = LeaseUpType(method=method, value=value, years=years)
+    dpost_lease(lease, uplift_type)
 
     return rent_id
-
-

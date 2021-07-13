@@ -1,11 +1,11 @@
 from app import db
 from sqlalchemy import select
-from sqlalchemy.orm import load_only, joinedload
+from sqlalchemy.orm import contains_eager, load_only, joinedload
 from app.dao.database import commit_to_database
-from app.models import Lease, LeaseRel, LeaseUpType, Rent
+from app.models import Lease, LeaseExt, LeaseRel, LeaseUpType, Rent
 
 
-def dbget_lease(lease_id, rent_id):
+def dget_leasep(lease_id, rent_id):
     filtr = []
     if lease_id != 0:
         filtr.append(Lease.id == lease_id)
@@ -21,44 +21,62 @@ def dbget_lease(lease_id, rent_id):
     return db.session.execute(stmt.filter(*filtr)).scalar_one_or_none()
 
 
-def dbget_leaseval_data(filtr):  # get lease and rent data for lease extension valuation and quotations
+def dget_lease(lease_id):
+    return db.session.get(Lease, lease_id)
+
+
+def dget_lease_exts(sql):# simple filtered data fopr lease extensions page using raw sql
+        return db.session.execute(sql).fetchall()
+
+# def dget_lease_exts(filtr):
+    # stmt = select(Lease).outerjoin(Lease.lext_lease).outerjoin(Rent) \
+    #     .options(contains_eager(Lease.lext_lease).load_only('date', 'value', 'lease_id'), load_only('id', 'rent_id'),
+    #            joinedload('rent').load_only('rentcode'))
+    # print(stmt)
+    #
+    # return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
+
+
+def dget_lease_relvals(ids):
+    return db.session.execute(select(LeaseRel.relativity).where(LeaseRel.unexpired.in_(ids))).all()
+
+
+def dget_lease_rent(rent_id):
+    return db.session.execute(select(Lease).filter_by(rent_id=rent_id)).scalar_one()
+
+
+def dget_leases(lfilter):
+    stmt = select(Lease).join(Rent).join(LeaseUpType).options(load_only(Lease.id, Lease.info, Lease.start_date,
+                  Lease.term, Lease.uplift_date), joinedload('rent').load_only(Rent.rentcode),
+                  joinedload('LeaseUpType').load_only(LeaseUpType.years, LeaseUpType.method, LeaseUpType.value))
+
+    return db.session.execute(stmt.filter(*lfilter)).scalars().all()
+
+
+def dget_leaseval_data(filtr):  # get lease and rent data for lease extension valuation and quotations
     stmt = select(Lease) \
         .options(load_only(Lease.info, Lease.rent_cap, Lease.rent_id, Lease.sale_value_k, Lease.start_date,
-                           Lease.start_rent, Lease.term, Lease.uplift_date, Lease.value, Lease.value_date),
+                           Lease.start_rent, Lease.term, Lease.uplift_date),
                  joinedload('LeaseUpType').load_only(LeaseUpType.method, LeaseUpType.value, LeaseUpType.years),
                  joinedload('rent').load_only(Rent.freq_id, Rent.rentcode, Rent.rentpa))
 
     return db.session.execute(stmt.filter(*filtr)).scalar_one_or_none()
 
 
-def dbget_lease_relvals(ids):
-
-    return db.session.execute(select(LeaseRel.relativity).where(LeaseRel.unexpired.in_(ids))).all()
-
-
-def dbget_lease_row(lease_id):
-
-    return Lease.query.get(lease_id)
+def dget_methods():
+    return db.session.execute(select(LeaseUpType.method).distinct()).scalars().all()
 
 
-def dbget_lease_row_rent(rent_id):
-
-    return db.session.execute(select(Lease).filter_by(rent_id=rent_id)).scalar_one()
-
-
-def dbget_leases(lfilter):
-    stmt = select(Lease) \
-        .options(load_only(Lease.id, Lease.info, Lease.start_date, Lease.term, Lease.uplift_date),
-                 joinedload('LeaseUpType').load_only(LeaseUpType.uplift_date),
-                 joinedload('rent').load_only(Rent.rentcode))
-
-    return db.session.execute(stmt.filter(*lfilter)).all()
+def dget_uplift_id(method, value, years):
+    return db.session.execute(select(LeaseUpType.id).
+        where(LeaseUpType.method==method, LeaseUpType.value==value, LeaseUpType.years==years)) \
+        .scalar_one_or_none()
 
 
-def dbget_methods():
-    return db.session.execute(select(LeaseUpType.method)).all()
-
-
-def dbpost_lease(lease):
-    db.session.add(lease)
+def dpost_lease(lease, uplift_type):
+    if uplift_type:
+        uplift_type.lease_up_type.append(lease)
+        db.session.add(uplift_type)
+    else:
+        db.session.add(lease)
     commit_to_database()
