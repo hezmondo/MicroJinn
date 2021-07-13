@@ -20,14 +20,18 @@
             <table class="table table-head">
                 <thead>
                 <tr>
-                    <td style="width: 25%">rent {{ rent.rentcode }}</td>
-                    <td style="width: 25%"><span class="rounded-background light-green">{{ rent.tenuredet }}</span></td>
-                    <td style="width: 25%"><span id="statusdet"
-                                                 class="rounded-background light-purple">{{ rent.statusdet }} status</span>
+                    <td style="width: 17%">rentcode: {{ rent.rentcode }}</td>
+                    <td style="width: 16%">tenure: {{ rent.tenuredet }}</td>
+                    <td style="width: 16%">
+                        {% if rent.salegrade_id == 1 %}
+                            for sale at {{ money_str(rent.price_quote, pound=True) }}
+                        {% else %}
+                        not for sale
+                        {% endif %}
                     </td>
-                    <td style="width: 25%"><span id="actype"
-                                                 class="rounded-background light-purple">{{ rent.actype }} actype</span>
-                    </td>
+                    <td style="width: 17%">status: {{ rent.statusdet }}</td>
+                    <td style="width: 17%">actype: {{ rent.actype }}</td>
+                    <td style="width: 17%">source: {{ rent.source }}</td>
                 </tr>
                 </thead>
             </table>
@@ -294,15 +298,10 @@
             <table class="table rounded-corners">
                 <thead>
                 <tr>
-                    <td style="width: 25%">
-                        {% if rent.salegrade_id == 1 %}
-                            for sale at {{ money_str(rent.price_quote, pound=True) }}
-                        {% else %}
-                        not for sale
-                        {% endif %}
-                    </td>
-                    <td style="width: 25%">source {{ rent.source }}</td>
-                    <td style="width: 25%">nfee {{ rent.typedeed.info }}</td>
+                    <td style="width: 15%">notice fee: {{ rent.typedeed.info }}</td>
+                    <td style="width: 23%">last rent date: {{ rent.lastrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 23%">next rent date: {{ rent.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 23%">paid up to: {{ rent.paidtodate.strftime('%d-%b-%Y') }}</td>
                 </tr>
                 </thead>
             </table>
@@ -376,7 +375,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label for="nextrentdate">next rent date:</label>
-                                    <input type="date" class="form-control" name="nexttrentdate"
+                                    <input type="date" class="form-control" name="nextrentdate"
                                            value="{{ rent.nextrentdate }}" readonly="readonly">
                                 </div>
                             </div>
