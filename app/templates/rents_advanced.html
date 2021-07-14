@@ -18,7 +18,7 @@
             <div>
                 {% if not action == 'initialize' %}
                 {% if rents|length == 0 %}
-                <div class="boxed boxed-center boxed-blue">
+                <div class="boxed boxed-blue">
                     <div class="row">
                         <div class="col">
                             No results. Refine your search using the filter options.
@@ -140,6 +140,7 @@
                        class="btn btn-block btn-secondary button-icon filter"
                        role="button">change filter options</a>
                 </div>
+                {% if action != 'initialize' %}
                 <div class="card card-blue" style="margin-bottom:1rem;">
                     <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
                        aria-controls="save_filter_card"
@@ -185,6 +186,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 {% if method == 'payrequest' and rents|length > 1 %}
                 <div class="card card-green" style="margin-bottom:1rem;">
                     <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
@@ -256,69 +258,13 @@
     {% else %}
     <input type="hidden" id="runcode" name="runcode" value="Unsaved Filter">
     {% endif %}
-</form>
 
-<!-- Modal - load filter -->
-<div class="modal fade" id="load_filter_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
-     aria-hidden="true">
-    <div class="modal-dialog mw-100 w-75" role="document">
-        <div class="modal-content no-border ">
-            <div class="modal-body no-padding">
-                <form method="POST">
-                    <div class="card card-clear">
-                        <div class="card-header" style="background-color:#e85765; color:white;">
-                            <div class="row">
-                                <div class="col vertical-align">select a filter to load</div>
-                                <div class="col align-right">
-                                    <a class="button-icon cross" role="button" style="color:inherit;"
-                                       data-dismiss="modal">cancel</a>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="table table-condensed">
-                            <tbody>
-                            {% for item in jfilters %}
-                            <tr>
-                                <td style="width: 20.00%">
-                                    {% if item.last_used %}
-                                    {{ item.last_used }}
-                                    {% else %}
-                                    <span>Unused</span>
-                                    {% endif %}
-                                </td>
-                                <td style="width: 10.00%">{{ item.code }}</td>
-                                <td style="width: 50.00%">{{ item.description}}</td>
-                                <td style="width: 15.00%">
-                                    <button type="submit"
-                                            formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
-                                        action='load', method=method) }}"
-                                            class="btn btn-danger btn-small button-icon filter">load
-                                    </button>
-                                </td>
-                                <td style="width: 5.00%">
-                                    <a class="btn btn-round btn-warning button-icon round trash"
-                                       title="delete this filter" data-toggle="tooltip"
-                                       href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
-                                       onclick="return confirm('are you sure you want to delete this filter?');"></a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal - filter options -->
-<div class="modal fade" id="filters_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
-     aria-hidden="true">
-    <div class="modal-dialog mw-100 w-75" role="document">
-        <div class="modal-content no-border ">
-            <div class="modal-body no-padding">
-                <form method="POST" id="rent">
+    <!-- Modal - filter options -->
+    <div class="modal fade" id="filters_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+         aria-hidden="true">
+        <div class="modal-dialog mw-100 w-75" role="document">
+            <div class="modal-content no-border ">
+                <div class="modal-body no-padding">
                     <div class="card card-clear">
                         <div class="card-header" style="background-color:#4e4e4e; color:white;">
                             <div class="row">
@@ -560,12 +506,63 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal - load filter -->
+<div class="modal fade" id="load_filter_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <div class="card card-clear">
+                    <div class="card-header" style="background-color:#e85765; color:white;">
+                        <div class="row">
+                            <div class="col vertical-align">select a filter to load</div>
+                            <div class="col align-right">
+                                <a class="button-icon cross" role="button" style="color:inherit;"
+                                   data-dismiss="modal">cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-condensed">
+                        <tbody>
+                        {% for item in jfilters %}
+                        <tr>
+                            <td style="width: 20.00%">
+                                {% if item.last_used %}
+                                {{ item.last_used }}
+                                {% else %}
+                                <span>Unused</span>
+                                {% endif %}
+                            </td>
+                            <td style="width: 10.00%">{{ item.code }}</td>
+                            <td style="width: 50.00%">{{ item.description}}</td>
+                            <td style="width: 15.00%">
+                                <a type="submit"
+                                   href="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
+                                        action='load', method=method) }}"
+                                   class="btn btn-danger btn-small button-icon filter">load
+                                </a>
+                            </td>
+                            <td style="width: 5.00%">
+                                <a class="btn btn-round btn-warning button-icon round trash"
+                                   title="delete this filter" data-toggle="tooltip"
+                                   href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
+                                   onclick="return confirm('are you sure you want to delete this filter?');"></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
 
 {% endblock %}
 
@@ -596,6 +593,9 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
+
+
 
 
 

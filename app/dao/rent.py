@@ -97,6 +97,18 @@ def get_rents_filters(typ):  # get stored advanced filter for advanced queries a
     return filters
 
 
+def get_jstore_row(code):
+    stmt = select(Jstore.id).filter_by(code=code)
+    jstore_id = db.session.execute(stmt).scalar_one_or_none()
+    return db.session.get(Jstore, jstore_id) if jstore_id else Jstore()
+
+
+def post_jstore_filter(jstore):
+    db.session.add(jstore)
+    commit_to_database()
+    return jstore.id
+
+
 def post_rent_filter(filterdict):
     # save this filter dictionary in jstore
     print("filterdict during save")
@@ -123,6 +135,7 @@ def post_rent_filter(filterdict):
     jstore.content = json.dumps(filterdict)
     db.session.add(jstore)
     commit_to_database()
+    return jstore.id
 
 
 def post_rent(rent):
