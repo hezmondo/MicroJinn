@@ -22,11 +22,11 @@
                     <tbody>
                         {% for item in lease_exts %}
                             <tr id="{{ item.id }}">
-                                <td style="width: 20.00%">{{ item.rentcode }}</td>
+                                <td style="width: 20.00%">{{ item.lease.rent.rentcode }}</td>
                                 <td style="width: 26.00%">{{ item.date.strftime('%d-%b-%Y') if item.date else 'none' }}</td>
                                 <td style="width: 20.00%">{{ item.value }}</td>
                                 <td style="width: 17.00%" class="vertical-align"><a href="{{ url_for('rent_bp.rent',
-                                    rent_id=item.rent_id) }}" class="btn btn-teal-light btn-round button-icon round circles"
+                                    rent_id=item.lease.rent_id) }}" class="btn btn-teal-light btn-round button-icon round circles"
                                     data-toggle="tooltip" title="goto rent" role="button"></a></td>
                                 <td style="width: 17.00%" class="vertical-align"><a href="{{ url_for('lease_bp.lease',
                                     lease_id=item.lease_id) }}" class="btn btn-teal-light btn-round button-icon round circles"

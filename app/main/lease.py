@@ -71,12 +71,13 @@ def mget_lease_exts():
 
     return dget_lease_exts(sql), rentcode
 
-# def mget_lease_exts():
+
+# def mget_lease_exts_alt():
 #     filtr = []
 #     rentcode = request.form.get("rentcode") or ""
 #     if rentcode and rentcode != '':
 #         filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
-#     lease_exts = dget_lease_exts(filtr)
+#     return dget_lease_exts_alt(filtr), rentcode
 
 
 def mget_lease_info(lease_id):

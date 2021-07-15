@@ -28,13 +28,14 @@ def dget_lease(lease_id):
 def dget_lease_exts(sql):# simple filtered data fopr lease extensions page using raw sql
         return db.session.execute(sql).fetchall()
 
-# def dget_lease_exts(filtr):
-    # stmt = select(Lease).outerjoin(Lease.lext_lease).outerjoin(Rent) \
-    #     .options(contains_eager(Lease.lext_lease).load_only('date', 'value', 'lease_id'), load_only('id', 'rent_id'),
-    #            joinedload('rent').load_only('rentcode'))
-    # print(stmt)
-    #
-    # return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
+
+# def dget_lease_exts_alt(filtr):
+#     stmt = select(LeaseExt).join(Lease).join(Rent) \
+#         .options(load_only('date', 'value', 'lease_id'),
+#                joinedload('lease').load_only('rent_id').joinedload('rent').load_only('rentcode'))
+#     print(stmt)
+#
+#     return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
 
 
 def dget_lease_relvals(ids):
