@@ -31,8 +31,8 @@ def dget_lease_exts(sql):# simple filtered data fopr lease extensions page using
 
 # def dget_lease_exts_alt(filtr):
 #     stmt = select(LeaseExt).join(Lease).join(Rent) \
-#         .options(load_only('date', 'value', 'lease_id'),
-#                joinedload('lease').load_only('rent_id').joinedload('rent').load_only('rentcode'))
+#         .options(load_only('date', 'value'),
+#                joinedload('lease').joinedload('rent').load_only('rentcode'))
 #     print(stmt)
 #
 #     return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
