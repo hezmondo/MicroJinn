@@ -25,17 +25,12 @@ def dget_lease(lease_id):
     return db.session.get(Lease, lease_id)
 
 
-def dget_lease_exts(sql):# simple filtered data fopr lease extensions page using raw sql
-        return db.session.execute(sql).fetchall()
+def dget_lease_exts(filtr):
+    stmt = select(LeaseExt).join(Lease).join(Rent) \
+        .options(load_only('date', 'value'),
+               joinedload('lease').joinedload('rent').load_only('rentcode'))
 
-
-# def dget_lease_exts_alt(filtr):
-#     stmt = select(LeaseExt).join(Lease).join(Rent) \
-#         .options(load_only('date', 'value'),
-#                joinedload('lease').joinedload('rent').load_only('rentcode'))
-#     print(stmt)
-#
-#     return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
+    return db.session.execute(stmt.filter(*filtr)).unique().scalars().all()
 
 
 def dget_lease_relvals(ids):
