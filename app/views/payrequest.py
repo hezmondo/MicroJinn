@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, redirect, render_template, request, url_for, json, send_from_directory
 from flask_login import login_required
 from app import db
-from app.email import app_send_email
+from app.emails import app_send_email
 from app.dao.common import get_filters
 from app.dao.rent import get_rentcode
 from app.dao.form_letter import get_form_id, get_pr_forms
