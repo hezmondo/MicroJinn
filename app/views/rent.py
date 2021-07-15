@@ -3,7 +3,7 @@ from flask_login import login_required
 from app import db
 from app.dao.common import get_filters
 from app.dao.rent import delete_rent_filter, get_rent_external
-from app.main.common import get_combodict_rent
+from app.main.common import get_combodict_rent, mpost_search
 from app.main.rent import collect_rents_advanced_html_elements, get_rentp, mget_recent_searches, get_rents_basic_sql, \
     get_rents_external, rent_validation, update_landlord, update_rent_rem, \
     update_tenant, mpost_rent_filter, mget_rents_advanced, mget_rents_advanced_from_search

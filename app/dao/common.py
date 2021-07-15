@@ -1,5 +1,5 @@
 import json
-from app import db, cache
+from app import app, db, cache
 from flask import request
 from flask_login import current_user
 from sqlalchemy import asc, select
@@ -165,6 +165,15 @@ def get_recent_searches(type):
 
 def get_recent_searches_asc(type):
     return RecentSearch.query.filter(RecentSearch.type == type).order_by(asc(RecentSearch.id)).all()
+
+
+@app.context_processor
+def rent_processor():
+    def get_rentcode(rent_id):
+        stmt = select(Rent.rentcode).filter_by(id=rent_id)
+        return db.session.execute(stmt).scalar_one_or_none()
+
+    return dict(get_rentcode=get_rentcode)
 
 
 def pop_idlist_recent(type, id):

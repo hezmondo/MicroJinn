@@ -137,11 +137,11 @@ def pr_print(pr_id):
         # update_pr_delivered(pr_id)
         convert_html_to_pdf(get_pr_block(pr_id), 'pr.pdf')
         workingdir = os.path.abspath(os.getcwd())
-        filepath = workingdir + '\\app\\temp_files\\'
+        filepath = workingdir + '\\temp_files\\'
         return send_from_directory(filepath, 'pr.pdf')
     except Exception as ex:
         message = f'Unable to produce pay request. Error: {str(ex)}'
-        return redirect(url_for('pr_bp.file', pr_id=pr_id, message=message))
+        return redirect(url_for('pr_bp.pr_file', pr_id=pr_id, message=message))
 
 
 # Test - Produces pay requests for rents 1 - 100. Pdf saved in jinn\app\temp_files

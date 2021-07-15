@@ -16,7 +16,7 @@ def allowed_filetypes():
 # Return the filepath of the pdf if success?
 def convert_html_to_pdf(source_html, output_filename):
     # open output file for writing (truncated binary)
-    workingdir = os.path.abspath(os.getcwd()) + '\\app\\temp_files\\'
+    workingdir = os.path.abspath(os.getcwd()) + '\\temp_files\\'
     result_file = open(workingdir + output_filename, "w+b")
     # convert HTML to PDF
     pisa_status = pisa.CreatePDF(

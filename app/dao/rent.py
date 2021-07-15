@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import joinedload, load_only, contains_eager
 from app.dao.common import pop_idlist_recent
 from app.dao.database import commit_to_database
-from app.models import Agent, Charge, Landlord, Jstore, Rent, RentExternal
+from app.models import Agent, Landlord, Jstore, Rent, RentExternal
 
 
 def create_new_rent():
