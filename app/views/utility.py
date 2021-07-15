@@ -7,7 +7,7 @@ from app.dao.common import delete_record, get_deed, get_deed_types, post_deed
 from app.dao.database import rollback_database
 from app.dao.email_acc import get_email_acc, get_email_accs, post_email_acc
 from app.dao.landlord import get_landlord, get_landlords, get_landlord_dict, post_landlord
-from app.email import app_send_email, test_email_connect, test_send_email
+from app.emails import app_send_email, test_email_connect, test_send_email
 from app.main.property import mget_properties_dict, mget_filter, mget_property, mget_properties_from_filter, mget_properties_all, \
     mget_properties_from_rent_id, mpost_new_property, mpost_property
 

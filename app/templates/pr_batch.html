@@ -121,7 +121,7 @@
         <div class="col-md-3">
             <div class="sticky-top">
                 <div class="card card-blue" style="margin-bottom:1rem;">
-                    <a href="#print_batch_card" data-toggle="collapse" aria-expanded="false"
+                    <a id="print_toggle" href="#print_batch_card" data-toggle="collapse" aria-expanded="false"
                        aria-controls="print_batch_card"
                        class="btn btn-block btn-primary button-icon letter" role="button">
                         print post pay requests</a>
@@ -154,7 +154,7 @@
                     </div>
                 </div>
                 <div class="card card-green" style="margin-bottom:1rem;">
-                    <a href="#email_batch_card" data-toggle="collapse" aria-expanded="false"
+                    <a id="email_toggle" href="#email_batch_card" data-toggle="collapse" aria-expanded="false"
                        aria-controls="email_batch_card"
                        class="btn btn-block btn-success button-icon arrow-right" role="button">
                         send email pay requests</a>
@@ -213,6 +213,5 @@
     ) }}
 </form>
 {% endblock %}
-
 
 

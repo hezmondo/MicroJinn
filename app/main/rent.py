@@ -7,17 +7,38 @@ from decimal import Decimal
 from app.dao.action import add_action
 from app.dao.agent import get_agent
 from app.dao.charge import get_charges_rent
-from app.dao.common import commit_to_database, get_deed_id, get_filter_stored, get_idlist_recent, get_recent_searches
+from app.dao.common import commit_to_database, get_deed_id, get_filters, get_filter_stored, get_idlist_recent, get_recent_searches
+from app.dao.form_letter import get_pr_form_codes
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic_sql, getrents_advanced, \
-    get_rentsexternal, post_rent, post_rent_filter
-from app.main.common import get_rents_fdict, inc_date_m, mpost_search
+    get_rentsexternal, post_rent, get_jstore_row, post_jstore_filter
+from app.main.common import get_rents_fdict, inc_date_m, get_combodict_filter
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
-from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic, filter_basic_sql_1, \
+from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic_sql_1, \
     filter_basic_sql_2
-from app.models import Rent, RentExternal, Agent
+from app.main.form_letter import mget_pr_defaults
+from app.models import Rent, RentExternal
 from app.modeltypes import AcTypes, AdvArr, Freqs, MailTos, PrDeliveryTypes, SaleGrades, Statuses, Tenures
+
+
+def append_fdict_metadata(fdict):
+    # add metadata of filter to display on rents_advanced.html
+    fdict['code'] = request.form.get("filtername")
+    fdict['description'] = request.form.get("filterdesc")
+    return fdict
+
+
+def collect_rents_advanced_html_elements(fdict, method):
+    pr_template_codes = []
+    pr_defaults = []
+    if fdict and not fdict.get('code'):
+        fdict.update({'code': request.args.get('code')})
+    jfilters = get_filters(1) if method == 'payrequest' else get_filters(2)
+    if method == 'payrequest':
+        pr_defaults = mget_pr_defaults()
+        pr_template_codes = get_pr_form_codes()
+    return get_combodict_filter(), fdict, jfilters, pr_defaults, pr_template_codes
 
 
 def get_mailaddr(rent_id, agent_id, mailto_id, tenantname):
@@ -297,31 +318,18 @@ def get_rent_owing(rent, rent_strings, nextrentdate):
     return rent_owing
 
 
-def get_rents_advanced(action, filtr_id):  # get rents for advanced queries page with multiple and stored filters
-    rents = []
-    if action == "load":  # load predefined filter dictionary from jstore
-        filter_data = get_filter_stored(filtr_id)
-        fdict = json.loads(filter_data.content)
-        for key, value in fdict.items():
-            fdict[key] = value
-        # add metadata of filter to display on rents_advanced.html
-        fdict['code'] = filter_data.code
-        fdict['description'] = filter_data.description
-    else:
-        fdict = dict_advanced()  # get request form values or default dictionary
-    # now we construct advanced sqlalchemy filter using either dictionary
+def mget_rents_advanced(filtr_id):  # get rents for advanced queries page with multiple and stored filters
+    fdict = load_filter_from_jstore(filtr_id)
     filtr = filter_advanced(fdict)
-    if action == "save":
-        post_rent_filter(fdict)
-        # add metadata of filter to display on rents_advanced.html
-        fdict['code'] = request.form.get("filtername")
-        fdict['description'] = request.form.get("filterdesc")
-    # now get filtered rent objects for this filter
-    if request.method == 'POST':
-        runsize = (request.form.get('runsize') or 300) if action != 'load' else (fdict.get('runsize') or 300)
-        rents = getrents_advanced(filtr, runsize)
+    runsize = fdict.get('runsize') or 300
+    return fdict, getrents_advanced(filtr, runsize)
 
-    return fdict, rents
+
+def mget_rents_advanced_from_search():
+    fdict = dict_advanced()
+    filtr = filter_advanced(fdict)
+    runsize = request.form.get('runsize') or 300
+    return fdict, getrents_advanced(filtr, runsize)
 
 
 def get_rents_basic_sql():  # get rents for home rents page with simple search option
@@ -383,6 +391,35 @@ def get_totcharges(charges):
         for charge in charges:
             totcharges += charge.chargebalance
     return totcharges
+
+
+def load_filter_from_jstore(filtr_id):
+    filter_data = get_filter_stored(filtr_id)
+    fdict = json.loads(filter_data.content)
+    for key, value in fdict.items():
+        fdict[key] = value
+    # add metadata of filter to display on rents_advanced.html
+    fdict['code'] = filter_data.code
+    fdict['description'] = filter_data.description
+    return fdict
+
+
+def mpost_rent_filter():
+    fdict = dict_advanced()
+    jname = request.form.get("filtername")
+    jtype = request.form.get("filtertype")
+    if jtype == "payrequest":
+        jtype = 1
+    elif jtype == "rentprop":
+        jtype = 2
+    else:
+        jtype = 3
+    jstore = get_jstore_row(jname)
+    jstore.type = jtype
+    jstore.code = jname
+    jstore.description = request.form.get("filterdesc")
+    jstore.content = json.dumps(fdict)
+    return post_jstore_filter(jstore)
 
 
 # simple check that there are no mail/post conflicts. If there are, a message is displayed on rent page load

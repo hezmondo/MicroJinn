@@ -18,7 +18,7 @@
             <div>
                 {% if not action == 'initialize' %}
                 {% if rents|length == 0 %}
-                <div class="boxed boxed-center boxed-blue">
+                <div class="boxed boxed-blue">
                     <div class="row">
                         <div class="col">
                             No results. Refine your search using the filter options.
@@ -97,7 +97,6 @@
             </div>
         </div>
         <div class="col-md-3">
-
             <div class="card card-white" style="margin-bottom:1rem;">
                 <div class="card-header">
                     <div class="row">
@@ -113,7 +112,7 @@
                             {{ fdict.description }}
                             {% endif %}
                             {% if action == 'search' %}
-                            New search
+                            unsaved filter options
                             {% endif %}
                         </div>
                     </div>
@@ -140,32 +139,26 @@
                        class="btn btn-block btn-secondary button-icon filter"
                        role="button">change filter options</a>
                 </div>
+                {% if action != 'initialize' %}
                 <div class="card card-blue" style="margin-bottom:1rem;">
-                    <a href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
+                    <a id="save_toggle" href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
                        aria-controls="save_filter_card"
-                       class="btn btn-block btn-primary button-icon save" role="button">save as new filter</a>
+                       class="btn btn-block btn-primary button-icon save" role="button">save filter</a>
                     <div id="save_filter_card" class="collapse">
                         <div class="card-body text-primary">
-                            <div class="form-group row">
-                                <div class="col">
+                            <div class="form-group row align-items-end">
+                                <div class="col" style="padding-right:5px;">
                                     <label for="filtertype">filter type:</label>
+                                    {% if method == 'payrequest' %}
                                     {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
-                                    item_selected=fdict.filtertype, id="filter_filtertype") }}
-                                </div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col">
-                                    {% if fdict.description %}
-                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
-                                           placeholder="enter description" value="{{ fdict.description }}">
+                                    item_selected='payrequest', id="filter_filtertype") }}
                                     {% else %}
-                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
-                                           placeholder="enter description">
+                                    {{ widgets.combobox(name="filtertype", items=combodict.filtertypes,
+                                    item_selected='rentprop', id="filter_filtertype") }}
                                     {% endif %}
                                 </div>
-                            </div>
-                            <div class="form-group row" style="margin-bottom: 0px;">
-                                <div class="col">
+                                <div class="col" style="padding-left:5px;">
+                                    <label for="filter_name">filter name:</label>
                                     {% if fdict.code %}
                                     <input id="filter_name" type="text" class="form-control" name="filtername"
                                            placeholder="enter name" value="{{ fdict.code }}">
@@ -174,20 +167,40 @@
                                            placeholder="enter name">
                                     {% endif %}
                                 </div>
+                            </div>
+                            <div class="form-group row">
                                 <div class="col">
-                                    <button type="submit"
+                                    {% if fdict.description %}
+                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
+                                           title="enter filter description" data-toggle="tooltip"
+                                           placeholder="enter description" value="{{ fdict.description }}">
+                                    {% else %}
+                                    <input id="filter_desc" type="text" class="form-control" name="filterdesc"
+                                           title="enter filter description" data-toggle="tooltip"
+                                           placeholder="enter description">
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="form-group row" style="margin-bottom: 0px;">
+                                <div class="col" style="padding-right:5px;">
+                                    <button type="submit" id="save_btn"
                                             formaction="{{ url_for('rent_bp.rents_advanced', action='save', filtr_id=filtr_id, method=method) }}"
-                                            class="btn btn-block btn-primary  button-icon save" role="button">save
-                                        filter
+                                            class="btn btn-block btn-primary  button-icon save" role="button">
+                                        {% if fdict.code %}
+                                        overwrite filter
+                                        {% else %}
+                                        save as new filter
+                                        {% endif %}
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                {% if method == 'payrequest' and rents|length > 1 %}
+                {% endif %}
+                {% if method == 'payrequest' and rents|length > 0 %}
                 <div class="card card-green" style="margin-bottom:1rem;">
-                    <a href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
+                    <a id="pr_toggle" href="#produce_pr_card" data-toggle="collapse" aria-expanded="false"
                        aria-controls="produce_pr_card"
                        class="btn btn-block btn-success button-icon letter" role="button">
                         produce {{ rents|length }} pay requests</a>
@@ -256,69 +269,12 @@
     {% else %}
     <input type="hidden" id="runcode" name="runcode" value="Unsaved Filter">
     {% endif %}
-</form>
-
-<!-- Modal - load filter -->
-<div class="modal fade" id="load_filter_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
-     aria-hidden="true">
-    <div class="modal-dialog mw-100 w-75" role="document">
-        <div class="modal-content no-border ">
-            <div class="modal-body no-padding">
-                <form method="POST">
-                    <div class="card card-clear">
-                        <div class="card-header" style="background-color:#e85765; color:white;">
-                            <div class="row">
-                                <div class="col vertical-align">select a filter to load</div>
-                                <div class="col align-right">
-                                    <a class="button-icon cross" role="button" style="color:inherit;"
-                                       data-dismiss="modal">cancel</a>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="table table-condensed">
-                            <tbody>
-                            {% for item in jfilters %}
-                            <tr>
-                                <td style="width: 20.00%">
-                                    {% if item.last_used %}
-                                    {{ item.last_used }}
-                                    {% else %}
-                                    <span>Unused</span>
-                                    {% endif %}
-                                </td>
-                                <td style="width: 10.00%">{{ item.code }}</td>
-                                <td style="width: 50.00%">{{ item.description}}</td>
-                                <td style="width: 15.00%">
-                                    <button type="submit"
-                                            formaction="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
-                                        action='load', method=method) }}"
-                                            class="btn btn-danger btn-small button-icon filter">load
-                                    </button>
-                                </td>
-                                <td style="width: 5.00%">
-                                    <a class="btn btn-round btn-warning button-icon round trash"
-                                       title="delete this filter" data-toggle="tooltip"
-                                       href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
-                                       onclick="return confirm('are you sure you want to delete this filter?');"></a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal - filter options -->
-<div class="modal fade" id="filters_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
-     aria-hidden="true">
-    <div class="modal-dialog mw-100 w-75" role="document">
-        <div class="modal-content no-border ">
-            <div class="modal-body no-padding">
-                <form method="POST" id="rent">
+    <!-- Modal - filter options -->
+    <div class="modal fade" id="filters_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+         aria-hidden="true">
+        <div class="modal-dialog mw-100 w-75" role="document">
+            <div class="modal-content no-border ">
+                <div class="modal-body no-padding">
                     <div class="card card-clear">
                         <div class="card-header" style="background-color:#4e4e4e; color:white;">
                             <div class="row">
@@ -482,7 +438,7 @@
                                             </div>
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
-                                                    <label for="enddate">end date:</label>
+                                                    <label for="enddate">end date (default 30 days from now):</label>
                                                     <input id="filter_enddate" type="date" class="form-control"
                                                            placeholder="end date"
                                                            name="enddate"
@@ -560,17 +516,92 @@
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal - load filter -->
+<div class="modal fade" id="load_filter_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <div class="card card-clear">
+                    <div class="card-header" style="background-color:#e85765; color:white;">
+                        <div class="row">
+                            <div class="col vertical-align">select a filter to load</div>
+                            <div class="col align-right">
+                                <a class="button-icon cross" role="button" style="color:inherit;"
+                                   data-dismiss="modal">cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-condensed">
+                        <tbody>
+                        {% for item in jfilters %}
+                        <tr>
+                            {% if method == 'payrequest' %}
+                            <td style="width: 20.00%">
+                                {% if item.last_used %}
+                                {{ item.last_used }}
+                                {% else %}
+                                <span>Unused</span>
+                                {% endif %}
+                            </td>
+                            {% endif %}
+                            <td style="width: 10.00%">{{ item.code }}</td>
+                            <td style="width: 50.00%">{{ item.description}}</td>
+                            <td style="width: 15.00%">
+                                <a type="submit"
+                                   href="{{ url_for('rent_bp.rents_advanced', filtr_id=item.id,
+                                        action='load', method=method) }}"
+                                   class="btn btn-danger btn-small button-icon filter">load
+                                </a>
+                            </td>
+                            <td style="width: 5.00%">
+                                <a class="btn btn-round btn-warning button-icon round trash"
+                                   title="delete this filter" data-toggle="tooltip"
+                                   href="{{ url_for('rent_bp.delete_filter', item_id=item.id, method=method) }}"
+                                   onclick="return confirm('are you sure you want to delete this filter?');"></a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-
 {% endblock %}
 
 {% block javascript %}
 <script type="text/javascript">
+    $('#filter_name').on("input", save_check);
+    function save_check(){
+        var code = $('#filter_name').val();
+        if(code == $('#runcode').val()) {
+            $('#save_btn').html('overwrite filter');
+        }
+        else {
+            $('#save_btn').html('save as new filter');
+        }
+    }
+    $('#save_filter_card').on('hidden.bs.collapse', function () {
+        $('#save_toggle').removeClass('cross, btn-secondary').addClass('save btn-primary').html('save');
+    });
+    $('#save_filter_card').on('shown.bs.collapse', function () {
+        $('#save_toggle').removeClass('save btn-primary').addClass('cross btn-secondary').html('cancel');
+    });
+    $('#produce_pr_card').on('hidden.bs.collapse', function () {
+        $('#pr_toggle').removeClass('cross, btn-secondary').addClass('letter btn-success').html('produce pay requests');
+    });
+    $('#produce_pr_card').on('shown.bs.collapse', function () {
+        $('#pr_toggle').removeClass('letter btn-success').addClass('cross btn-secondary').html('cancel');
+    });
     $('.clear-filters').mousedown(function(e) {
         $('#filter_rentcode').val('');
         $('#filter_tenantname').val('');
@@ -596,30 +627,5 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 {% endblock %}

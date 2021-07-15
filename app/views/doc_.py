@@ -5,7 +5,7 @@ from app.dao.common import get_doc_types
 from app.dao.doc import get_docfiles_text, get_docfile_text, dbget_digfile_row
 from app.main.doc import convert_html_to_pdf, get_docfile, get_docfiles, \
     docfile_create, upload_docfile, post_docfile, post_upload
-from app.email import app_send_email
+from app.emails import app_send_email
 import os
 
 doc_bp = Blueprint('doc_bp', __name__)
