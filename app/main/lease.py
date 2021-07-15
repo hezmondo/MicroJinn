@@ -64,19 +64,13 @@ def mget_gr_value(freq_id, gr_rate, method, rentcap, rentpa, unexpired, up_date,
 
 
 def mget_lease_exts():
+    filtr = []
     rentcode = request.form.get("rentcode") or ""
-    sql = mget_sql()
     if rentcode and rentcode != '':
-        sql = sql + " WHERE r.rentcode LIKE '{}%' ".format(rentcode)
+        filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
+    lease_exts = dget_lease_exts(filtr)
 
-    return dget_lease_exts(sql), rentcode
-
-# def mget_lease_exts():
-#     filtr = []
-#     rentcode = request.form.get("rentcode") or ""
-#     if rentcode and rentcode != '':
-#         filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
-#     lease_exts = dget_lease_exts(filtr)
+    return lease_exts, rentcode
 
 
 def mget_lease_info(lease_id):
@@ -196,14 +190,6 @@ def mget_rent_period_value(freq_id, gr_rate, rentpa, period):
         periods = periods - 1
 
     return rpval
-
-
-def mget_sql():
-    return """ SELECT r.rentcode, x.id, x.date, x.value, x.lease_id, y.rent_id  
-                FROM lease_extension x LEFT JOIN lease y
-                ON x.lease_id = y.id
-                LEFT JOIN rent r
-                ON y.rent_id = r.id"""
 
 
 def mget_unexpired(term, startdate):
