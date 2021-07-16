@@ -343,7 +343,7 @@
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="landlord",
-                                                    items=Landlords.names(),
+                                                    items=Landlords.names(), size=5,
                                                     items0="all landlords", id="filter_landlord",
                                                     items_selected=fdict.landlord) }}
                                                 </div>
@@ -360,13 +360,13 @@
                                             <div class="form-group row">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="tenure",
-                                                    items=Tenures.names(),
+                                                    items=Tenures.names(), size=5,
                                                     items0="all tenures",
                                                     items_selected=fdict.tenure, id="filter_tenure") }}
                                                 </div>
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="status",
-                                                    items=Statuses.names(),
+                                                    items=Statuses.names(), size=5,
                                                     items0="all statuses", id="filter_status",
                                                     items_selected=fdict.status) }}
                                                 </div>
@@ -374,13 +374,13 @@
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="salegrade",
-                                                    items=SaleGrades.names(),
+                                                    items=SaleGrades.names(), size=5,
                                                     items0="all salegrades", id="filter_salegrade",
                                                     items_selected=fdict.salegrade) }}
                                                 </div>
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="actype",
-                                                    items=AcTypes.names(),
+                                                    items=AcTypes.names(), size=5,
                                                     items0="all actypes",
                                                     items_selected=fdict.actype, id="filter_actype") }}
                                                 </div>
@@ -389,6 +389,32 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col"><b>run this filter</b></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <input type="text" class="form-control"
+                                                           placeholder="run size | default 300"
+                                                           name="runsize"
+                                                           id="filter_runsize" value="{{ fdict.runsize }}">
+                                                </div>
+                                                <div class="col">
+                                                    <button type="submit"
+                                                            formaction="{{ url_for('rent_bp.rents_advanced',
+                                                            filtr_id=filtr_id, action='search', method=method, code=fdict.code) }}"
+                                                            class="btn btn-block btn-success button-icon search"
+                                                            role="button">
+                                                        run filter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="card card-clear" style="margin-bottom:1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
@@ -483,7 +509,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                    <div class="card card-clear">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
                                                 <div class="col"><b>mail</b></div>
@@ -512,32 +538,6 @@
                                                     items=PrDeliveryTypes.names(),
                                                     items0="all prdeliveries", id="filter_prdelivery",
                                                     items_selected=fdict.prdelivery) }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card card-clear">
-                                        <div class="card-header card-header-narrow">
-                                            <div class="row">
-                                                <div class="col"><b>run this filter</b></div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body text-primary">
-                                            <div class="form-group row" style="margin-bottom: 0px;">
-                                                <div class="col">
-                                                    <input type="text" class="form-control"
-                                                           placeholder="run size | default 300"
-                                                           name="runsize"
-                                                           id="filter_runsize" value="{{ fdict.runsize }}">
-                                                </div>
-                                                <div class="col">
-                                                    <button type="submit"
-                                                            formaction="{{ url_for('rent_bp.rents_advanced',
-                                                            filtr_id=filtr_id, action='search', method=method, code=fdict.code) }}"
-                                                            class="btn btn-block btn-success button-icon search"
-                                                            role="button">
-                                                        run filter
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -686,6 +686,7 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
 
 
 

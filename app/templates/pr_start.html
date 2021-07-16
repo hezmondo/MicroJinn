@@ -22,7 +22,7 @@
                     {% for item in filters %}
                     <tr id="{{ item.id }}">
                         <td style="width: 15.00%">{{ item.last_used.strftime('%d-%b-%Y %H:%M') if item.last_used else
-                            '' }}
+                            'Not yet used' }}
                         </td>
                         <td style="width: 10.00%"> {{ item.code }}</td>
                         <td style="width: 55.00%"> {{ item.description }}</td>

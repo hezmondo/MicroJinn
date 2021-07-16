@@ -28,11 +28,11 @@ $(document).ready(function(){
         $('#form-agent').val('');
         $('#form-nextrentdate').val('');
         $('#expand_next_rent_date').collapse('hide')
-        $('#form-status').val('');
+        $('#form-status').val('all statuses');
     });
     $('.reset-date').click(function(e) {
         var date = new Date()
-        date.setDate(date.getDate() + 35)
+        date.setDate(date.getDate() + 45)
         $('#form-nextrentdate').val(date.toISOString().split('T')[0]);
     });
     //add or remove next rent date based on visibility of next rent date input
@@ -44,7 +44,7 @@ $(document).ready(function(){
         if ($('#form-nextrentdate').val() == '')
         {
             var date = new Date()
-            date.setDate(date.getDate() + 35)
+            date.setDate(date.getDate() + 45)
             $('#form-nextrentdate').val(date.toISOString().split('T')[0]);
         }
         $('.remove-date').removeClass('plus').addClass('minus');
