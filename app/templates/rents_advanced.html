@@ -135,9 +135,9 @@
             </div>
             <div class="sticky-top">
                 <div class="card card-clear" style="margin-bottom:1rem;">
-                    <a data-toggle="modal" data-target="#filters_modal"
+                    <a id="btn_filter_options" data-toggle="modal" data-target="#filters_modal"
                        class="btn btn-block btn-secondary button-icon filter"
-                       role="button">change filter options</a>
+                       role="button">filter options</a>
                 </div>
                 {% if action != 'initialize' %}
                 <div class="card card-blue" style="margin-bottom:1rem;">
@@ -264,6 +264,8 @@
     </div>
     <!--hidden input to save rent ids to send to pr_batch-->
     <input type="hidden" id="rent_id_list" name="rent_id_list" value="{{ rent_ids }}">
+    <input type="hidden" id="hidden_method" name="hidden_method" value="{{ method }}">
+    <input type="hidden" id="hidden_action" name="hidden_action" value="{{ action }}">
     {% if fdict.code %}
     <input type="hidden" id="runcode" name="runcode" value="{{ fdict.code }}">
     {% else %}
@@ -341,7 +343,7 @@
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="landlord",
-                                                    items=Landlords.names(),
+                                                    items=Landlords.names(), size=5,
                                                     items0="all landlords", id="filter_landlord",
                                                     items_selected=fdict.landlord) }}
                                                 </div>
@@ -358,13 +360,13 @@
                                             <div class="form-group row">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="tenure",
-                                                    items=Tenures.names(),
+                                                    items=Tenures.names(), size=5,
                                                     items0="all tenures",
                                                     items_selected=fdict.tenure, id="filter_tenure") }}
                                                 </div>
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="status",
-                                                    items=Statuses.names(),
+                                                    items=Statuses.names(), size=5,
                                                     items0="all statuses", id="filter_status",
                                                     items_selected=fdict.status) }}
                                                 </div>
@@ -372,13 +374,13 @@
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="salegrade",
-                                                    items=SaleGrades.names(),
+                                                    items=SaleGrades.names(), size=5,
                                                     items0="all salegrades", id="filter_salegrade",
                                                     items_selected=fdict.salegrade) }}
                                                 </div>
                                                 <div class="col">
                                                     {{ widgets.multiselect_as_select(name="actype",
-                                                    items=AcTypes.names(),
+                                                    items=AcTypes.names(), size=5,
                                                     items0="all actypes",
                                                     items_selected=fdict.actype, id="filter_actype") }}
                                                 </div>
@@ -387,6 +389,32 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                        <div class="card-header card-header-narrow">
+                                            <div class="row">
+                                                <div class="col"><b>run this filter</b></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body text-primary">
+                                            <div class="form-group row" style="margin-bottom: 0px;">
+                                                <div class="col">
+                                                    <input type="text" class="form-control"
+                                                           placeholder="run size | default 300"
+                                                           name="runsize"
+                                                           id="filter_runsize" value="{{ fdict.runsize }}">
+                                                </div>
+                                                <div class="col">
+                                                    <button type="submit"
+                                                            formaction="{{ url_for('rent_bp.rents_advanced',
+                                                            filtr_id=filtr_id, action='search', method=method, code=fdict.code) }}"
+                                                            class="btn btn-block btn-success button-icon search"
+                                                            role="button">
+                                                        run filter
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="card card-clear" style="margin-bottom:1rem;">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
@@ -438,11 +466,39 @@
                                             </div>
                                             <div class="form-group row" style="margin-bottom: 0px;">
                                                 <div class="col">
-                                                    <label for="enddate">end date (default 30 days from now):</label>
-                                                    <input id="filter_enddate" type="date" class="form-control"
-                                                           placeholder="end date"
-                                                           name="enddate"
-                                                           value="{{ fdict.enddate }}">
+                                                    <div class="row" style="margin-left:0.25rem;">
+                                                        <label for="enddate">end date:</label>
+                                                    </div>
+                                                    <div class="row" style="margin-left:0.25rem;">
+                                                        <div class="col-md-9 collapse" id="date_filter">
+                                                            <div class="row">
+                                                                <select style="width:50px; padding:0px;"
+                                                                        class="form-control" name="modifier_date"
+                                                                        id="modifier_date">
+                                                                    {% set items = ['<=','>=','<','>','='] %}
+                                                                    {% for item in items %}
+                                                                    {% set selected = 'selected' if item ==
+                                                                    fdict.modifier_date
+                                                                    else '' %}
+                                                                    <option value="{{item}}" {{selected}}>{{item}}
+                                                                    </option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                <input id="filter_enddate" type="date"
+                                                                       class="form-control" style="width:150px;"
+                                                                       placeholder="end date"
+                                                                       name="enddate"
+                                                                       value="{{ fdict.enddate }}">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3" style="padding:0;">
+                                                            <a id="date_toggle" href="#date_filter"
+                                                               data-toggle="collapse" aria-expanded="false"
+                                                               aria-controls="date_filter"
+                                                               class="btn btn-round btn-primary button-icon-center plus"
+                                                               role="button"></a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col">
                                                     <label for="charges">charges:</label>
@@ -453,7 +509,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="card card-clear" style="margin-bottom:1rem;">
+                                    <div class="card card-clear">
                                         <div class="card-header card-header-narrow">
                                             <div class="row">
                                                 <div class="col"><b>mail</b></div>
@@ -482,32 +538,6 @@
                                                     items=PrDeliveryTypes.names(),
                                                     items0="all prdeliveries", id="filter_prdelivery",
                                                     items_selected=fdict.prdelivery) }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card card-clear">
-                                        <div class="card-header card-header-narrow">
-                                            <div class="row">
-                                                <div class="col"><b>run this filter</b></div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body text-primary">
-                                            <div class="form-group row" style="margin-bottom: 0px;">
-                                                <div class="col">
-                                                    <input type="text" class="form-control"
-                                                           placeholder="run size | default 300"
-                                                           name="runsize"
-                                                           id="filter_runsize" value="{{ fdict.runsize }}">
-                                                </div>
-                                                <div class="col">
-                                                    <button type="submit"
-                                                            formaction="{{ url_for('rent_bp.rents_advanced',
-                                                            filtr_id=filtr_id, action='search', method=method, code=fdict.code) }}"
-                                                            class="btn btn-block btn-success button-icon search"
-                                                            role="button">
-                                                        run filter
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -580,6 +610,35 @@
 
 {% block javascript %}
 <script type="text/javascript">
+    //add or remove enddate based on visibility of enddate input
+    $('#date_filter').on('hidden.bs.collapse', function () {
+        $('#filter_enddate').val('');
+        $('#date_toggle').removeClass('minus').addClass('plus');
+    });
+    $('#date_filter').on('shown.bs.collapse', function () {
+        if ($('#filter_enddate').val() == '')
+        {
+            var date = new Date()
+            date.setDate(date.getDate() + 45)
+            $('#filter_enddate').val(date.toISOString().split('T')[0]);
+        }
+        $('#date_toggle').removeClass('plus').addClass('minus');
+    });
+    //show enddate if there is an enddate value
+    $('#btn_filter_options').click(function(e) {
+       if ($('#filter_enddate').val() != '')
+       {
+            $('#date_filter').collapse('show')
+       }
+       else
+       {
+            $('#date_filter').collapse('hide')
+       }
+    });
+    if ($('#hidden_method').val() == 'payrequest' && $('#hidden_action').val() == 'initialize')
+    {
+        $('#date_filter').collapse('show')
+    }
     $('#filter_name').on("input", save_check);
     function save_check(){
         var code = $('#filter_name').val();
@@ -627,5 +686,15 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
+
+
+
+
+
+
+
+
+
+
 </script>
 {% endblock %}

@@ -59,6 +59,84 @@
             {% endif %}
         </div>
         <div class="col-md-3">
+            <div class="card card-white" style="margin-bottom:1rem;">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">search</div>
+                        <div class="col align-right"><b>{{ headrents|length }}</b> results</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group row" style="margin-bottom: 1rem;">
+                                <div class="col-md-5" style="padding-right:5px;">
+                                    <button class="btn btn-block btn-primary button-icon sync search-clear"
+                                            onclick="return false;">clear
+                                    </button>
+                                </div>
+                                <div class="col-md-7" style="padding-left:5px;">
+                                    <button type="submit" class="btn btn-block btn-success button-icon search"
+                                            role="button">search
+                                    </button>
+                                </div>
+                            </div>
+                            <input id="form-rentcode" type="text" class="form-control" name="rentcode"
+                                   placeholder="rentcode" value="{{ fdict.rentcode }}">
+                            <input id="form-propaddr" type="text" class="form-control" name="propaddr"
+                                   placeholder="propaddr" value="{{ fdict.propaddr }}">
+                            <input id="form-agentdetail" type="text" class="form-control" name="agentdetail"
+                                   placeholder="agent" value="{{ fdict.agentdetail }}">
+                            {% if fdict.nextrentdate != '' %}
+                            <div style="margin-top: 10px;">
+                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
+                                   aria-controls="expand_next_rent_date"
+                                   class="button-icon minus remove-date">next rent date</a>
+                            </div>
+                            <div id="expand_next_rent_date" class="form-group row collapse show"
+                                 style="margin-top: 10px;">
+                                <div class="col-md-9" style="padding-right:5px">
+                                    <input id="form-nextrentdate" type="date" class="form-control date"
+                                           name="nextrentdate"
+                                           value="{{ fdict.nextrentdate }}">
+                                </div>
+                                <div class="col-md-3 align-self-end" style="padding-left:5px">
+                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
+                                       data-toggle="tooltip" title="set next rent date to today + 45 days"
+                                       onclick="return false;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div style="margin-top: 10px;">
+                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
+                                   aria-controls="expand_next_rent_date"
+                                   class="button-icon plus remove-date">next rent date</a>
+                            </div>
+                            <div id="expand_next_rent_date" class="form-group row collapse"
+                                 style="margin-top: 10px;">
+                                <div class="col-md-9" style="padding-right:5px">
+                                    <input id="form-nextrentdate" type="date" class="form-control date"
+                                           name="nextrentdate"
+                                           value="{{ fdict.nextrentdate }}">
+                                </div>
+                                <div class="col-md-3 align-self-end" style="padding-left:5px">
+                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
+                                       data-toggle="tooltip" title="set next rent date to today + 45 days"
+                                       onclick="return false;">
+                                    </a>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div style="margin-top: 1rem;">
+                                {{ widgets.multiselect_as_select(name="status",
+                                items=HrStatuses.names(), items0="all statuses",
+                                items_selected=fdict.status, id="form-status") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% if recent_searches|length > 0 %}
             <div class="card card-white" style="margin-bottom:1rem;">
                 <div class="card-header">
@@ -78,7 +156,8 @@
                     <div class="form-group row" style="margin-bottom: 5px;">
                         <div class="col-md-9" style="padding-right:2px;">
                             <button
-                                    class="btn btn-block btn-light search-history" style="text-align: left; box-shadow:none;"
+                                    class="btn btn-block btn-light search-history"
+                                    style="text-align: left; box-shadow:none;"
                                     value="{{ item.dict }}" onclick="return false;">
                                 <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
                                 <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
@@ -105,7 +184,8 @@
                         <div class="form-group row" style="margin-bottom: 5px;">
                             <div class="col-md-9" style="padding-right:2px;">
                                 <button
-                                        class="btn btn-block btn-light search-history" style="text-align: left; box-shadow:none;"
+                                        class="btn btn-block btn-light search-history"
+                                        style="text-align: left; box-shadow:none;"
                                         value="{{ item.dict }}" onclick="return false;">
                                     <span><b>{{ item.rentcode }} </b></span><span>{{ item.propaddr }} </span>
                                     <span><b>{{ item.agent }} </b></span><span>{{ item.nextrentdate }} </span>
@@ -125,87 +205,8 @@
                         {% endfor %}
                     </div>
                 </div>
-
             </div>
             {% endif %}
-            <div class="card card-white sticky-top">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col">search</div>
-                        <div class="col align-right"><b>{{ headrents|length }}</b> results</div>
-                    </div>
-                </div>
-                <div class="card-body text-primary">
-                    <div class="form-group row">
-                        <div class="col">
-                            <input id="form-rentcode" type="text" class="form-control" name="rentcode"
-                                   placeholder="rentcode" value="{{ fdict.rentcode }}">
-                            <input id="form-propaddr" type="text" class="form-control" name="propaddr"
-                                   placeholder="propaddr" value="{{ fdict.propaddr }}">
-                            <input id="form-agentdetail" type="text" class="form-control" name="agentdetail"
-                                   placeholder="agent" value="{{ fdict.agentdetail }}">
-                            {% if fdict.nextrentdate != '' %}
-                            <div style="margin-top: 10px;">
-                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
-                                   aria-controls="expand_next_rent_date"
-                                   class="button-icon minus remove-date">next rent date</a>
-                            </div>
-                            <div id="expand_next_rent_date" class="form-group row collapse show"
-                                 style="margin-top: 10px;">
-                                <div class="col-md-9" style="padding-right:5px">
-                                    <input id="form-nextrentdate" type="date" class="form-control date"
-                                           name="nextrentdate"
-                                           value="{{ fdict.nextrentdate }}">
-                                </div>
-                                <div class="col-md-3 align-self-end" style="padding-left:5px">
-                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
-                                       data-toggle="tooltip" title="set next rent date to today + 35 days"
-                                       onclick="return false;">
-                                    </a>
-                                </div>
-                            </div>
-                            {% else %}
-                            <div style="margin-top: 10px;">
-                                <a href="#expand_next_rent_date" data-toggle="collapse" aria-expanded="false"
-                                   aria-controls="expand_next_rent_date"
-                                   class="button-icon plus remove-date">next rent date</a>
-                            </div>
-                            <div id="expand_next_rent_date" class="form-group row collapse"
-                                 style="margin-top: 10px;">
-                                <div class="col-md-9" style="padding-right:5px">
-                                    <input id="form-nextrentdate" type="date" class="form-control date"
-                                           name="nextrentdate"
-                                           value="{{ fdict.nextrentdate }}">
-                                </div>
-                                <div class="col-md-3 align-self-end" style="padding-left:5px">
-                                    <a class="btn btn-block btn-teal button-icon-center sync reset-date"
-                                       data-toggle="tooltip" title="set next rent date to today + 35 days"
-                                       onclick="return false;">
-                                    </a>
-                                </div>
-                            </div>
-                            {% endif %}
-                            <div style="margin-top: 1rem;">
-                                {{ widgets.multiselect_as_select(name="status",
-                                items=HrStatuses.names(), items0="all statuses",
-                                items_selected=fdict.status, id="form-status") }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row" style="margin-bottom: 0px;">
-                        <div class="col-md-5" style="padding-right:5px;">
-                            <button class="btn btn-block btn-primary button-icon sync search-clear"
-                                    onclick="return false;">clear
-                            </button>
-                        </div>
-                        <div class="col-md-7" style="padding-left:5px;">
-                            <button type="submit" class="btn btn-block btn-success button-icon search"
-                                    role="button">search
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </form>
@@ -213,7 +214,5 @@
 {% block javascript %}
 <script type="text/javascript">
     {% include "headrents.js" %}
-
-
 </script>
 {% endblock %}

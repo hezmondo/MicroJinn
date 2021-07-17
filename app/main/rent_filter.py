@@ -23,9 +23,10 @@ def dict_advanced():
     dict['agentmailto'] = request.form.get('agentmailto') or 'include'
     dict['modifier_arrears'] = request.form.get('modifier_arrears') or ''
     dict['arrears'] = request.form.get('arrears') or ''
+    dict['modifier_date'] = request.form.get('modifier_date') or ''
+    dict['enddate'] = request.form.get('enddate') or ''
     dict['charges'] = request.form.get('charges') or 'include'
     dict['emailable'] = request.form.get('emailable') or 'include'
-    dict['enddate'] = request.form.get('enddate') or ''
     dict['landlord'] = request.form.getlist('landlord') or ['all landlords']
     dict['prdelivery'] = request.form.getlist('prdelivery') or ['all prdeliveries']
     dict['modifier_rentpa'] = request.form.get('modifier_rentpa') or ''
@@ -94,7 +95,17 @@ def filter_advanced(dict):
             filtr.append(Rent.arrears > dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
         if dict['modifier_rentperiods'] == '>=':
             filtr.append(Rent.arrears >= dict['rentperiods'] * Rent.rentpa / Rent.freq_id)
-    filtr.append(Rent.lastrentdate <= (dict['enddate'] or (date.today() + relativedelta(days=30))))
+    if dict['enddate'] and dict['enddate'] != "":
+        if dict['modifier_date'] == '=':
+            filtr.append(Rent.lastrentdate == (dict['enddate']))
+        if dict['modifier_date'] == '<':
+            filtr.append(Rent.lastrentdate < (dict['enddate']))
+        if dict['modifier_date'] == '<=':
+            filtr.append(Rent.lastrentdate <= (dict['enddate']))
+        if dict['modifier_date'] == '>':
+            filtr.append(Rent.lastrentdate > (dict['enddate']))
+        if dict['modifier_date'] == '>=':
+            filtr.append(Rent.lastrentdate >= (dict['enddate']))
     if dict['landlord'] and dict['landlord'] != ['all landlords']:
         filtr.append(Landlord.name.in_(dict['landlord']))
     if dict['prdelivery'] and dict['prdelivery'] != ['all prdeliveries']:
