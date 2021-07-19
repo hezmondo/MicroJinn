@@ -731,6 +731,13 @@ wallet
 {
 	padding: 0.6rem;
 }
+.table-row-rent
+{
+	color: #4a4a4a;
+	background-color: #9cbae6;
+	font-weight:400;
+	text-align:center;
+}
 .text-primary
 {
 	color: inherit !important;

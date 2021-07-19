@@ -11,6 +11,7 @@ from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
 from app.main.doc import convert_html_to_pdf
 from app.dao.form_letter import get_pr_form_essential, get_pr_form_code, get_pr_email_form
+from app.main.form_letter import mget_pr_defaults
 from app.dao.payrequest import post_pr_batch_empty,  add_pr_history, get_last_arrears_level, get_pr_ids_from_batch, \
     get_pr_charge, get_pr_file, get_pr_history_row, get_recovery_info, get_recovery_info_x, prepare_new_pr_history_entry, \
     post_updated_payrequest_delivery, add_pr_charge, update_pr_batch
@@ -133,6 +134,11 @@ def forward_rent_case_and_charges(pr_id, pr_rent_data, rent_id):
         create_case(rent_id, pr_id)
         case_created = True
     return case_created, charge_id
+
+
+def mget_default_pr_email():
+    pr_defaults = mget_pr_defaults()
+    return pr_defaults.get('pr_email_default') if pr_defaults else 'EPR'
 
 
 def mget_recent_charge_date(rent_pr):
@@ -266,7 +272,7 @@ def update_pr_delivered(pr_id):
         post_updated_payrequest_delivery(True, pr_file)
 
 
-def write_payrequest(rent_id, pr_form_id):
+def write_payrequest(rent_id, pr_form_id, email_form_id='EPR'):
     rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
     rent_pr = append_pr_history_details(rent_pr)
     pr_form = get_pr_form_essential(pr_form_id)
@@ -284,7 +290,7 @@ def write_payrequest(rent_id, pr_form_id):
     subject = capitalize_first_only(doReplace(pr_variables, pr_form.subject))
     arrears_clause = doReplace(pr_variables, arrears_clause) + '\n\n' if arrears_clause else ""
     block = arrears_clause.capitalize() + doReplace(pr_variables, pr_form.block) if pr_form.block else ""
-    block_email = get_pr_email_form()
+    block_email = get_pr_email_form(email_form_id)
     block_email = doReplace(pr_variables, block_email.block)
     return block, block_email, rent_pr, subject
 

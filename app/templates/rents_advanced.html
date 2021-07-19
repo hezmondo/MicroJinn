@@ -227,7 +227,8 @@
                             <div class="form-group row">
                                 <div class="col">
                                     <a class="btn btn-block btn-teal button-icon circles"
-                                       href="{{ url_for('form_letter_bp.form_letters', method='payrequest') }}"
+                                       href="{{ url_for('form_letter_bp.form_letters', method='payrequest',
+                                       nav='rents_advanced', nav_id=filtr_id) }}"
                                        role="button">
                                         view pay request templates
                                     </a>

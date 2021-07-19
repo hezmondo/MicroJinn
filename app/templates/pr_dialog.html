@@ -4,44 +4,110 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
+
+<div class="row">
+    <div class="col">
+        Choose a pay request and delivery option below
+    </div>
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+    </div>
+</div>
+<hr class="hr-invisible">
 <form method="POST" id="target">
-    <div class="d-flex">
-        <div class="mr-auto p-2">
-            Choose a payrequest and delivery option below
+    <div class="row" style="margin-top: 1rem;">
+        <div class="col-md-9">
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th style="width: 15.00%">Code</th>
+                    <th style="width: 70.00%">Description</th>
+                    <th style="width: 15.00%"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in pr_forms %}
+                {% if item.template != 'PRX' %}
+                <tr>
+                    <td style="width: 15.00%">
+                        <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id, method='payrequest') }}" title="edit template"
+                           data-toggle="tooltip"
+                           class="btn btn-teal-light btn-small" role="button">{{ item.code }}</a>
+                    </td>
+                    <td style="width: 70.00%">{{ item.description }}</td>
+                    <td style="width: 15.00%">
+                        <button type="submit"
+                                formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id) }}"
+                                class="btn btn-small btn-success button-icon arrow-right">preview
+                        </button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td style="width: 15.00%">
+                        <a href="{{ url_for('form_letter_bp.form_letters') }}" title="edit template"
+                           data-toggle="tooltip"
+                           class="btn btn-teal-light btn-small" role="button">{{ item.code }}</a>
+                    </td>
+                    <td style="width: 70.00%">{{ item.description }} - XRAY</td>
+                    <td style="width: 15.00%">
+                        <button type="submit"
+                                formaction="{{ url_for('pr_bp.pr_edit_xray', pr_form_id=item.id, rent_id=rent_id) }}"
+                                class="btn btn-small btn-danger button-icon arrow-right">preview
+                        </button>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="p-2 col-md-3">
-            <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}" class="btn btn-block btn-tog button-icon arrow-left" role="button">back to rent</a>
+        <div class="col-md-3">
+            <div class="card card-white">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col">pay request defaults</div>
+                    </div>
+                </div>
+                <div class="card-body text-primary">
+                    <div class="row">
+                        <div class="col">
+                            select default pr template
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{ widgets.combobox(name="pr_default", items=pr_template_codes,
+                            item_selected=pr_defaults.pr_default) }}
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:1rem;">
+                        <div class="col">
+                            select default pr email template
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{ widgets.combobox(name="pr_email_default", items=pr_template_codes,
+                            item_selected=pr_defaults.pr_email_default) }}
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:1rem;">
+                        <div class="col">
+                            <button type="submit"
+                                    class="btn btn-block btn-primary button-icon save" role="button">save defaults
+                            </button>
+                            <a href="{{ url_for('form_letter_bp.form_letters', method='payrequest',
+                                nav='pr_dialog', nav_id=rent_id) }}"
+                               class="btn btn-block btn-success button-icon arrow-right" role="button">
+                                view pay request templates
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <hr class="hr-invisible">
-    <table class="table table-condensed">
-        <thead>
-        <tr>
-            <th style="width: 90.00%">Description</th>
-            <th style="width: 10.00%"></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in pr_forms %}
-            {% if item.template != 'PRX' %}
-                <tr>
-                    <td style="width: 60.00%">{{ item.description }}</td>
-                    <td>
-                        <button type="submit" formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id) }}"
-                                class="btn btn-small btn-success button-icon arrow-right">select</button>
-                    </td>
-                </tr>
-            {% else %}
-                 <tr>
-                    <td style="width: 60.00%">{{ item.description }} - XRAY</td>
-                    <td>
-                        <button type="submit" formaction="{{ url_for('pr_bp.pr_edit_xray', pr_form_id=item.id, rent_id=rent_id) }}"
-                                class="btn btn-small btn-danger button-icon arrow-right">select</button>
-                    </td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-        </tbody>
-    </table>
 </form>
 {% endblock %}

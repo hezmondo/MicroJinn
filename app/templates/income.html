@@ -57,6 +57,14 @@
                     <form method="POST" id="target">
                         <div class="form-group row">
                             <div class="col">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">
+                                    search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 0;">
+                            <div class="col">
                                 <input type="text" class="form-control" name="payer"
                                        value="{{ incomevals.payer }}" placeholder="payer">
                                 <input type="text" class="form-control" name="rentcode"
@@ -71,14 +79,6 @@
                                     items=PayTypes.names(), items0="all payment types",
                                     items_selected=incomevals.paytype) }}
                                 </div>
-                            </div>
-                        </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <button type="submit" class="btn btn-block btn-success button-icon search"
-                                        role="button">
-                                    search
-                                </button>
                             </div>
                         </div>
                     </form>
