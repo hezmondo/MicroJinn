@@ -1,31 +1,62 @@
-# Hez python, mysql server and workbench installation guide - updated by Hez 9th May 2021:
+# Hez python, mysql server and workbench installation guide - updated by Hez 17th July 2021:
 
 **Windows**
 
-Download the small msi installer for myql 8.0.24
+install latest python 64 bit for lulu or 3.7.9 32 bit for jinn - tick all users, choose location eg C:\Program files(86)\Python37
 
-Install python 3.9.4 64 bit, ticking all users, which will choose location C:\Program files\Python39
+Download the small msi installer for myql (for jinn stick with 8.0.24)
 
-Install myql server, mysql workbench and mysql python connector, all 8.0.24 64 bit, using SHA authentication and setting a strong password for root
+Install myql server, mysql workbench and mysql python connector, all 8.0.24 64 bit, using SHA authentication and setting a strong password for root such as JxxxYxxx14!
+At the same time, you might as well add a user eg hezm at the same time, with dba admin privileges and strong password such as YxxxJxxx14!
 
-open cmd prompt as administrator an do this to get into mysql console:
+Start up workbench and create schema lulu and/or yoda and/or mfit 
+
+NB if you have password problems, you might need to open a mysql console: open cmd prompt as administrator an do this to get into mysql console:
 
 	cd C:\Program Files\MySQL\MySQL Server 8.0\bin
 
 	mysql -u root -p
 
-Enter password: YxxxJxxx14!
+Enter password: JxxxYxxx14!
+
+Now follow mysql console instructions included below in linux setup
+
+
+**python_jinn for Windows**
+
+open a command window as administrator
+
+for Lulu, install the required python dependencies using pip -r with a text filefrom C:\flask\mjinn:
+
+	pip install -r lulu_dependencies.txt
+	
+or for Jinn, best install the required python dependencies individually and carefully:
+
+	pip install pyqt5==5.12.2
+	pip install PyQtWebEngine==5.12.1
+	pip install mysql-connector-python
+	pip install dateutils
+	pip install openpyxl
+	pip install python-docx
+
+NB - to make it all work, you must get the drivers for Qt_5.12.2 from hez or from thecodemonkey86 and place libmysql.dll in C:\Windows, C:\Windows\system32 and C:\jinn\code\DLLs and then place qsqlmysql.dll in C:\Program Files(86)\Python37\Lib\site-packages\PyQt5\Qt5\plugins\sqldrivers\
+
+ 	cd  C:\jinn	
+	python code/home.py --version
+	python code/home.py
+
+
 
 
 **Linux**
 
-Install mysql 8.0.23:
+Install latest mysql:
 
 	sudo apt-get update -y
 	sudo apt-get install mysql-server
 	sudo mysql_secure_installation
 
-set a full strength 10 character password for root with one or more special characters
+set a strong password for root such as YxxxJxxx14!
 
 Now enter the mysql console with this command using your password for root:
 
@@ -88,34 +119,6 @@ You need to enter a command to allow this package to access the service. The com
 	sudo snap connect mysql-workbench-community:password-manager-service :password-manager-service
 
 now restart and try again to add a connection for hezm, which should now work fine
-
-
-**python_jinn for Windows**
-
-for Lulu, install the required python dependencies using pip -r with a text filefrom C:\flask\mjinn:
-
-	pip install -r lulu_dependencies.txt
-	
-or
-
-	
-
-
-for Jinn, best install the required python dependencies individually and carefully:
-
-	pip install pyqt5==5.15.2
-	pip install PyQtWebEngine
-	pip install mysql-connector-python
-	pip install dateutils
-	pip install openpyxl
-	pip install python-docx
-
-NB - to make it all work, you must get the drivers for Qt_15.2 from thecodemonkey86 and place libmysql.dll in C:\Windows and 
-C:\Jinn\Code\DLLs and qsqlmysql.dll in C:\Program Files\Python39\Lib\site-packages\PyQt5\Qt5\plugins\sqldrivers\
-
- 	cd  C:\Jinn	
-	python Code/home.py --version
-	python Code/home.py
 
 
 **python_jinn for Linux**

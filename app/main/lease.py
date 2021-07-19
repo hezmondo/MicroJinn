@@ -70,6 +70,7 @@ def mget_lease_exts():
         filtr.append(Rent.rentcode.ilike('%{}%'.format(rentcode)))
     lease_exts = dget_lease_exts(filtr)
 
+    return lease_exts, rentcode
 
 def mget_lease_info(lease_id):
     rent_id = int(request.args.get('rent_id', "0", type=str))

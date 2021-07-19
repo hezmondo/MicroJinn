@@ -19,19 +19,19 @@
         <div class="table-fixed table-rent " style="margin-bottom: 1.5rem;">
             <table class="table table-head">
                 <thead>
-                <tr style="font-weight:400; text-align:center">
-                    <td style="width: 17%; background-color: #5b82bd;">rentcode | <b>{{ rent.rentcode }}</b></td>
-                    <td style="width: 16%; background-color: #698dc2;">tenure | <b>{{ rent.tenuredet }}</b></td>
-                    <td style="width: 16%; background-color: #5b82bd;">
+                <tr style="font-weight:400; text-align:center; color: #4a4a4a">
+                    <td style="width: 17%; background-color: #9cbae6;">rentcode {{ rent.rentcode }}</td>
+                    <td style="width: 16%; background-color: #9cbae6;">tenure {{ rent.tenuredet }}</td>
+                    <td style="width: 16%; background-color: #9cbae6;">
                         {% if rent.salegrade_id == 1 %}
-                        for sale at <b>{{ money_str(rent.price_quote, pound=True) }}</b>
+                        for sale at {{ money_str(rent.price_quote, pound=True) }}
                         {% else %}
-                        <b>not for sale</b>
+                        not for sale
                         {% endif %}
                     </td>
-                    <td style="width: 17%; background-color: #698dc2;">status | <b>{{ rent.statusdet }}</b></td>
-                    <td style="width: 17%; background-color: #5b82bd;">actype | <b>{{ rent.actype }}</b></td>
-                    <td style="width: 17%; background-color: #698dc2;">source | <b>{{ rent.source }}</b></td>
+                    <td style="width: 17%; background-color: #9cbae6;">status {{ rent.statusdet }}</td>
+                    <td style="width: 17%; background-color: #9cbae6;">actype {{ rent.actype }}</td>
+                    <td style="width: 17%; background-color: #9cbae6;">source {{ rent.source }}</td>
                 </tr>
                 </thead>
             </table>
@@ -297,11 +297,11 @@
         <div class="table-fixed table-rent">
             <table class="table rounded-corners">
                 <thead>
-                <tr style="font-weight:400; text-align:center;">
-                    <td style="width: 25%; background-color: #5b82bd;">notice fee | <b>{{ rent.typedeed.info }}</b></td>
-                    <td style="width: 25%; background-color: #698dc2;">last rent date | <b>{{ rent.lastrentdate.strftime('%d-%b-%Y') }}</b></td>
-                    <td style="width: 25%; background-color: #5b82bd;">next rent date | <b>{{ rent.nextrentdate.strftime('%d-%b-%Y') }}</b></td>
-                    <td style="width: 25%; background-color: #698dc2;">paid up to | <b>{{ rent.paidtodate.strftime('%d-%b-%Y') }}</b></td>
+                <tr style="font-weight:400; text-align:center; color:#4a4a4a">
+                    <td style="width: 25%; background-color: #9cbae6;">notice fee {{ rent.typedeed.info }}</td>
+                    <td style="width: 25%; background-color: #9cbae6;">last rent date {{ rent.lastrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 25%; background-color: #9cbae6;">next rent date {{ rent.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 25%; background-color: #9cbae6;">paid up to {{ rent.paidtodate.strftime('%d-%b-%Y') }}</td>
                 </tr>
                 </thead>
             </table>
