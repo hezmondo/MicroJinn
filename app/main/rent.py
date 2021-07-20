@@ -123,6 +123,17 @@ def get_rent_gale(next_rent_date, frequency, rentpa):
         return money(rent_gale)
 
 
+def mget_rents_errors_list(rents):
+    are_errors = False
+    for rent in rents:
+        rent.mailaddr = get_mailaddr(rent.id, rent.agent_id, rent.mailto_id, rent.tenantname)
+        rent.prdeliverydet = PrDeliveryTypes.get_name(rent.prdelivery_id)
+        rent.error = rent_validation(rent, '', False)
+        if rent.error:
+            are_errors = True
+    return rents, are_errors
+
+
 def get_rentp(rent_id):
     # returns a mutable dict with Rent (full) plus joined and derived variables for rent screen, mail, payrequest
     rent = get_rent(rent_id)
@@ -423,7 +434,7 @@ def mpost_rent_filter():
 
 
 # simple check that there are no mail/post conflicts. If there are, a message is displayed on rent page load
-def rent_validation(rent, message=""):
+def rent_validation(rent, message="", create_alert=True):
     messages = [message] if message else []
     action_message = ''
     if ('email' in rent.prdeliverydet) and ('@' not in rent.email):
@@ -433,7 +444,7 @@ def rent_validation(rent, message=""):
         messages.append("No mail address set. Please change the mail address "
                         "from 'mail to agent' or link a new agent.")
         action_message = action_message + 'No valid mail address'
-    if action_message:
+    if action_message and create_alert:
         # save alert to actions table
         action_str = 'Rent ' + rent.rentcode + ': ' + action_message
         add_action(3, 1, action_str, 'rent_bp.rent', {'rent_id': rent.id})

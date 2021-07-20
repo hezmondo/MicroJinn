@@ -5,7 +5,7 @@ from app.dao.common import get_filters
 from app.dao.rent import delete_rent_filter, get_rent_external
 from app.main.common import get_combodict_rent, mpost_search
 from app.main.rent import collect_rents_advanced_html_elements, get_rentp, mget_recent_searches, get_rents_basic_sql, \
-    get_rents_external, rent_validation, update_landlord, update_rent_rem, \
+    mget_rents_errors_list, get_rents_external, rent_validation, update_landlord, update_rent_rem, \
     update_tenant, mpost_rent_filter, mget_rents_advanced, mget_rents_advanced_from_search
 from app.main.rent_filter import dict_advanced
 rent_bp = Blueprint('rent_bp', __name__)
@@ -75,10 +75,12 @@ def rents_advanced(filtr_id):  # get rents for advanced queries page and pr page
         fdict, rents = mget_rents_advanced(filtr_id)
     else:
         fdict = dict_advanced()
+    rents, are_errors = mget_rents_errors_list(rents)
     combodict, fdict, jfilters, pr_defaults, pr_template_codes = collect_rents_advanced_html_elements(fdict, method)
     return render_template('rents_advanced.html', action=action, combodict=combodict, filtr_id=filtr_id,
                            fdict=fdict, jfilters=jfilters, method=method, pr_defaults=pr_defaults,
-                           pr_template_codes=pr_template_codes, rents=rents, message=message)
+                           pr_template_codes=pr_template_codes, rents=rents, are_errors=are_errors,
+                           message=message)
 
 
 @rent_bp.route('/', methods=['GET', 'POST'])

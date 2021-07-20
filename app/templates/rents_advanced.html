@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <div class="card-body text-primary">
-                    <div class="form-group row" style="margin-bottom:0rem;">
+                    <div class="form-group row" style="margin-bottom:1rem;">
                         <div class="col">
                             {% if fdict.code %}
                             <b>{{ fdict.code }} - </b>
@@ -116,13 +116,22 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% if are_errors %}
+                    <span>Warning - Errors have been identified in this batch</span>
+                    <a id="btn_check_rents" data-toggle="modal" data-target="#check_rents_modal"
+                           class="btn btn-block btn-warning button-icon exclamation"
+                           href="#" style="margin-top:1rem;">view rent errors</a>
+                    {% endif %}
                 </div>
             </div>
-            <div class="card card-red" style="margin-bottom:1rem;">
-                <a data-toggle="modal" data-target="#load_filter_modal"
-                   class="btn btn-block btn-danger button-icon filter"
-                   role="button">
-                    <span>
+            <div class="card card-white" style="margin-bottom:1rem;">
+                <div class="card-header">
+                    <span>Load and edit filter</span>
+                </div>
+                <div class="card-body text-primary">
+                        <a data-toggle="modal" data-target="#load_filter_modal"
+                           class="btn btn-block btn-danger button-icon filter"
+                           role="button">
                         {% if method == 'payrequest' %}
                         load pay request filter
                         {% elif method == 'rent' %}
@@ -130,15 +139,13 @@
                         {% else %}
                         load filter
                         {% endif %}
-                    </span>
-                </a>
+                        </a>
+                        <a id="btn_filter_options" data-toggle="modal" data-target="#filters_modal"
+                           class="btn btn-block btn-secondary button-icon filter"
+                           role="button">filter options</a>
+                </div>
             </div>
             <div class="sticky-top">
-                <div class="card card-clear" style="margin-bottom:1rem;">
-                    <a id="btn_filter_options" data-toggle="modal" data-target="#filters_modal"
-                       class="btn btn-block btn-secondary button-icon filter"
-                       role="button">filter options</a>
-                </div>
                 {% if action != 'initialize' %}
                 <div class="card card-blue" style="margin-bottom:1rem;">
                     <a id="save_toggle" href="#save_filter_card" data-toggle="collapse" aria-expanded="false"
@@ -606,7 +613,48 @@
         </div>
     </div>
 </div>
-
+{% if are_errors %}
+<!-- Modal - check rents -->
+<div class="modal fade" id="check_rents_modal" tabindex="-1" role="dialog" aria-labelledby="copy_modal_label"
+     aria-hidden="true">
+    <div class="modal-dialog mw-100 w-75" role="document">
+        <div class="modal-content no-border ">
+            <div class="modal-body no-padding">
+                <div class="card card-clear">
+                    <div class="card-header" style="background-color:#e85765; color:white;">
+                        <div class="row">
+                            <div class="col vertical-align">Warning | Rent errors detected</div>
+                            <div class="col align-right">
+                                <a class="button-icon cross" role="button" style="color:inherit;"
+                                   data-dismiss="modal">cancel</a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-condensed">
+                        <tbody>
+                        {% for rent in rents %}
+                        {% if rent.error != [] %}
+                        <tr>
+                            <td style="width: 10.00%"><a href="{{ url_for('rent_bp.rent', rent_id=rent.id) }}"
+                               class="btn btn-teal-light btn-small"
+                               data-toggle="tooltip" title="view rent" role="button">{{ rent.rentcode }}</a>
+                            </td>
+                            <td style="width: 90.00%">
+                                {% for error in rent.error %}
+                                {{ error }}.
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block javascript %}
@@ -687,15 +735,5 @@
         $('#filter_filtertype').val('');
         $('#filter_runsize').val('');
     });
-
-
-
-
-
-
-
-
-
-
 </script>
 {% endblock %}

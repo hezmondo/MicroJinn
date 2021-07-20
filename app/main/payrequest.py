@@ -1,6 +1,4 @@
 import datetime
-import json
-from app import decimal_default
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from flask import request, render_template
@@ -295,21 +293,21 @@ def write_payrequest(rent_id, pr_form_id, email_form_id='EPR'):
     return block, block_email, rent_pr, subject
 
 
-def write_payrequest_x(rent_id, pr_form_id):
-    rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
-    rent_pr = append_pr_history_details(rent_pr)
-    pr_form = get_pr_form_code(pr_form_id)
-    rent_pr.pr_code = pr_form.code
-    rent_pr.suffix = build_charges_suffix(rent_pr)
-    rent_pr.create_case, recovery_charge_amount = get_recovery_info_x(rent_pr.suffix)
-    rent_pr.new_arrears_level = build_new_arrears_level_string(rent_pr.suffix)
-    includes_recovery = check_recovery_in_charges(rent_pr.charges, recovery_charge_amount)
-    rent_pr.recovery_charge_amount = 0
-    if recovery_charge_amount > 0 and not includes_recovery:
-        rent_pr.recovery_charge_amount = recovery_charge_amount
-        rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
-    rent_pr = append_pr_date_variables(rent_pr)
-    return rent_pr
+# def write_payrequest_x(rent_id, pr_form_id):
+#     rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
+#     rent_pr = append_pr_history_details(rent_pr)
+#     pr_form = get_pr_form_code(pr_form_id)
+#     rent_pr.pr_code = pr_form.code
+#     rent_pr.suffix = build_charges_suffix(rent_pr)
+#     rent_pr.create_case, recovery_charge_amount = get_recovery_info_x(rent_pr.suffix)
+#     rent_pr.new_arrears_level = build_new_arrears_level_string(rent_pr.suffix)
+#     includes_recovery = check_recovery_in_charges(rent_pr.charges, recovery_charge_amount)
+#     rent_pr.recovery_charge_amount = 0
+#     if recovery_charge_amount > 0 and not includes_recovery:
+#         rent_pr.recovery_charge_amount = recovery_charge_amount
+#         rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
+#     rent_pr = append_pr_date_variables(rent_pr)
+#     return rent_pr
 
 
 class ArrearsLevel:
