@@ -536,16 +536,15 @@ class RentExternal(db.Model):
     rentcode = db.Column(db.String(20), index=True, unique=True)
     tenantname = db.Column(db.String(30))
     propaddr = db.Column(db.String(180))
-    agentdetail = db.Column(db.String(45))
+    agentdetail = db.Column(db.String(120))
     rentpa = db.Column(db.Numeric(8, 2))
     arrears = db.Column(db.Numeric(8, 2))
     lastrentdate = db.Column(db.Date)
     tenure = db.Column(db.String(1))
-    owner = db.Column(db.String(15))
+    owner = db.Column(db.String(30))
     source = db.Column(db.String(15))
     status = db.Column(db.String(1))
     extmanager_id = db.Column(db.Integer, db.ForeignKey('manager_external.id'))
-    datecode_id = db.Column(db.Integer, default=0)
 
 
 class TypeDeed(db.Model):

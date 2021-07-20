@@ -57,7 +57,7 @@
             <th style="width: 8.00%">rentcode</th>
             <th style="width: 8.00%">rentpa</th>
             <th style="width: 8.00%">arrears</th>
-            <th style="width: 8.00%">nextrentdate</th>
+            <th style="width: 8.00%">lastrentdate</th>
             <th style="width: 15.00%">tenantname</th>
             <th style="width: 18.00%">propaddr</th>
             <th style="width: 8.00%">source</th>
@@ -71,7 +71,7 @@
             <td style="width: 8.00%">{{ item.rentcode }}</td>
             <td style="width: 8.00%"> {{ item.rentpa }}</td>
             <td style="width: 8.00%"> {{ item.arrears }}</td>
-            <td style="width: 8.00%"> {{ item.nextrentdate.strftime('%d-%b-%Y') if item.nextrentdate else 'none' }}</td>
+            <td style="width: 8.00%"> {{ item.lastrentdate.strftime('%d-%b-%Y') if item.lastrentdate else 'none' }}</td>
             <td style="width: 15.00%"> {{ item.tenantname }}</td>
             <td style="width: 18.00%">{{ item.propaddr }}</td>
             <td style="width: 8.00%"> {{ item.source }}</td>
