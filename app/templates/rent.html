@@ -19,19 +19,19 @@
         <div class="table-fixed table-rent " style="margin-bottom: 1.5rem;">
             <table class="table table-head">
                 <thead>
-                <tr style="font-weight:400; text-align:center; color: #4a4a4a">
-                    <td style="width: 17%; background-color: #9cbae6;">rentcode {{ rent.rentcode }}</td>
-                    <td style="width: 16%; background-color: #9cbae6;">tenure {{ rent.tenuredet }}</td>
-                    <td style="width: 16%; background-color: #9cbae6;">
+                <tr class="table-row-rent">
+                    <td style="width: 17%;">rentcode {{ rent.rentcode }}</td>
+                    <td style="width: 16%;">tenure {{ rent.tenuredet }}</td>
+                    <td style="width: 16%;">
                         {% if rent.salegrade_id == 1 %}
                         for sale at {{ money_str(rent.price_quote, pound=True) }}
                         {% else %}
                         not for sale
                         {% endif %}
                     </td>
-                    <td style="width: 17%; background-color: #9cbae6;">status {{ rent.statusdet }}</td>
-                    <td style="width: 17%; background-color: #9cbae6;">actype {{ rent.actype }}</td>
-                    <td style="width: 17%; background-color: #9cbae6;">source {{ rent.source }}</td>
+                    <td style="width: 17%;">status {{ rent.statusdet }}</td>
+                    <td style="width: 17%;">actype {{ rent.actype }}</td>
+                    <td style="width: 17%;">source {{ rent.source }}</td>
                 </tr>
                 </thead>
             </table>
@@ -297,11 +297,11 @@
         <div class="table-fixed table-rent">
             <table class="table rounded-corners">
                 <thead>
-                <tr style="font-weight:400; text-align:center; color:#4a4a4a">
-                    <td style="width: 25%; background-color: #9cbae6;">notice fee {{ rent.typedeed.info }}</td>
-                    <td style="width: 25%; background-color: #9cbae6;">last rent date {{ rent.lastrentdate.strftime('%d-%b-%Y') }}</td>
-                    <td style="width: 25%; background-color: #9cbae6;">next rent date {{ rent.nextrentdate.strftime('%d-%b-%Y') }}</td>
-                    <td style="width: 25%; background-color: #9cbae6;">paid up to {{ rent.paidtodate.strftime('%d-%b-%Y') }}</td>
+                <tr class="table-row-rent">
+                    <td style="width: 25%;">notice fee {{ rent.typedeed.info }}</td>
+                    <td style="width: 25%;">last rent date {{ rent.lastrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 25%;">next rent date {{ rent.nextrentdate.strftime('%d-%b-%Y') }}</td>
+                    <td style="width: 25%;">paid up to {{ rent.paidtodate.strftime('%d-%b-%Y') }}</td>
                 </tr>
                 </thead>
             </table>

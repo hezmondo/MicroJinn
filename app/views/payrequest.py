@@ -4,13 +4,14 @@ from app import db
 from app.emails import app_send_email
 from app.dao.common import get_filters
 from app.dao.rent import get_rentcode
-from app.dao.form_letter import get_form_id, get_pr_forms
+from app.dao.form_letter import get_form_id, get_pr_forms, get_pr_form_codes
 from app.dao.payrequest import get_batch_pay_requests, get_batch_pr_post_html, get_pr_batch, get_pr_batches, get_pr_block, \
     get_pr_file, get_pr_history, get_pr_history_row, post_updated_payrequest, post_updated_payrequest_delivery
 from app.main.payrequest import collect_pr_history_data, collect_pr_rent_data, undo_pr_batch, run_batch, \
     save_new_payrequest_from_batch, \
     save_new_payrequest, undo_pr, write_payrequest, write_payrequest_x
 from app.main.doc import convert_html_to_pdf
+from app.main.form_letter import mget_pr_defaults, msave_pr_defaults
 import os
 
 pr_bp = Blueprint('pr_bp', __name__)
@@ -40,7 +41,7 @@ def pr_batch_post(batch_id):
         html_complete = html_complete + pay_request.block + "<p style='page-break-before: always'></p>"
     convert_html_to_pdf(html_complete, 'pr.pdf')
     workingdir = os.path.abspath(os.getcwd())
-    filepath = workingdir + '\\app\\temp_files\\'
+    filepath = workingdir + '\\temp_files\\'
     return send_from_directory(filepath, 'pr.pdf')
 
 
@@ -70,8 +71,23 @@ def pr_delivery(pr_id):
 @pr_bp.route('/pr_dialog/<int:rent_id>', methods=["GET", "POST"])
 @login_required
 def pr_dialog(rent_id):
+    if request.method == 'POST':
+        try:
+            msave_pr_defaults()
+            message = "Defaults saved successfully."
+        except Exception as ex:
+            message = f'Unable to save defaults. Error: {str(ex)}'
+        return redirect(url_for('pr_bp.pr_dialog', rent_id=rent_id, message=message))
+    message = request.args.get('message', '', type=str)
     pr_forms = get_pr_forms()
-    return render_template('pr_dialog.html', pr_forms=pr_forms, rent_id=rent_id)
+    pr_template_codes = []
+    for pr_form in pr_forms:
+        pr_template_codes.append(pr_form.code)
+    pr_defaults = mget_pr_defaults()
+    if not pr_defaults:
+        message = "Before creating any pay requests please select a default email template."
+    return render_template('pr_dialog.html', pr_defaults=pr_defaults, pr_forms=pr_forms,
+                           pr_template_codes=pr_template_codes, rent_id=rent_id, message=message)
 
 
 @pr_bp.route('/pr_edit/<int:pr_form_id>', methods=["GET", "POST"])
@@ -79,8 +95,9 @@ def pr_dialog(rent_id):
 def pr_edit(pr_form_id):
     if request.method == "POST":
         rent_id = request.args.get('rent_id')
+        email_form_id = request.form.get('pr_email_default')
         try:
-            block, block_email, rent_pr, subject = write_payrequest(rent_id, pr_form_id)
+            block, block_email, rent_pr, subject = write_payrequest(rent_id, pr_form_id, email_form_id)
             return render_template('mergedocs/PR.html', block=block, block_email=block_email, rent_pr=rent_pr,
                                    subject=subject)
         except Exception as ex:

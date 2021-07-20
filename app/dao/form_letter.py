@@ -1,11 +1,14 @@
 from app import db
-import json
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import load_only
-from app.models import FormLetter, User
+from app.models import FormLetter
 from app.dao.database import commit_to_database
-from flask_login import current_user
-from app.dao.doc import get_typedoc_id
+
+
+def delete_form_letter(form_letter_id):
+    stmt = delete(FormLetter).where(FormLetter.id == form_letter_id)
+    db.session.execute(stmt)
+    commit_to_database()
 
 
 def get_form_id(form_letter_code):
@@ -51,8 +54,8 @@ def get_pr_form_essential(pr_form_id):
         .one_or_none()
 
 
-def get_pr_email_form():
-    return db.session.query(FormLetter).filter_by(code='EPR').options(load_only('block')).one_or_none()
+def get_pr_email_form(pr_email_id):
+    return db.session.query(FormLetter).filter_by(code=pr_email_id).options(load_only('block')).one_or_none()
 
 
 def get_pr_forms():

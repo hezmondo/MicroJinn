@@ -18,6 +18,7 @@ def add_action(actiontype_id, alert, detail, link, link_vars=''):
     db.session.flush()
     db.session.commit()
 
+
 def delete_action(action_id):
     Action.query.filter_by(id=action_id).delete()
     db.session.commit()

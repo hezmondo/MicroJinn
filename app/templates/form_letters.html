@@ -2,7 +2,27 @@
 {% extends 'base.html' %}
 {% import 'widgets.html' as widgets %}
 {% block app_content %}
-
+<div class="form-group row flex-row-reverse">
+    {% if nav == 'rents_advanced'%}
+    {% if nav_id != 0 %}
+    <div class="col-md-3">
+        <a href="{{ url_for('rent_bp.rents_advanced', filtr_id=nav_id, method='payrequest', action='load') }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr filter</a>
+    </div>
+    {% else %}
+    <div class="col-md-3">
+        <a href="{{ url_for('pr_bp.pr_start') }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr start</a>
+    </div>
+    {% endif %}
+    {% endif %}
+    {% if nav == 'pr_dialog' and nav_id != 0 %}
+    <div class="col-md-3">
+        <a href="{{ url_for('pr_bp.pr_dialog', rent_id=nav_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr select</a>
+    </div>
+    {% endif %}
+</div>
 <div class="row">
     <div class="col-md-9">
         <div class="table-fixed">
@@ -26,20 +46,14 @@
                             href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id, method=method) }}"
                             class="btn btn-teal-light btn-small button-icon circles" role="button">view</a></td>
                     <td style="width: 12.00%">
-                        {% if method == 'payrequest' %}
                         <a data-toggle="tooltip" title="make a copy of this form letter"
-                           href="{{ url_for('form_letter_bp.form_letter_clone', method=method, form_letter_id=item.id) }}"
+                           href="{{ url_for('form_letter_bp.form_letter_clone', method=method, form_letter_id=item.id, nav=nav, nav_id=nav_id) }}"
                            class="btn btn-info btn-small button-icon invoice" role="button">clone</a>
-                        {% else %}
-                        <a data-toggle="tooltip" title="make a copy of this form letter"
-                           href="{{ url_for('form_letter_bp.form_letter_clone', form_letter_id=item.id) }}"
-                           class="btn btn-info btn-small button-icon invoice" role="button">clone</a>
-                        {% endif %}
                     </td>
                     <td style="width: 5.00%"><a
                             data-toggle="tooltip" title="delete this form letter"
                             onclick="return confirm('Are you sure you want to delete this form letter?');"
-                            href="{{ url_for('util_bp.delete_item', item_id=item.id, item='formletter') }}"
+                            href="{{ url_for('form_letter_bp.form_letter_delete', method=method, form_letter_id=item.id, nav=nav, nav_id=nav_id) }}"
                             class="btn btn-danger btn-round button-icon round trash" role="button"></a></td>
                 </tr>
                 {% endfor %}
@@ -59,6 +73,13 @@
                 <div class="card-body text-primary">
                     <form method="POST" id="target">
                         <div class="form-group row">
+                            <div class="col">
+                                <button type="submit" class="btn btn-block btn-success button-icon search"
+                                        role="button">search
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group row" style="margin-bottom: 0px;">
                             <div class="col">
                                 {% if method %}
                                 {{ widgets.combobox(name="doc_type", items=doc_types, items0="all doc types",
@@ -80,13 +101,6 @@
                                        value="{{ fdict.block }}">
                             </div>
                         </div>
-                        <div class="form-group row" style="margin-bottom: 0px;">
-                            <div class="col">
-                                <button type="submit" class="btn btn-block btn-success button-icon search"
-                                        role="button">search
-                                </button>
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -98,7 +112,7 @@
                     </div>
                 </div>
                 <div class="card-body text-primary">
-                    <form method="POST" id="pr_defaults" target="{{ url_for('form_letter_bp.save_pr_defaults') }}">
+                    <form method="POST" id="pr_defaults">
                         <div class="row">
                             <div class="col">
                                 select default pr template
@@ -123,7 +137,7 @@
                         </div>
                         <div class="row" style="margin-top:1rem;">
                             <div class="col">
-                                <button formaction="{{ url_for('form_letter_bp.save_pr_defaults') }}"
+                                <button formaction="{{ url_for('form_letter_bp.save_pr_defaults', nav=nav, nav_id=nav_id) }}"
                                         class="btn btn-block btn-primary button-icon save" role="button">save defaults
                                 </button>
                             </div>
@@ -143,7 +157,7 @@
                         <div class="col">
                             <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=0) }}"
                                class="btn btn-block btn-danger button-icon plus" role="button">add new
-                                form_letter</a>
+                                form letter</a>
                         </div>
                     </div>
                 </div>

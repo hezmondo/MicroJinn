@@ -45,7 +45,7 @@ def doc_print(doc_id):
         docfile_text = get_docfile_text(doc_id)
         convert_html_to_pdf(docfile_text.doc_text, 'document.pdf')
         workingdir = os.path.abspath(os.getcwd())
-        filepath = workingdir + '\\app\\temp_files\\'
+        filepath = workingdir + '\\temp_files\\'
         return send_from_directory(filepath, 'document.pdf')
     except Exception as ex:
         message = f'Unable to produce document. Error: {str(ex)}'
