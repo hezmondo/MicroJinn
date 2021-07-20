@@ -1,8 +1,7 @@
-import sqlalchemy
 from app import db
 from app.dao.database import commit_to_database
 from app.dao.money import get_money_items_loan
-from app.models import Loan, LoanStat, LoanTran
+from app.models import Loan, LoanTran
 
 
 def dbget_loan_row(loan_id):
@@ -33,16 +32,3 @@ def post_loan(loan):
     commit_to_database()
 
     return loan_id
-
-
-def dbget_loan_statement(loan_id, stat_date):
-    rproxy = db.session.execute(sqlalchemy.text("CALL pop_loan_statement(:x, :y)"),
-                                params={"x": loan_id, "y": stat_date})
-    checksums = rproxy.fetchall()
-    commit_to_database()
-    loanstatement = LoanStat.query.with_entities(LoanStat.id, LoanStat.date, LoanStat.memo,
-                                                 LoanStat.transaction, LoanStat.rate,
-                                                 LoanStat.interest,
-                                                 LoanStat.add_interest, LoanStat.balance).all()
-
-    return checksums, loanstatement

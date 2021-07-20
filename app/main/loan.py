@@ -1,8 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from flask import request
-from app.dao.loan import dbget_loan_statement, dbget_loan_row, dbget_loans_all, dbget_loanstat_data, \
-    dbget_loans_nick, post_loan
+from app.dao.loan import dbget_loan_row, dbget_loans_all, dbget_loanstat_data, dbget_loans_nick, post_loan
 from app.main.common import inc_date
 from app.main.functions import money
 from app.models import Loan
@@ -58,13 +57,6 @@ def update_loan(loan_id):
     return loan_id
 
 
-def get_loan_statement(loan_id):
-    stat_date = request.form.get("statdate")
-    loancode = request.form.get("loancode")
-    checksums, loanstatement = dbget_loan_statement(loan_id, stat_date)
-
-    return checksums, loancode, loanstatement
-
 def get_loan_stat(loan_id):
     stat_date = datetime.strptime(request.form.get("statdate"), '%Y-%m-%d')
     stat_date = stat_date.date()
@@ -74,7 +66,8 @@ def get_loan_stat(loan_id):
     checksums = {'id': 1, 'memo': 'abc', 'advanced': 0, 'interest': 0, 'repaid': 0}
     loanstatement = []
     for item in money_items:
-        item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
+        item_row = {'id': item.id, 'date': item.date, 'memo': item.payer + "-" + item.memo,
+                    'amount': -item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
         loanstatement.append(item_row)
     for item in transactions:
         item_row = {'id': item.id, 'date': item.date, 'memo': item.memo, 'amount': item.amount, 'rate': 0, 'interest': 0, 'addinterest': 'no', 'balance': 0}
