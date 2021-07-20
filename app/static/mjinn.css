@@ -624,6 +624,9 @@ wallet
 {
 	border-radius: 5px 5px 5px 5px;
 }
+.row-warning {
+    color: red;
+}
 .save::before
 {
 	content: "\f0c7";

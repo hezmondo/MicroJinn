@@ -15,8 +15,7 @@ def add_action(actiontype_id, alert, detail, link, link_vars=''):
     action = Action(time_date=datetime.now(), actiontype_id=actiontype_id, detail=detail, link=link,
                     link_vars=json.dumps(link_vars), alert=alert)
     db.session.add(action)
-    db.session.flush()
-    db.session.commit()
+    return action
 
 
 def delete_action(action_id):
@@ -26,6 +25,13 @@ def delete_action(action_id):
 
 def delete_actions():
     Action.query.delete()
+    db.session.commit()
+
+
+# agent - id = 1, pay request - id = 2, rent - id = 3
+# alert = 1, info = 0
+def post_action(actiontype_id, alert, detail, link, link_vars=''):
+    add_action(actiontype_id, alert, detail, link, link_vars)
     db.session.commit()
 
 

@@ -4,11 +4,19 @@
 {% import 'widgets.html' as widgets %}
 
 {% block app_content %}
-{% if nav %}
+{% if nav and nav_id != 0 %}
 {% if nav == 'batch' %}
 <div class="form-group row flex-row-reverse">
     <div class="col-md-3">
         <a href="{{  url_for('pr_bp.pr_batch', batch_id=nav_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to batch</a>
+    </div>
+</div>
+{% endif %}
+{% if nav == 'rents_advanced' %}
+<div class="form-group row flex-row-reverse">
+    <div class="col-md-3">
+        <a href="{{  url_for('rent_bp.rents_advanced', action='load', method='payrequest', filtr_id=nav_id) }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to batch</a>
     </div>
 </div>

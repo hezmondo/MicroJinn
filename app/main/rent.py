@@ -126,7 +126,10 @@ def get_rent_gale(next_rent_date, frequency, rentpa):
 def mget_rents_errors_list(rents):
     are_errors = False
     for rent in rents:
-        rent.mailaddr = get_mailaddr(rent.id, rent.agent_id, rent.mailto_id, rent.tenantname)
+        if rent.mailto_id in (1, 2) and not rent.agent:
+            rent.mailaddr = ''
+        else:
+            rent.mailaddr = 'exists'
         rent.prdeliverydet = PrDeliveryTypes.get_name(rent.prdelivery_id)
         rent.error = rent_validation(rent, '', False)
         if rent.error:
@@ -437,7 +440,7 @@ def mpost_rent_filter():
 def rent_validation(rent, message="", create_alert=True):
     messages = [message] if message else []
     action_message = ''
-    if ('email' in rent.prdeliverydet) and ('@' not in rent.email):
+    if ('email' in rent.prdeliverydet) and (not rent.email or '@' not in rent.email):
         messages.append('Payrequest delivery is set to email but there is no valid email address linked to this rent.')
         action_message = 'No valid email '
     if not rent.mailaddr:

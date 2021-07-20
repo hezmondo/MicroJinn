@@ -33,7 +33,7 @@ def load_filter():
 # @login_required
 def rent(rent_id):
     nav = request.args.get('nav', '', type=str)
-    nav_id = request.args.get('nav_id', type=int)
+    nav_id = request.args.get('nav_id', 0, type=int)
     message = request.args.get('message', '', type=str)
     combodict = get_combodict_rent()
     # gather rent combobox values
