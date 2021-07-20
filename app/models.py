@@ -313,20 +313,6 @@ class LoanIntRate(db.Model):
     loan_id = db.Column(db.Integer, db.ForeignKey('loan.id'))
 
 
-class LoanStat(db.Model):
-    __tablename__ = 'loan_statement'
-
-    id = db.Column(db.Integer, primary_key=True)
-    ltid = db.Column(db.Integer)
-    date = db.Column(db.Date)
-    memo = db.Column(db.String(60))
-    transaction = db.Column(db.Numeric(8, 2))
-    rate = db.Column(db.Numeric(8, 2))
-    interest = db.Column(db.Numeric(8, 2))
-    add_interest = db.Column(db.String(10))
-    balance = db.Column(db.Numeric(8, 2))
-
-
 class LoanTran(db.Model):
     __tablename__ = 'loan_trans'
 
