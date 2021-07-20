@@ -1,11 +1,9 @@
 import datetime
-import json
-from app import decimal_default
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from flask import request, render_template
 from dateutil.relativedelta import relativedelta
-from app.dao.action import add_action
+from app.dao.action import post_action
 from app.dao.case import check_case_exists, add_case
 from app.dao.charge import add_charge, get_charge_type, get_total_charges
 from app.dao.database import commit_to_database
@@ -166,7 +164,7 @@ def run_batch(pr_template_id, rent_id_list, runcode):
         update_filter_last_used(pr_batch.code, pr_batch.time_date)
     action_str = 'Pay request Batch ' + str(pr_batch.id) + ' containing ' + str(pr_batch.size) + ' pay requests saved | ' + \
                  pr_batch.code
-    add_action(2, 0, action_str, 'pr_bp.pr_batches')
+    post_action(2, 0, action_str, 'pr_bp.pr_batches')
     return pr_batch, pr_complete, pr_error
 
 
@@ -191,7 +189,7 @@ def save_new_payrequest(method, pr_history_data, pr_rent_data, rent_id):
     #  rent_id - get_rentcode(rent_id)
     action_str = 'Pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
                  moneyToStr(pr_history_data.get('tot_due'), pound=True) + ' saved'
-    add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
+    post_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
     commit_to_database()
     return pr_id
 
@@ -249,7 +247,7 @@ def undo_pr(pr_id, batch=False):
         if not batch:
             action_str = 'pay request for rent ' + get_rentcode(rent_id) + ' totalling ' + \
                          moneyToStr(pr_file.total_due, pound=True) + ' has been undone'
-            add_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
+            post_action(2, 0, action_str, 'pr_bp.pr_history', {'rent_id': rent_id})
         message = "Pay request undone!"
     except Exception as ex:
         return type(ex), rent_id
@@ -263,7 +261,7 @@ def undo_pr_batch(batch_id):
     delete_record_basic(batch_id, 'pr_batch')
     commit_to_database()
     action_str = 'Pay request Batch ' + str(batch_id) + ' undone'
-    add_action(2, 0, action_str, 'pr_bp.pr_batches')
+    post_action(2, 0, action_str, 'pr_bp.pr_batches')
 
 
 def update_pr_delivered(pr_id):
@@ -295,21 +293,21 @@ def write_payrequest(rent_id, pr_form_id, email_form_id='EPR'):
     return block, block_email, rent_pr, subject
 
 
-def write_payrequest_x(rent_id, pr_form_id):
-    rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
-    rent_pr = append_pr_history_details(rent_pr)
-    pr_form = get_pr_form_code(pr_form_id)
-    rent_pr.pr_code = pr_form.code
-    rent_pr.suffix = build_charges_suffix(rent_pr)
-    rent_pr.create_case, recovery_charge_amount = get_recovery_info_x(rent_pr.suffix)
-    rent_pr.new_arrears_level = build_new_arrears_level_string(rent_pr.suffix)
-    includes_recovery = check_recovery_in_charges(rent_pr.charges, recovery_charge_amount)
-    rent_pr.recovery_charge_amount = 0
-    if recovery_charge_amount > 0 and not includes_recovery:
-        rent_pr.recovery_charge_amount = recovery_charge_amount
-        rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
-    rent_pr = append_pr_date_variables(rent_pr)
-    return rent_pr
+# def write_payrequest_x(rent_id, pr_form_id):
+#     rent_pr = get_rentp(rent_id)  # get full enhanced rent pack
+#     rent_pr = append_pr_history_details(rent_pr)
+#     pr_form = get_pr_form_code(pr_form_id)
+#     rent_pr.pr_code = pr_form.code
+#     rent_pr.suffix = build_charges_suffix(rent_pr)
+#     rent_pr.create_case, recovery_charge_amount = get_recovery_info_x(rent_pr.suffix)
+#     rent_pr.new_arrears_level = build_new_arrears_level_string(rent_pr.suffix)
+#     includes_recovery = check_recovery_in_charges(rent_pr.charges, recovery_charge_amount)
+#     rent_pr.recovery_charge_amount = 0
+#     if recovery_charge_amount > 0 and not includes_recovery:
+#         rent_pr.recovery_charge_amount = recovery_charge_amount
+#         rent_pr.totcharges = rent_pr.totcharges + recovery_charge_amount
+#     rent_pr = append_pr_date_variables(rent_pr)
+#     return rent_pr
 
 
 class ArrearsLevel:

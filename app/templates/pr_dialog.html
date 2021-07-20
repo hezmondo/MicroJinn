@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col">
-        Choose a pay request and delivery option below
+        Choose a pay request below
     </div>
     <div class="col-md-3">
         <a href="{{ url_for('rent_bp.rent', rent_id=rent_id) }}"
@@ -31,7 +31,8 @@
                 {% if item.template != 'PRX' %}
                 <tr>
                     <td style="width: 15.00%">
-                        <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id, method='payrequest') }}" title="edit template"
+                        <a href="{{ url_for('form_letter_bp.form_letter', form_letter_id=item.id, method='payrequest',
+                        nav='pr_dialog', nav_id=rent_id) }}" title="edit template"
                            data-toggle="tooltip"
                            class="btn btn-teal-light btn-small" role="button">{{ item.code }}</a>
                     </td>
@@ -40,21 +41,6 @@
                         <button type="submit"
                                 formaction="{{ url_for('pr_bp.pr_edit', pr_form_id=item.id, rent_id=rent_id) }}"
                                 class="btn btn-small btn-success button-icon arrow-right">preview
-                        </button>
-                    </td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td style="width: 15.00%">
-                        <a href="{{ url_for('form_letter_bp.form_letters') }}" title="edit template"
-                           data-toggle="tooltip"
-                           class="btn btn-teal-light btn-small" role="button">{{ item.code }}</a>
-                    </td>
-                    <td style="width: 70.00%">{{ item.description }} - XRAY</td>
-                    <td style="width: 15.00%">
-                        <button type="submit"
-                                formaction="{{ url_for('pr_bp.pr_edit_xray', pr_form_id=item.id, rent_id=rent_id) }}"
-                                class="btn btn-small btn-danger button-icon arrow-right">preview
                         </button>
                     </td>
                 </tr>

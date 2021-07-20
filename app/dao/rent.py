@@ -77,8 +77,8 @@ def getrents_basic_sql(sql):  # simple filtered rents for main rents page using 
 def getrents_advanced(filtr, runsize):
     stmt = select(Rent).join(Rent.prop_rent).join(Landlord).outerjoin(Agent).outerjoin(Rent.charge_rent) \
         .options(contains_eager(Rent.prop_rent).load_only('propaddr'),
-                 load_only('advarr_id', 'arrears', 'freq_id', 'lastrentdate', 'prdelivery_id', 'rentcode',
-                           'rentpa', 'source', 'tenantname', 'datecode_id'),
+                 load_only('advarr_id', 'arrears', 'email', 'freq_id', 'lastrentdate', 'prdelivery_id', 'rentcode',
+                           'mailto_id', 'rentpa', 'source', 'tenantname', 'datecode_id'),
                  joinedload('agent').load_only('detail'))
     return db.session.execute(stmt.filter(*filtr).limit(runsize)).unique().scalars().all()
 

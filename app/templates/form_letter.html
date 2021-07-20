@@ -9,6 +9,12 @@
         <a href="{{ url_for('form_letter_bp.form_letters', method=method) }}"
            class="btn btn-block btn-tog button-icon arrow-left" role="button">back to form letters</a>
     </div>
+    {% if nav == 'pr_dialog' and nav_id != 0 %}
+    <div class="col-md-3">
+        <a href="{{ url_for('pr_bp.pr_dialog', rent_id=nav_id) }}"
+           class="btn btn-block btn-tog button-icon arrow-left" role="button">back to pr select</a>
+    </div>
+    {% endif %}
 </div>
 <form method="POST" id="target">
     <div class="row">
@@ -45,7 +51,8 @@
                         <div class="col">
                             <label for="subject">subject:</label>
                             <input type="text" class="form-control" name="subject"
-                                   title="can include mail variables" data-toggle="tooltip" value="{{ form_letter.subject }}">
+                                   title="can include mail variables" data-toggle="tooltip"
+                                   value="{{ form_letter.subject }}">
                         </div>
                     </div>
                     {% else %}
@@ -218,6 +225,7 @@
     {% else %}
         $(':input').prop('readonly', false);
     {% endif %}
+
 
 
 

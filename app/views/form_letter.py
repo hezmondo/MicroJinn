@@ -12,10 +12,12 @@ form_letter_bp = Blueprint('form_letter_bp', __name__)
 @login_required
 def form_letter(form_letter_id):
     method = request.args.get('method')
+    nav = request.args.get('nav', '', type=str)
+    nav_id = request.args.get('nav_id', 0, type=int)
     if request.method == "POST":
         try:
             form_letter_id = mpost_form_letter_new() if form_letter_id == 0 else mpost_form_letter(form_letter_id)
-            return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id))
+            return redirect(url_for('form_letter_bp.form_letter', form_letter_id=form_letter_id, nav=nav, nav_id=nav_id))
         except Exception as ex:
             message = f'Unable to save the letter. Error: {str(ex)}'
             return redirect(url_for('form_letter_bp.form_letters', message=message))
@@ -23,7 +25,7 @@ def form_letter(form_letter_id):
     form_letter = mget_form_letter(form_letter_id) if form_letter_id != 0 else ''
     variables = list_variables()
     return render_template('form_letter.html', doc_types=doc_types, form_letter=form_letter, method=method,
-                           variables=variables)
+                           variables=variables, nav=nav, nav_id=nav_id)
 
 
 @form_letter_bp.route('/form_letter_clone/<int:form_letter_id>', methods=['GET', 'POST'])
