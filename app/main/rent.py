@@ -12,7 +12,7 @@ from app.dao.form_letter import get_pr_form_codes
 from app.dao.landlord import get_landlord_id
 from app.dao.property import get_propaddrs
 from app.dao.rent import get_rent, getrents_basic_sql, getrents_advanced, \
-    get_rentsexternal, post_rent, get_jstore_row, post_jstore_filter
+    get_rents_ext, post_rent, get_jstore_row, post_jstore_filter
 from app.main.common import get_rents_fdict, inc_date_m, get_combodict_filter
 from app.main.functions import dateToStr, hashCode, money, moneyToStr, round_decimals_down, strToDec
 from app.main.rent_filter import dict_advanced, dict_basic, filter_advanced, filter_basic_sql_1, \
@@ -375,7 +375,7 @@ def get_rents_external():
         filtr.append(RentExternal.source.ilike('%{}%'.format(dict.get('source'))))
     if dict.get('tenantname') and dict.get('tenantname') != "":
         filtr.append(RentExternal.tenantname.ilike('%{}%'.format(dict.get('tenantname'))))
-    rents = get_rentsexternal(filtr)
+    rents = get_rents_ext(filtr)
 
     return dict, rents
 

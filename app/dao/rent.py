@@ -83,9 +83,9 @@ def getrents_advanced(filtr, runsize):
     return db.session.execute(stmt.filter(*filtr).limit(runsize)).unique().scalars().all()
 
 
-def get_rentsexternal(filtr):  # simple filtered external rents for main rents page or external rents page
+def get_rents_ext(filtr):  # simple filtered external rents for main rents page or external rents page
     return db.session.query(RentExternal) \
-        .options(load_only('id', 'agentdetail', 'arrears', 'datecode_id', 'lastrentdate', 'rentcode', 'owner',
+        .options(load_only('id', 'agentdetail', 'arrears', 'lastrentdate', 'rentcode', 'owner',
                            'propaddr', 'rentpa', 'source', 'status', 'tenantname'),
                  joinedload('manager_external').load_only('codename')) \
         .filter(*filtr).order_by(RentExternal.rentcode).limit(30).all()
