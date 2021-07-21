@@ -16,10 +16,10 @@ import logging
 # This allows us to access it, and use function decorations like `@app.context_processor`, from other modules
 # which would not be the case if we created `app` from the main `mjinn.py` module
 app = Flask(__name__)
-
+app.config.from_object(Config)
 cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
-db = SQLAlchemy()
-migrate = Migrate()
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 login = LoginManager()
 login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
